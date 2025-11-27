@@ -60,7 +60,7 @@ export const createNavigation = async () => {
 
   const logo = document.createElement("div");
   logo.className = "logo";
-  logo.textContent = "APERTURE";
+  logo.textContent = "RED FOX COLLECTIONS";
 
   const ul = document.createElement("ul");
   ul.className = "nav-links";
