@@ -1,0 +1,25 @@
+{
+  "name": "art_site",
+  "version": "1.0.0",
+  "type": "module",
+  "description": "",
+  "homepage": "https://github.com/GeorgeThomas1863/art-site#readme",
+  "bugs": {
+    "url": "https://github.com/GeorgeThomas1863/art-site/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/GeorgeThomas1863/art-site.git"
+  },
+  "license": "ISC",
+  "author": "George H. Thomas",
+  "main": "app.js",
+  "scripts": {
+    "start": "nodemon app.js"
+  },
+  "dependencies": {
+    "express": "^5.1.0",
+    "mongodb": "^7.0.0",
+    "nodemon": "^3.1.11"
+  }
+}
