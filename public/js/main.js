@@ -22,32 +22,32 @@ export const buildDisplay = async () => {
 
 const inputArray = [
   {
-    url: path.join("/pics", "photo_2025-11-27_16-18-06.jpg"),
+    url: "/images/photo_2025-11-27_16-18-06.jpg",
     title: "Alpine Solitude",
     price: "$425",
     description:
       "Captured at dawn in the Swiss Alps, this piece embodies the quiet magnificence of untouched wilderness. Museum-quality archival print on fine art paper.",
   },
   {
-    url: "https://images.unsplash.com/photo-1469474968028-56623f02e42e?w=800",
+    url: "/images/photo_2025-11-27_16-18-21.jpg",
     title: "Emerald Path",
     price: "$350",
     description: "Limited edition print, 20x30 inches",
   },
   {
-    url: "https://images.unsplash.com/photo-1470071459604-3b5ec3a7fe05?w=800",
+    url: "/images/photo_2025-11-27_16-18-24.jpg",
     title: "Prairie Light",
     price: "$375",
     description: "Limited edition print, 30x40 inches",
   },
   {
-    url: "https://images.unsplash.com/photo-1472214103451-9374bd1c798e?w=800",
+    url: "/images/photo_2025-11-27_16-18-28.jpg",
     title: "Horizon",
     price: "$325",
     description: "Limited edition print, 24x36 inches",
   },
   {
-    url: "https://images.unsplash.com/photo-1501785888041-af3ef285b470?w=800",
+    url: "/images/photo_2025-11-27_16-18-35.jpg",
     title: "Dunes",
     price: "$400",
     description: "Limited edition print, 24x36 inches",

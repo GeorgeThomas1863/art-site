@@ -1,8 +1,8 @@
 import express from "express";
 // import session from "express-session";
 import routes from "./routes/router.js";
-import path from "path";
-import { fileURLToPath } from "url";
+// import path from "path";
+// import { fileURLToPath } from "url";
 
 import CONFIG from "./config/config.js";
 
@@ -10,10 +10,10 @@ import CONFIG from "./config/config.js";
 const { expressPicPath, displayPort } = CONFIG;
 
 // Get __dirname equivalent for ES modules
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
+// const __filename = fileURLToPath(import.meta.url);
+// const __dirname = path.dirname(__filename);
 
-const basePicPath = path.join(__dirname);
+// const basePicPath = path.join(__dirname, "/pics");
 
 const app = express();
 
@@ -23,7 +23,7 @@ const app = express();
 // app.use(session(CONFIG.buildSessionConfig()));
 
 //custom paths to expose to frontend
-app.use(expressPicPath, express.static(basePicPath));
+// app.use(expressPicPath, express.static(basePicPath));
 // app.use(expressVidPath, express.static(vidPath));
 // app.use(expressWatchPath, express.static(watchPath));
 // app.use(expressConfigPublicPath, express.static("config/config-public.js"));
