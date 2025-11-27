@@ -1,5 +1,5 @@
 // Main function to build and render the photography site
-export const buildDisplay = async (inputArray) => {
+export const buildHomeForm = async (inputArray) => {
   if (!inputArray || !inputArray.length) return null;
 
   const homeContainer = document.createElement("div");

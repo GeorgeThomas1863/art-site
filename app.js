@@ -29,8 +29,8 @@ app.use(express.json());
 //routes
 app.use(routes);
 
-console.log("DISPLAY PORT");
-console.log(displayPort);
+// console.log("DISPLAY PORT");
+// console.log(displayPort);
 
 // app.listen(1801);
 app.listen(displayPort);
