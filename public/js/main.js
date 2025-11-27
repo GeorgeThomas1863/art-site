@@ -6,7 +6,8 @@ export const buildDisplay = async () => {
   if (!displayElement) return null;
   //   const { isFirstLoad } = stateFront;
 
-  await buildHomeForm(inputArray);
+  const data = await buildHomeForm(inputArray);
+  displayElement.append(data);
 
   //   if (isFirstLoad) {
   //     const dropDownElement = await buildDropDownForm();
