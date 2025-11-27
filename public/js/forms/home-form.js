@@ -9,8 +9,8 @@ export const buildHomeForm = async (inputArray) => {
   homeContainer.innerHTML = "";
 
   // Create navigation
-  const nav = createNavigation();
-  homeContainer.appendChild(nav);
+  const nav = await createNavigation();
+  homeContainer.append(nav);
 
   // Create featured section container
   const featuredSection = document.createElement("div");
@@ -19,7 +19,7 @@ export const buildHomeForm = async (inputArray) => {
   // Create featured product display
   const featuredContainer = document.createElement("div");
   featuredContainer.id = "featured-container";
-  const featuredGrid = createFeaturedProduct(inputArray[0]);
+  const featuredGrid = await createFeaturedProduct(inputArray[0]);
   featuredContainer.appendChild(featuredGrid);
 
   // Create more products section
@@ -36,7 +36,7 @@ export const buildHomeForm = async (inputArray) => {
 
   // Add remaining products to grid
   for (let i = 1; i < inputArray.length; i++) {
-    const productItem = createProductItem(inputArray[i]);
+    const productItem = await createProductItem(inputArray[i]);
     productsGrid.appendChild(productItem);
   }
 
@@ -47,6 +47,7 @@ export const buildHomeForm = async (inputArray) => {
   featuredSection.appendChild(moreProducts);
 
   homeContainer.appendChild(featuredSection);
+  return homeContainer;
 };
 
 // Create navigation bar

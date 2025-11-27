@@ -22,7 +22,7 @@ export const buildDisplay = async () => {
 
 const inputArray = [
   {
-    url: "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=1200",
+    url: path.join("/pics", "photo_2025-11-27_16-18-06.jpg"),
     title: "Alpine Solitude",
     price: "$425",
     description:
