@@ -1,6 +1,5 @@
-//connect to mongo
-
 import express from "express";
+import session from "express-session";
 import routes from "./routes/router.js";
 
 import CONFIG from "./config/config.js";
