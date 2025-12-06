@@ -1,3 +1,5 @@
+import { EYE_CLOSED_SVG } from "../util/define-things.js";
+
 export const buildAuthForm = async () => {
   const authFormWrapper = document.createElement("ul");
   authFormWrapper.id = "auth-form-wrapper";

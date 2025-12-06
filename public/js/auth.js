@@ -1,6 +1,8 @@
 import { buildAuthForm } from "./forms/auth-form.js";
 
 const authElement = document.getElementById("auth-element");
+console.log("AUTH ELEMENT");
+console.log(authElement);
 
 export const buildAuthDisplay = async () => {
   if (!authElement) return null;

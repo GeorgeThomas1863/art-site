@@ -9,6 +9,7 @@ const router = express.Router();
 
 // Login AUTH route
 router.post("/site-auth-route", authController);
+
 router.get("/401", display401);
 
 router.get("/admin", requireAuth, adminDisplay);
