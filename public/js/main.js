@@ -1,4 +1,4 @@
-import { buildHomeForm } from "./forms/home-form.js";
+import { buildMainForm } from "./forms/main-form.js";
 
 const displayElement = document.getElementById("display-element");
 
@@ -6,11 +6,21 @@ export const buildDisplay = async () => {
   if (!displayElement) return null;
   //   const { isFirstLoad } = stateFront;
 
-  const data = await buildHomeForm(inputArray);
+  const data = await buildMainForm(inputArray);
   displayElement.append(data);
 
   return true;
 };
+
+//REMOVE
+const inputArray = [
+  {
+    url: "/images/photo_2025-11-27_16-18-06.jpg",
+    title: "Alpine Solitude",
+    price: "$425",
+    description: "Captured at dawn in the Swiss Alps, this piece embodies the quiet magnificence of untouched wilderness. Museum-quality archival print on fine art paper.",
+  },
+];
 
 // const inputArray = [
 //   {
