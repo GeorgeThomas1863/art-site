@@ -75,7 +75,6 @@ body {
   color: var(--color-text-primary);
 }
 
-/* Navigation */
 .navbar {
   background-color: var(--color-bg-secondary);
   padding: var(--padding-nav);
