@@ -20,7 +20,7 @@ export const buildAuthPwListItem = async () => {
   const authPwLabel = document.createElement("label");
   authPwLabel.id = "auth-label";
   authPwLabel.setAttribute("for", "auth-pw-input");
-  authPwLabel.textContent = "Welcome to the ADMIN section, please enter the password to continue";
+  authPwLabel.textContent = "Site Admin Section";
 
   const authPwWrapper = document.createElement("div");
   authPwWrapper.className = "password-input-wrapper";
