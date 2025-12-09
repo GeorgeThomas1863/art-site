@@ -13,3 +13,5 @@ export const buildAdminDisplay = async () => {
 
   return true;
 };
+
+buildAdminDisplay();

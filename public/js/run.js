@@ -6,6 +6,7 @@ export const runAuthSubmit = async () => {
   if (!authPwInput || !authPwInput.value) return null;
 
   const data = await sendToBack({ route: "/site-auth-route", pw: authPwInput.value });
+
   if (!data || !data.redirect) return null;
 
   window.location.href = data.redirect;
@@ -17,9 +18,6 @@ export const runAuthSubmit = async () => {
 export const runPwToggle = async () => {
   const pwButton = document.querySelector(".password-toggle-btn");
   const pwInput = document.querySelector(".password-input");
-
-  console.log(pwButton);
-  console.log(pwInput);
   const currentSvgId = pwButton.querySelector("svg").id;
 
   if (currentSvgId === "eye-closed-icon") {

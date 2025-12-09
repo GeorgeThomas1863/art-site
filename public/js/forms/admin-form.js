@@ -2,39 +2,76 @@ export const buildAdminForm = async () => {
   const adminFormWrapper = document.createElement("ul");
   adminFormWrapper.id = "admin-form-wrapper";
 
-  //build FORM list items
-  const adminTitleListItem = await buildAdminTitleListItem();
-  const adminButtonListItem = await buildAdminButtonListItem();
+  // Create form title
+  const adminTitle = document.createElement("h1");
+  adminTitle.className = "admin-form-title";
+  adminTitle.textContent = "Add New Product";
+  adminFormWrapper.appendChild(adminTitle);
 
-  adminFormWrapper.append(adminTitleListItem, adminButtonListItem);
+  // Create fields container
+  const adminFormInputList = document.createElement("ul");
+  adminFormInputList.className = "admin-form-input-list";
+
+  // Form fields configuration
+  const fields = [
+    { name: "title", label: "Title", type: "text", required: true },
+    { name: "price", label: "Price", type: "text", required: true },
+    { name: "description", label: "Description", type: "textarea", required: true },
+  ];
+
+  // Create each form field
+  for (let i = 0; i < fields.length; i++) {
+    const field = fields[i];
+    const fieldWrapper = document.createElement("li");
+    fieldWrapper.className = "form-field";
+
+    const label = document.createElement("label");
+    label.className = "form-label";
+    label.textContent = field.label;
+    label.setAttribute("for", field.name);
+
+    let input;
+    if (field.type === "textarea") {
+      input = document.createElement("textarea");
+      input.className = "form-textarea";
+    } else {
+      input = document.createElement("input");
+      input.className = "form-input";
+      input.type = field.type;
+    }
+
+    input.id = field.name;
+    input.name = field.name;
+
+    fieldWrapper.append(label, input);
+    adminFormInputList.append(fieldWrapper);
+  }
+
+  adminFormWrapper.append(adminFormInputList);
+
+  // Create upload section
+  const uploadSection = document.createElement("div");
+  uploadSection.className = "upload-section";
+
+  const uploadLabel = document.createElement("label");
+  uploadLabel.className = "upload-label";
+  uploadLabel.textContent = "Image";
+  uploadSection.appendChild(uploadLabel);
+
+  const uploadButton = document.createElement("button");
+  uploadButton.type = "button";
+  uploadButton.className = "upload-button";
+  uploadButton.textContent = "Choose Image";
+  uploadSection.appendChild(uploadButton);
+
+  adminFormWrapper.appendChild(uploadSection);
+
+  // Create submit button
+  const submitButton = document.createElement("button");
+  submitButton.type = "submit";
+  submitButton.className = "submit-button";
+  submitButton.textContent = "Submit";
+  adminFormWrapper.appendChild(submitButton);
 
   return adminFormWrapper;
-};
-
-export const buildAdminTitleListItem = async () => {
-  const adminTitleListItem = document.createElement("li");
-  adminTitleListItem.id = "admin-title-list-item";
-
-  //FIX
-  const adminTitle = document.createElement("h1");
-  adminTitle.id = "admin-title";
-  adminTitle.textContent = "ADMIN SECTION";
-
-  adminTitleListItem.append(adminTitle);
-
-  return adminTitleListItem;
-};
-
-export const buildAdminButtonListItem = async () => {
-  const adminButtonListItem = document.createElement("li");
-  adminButtonListItem.id = "admin-button-list-item";
-
-  const adminButton = document.createElement("button");
-  adminButton.id = "admin-button";
-  adminButton.className = "btn-submit";
-  adminButton.textContent = "SUBMIT";
-
-  adminButtonListItem.append(adminButton);
-
-  return adminButtonListItem;
 };

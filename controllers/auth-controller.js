@@ -14,5 +14,5 @@ export const authController = (req, res) => {
 
   // auth pw
   req.session.authenticated = true;
-  res.json({ success: true, redirect: "/" });
+  res.json({ success: true, redirect: "/admin" });
 };
