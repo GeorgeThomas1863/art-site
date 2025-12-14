@@ -30,3 +30,7 @@ export const runPwToggle = async () => {
   pwInput.type = "password";
   return true;
 };
+
+//---------------------
+
+export const runAddNewProduct = async () => {};

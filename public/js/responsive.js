@@ -2,6 +2,7 @@ import { runPwToggle, runAuthSubmit } from "./run.js";
 
 const authElement = document.getElementById("auth-element");
 const displayElement = document.getElementById("display-element");
+const adminDisplayElement = document.getElementById("admin-display-element");
 
 export const clickHandler = async (e) => {
   e.preventDefault();
@@ -16,7 +17,7 @@ export const clickHandler = async (e) => {
   console.log(clickType);
 
   if (clickType === "auth-submit") await runAuthSubmit();
-  // if (clickType === "submit-button") await runMainSubmit();
+  if (clickType === "new-product-submit") await runAddNewProduct();
 
   if (clickType === "pwToggle") await runPwToggle();
   // if (clickType === "advancedToggle") await runAdvancedToggle();
@@ -49,6 +50,11 @@ if (authElement) {
 
 if (displayElement) {
   displayElement.addEventListener("click", clickHandler);
-  // displayElement.addEventListener("keydown", keyHandler);
+  displayElement.addEventListener("keydown", keyHandler);
   // displayElement.addEventListener("change", changeHandler);
+}
+
+if (adminDisplayElement) {
+  adminDisplayElement.addEventListener("click", clickHandler);
+  adminDisplayElement.addEventListener("keydown", keyHandler);
 }

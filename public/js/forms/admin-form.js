@@ -6,7 +6,7 @@ export const buildAdminForm = async () => {
   const adminTitle = document.createElement("h1");
   adminTitle.className = "admin-form-title";
   adminTitle.textContent = "Add New Product";
-  adminFormWrapper.appendChild(adminTitle);
+  // adminFormWrapper.appendChild(adminTitle);
 
   // Create fields container
   const adminFormInputList = document.createElement("ul");
@@ -47,7 +47,7 @@ export const buildAdminForm = async () => {
     adminFormInputList.append(fieldWrapper);
   }
 
-  adminFormWrapper.append(adminFormInputList);
+  // adminFormWrapper.append(adminFormInputList);
 
   // Create upload section
   const uploadSection = document.createElement("div");
@@ -64,14 +64,18 @@ export const buildAdminForm = async () => {
   uploadButton.textContent = "Choose Image";
   uploadSection.appendChild(uploadButton);
 
-  adminFormWrapper.appendChild(uploadSection);
+  // adminFormWrapper.appendChild(uploadSection);
 
   // Create submit button
   const submitButton = document.createElement("button");
   submitButton.type = "submit";
   submitButton.className = "submit-button";
   submitButton.textContent = "Submit";
-  adminFormWrapper.appendChild(submitButton);
+  submitButton.setAttribute("data-label", "new-product-submit");
+
+  // adminFormWrapper.appendChild(submitButton);
+
+  adminFormWrapper.append(adminTitle, adminFormInputList, uploadSection, submitButton);
 
   return adminFormWrapper;
 };
