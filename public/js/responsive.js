@@ -2,7 +2,7 @@ import { runPwToggle, runAuthSubmit } from "./run.js";
 
 const authElement = document.getElementById("auth-element");
 const displayElement = document.getElementById("display-element");
-const adminDisplayElement = document.getElementById("admin-display-element");
+const adminElement = document.getElementById("admin-element");
 
 export const clickHandler = async (e) => {
   e.preventDefault();
@@ -54,7 +54,7 @@ if (displayElement) {
   // displayElement.addEventListener("change", changeHandler);
 }
 
-if (adminDisplayElement) {
-  adminDisplayElement.addEventListener("click", clickHandler);
-  adminDisplayElement.addEventListener("keydown", keyHandler);
+if (adminElement) {
+  adminElement.addEventListener("click", clickHandler);
+  adminElement.addEventListener("keydown", keyHandler);
 }
