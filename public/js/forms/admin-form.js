@@ -56,13 +56,28 @@ export const buildAdminForm = async () => {
   const uploadLabel = document.createElement("label");
   uploadLabel.className = "upload-label";
   uploadLabel.textContent = "Image";
-  uploadSection.appendChild(uploadLabel);
+
+  // Hidden for pic upload
+  const picInput = document.createElement("input");
+  picInput.type = "file";
+  picInput.id = "upload-pic-input";
+  picInput.accept = ".jpg,.jpeg,.png,.gif,.webp";
+  picInput.style.display = "none";
 
   const uploadButton = document.createElement("button");
   uploadButton.type = "button";
+  uploadButton.id = "upload-button";
   uploadButton.className = "upload-btn";
   uploadButton.textContent = "Choose Image";
-  uploadSection.appendChild(uploadButton);
+  uploadButton.setAttribute("data-label", "upload-pic");
+
+  const uploadStatus = document.createElement("span");
+  uploadStatus.id = "upload-status";
+  uploadStatus.className = "upload-status";
+  uploadStatus.style.marginLeft = "10px";
+  uploadStatus.style.display = "none";
+
+  uploadSection.append(uploadLabel, picInput, uploadButton, uploadStatus);
 
   // adminFormWrapper.appendChild(uploadSection);
 

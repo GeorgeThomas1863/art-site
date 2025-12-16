@@ -1,12 +1,10 @@
-import { runPwToggle, runAuthSubmit } from "./run.js";
+import { runPwToggle, runAuthSubmit, runAddNewProduct, runUploadClick, runUploadPic } from "./run.js";
 
 const authElement = document.getElementById("auth-element");
 const displayElement = document.getElementById("display-element");
 const adminElement = document.getElementById("admin-element");
 
 export const clickHandler = async (e) => {
-  e.preventDefault();
-
   const clickElement = e.target;
   const clickId = clickElement.id;
   const clickType = clickElement.getAttribute("data-label");
@@ -18,6 +16,7 @@ export const clickHandler = async (e) => {
 
   if (clickType === "auth-submit") await runAuthSubmit();
   if (clickType === "new-product-submit") await runAddNewProduct();
+  if (clickType === "upload-pic") await runUploadClick();
 
   if (clickType === "pwToggle") await runPwToggle();
   // if (clickType === "advancedToggle") await runAdvancedToggle();
@@ -41,6 +40,23 @@ export const keyHandler = async (e) => {
   // await runMainSubmit();
 
   return true;
+};
+
+//for file upload
+export const changeHandler = async (e) => {
+  const changeElement = e.target;
+  const changeId = changeElement.id;
+
+  if (changeId !== "upload-pic-input") return null;
+
+  console.log("CHANGE HANDLER");
+
+  const pic = e.target.files[0];
+  console.log("PIC");
+  console.log(pic);
+  if (!pic) return null;
+
+  await runUploadPic(pic);
 };
 
 if (authElement) {

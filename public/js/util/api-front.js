@@ -16,3 +16,27 @@ export const sendToBack = async (inputParams) => {
     console.log(error);
   }
 };
+
+export const sendToBackFile = async (inputParams) => {
+  const { route, formData } = inputParams;
+
+  try {
+    const res = await fetch(route, {
+      method: "POST",
+      body: formData,
+    });
+
+    if (res.error) {
+      console.log("UPLOAD ERROR");
+      console.log(res.error);
+      return "FAIL";
+    }
+
+    const data = await res.json();
+    return data;
+  } catch (e) {
+    console.log("UPLOAD ERROR");
+    console.log(e);
+    return "FAIL";
+  }
+};

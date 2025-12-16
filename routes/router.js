@@ -4,6 +4,7 @@ import CONFIG from "../config/config.js";
 import requireAuth from "./auth.js";
 import { authController } from "../controllers/auth-controller.js";
 import { mainDisplay, adminDisplay, display404, display500, display401 } from "../controllers/display-controller.js";
+import { uploadPicController } from "../controllers/data-controller.js";
 
 const router = express.Router();
 
@@ -13,6 +14,8 @@ router.post("/site-auth-route", authController);
 router.get("/401", display401);
 
 router.get("/admin", requireAuth, adminDisplay);
+
+router.post("/upload-pic-route", uploadPicController);
 
 router.get("/", mainDisplay);
 

@@ -1,5 +1,5 @@
 import { EYE_OPEN_SVG, EYE_CLOSED_SVG } from "./util/define-things.js";
-import { sendToBack } from "./util/api-front.js";
+import { sendToBack, sendToBackFile } from "./util/api-front.js";
 
 export const runAuthSubmit = async () => {
   const authPwInput = document.getElementById("auth-pw-input");
@@ -32,5 +32,38 @@ export const runPwToggle = async () => {
 };
 
 //---------------------
+
+export const runUploadClick = async () => {
+  const fileInput = document.getElementById("upload-file-input");
+  if (!fileInput) return null;
+
+  fileInput.click();
+  // return true;
+};
+
+export const runUploadPic = async (pic) => {
+  if (!pic) return null;
+
+  const uploadStatus = document.getElementById("upload-status");
+  const uploadButton = document.getElementById("upload-button");
+
+  uploadStatus.textContent = "Uploading...";
+  uploadStatus.style.display = "inline";
+  uploadButton.disabled = true;
+
+  const formData = new FormData();
+  formData.append("image", pic);
+
+  const data = await sendToBackFile({ route: "/upload-pic-route", formData: formData });
+  if (data === "FAIL") {
+    uploadStatus.textContent = "✗ Upload failed";
+    uploadStatus.style.color = "red";
+    return null;
+  }
+
+  uploadStatus.textContent = `✓ ${pic.name}`;
+  uploadStatus.style.color = "green";
+  return data;
+};
 
 export const runAddNewProduct = async () => {};
