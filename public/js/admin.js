@@ -1,13 +1,13 @@
 import { buildAdminForm } from "./forms/admin-form.js";
 
-const adminDisplayElement = document.getElementById("admin-display-element");
+const adminElement = document.getElementById("admin-element");
 
 export const buildAdminDisplay = async () => {
-  if (!adminDisplayElement) return null;
+  if (!adminElement) return null;
   // const { isFirstLoad } = stateAdmin;
 
   const adminFormData = await buildAdminForm();
-  adminDisplayElement.append(adminFormData);
+  adminElement.append(adminFormData);
 
   //   await updateAdminDisplay();
 

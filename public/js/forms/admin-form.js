@@ -60,7 +60,7 @@ export const buildAdminForm = async () => {
 
   const uploadButton = document.createElement("button");
   uploadButton.type = "button";
-  uploadButton.className = "upload-button";
+  uploadButton.className = "upload-btn";
   uploadButton.textContent = "Choose Image";
   uploadSection.appendChild(uploadButton);
 
@@ -69,7 +69,7 @@ export const buildAdminForm = async () => {
   // Create submit button
   const submitButton = document.createElement("button");
   submitButton.type = "submit";
-  submitButton.className = "submit-button";
+  submitButton.className = "submit-btn";
   submitButton.textContent = "Submit";
   submitButton.setAttribute("data-label", "new-product-submit");
 
