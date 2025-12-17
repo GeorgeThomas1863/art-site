@@ -1,9 +1,10 @@
 export const getNewProductParams = async () => {
   const params = {
+    productType: document.getElementById("product-type").value,
     title: document.getElementById("title").value,
     price: document.getElementById("price").value,
     description: document.getElementById("description").value,
-    picData: document.getElementById("upload-button").dataset.uploadData,
+    picData: document.getElementById("upload-button").uploadData,
   };
   return params;
 };

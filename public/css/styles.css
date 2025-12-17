@@ -97,7 +97,7 @@
   font-size: 1.5rem;
   font-weight: 300;
   letter-spacing: 2px;
-  /* margin-bottom: 1rem; */
+  margin-bottom: 1.5rem;
   text-align: center;
   color: #000000;
 }
@@ -107,6 +107,7 @@
   display: flex;
   flex-direction: column;
   gap: 2rem;
+  margin-top: 2rem;
   margin-bottom: 2rem;
   padding: 0;
 }
@@ -126,7 +127,8 @@
 }
 
 .form-input,
-.form-textarea {
+.form-textarea,
+.form-select {
   font-family: "Georgia", serif;
   font-size: 1rem;
   border: 1px solid #333;

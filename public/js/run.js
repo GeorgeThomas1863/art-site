@@ -69,8 +69,10 @@ export const runUploadPic = async (pic) => {
   uploadStatus.style.color = "green";
   uploadButton.textContent = "Change Image";
   uploadButton.disabled = false;
-  uploadButton.dataset.uploadData = JSON.stringify(data); //unsure if stringifying is necessary
-
+  uploadButton.uploadData = data
+  // uploadButton.dataset.uploadData = JSON.stringify(data); //unsure if stringifying is necessary
+ 
+  
   return data;
 };
 

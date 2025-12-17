@@ -8,6 +8,41 @@ export const buildAdminForm = async () => {
   adminTitle.textContent = "Add New Product";
   // adminFormWrapper.appendChild(adminTitle);
 
+  const adminProductTypeSection = document.createElement("div");
+  adminProductTypeSection.className = "product-type-section";
+  adminProductTypeSection.className = "form-field";
+
+  const productTypeLabel = document.createElement("label");
+  productTypeLabel.className = "form-label";
+  productTypeLabel.textContent = "Product Type";
+  productTypeLabel.setAttribute("for", "product-type");
+
+  const productTypeSelect = document.createElement("select");
+  productTypeSelect.className = "form-select";
+  productTypeSelect.id = "product-type";
+
+  const optionArray = [
+    { value: "acorns", text: "Acorns", selected: true },
+    { value: "mountainTreasureBaskets", text: "Mountain Treasure Baskets" },
+    { value: "animals", text: "Animals" },
+    { value: "geodes", text: "Geodes" },
+    { value: "gnomeHouses", text: "Gnome Houses" },
+    { value: "wallPieces", text: "Wall Pieces" },
+  ];
+
+  for (let i = 0; i < optionArray.length; i++) {
+    const optionData = optionArray[i];
+    const option = document.createElement("option");
+    option.value = optionData.value;
+    option.textContent = optionData.text;
+    if (optionData.selected) {
+      option.selected = true;
+    }
+    productTypeSelect.append(option);
+  }
+
+  adminProductTypeSection.append(productTypeLabel, productTypeSelect);
+
   // Create fields container
   const adminFormInputList = document.createElement("ul");
   adminFormInputList.className = "admin-form-input-list";
@@ -90,7 +125,7 @@ export const buildAdminForm = async () => {
 
   // adminFormWrapper.appendChild(submitButton);
 
-  adminFormWrapper.append(adminTitle, adminFormInputList, uploadSection, submitButton);
+  adminFormWrapper.append(adminTitle, adminProductTypeSection, adminFormInputList, uploadSection, submitButton);
 
   return adminFormWrapper;
 };
