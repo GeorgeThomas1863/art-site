@@ -16,7 +16,7 @@ router.get("/401", display401);
 
 router.get("/admin", requireAuth, adminDisplay);
 
-router.post("/upload-pic-route", requireAuth, upload.single("pic"), uploadPicController);
+router.post("/upload-pic-route", requireAuth, upload.single("image"), uploadPicController);
 
 router.get("/", mainDisplay);
 
