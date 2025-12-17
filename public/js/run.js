@@ -1,5 +1,6 @@
 import { EYE_OPEN_SVG, EYE_CLOSED_SVG } from "./util/define-things.js";
 import { sendToBack, sendToBackFile } from "./util/api-front.js";
+import { getNewProductParams } from "./util/params.js";
 
 export const runAuthSubmit = async () => {
   const authPwInput = document.getElementById("auth-pw-input");
@@ -73,4 +74,8 @@ export const runUploadPic = async (pic) => {
   return data;
 };
 
-export const runAddNewProduct = async () => {};
+export const runAddNewProduct = async () => {
+  const newProductParams = await getNewProductParams();
+  console.log("NEW PRODUCT PARAMS");
+  console.dir(newProductParams);
+};
