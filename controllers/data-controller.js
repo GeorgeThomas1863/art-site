@@ -1,4 +1,10 @@
 export const uploadPicController = async (req, res) => {
+  console.log("CONTROLLER REQ");
+  console.log(req.image);
+
+  console.log("AHHHH");
+  console.log(req.body);
+
   if (!req.pic) {
     return res.status(400).json({ error: "No file uploaded" });
   }

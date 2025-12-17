@@ -69,7 +69,7 @@ export const buildAdminForm = async () => {
   uploadButton.id = "upload-button";
   uploadButton.className = "upload-btn";
   uploadButton.textContent = "Choose Image";
-  uploadButton.setAttribute("data-label", "upload-pic");
+  uploadButton.setAttribute("data-label", "upload-click");
 
   const uploadStatus = document.createElement("span");
   uploadStatus.id = "upload-status";

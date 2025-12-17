@@ -16,7 +16,7 @@ export const clickHandler = async (e) => {
 
   if (clickType === "auth-submit") await runAuthSubmit();
   if (clickType === "new-product-submit") await runAddNewProduct();
-  if (clickType === "upload-pic") await runUploadClick();
+  if (clickType === "upload-click") await runUploadClick();
 
   if (clickType === "pwToggle") await runPwToggle();
   // if (clickType === "advancedToggle") await runAdvancedToggle();
@@ -49,11 +49,9 @@ export const changeHandler = async (e) => {
 
   if (changeId !== "upload-pic-input") return null;
 
-  console.log("CHANGE HANDLER");
-
   const pic = e.target.files[0];
-  console.log("PIC");
-  console.log(pic);
+  // console.log("PIC");
+  // console.log(pic);
   if (!pic) return null;
 
   await runUploadPic(pic);
@@ -73,4 +71,5 @@ if (displayElement) {
 if (adminElement) {
   adminElement.addEventListener("click", clickHandler);
   adminElement.addEventListener("keydown", keyHandler);
+  adminElement.addEventListener("change", changeHandler);
 }

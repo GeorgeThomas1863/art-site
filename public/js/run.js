@@ -34,15 +34,18 @@ export const runPwToggle = async () => {
 //---------------------
 
 export const runUploadClick = async () => {
-  const fileInput = document.getElementById("upload-file-input");
-  if (!fileInput) return null;
+  const picInput = document.getElementById("upload-pic-input");
+  if (!picInput) return null;
 
-  fileInput.click();
+  picInput.click();
   // return true;
 };
 
 export const runUploadPic = async (pic) => {
   if (!pic) return null;
+
+  console.log("PIC");
+  console.log(pic);
 
   const uploadStatus = document.getElementById("upload-status");
   const uploadButton = document.getElementById("upload-button");
