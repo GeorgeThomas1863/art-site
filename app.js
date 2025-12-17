@@ -1,3 +1,9 @@
+//TO DO: - HOOK THE FILE UPLOAD TO MONGO
+
+// - BUILD FRONTEND (just so have something to show)
+
+// - ADD EDIT ITEM / VIEW ITEM BUTTONS / FUNCTIONS
+
 import express from "express";
 import session from "express-session";
 import routes from "./routes/router.js";
