@@ -1,3 +1,5 @@
+import { runAddNewProduct } from "../src/add-product.js";
+
 export const uploadPicController = async (req, res) => {
   console.log("AHHHH");
   console.log(req.file);
@@ -14,5 +16,13 @@ export const uploadPicController = async (req, res) => {
     size: req.file.size,
   };
 
+  return res.json(data);
+};
+
+export const addNewProductController = async (req, res) => {
+  const inputParams = req.body;
+  if (!inputParams) return res.status(500).json({ error: "No input parameters" });
+
+  const data = await runAddNewProduct(inputParams);
   return res.json(data);
 };

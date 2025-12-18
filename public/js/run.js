@@ -69,10 +69,9 @@ export const runUploadPic = async (pic) => {
   uploadStatus.style.color = "green";
   uploadButton.textContent = "Change Image";
   uploadButton.disabled = false;
-  uploadButton.uploadData = data
+  uploadButton.uploadData = data;
   // uploadButton.dataset.uploadData = JSON.stringify(data); //unsure if stringifying is necessary
- 
-  
+
   return data;
 };
 
@@ -80,4 +79,6 @@ export const runAddNewProduct = async () => {
   const newProductParams = await getNewProductParams();
   console.log("NEW PRODUCT PARAMS");
   console.dir(newProductParams);
+
+  const data = await sendToBack({ route: "/add-new-product-route", params: newProductParams });
 };

@@ -5,7 +5,7 @@ import requireAuth from "./auth.js";
 import { authController } from "../controllers/auth-controller.js";
 import { mainDisplay, adminDisplay, display404, display500, display401 } from "../controllers/display-controller.js";
 import { uploadPicController } from "../controllers/data-controller.js";
-import { upload } from "../src/util/upload.js";
+import { upload } from "../src/upload-pic.js";
 
 const router = express.Router();
 
@@ -17,6 +17,8 @@ router.get("/401", display401);
 router.get("/admin", requireAuth, adminDisplay);
 
 router.post("/upload-pic-route", requireAuth, upload.single("image"), uploadPicController);
+
+router.post("/add-new-product-route", requireAuth, addNewProductController);
 
 router.get("/", mainDisplay);
 

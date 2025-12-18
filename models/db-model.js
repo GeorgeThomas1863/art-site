@@ -18,6 +18,12 @@ class dbModel {
     const storeData = await dbGet().collection(this.collection).insertOne(this.dataObject);
     return storeData;
   }
+
+  async updateObjItem() {
+    const { keyToLookup, itemValue, updateObj } = this.dataObject;
+    const updateData = await dbGet().collection(this.collection).updateOne({ [keyToLookup]: itemValue }, { $set: { ...updateObj } }); //prettier-ignore
+    return updateData;
+  }
 }
 
 export default dbModel;
