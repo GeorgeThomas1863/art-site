@@ -75,10 +75,17 @@ export const runUploadPic = async (pic) => {
   return data;
 };
 
+//ADD CHECK FOR IMAGE [CLEAR DATA FROM UPLOAD BUTTON BEFORE UPLOAD]
 export const runAddNewProduct = async () => {
   const newProductParams = await getNewProductParams();
+  if (!newProductParams) return null;
   console.log("NEW PRODUCT PARAMS");
   console.dir(newProductParams);
+  newProductParams.route = "/add-new-product-route";
 
-  const data = await sendToBack({ route: "/add-new-product-route", params: newProductParams });
+  const data = await sendToBack(newProductParams);
+  console.log("DATA");
+  console.dir(data);
+
+  //BUILD POP UP WITH SUCCESS HERE
 };

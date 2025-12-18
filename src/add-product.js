@@ -4,7 +4,10 @@ import dbModel from "../models/db-model.js";
 export const runAddNewProduct = async (inputParams) => {
   const { productsCollection } = CONFIG;
 
-  const params = { ...inputParams };
+  const { route: _, ...params } = inputParams;
+
+  console.log("PARAMS");
+  console.log(params);
 
   //store
   const storeModel = new dbModel(params, productsCollection);

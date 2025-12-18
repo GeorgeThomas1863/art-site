@@ -4,7 +4,7 @@ import CONFIG from "../config/config.js";
 import requireAuth from "./auth.js";
 import { authController } from "../controllers/auth-controller.js";
 import { mainDisplay, adminDisplay, display404, display500, display401 } from "../controllers/display-controller.js";
-import { uploadPicController } from "../controllers/data-controller.js";
+import { uploadPicController, addNewProductController } from "../controllers/data-controller.js";
 import { upload } from "../src/upload-pic.js";
 
 const router = express.Router();

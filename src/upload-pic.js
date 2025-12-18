@@ -9,7 +9,7 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
 // Define upload directory //CHANGE
-const uploadDir = path.join(__dirname, "../../public/images"); 
+const uploadDir = path.join(__dirname, "../public/images"); 
 
 // Create directory if it doesn't exist
 if (!fs.existsSync(uploadDir)) {
