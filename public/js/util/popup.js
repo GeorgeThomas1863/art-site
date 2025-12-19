@@ -3,6 +3,10 @@ const adminElement = document.getElementById("admin-element");
 export const displayPopup = async (message, type = "success") => {
   if (!adminElement) return null;
 
+  console.log("DISPLAY POPUP");
+  console.log(message);
+  console.log(type);
+
   // Remove any existing popup
   const existingPopup = document.getElementById("popup-notification");
   if (existingPopup) {
@@ -63,8 +67,6 @@ export const displayPopup = async (message, type = "success") => {
   //       }, 300);
   //     }
   //   }, 5000);
-
-  return popup;
 };
 
 export const closePopup = async () => {
