@@ -118,6 +118,19 @@
   gap: 0.5rem;
 }
 
+.drop-down-row {
+  display: flex;
+  gap: 1.5rem;
+  list-style: none;
+}
+
+.drop-down-half {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
 .form-label {
   font-size: 0.9rem;
   font-weight: 400;

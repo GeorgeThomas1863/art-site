@@ -8,6 +8,22 @@ export const buildAdminForm = async () => {
   adminTitle.textContent = "Add New Product";
   // adminFormWrapper.appendChild(adminTitle);
 
+  const nameFieldWrapper = document.createElement("li");
+  nameFieldWrapper.className = "form-field";
+
+  const nameLabel = document.createElement("label");
+  nameLabel.className = "form-label";
+  nameLabel.textContent = "Name";
+  nameLabel.setAttribute("for", "name");
+
+  const nameInput = document.createElement("input");
+  nameInput.className = "form-input";
+  nameInput.type = "text";
+  nameInput.id = "name";
+  nameInput.name = "name";
+
+  nameFieldWrapper.append(nameLabel, nameInput);
+
   const adminProductTypeSection = document.createElement("div");
   adminProductTypeSection.className = "product-type-section";
   adminProductTypeSection.className = "form-field";
@@ -42,6 +58,76 @@ export const buildAdminForm = async () => {
   }
 
   adminProductTypeSection.append(productTypeLabel, productTypeSelect);
+
+  // Create two-column select row for Display and Sold
+  const dropDownRow = document.createElement("li");
+  dropDownRow.className = "drop-down-row";
+
+  // Display select
+  const displayFieldWrapper = document.createElement("div");
+  displayFieldWrapper.className = "drop-down-half";
+
+  const displayLabel = document.createElement("label");
+  displayLabel.className = "form-label";
+  displayLabel.textContent = "Display";
+  displayLabel.setAttribute("for", "display");
+
+  const displaySelect = document.createElement("select");
+  displaySelect.className = "form-select";
+  displaySelect.id = "display";
+  displaySelect.name = "display";
+
+  const displayOptions = [
+    { value: "yes", text: "Yes", selected: true },
+    { value: "no", text: "No" },
+  ];
+
+  for (let i = 0; i < displayOptions.length; i++) {
+    const optionData = displayOptions[i];
+    const option = document.createElement("option");
+    option.value = optionData.value;
+    option.textContent = optionData.text;
+    if (optionData.selected) {
+      option.selected = true;
+    }
+    displaySelect.append(option);
+  }
+
+  displayFieldWrapper.append(displayLabel, displaySelect);
+
+  // Sold select
+  const soldFieldWrapper = document.createElement("div");
+  soldFieldWrapper.className = "drop-down-half";
+
+  const soldLabel = document.createElement("label");
+  soldLabel.className = "form-label";
+  soldLabel.textContent = "Sold";
+  soldLabel.setAttribute("for", "sold");
+
+  const soldSelect = document.createElement("select");
+  soldSelect.className = "form-select";
+  soldSelect.id = "sold";
+  soldSelect.name = "sold";
+
+  const soldOptions = [
+    { value: "yes", text: "Yes" },
+    { value: "no", text: "No", selected: true },
+  ];
+
+  for (let i = 0; i < soldOptions.length; i++) {
+    const optionData = soldOptions[i];
+    const option = document.createElement("option");
+    option.value = optionData.value;
+    option.textContent = optionData.text;
+    if (optionData.selected) {
+      option.selected = true;
+    }
+    soldSelect.append(option);
+  }
+
+  soldFieldWrapper.append(soldLabel, soldSelect);
+
+  dropDownRow.append(displayFieldWrapper, soldFieldWrapper);
 
   // Create fields container
   const adminFormInputList = document.createElement("ul");
@@ -81,8 +167,6 @@ export const buildAdminForm = async () => {
     fieldWrapper.append(label, input);
     adminFormInputList.append(fieldWrapper);
   }
-
-  // adminFormWrapper.append(adminFormInputList);
 
   // Create upload section
   const uploadSection = document.createElement("div");
@@ -125,7 +209,7 @@ export const buildAdminForm = async () => {
 
   // adminFormWrapper.appendChild(submitButton);
 
-  adminFormWrapper.append(adminTitle, adminProductTypeSection, adminFormInputList, uploadSection, submitButton);
+  adminFormWrapper.append(adminTitle, nameFieldWrapper, adminProductTypeSection, dropDownRow, adminFormInputList, uploadSection, submitButton);
 
   return adminFormWrapper;
 };
