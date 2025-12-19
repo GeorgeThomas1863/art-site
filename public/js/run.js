@@ -35,6 +35,32 @@ export const runPwToggle = async () => {
 
 //---------------------
 
+export const runTabClick = async (clickElement) => {
+  if (!clickElement) return null;
+  const tabType = clickElement.getAttribute("data-tab");
+  if (!tabType || (tabType !== "add" && tabType !== "edit")) return null;
+
+  const tabButtons = document.querySelectorAll(".admin-tab-button");
+  for (let i = 0; i < tabButtons.length; i++) {
+    tabButtons[i].classList.remove("active");
+  }
+  clickElement.classList.add("active");
+
+  const addTab = document.getElementById("add-tab");
+  const editTab = document.getElementById("edit-tab");
+
+  if (tabType === "add") {
+    addTab.style.display = "block";
+    editTab.style.display = "none";
+    return true;
+  }
+
+  addTab.style.display = "none";
+  editTab.style.display = "block";
+
+  return true;
+};
+
 export const runUploadClick = async () => {
   const picInput = document.getElementById("upload-pic-input");
   if (!picInput) return null;

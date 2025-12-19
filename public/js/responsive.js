@@ -1,4 +1,4 @@
-import { runPwToggle, runAuthSubmit, runAddNewProduct, runUploadClick, runUploadPic } from "./run.js";
+import { runPwToggle, runAuthSubmit, runAddNewProduct, runUploadClick, runUploadPic, runTabClick } from "./run.js";
 import { closePopup } from "./util/popup.js";
 
 const authElement = document.getElementById("auth-element");
@@ -9,6 +9,7 @@ export const clickHandler = async (e) => {
   const clickElement = e.target;
   const clickId = clickElement.id;
   const clickType = clickElement.getAttribute("data-label");
+  const tabType = clickElement.getAttribute("data-tab");
 
   console.log("CLICK HANDLER");
   console.log(clickId);
@@ -24,6 +25,8 @@ export const clickHandler = async (e) => {
   // if (clickType === "advancedToggle") await runAdvancedToggle();
   // if (clickType === "make-pretty") await runPrettyToggle(clickId);
   // if (clickType === "copy-return-data") await runCopyReturnData();
+
+  if (tabType) await runTabClick(clickElement);
 };
 
 export const keyHandler = async (e) => {
