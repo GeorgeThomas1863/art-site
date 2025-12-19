@@ -1,4 +1,5 @@
 import { runPwToggle, runAuthSubmit, runAddNewProduct, runUploadClick, runUploadPic } from "./run.js";
+import { closePopup } from "./util/popup.js";
 
 const authElement = document.getElementById("auth-element");
 const displayElement = document.getElementById("display-element");
@@ -17,6 +18,7 @@ export const clickHandler = async (e) => {
   if (clickType === "auth-submit") await runAuthSubmit();
   if (clickType === "upload-click") await runUploadClick();
   if (clickType === "new-product-submit") await runAddNewProduct();
+  if (clickType === "popup-close") await closePopup();
 
   if (clickType === "pwToggle") await runPwToggle();
   // if (clickType === "advancedToggle") await runAdvancedToggle();

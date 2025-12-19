@@ -50,6 +50,7 @@ export const runUploadPic = async (pic) => {
 
   const uploadStatus = document.getElementById("upload-status");
   const uploadButton = document.getElementById("upload-button");
+  uploadButton.uploadData = null;
 
   uploadStatus.textContent = "Uploading...";
   uploadStatus.style.display = "inline";
@@ -62,6 +63,7 @@ export const runUploadPic = async (pic) => {
   if (data === "FAIL") {
     uploadStatus.textContent = "✗ Upload failed";
     uploadStatus.style.color = "red";
+    uploadButton.uploadData = null;
     return null;
   }
 
@@ -70,22 +72,39 @@ export const runUploadPic = async (pic) => {
   uploadButton.textContent = "Change Image";
   uploadButton.disabled = false;
   uploadButton.uploadData = data;
-  // uploadButton.dataset.uploadData = JSON.stringify(data); //unsure if stringifying is necessary
 
   return data;
 };
 
 //ADD CHECK FOR IMAGE [CLEAR DATA FROM UPLOAD BUTTON BEFORE UPLOAD]
 export const runAddNewProduct = async () => {
+  //check if image uploaded
+  const uploadButton = document.getElementById("upload-button");
+  if (!uploadButton.uploadData) {
+    await displayPopup("Please upload an image of the product first", "error");
+    return null;
+  }
+
   const newProductParams = await getNewProductParams();
-  if (!newProductParams) return null;
+  if (!newProductParams) {
+    await displayPopup("Please fill in all product fields before submitting", "error");
+    return null;
+  }
+
+  newProductParams.route = "/add-new-product-route";
   console.log("NEW PRODUCT PARAMS");
   console.dir(newProductParams);
-  newProductParams.route = "/add-new-product-route";
 
   const data = await sendToBack(newProductParams);
+  if (!data || !data.success) {
+    await displayPopup("Failed to add new product", "error");
+    return null;
+  }
+
   console.log("DATA");
   console.dir(data);
 
-  //BUILD POP UP WITH SUCCESS HERE
+  await displayPopup(data.message, data.success ? "success" : "error");
+
+  return data;
 };

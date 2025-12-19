@@ -12,6 +12,7 @@ export const runAddNewProduct = async (inputParams) => {
   //store
   const storeModel = new dbModel(params, productsCollection);
   const storeData = await storeModel.storeAny();
+  if (!storeData) return { success: false, message: "Failed to store product" };
   console.log("STORE DATA");
   console.log(storeData);
 
@@ -30,8 +31,12 @@ export const runAddNewProduct = async (inputParams) => {
 
   const updateModel = new dbModel(updateParams, productsCollection);
   const updateData = await updateModel.updateObjItem();
+  if (!updateData) return { success: false, message: "Failed to update product" };
   console.log("UPDATE DATA");
   console.log(updateData);
+
+  params.success = true;
+  params.message = "Product added successfully";
 
   return params;
 };
