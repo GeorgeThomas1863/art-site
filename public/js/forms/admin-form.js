@@ -10,7 +10,7 @@ export const buildAdminForm = async () => {
   const adminUpload = await buildAdminUpload();
   const adminSubmit = await buildAdminSubmit();
 
-  adminFormWrapper.append(adminTitle, adminName, adminProductType, adminDropDownRow, adminFormInput, adminUpload, adminSubmit);
+  adminFormWrapper.append(adminTitle, adminName, adminProductType, adminFormInput, adminDropDownRow, adminUpload, adminSubmit);
 
   return adminFormWrapper;
 };
