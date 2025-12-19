@@ -49,7 +49,7 @@ export const buildAdminForm = async () => {
 
   // Form fields configuration
   const fields = [
-    { name: "name", label: "Product Name", type: "text", required: true },
+    { name: "name", label: "Name", type: "text", required: true },
     { name: "price", label: "Price", type: "text", required: true },
     { name: "description", label: "Description", type: "textarea", required: true },
   ];
