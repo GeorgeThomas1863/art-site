@@ -1,61 +1,119 @@
 export const buildAdminForm = async () => {
-  const adminFormWrapper = document.createElement("ul");
-  adminFormWrapper.id = "admin-form-wrapper";
-  //here
+  const adminFormWrapper = document.createElement("div");
+  adminFormWrapper.className = "admin-form-wrapper";
 
-  const adminTitle = await buildAdminTitle();
-  const adminName = await buildAdminName();
-  const adminProductType = await buildAdminProductType();
-  const adminFormInput = await buildAdminFormInput(); //includes price and description fields
-  const adminDropDownRow = await buildAdminDropDownRow(); //includes display and sold toggles
-  const adminUpload = await buildAdminUpload();
-  const adminSubmit = await buildAdminSubmit();
-
-  adminFormWrapper.append(adminTitle, adminName, adminProductType, adminFormInput, adminDropDownRow, adminUpload, adminSubmit);
+  const addTab = await buildAdminTab("add");
+  const editTab = await buildAdminTab("edit");
+  adminFormWrapper.append(addTab, editTab);
 
   return adminFormWrapper;
 };
 
-export const buildAdminTitle = async () => {
-  const adminTitle = document.createElement("h1");
-  adminTitle.className = "admin-form-title";
-  adminTitle.textContent = "Add New Product";
+export const buildAdminTab = async (mode = "add") => {
+  const tabWrapper = document.createElement("ul");
+  tabWrapper.id = mode === "add" ? "add-tab" : "edit-tab";
+  tabWrapper.className = "admin-tab active";
 
-  return adminTitle;
+  const tabTitle = await buildTabTitle(mode);
+  tabWrapper.append(tabTitle);
+
+  // Hide edit form by default
+  if (mode === "edit") {
+    tabWrapper.style.display = "none";
+    const productSelector = await buildProductSelector();
+    tabWrapper.append(productSelector);
+  }
+
+  const adminName = await buildAdminName(mode);
+  const productTypeField = await buildAdminProductType(mode);
+  const formInput = await buildFormInput(mode); // price and description
+  const dropDownRow = await buildDropDownRow(mode); // display and sold toggles
+  const uploadSection = await buildUploadSection(mode);
+  // const deleteButton = mode === "edit" ? await buildDeleteButton() : null;
+  const submitButton = await buildSubmitButton(mode);
+
+  tabWrapper.append(adminName, productTypeField, formInput, dropDownRow, uploadSection, submitButton);
+
+  // Append elements based on mode
+
+  return tabWrapper;
 };
 
-export const buildAdminName = async () => {
+export const buildTabTitle = async (mode) => {
+  const tabTitle = document.createElement("h1");
+  tabTitle.className = "admin-tab-title";
+  tabTitle.textContent = mode === "add" ? "Add New Product" : "Edit Product";
+
+  return tabTitle;
+};
+
+export const buildProductSelector = async () => {
+  const selectorWrapper = document.createElement("li");
+  selectorWrapper.className = "form-field product-selector-field";
+
+  const selectorLabel = document.createElement("label");
+  selectorLabel.className = "form-label";
+  selectorLabel.textContent = "Select Product to Edit";
+  selectorLabel.setAttribute("for", "product-selector");
+
+  const productSelect = document.createElement("select");
+  productSelect.className = "form-select";
+  productSelect.id = "product-selector";
+  productSelect.name = "product-selector";
+
+  // Default option
+  const defaultOption = document.createElement("option");
+  defaultOption.value = "";
+  defaultOption.textContent = "-- Select a product --";
+  defaultOption.selected = true;
+  defaultOption.disabled = true;
+  productSelect.append(defaultOption);
+
+  selectorWrapper.append(selectorLabel, productSelect);
+
+  return selectorWrapper;
+};
+
+export const buildAdminName = async (mode) => {
   const nameWrapper = document.createElement("li");
   nameWrapper.className = "form-field";
 
   const nameLabel = document.createElement("label");
   nameLabel.className = "form-label";
   nameLabel.textContent = "Product Name";
-  nameLabel.setAttribute("for", "name");
+  nameLabel.setAttribute("for", mode === "add" ? "name" : "edit-name");
 
   const nameInput = document.createElement("input");
   nameInput.className = "form-input";
   nameInput.type = "text";
-  nameInput.id = "name";
-  nameInput.name = "name";
+  nameInput.id = mode === "add" ? "name" : "edit-name";
+  nameInput.name = mode === "add" ? "name" : "edit-name";
+
+  if (mode === "edit") {
+    nameInput.disabled = true;
+  }
 
   nameWrapper.append(nameLabel, nameInput);
 
   return nameWrapper;
 };
 
-export const buildAdminProductType = async () => {
+export const buildAdminProductType = async (mode) => {
   const adminProductType = document.createElement("div");
   adminProductType.className = "form-field";
 
   const productTypeLabel = document.createElement("label");
   productTypeLabel.className = "form-label";
   productTypeLabel.textContent = "Type";
-  productTypeLabel.setAttribute("for", "product-type");
+  productTypeLabel.setAttribute("for", mode === "add" ? "product-type" : "edit-product-type");
 
   const productTypeSelect = document.createElement("select");
   productTypeSelect.className = "form-select";
-  productTypeSelect.id = "product-type";
+  productTypeSelect.id = mode === "add" ? "product-type" : "edit-product-type";
+
+  if (mode === "edit") {
+    productTypeSelect.disabled = true;
+  }
 
   const optionArray = [
     { value: "acorns", text: "Acorns", selected: true },
