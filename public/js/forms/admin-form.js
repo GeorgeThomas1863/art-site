@@ -91,6 +91,8 @@ export const buildAdminDropDownRow = async () => {
   const adminSoldToggle = await buildAdminSoldToggle();
 
   dropDownRow.append(adminDisplayToggle, adminSoldToggle);
+
+  return dropDownRow;
 };
 
 export const buildAdminDisplayToggle = async () => {
