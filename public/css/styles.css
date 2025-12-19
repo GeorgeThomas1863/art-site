@@ -136,6 +136,10 @@
   transition: border-color 0.3s;
 }
 
+.form-select {
+  background-color: #ffffff;
+}
+
 .form-input:focus,
 .form-textarea:focus {
   outline: none;
