@@ -87,7 +87,7 @@ export const runAddNewProduct = async () => {
   }
 
   const newProductParams = await getNewProductParams();
-  if (!newProductParams || !newProductParams.title || !newProductParams.price) {
+  if (!newProductParams || !newProductParams.name || !newProductParams.price) {
     await displayPopup("Please fill in all product fields before submitting", "error");
     return null;
   }
@@ -104,7 +104,7 @@ export const runAddNewProduct = async () => {
 
   console.log("DATA");
   console.dir(data);
-  const popupText = `Product ${data.title} added successfully`;
+  const popupText = `Product [${data.name}] added successfully`;
 
   await displayPopup(popupText, "success");
 
