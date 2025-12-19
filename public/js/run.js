@@ -79,16 +79,16 @@ export const runUploadPic = async (pic) => {
 
 //ADD CHECK FOR IMAGE [CLEAR DATA FROM UPLOAD BUTTON BEFORE UPLOAD]
 export const runAddNewProduct = async () => {
+  const newProductParams = await getNewProductParams();
+  if (!newProductParams || !newProductParams.name || !newProductParams.price) {
+    await displayPopup("Please fill in all product fields before submitting", "error");
+    return null;
+  }
+
   //check if image uploaded
   const uploadButton = document.getElementById("upload-button");
   if (!uploadButton.uploadData) {
     await displayPopup("Please upload an image of the product first", "error");
-    return null;
-  }
-
-  const newProductParams = await getNewProductParams();
-  if (!newProductParams || !newProductParams.name || !newProductParams.price) {
-    await displayPopup("Please fill in all product fields before submitting", "error");
     return null;
   }
 
