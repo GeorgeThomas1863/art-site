@@ -2,18 +2,34 @@ export const buildAdminForm = async () => {
   const adminFormWrapper = document.createElement("ul");
   adminFormWrapper.id = "admin-form-wrapper";
 
-  // Create form title
+  const adminTitle = await buildAdminTitle();
+  const adminName = await buildAdminName();
+  const adminProductType = await buildAdminProductType();
+  const adminDropDownRow = await buildAdminDropDownRow(); //includes display and sold toggles
+  const adminFormInput = await buildAdminFormInput(); //includes price and description fields
+  const adminUpload = await buildAdminUpload();
+  const adminSubmit = await buildAdminSubmit();
+
+  adminFormWrapper.append(adminTitle, adminName, adminProductType, adminDropDownRow, adminFormInput, adminUpload, adminSubmit);
+
+  return adminFormWrapper;
+};
+
+export const buildAdminTitle = async () => {
   const adminTitle = document.createElement("h1");
   adminTitle.className = "admin-form-title";
   adminTitle.textContent = "Add New Product";
-  // adminFormWrapper.appendChild(adminTitle);
 
-  const nameFieldWrapper = document.createElement("li");
-  nameFieldWrapper.className = "form-field";
+  return adminTitle;
+};
+
+export const buildAdminName = async () => {
+  const nameWrapper = document.createElement("li");
+  nameWrapper.className = "form-field";
 
   const nameLabel = document.createElement("label");
   nameLabel.className = "form-label";
-  nameLabel.textContent = "Product Name";
+  nameLabel.textContent = "New Product Name";
   nameLabel.setAttribute("for", "name");
 
   const nameInput = document.createElement("input");
@@ -22,10 +38,14 @@ export const buildAdminForm = async () => {
   nameInput.id = "name";
   nameInput.name = "name";
 
-  nameFieldWrapper.append(nameLabel, nameInput);
+  nameWrapper.append(nameLabel, nameInput);
 
-  const adminProductTypeSection = document.createElement("div");
-  adminProductTypeSection.className = "form-field";
+  return nameWrapper;
+};
+
+export const buildAdminProductType = async () => {
+  const adminProductType = document.createElement("div");
+  adminProductType.className = "form-field";
 
   const productTypeLabel = document.createElement("label");
   productTypeLabel.className = "form-label";
@@ -56,19 +76,31 @@ export const buildAdminForm = async () => {
     productTypeSelect.append(option);
   }
 
-  adminProductTypeSection.append(productTypeLabel, productTypeSelect);
+  adminProductType.append(productTypeLabel, productTypeSelect);
 
-  // Create two-column select row for Display and Sold
+  return adminProductType;
+};
+
+//-----------------------
+
+export const buildAdminDropDownRow = async () => {
   const dropDownRow = document.createElement("li");
   dropDownRow.className = "drop-down-row";
 
+  const adminDisplayToggle = await buildAdminDisplayToggle();
+  const adminSoldToggle = await buildAdminSoldToggle();
+
+  dropDownRow.append(adminDisplayToggle, adminSoldToggle);
+};
+
+export const buildAdminDisplayToggle = async () => {
   // Display select
-  const displayFieldWrapper = document.createElement("div");
-  displayFieldWrapper.className = "drop-down-half";
+  const displayToggle = document.createElement("div");
+  displayToggle.className = "drop-down-half";
 
   const displayLabel = document.createElement("label");
   displayLabel.className = "form-label";
-  displayLabel.textContent = "Display";
+  displayLabel.textContent = "Display on Site?";
   displayLabel.setAttribute("for", "display");
 
   const displaySelect = document.createElement("select");
@@ -92,15 +124,19 @@ export const buildAdminForm = async () => {
     displaySelect.append(option);
   }
 
-  displayFieldWrapper.append(displayLabel, displaySelect);
+  displayToggle.append(displayLabel, displaySelect);
 
+  return displayToggle;
+};
+
+export const buildAdminSoldToggle = async () => {
   // Sold select
-  const soldFieldWrapper = document.createElement("div");
-  soldFieldWrapper.className = "drop-down-half";
+  const soldToggle = document.createElement("div");
+  soldToggle.className = "drop-down-half";
 
   const soldLabel = document.createElement("label");
   soldLabel.className = "form-label";
-  soldLabel.textContent = "Sold";
+  soldLabel.textContent = "Sold?";
   soldLabel.setAttribute("for", "sold");
 
   const soldSelect = document.createElement("select");
@@ -124,10 +160,15 @@ export const buildAdminForm = async () => {
     soldSelect.append(option);
   }
 
-  soldFieldWrapper.append(soldLabel, soldSelect);
-  dropDownRow.append(displayFieldWrapper, soldFieldWrapper);
+  soldToggle.append(soldLabel, soldSelect);
 
-  // Create fields container
+  return soldToggle;
+};
+
+//------------------
+
+export const buildAdminFormInput = async () => {
+  // Create fields containe
   const adminFormInputList = document.createElement("ul");
   adminFormInputList.className = "admin-form-input-list";
 
@@ -165,7 +206,10 @@ export const buildAdminForm = async () => {
     adminFormInputList.append(fieldWrapper);
   }
 
-  // Create upload section
+  return adminFormInputList;
+};
+
+export const buildAdminUpload = async () => {
   const uploadSection = document.createElement("div");
   uploadSection.className = "upload-section";
 
@@ -195,18 +239,15 @@ export const buildAdminForm = async () => {
 
   uploadSection.append(uploadLabel, picInput, uploadButton, uploadStatus);
 
-  // adminFormWrapper.appendChild(uploadSection);
+  return uploadSection;
+};
 
-  // Create submit button
+export const buildAdminSubmit = async () => {
   const submitButton = document.createElement("button");
   submitButton.type = "submit";
   submitButton.className = "submit-btn";
   submitButton.textContent = "Submit";
   submitButton.setAttribute("data-label", "new-product-submit");
 
-  // adminFormWrapper.appendChild(submitButton);
-
-  adminFormWrapper.append(adminTitle, nameFieldWrapper, adminProductTypeSection, dropDownRow, adminFormInputList, uploadSection, submitButton);
-
-  return adminFormWrapper;
+  return submitButton;
 };
