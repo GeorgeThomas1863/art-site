@@ -24,17 +24,15 @@ export const buildAdminTab = async (mode = "add") => {
     tabWrapper.append(productSelector);
   }
 
-  const adminName = await buildAdminName(mode);
-  const productTypeField = await buildAdminProductType(mode);
-  const formInput = await buildFormInput(mode); // price and description
+  const adminName = await buildName(mode);
+  const productType = await buildProductType(mode);
+  const formInputList = await buildFormInputList(mode); // price and description
   const dropDownRow = await buildDropDownRow(mode); // display and sold toggles
-  const uploadSection = await buildUploadSection(mode);
+  const adminUpload = await buildAdminUpload(mode);
   // const deleteButton = mode === "edit" ? await buildDeleteButton() : null;
-  const submitButton = await buildSubmitButton(mode);
+  const adminSubmit = await buildAdminSubmit(mode);
 
-  tabWrapper.append(adminName, productTypeField, formInput, dropDownRow, uploadSection, submitButton);
-
-  // Append elements based on mode
+  tabWrapper.append(adminName, productType, formInputList, dropDownRow, adminUpload, adminSubmit);
 
   return tabWrapper;
 };
@@ -74,7 +72,7 @@ export const buildProductSelector = async () => {
   return selectorWrapper;
 };
 
-export const buildAdminName = async (mode) => {
+export const buildName = async (mode) => {
   const nameWrapper = document.createElement("li");
   nameWrapper.className = "form-field";
 
@@ -98,7 +96,7 @@ export const buildAdminName = async (mode) => {
   return nameWrapper;
 };
 
-export const buildAdminProductType = async (mode) => {
+export const buildProductType = async (mode) => {
   const adminProductType = document.createElement("div");
   adminProductType.className = "form-field";
 
@@ -142,7 +140,7 @@ export const buildAdminProductType = async (mode) => {
 
 //------------------
 
-export const buildAdminFormInput = async () => {
+export const buildFormInputList = async (mode) => {
   // Create fields containe
   const adminFormInputList = document.createElement("ul");
   adminFormInputList.className = "admin-form-input-list";
@@ -177,6 +175,10 @@ export const buildAdminFormInput = async () => {
     input.id = field.name;
     input.name = field.name;
 
+    if (mode === "edit") {
+      input.disabled = true;
+    }
+
     fieldWrapper.append(label, input);
     adminFormInputList.append(fieldWrapper);
   }
@@ -185,19 +187,19 @@ export const buildAdminFormInput = async () => {
 };
 //-----------------------
 
-export const buildAdminDropDownRow = async () => {
+export const buildDropDownRow = async (mode) => {
   const dropDownRow = document.createElement("li");
   dropDownRow.className = "drop-down-row";
 
-  const adminDisplayToggle = await buildAdminDisplayToggle();
-  const adminSoldToggle = await buildAdminSoldToggle();
+  const adminDisplayToggle = await buildDisplayToggle(mode);
+  const adminSoldToggle = await buildSoldToggle(mode);
 
   dropDownRow.append(adminDisplayToggle, adminSoldToggle);
 
   return dropDownRow;
 };
 
-export const buildAdminDisplayToggle = async () => {
+export const buildDisplayToggle = async (mode) => {
   // Display select
   const displayToggle = document.createElement("div");
   displayToggle.className = "drop-down-half";
@@ -205,12 +207,16 @@ export const buildAdminDisplayToggle = async () => {
   const displayLabel = document.createElement("label");
   displayLabel.className = "form-label";
   displayLabel.textContent = "Display on Site?";
-  displayLabel.setAttribute("for", "display");
+  displayLabel.setAttribute("for", mode === "add" ? "display" : "edit-display");
 
   const displaySelect = document.createElement("select");
   displaySelect.className = "form-select";
-  displaySelect.id = "display";
-  displaySelect.name = "display";
+  displaySelect.id = mode === "add" ? "display" : "edit-display";
+  displaySelect.name = mode === "add" ? "display" : "edit-display";
+
+  if (mode === "edit") {
+    displaySelect.disabled = true;
+  }
 
   const displayOptions = [
     { value: "yes", text: "Yes", selected: true },
@@ -233,7 +239,7 @@ export const buildAdminDisplayToggle = async () => {
   return displayToggle;
 };
 
-export const buildAdminSoldToggle = async () => {
+export const buildSoldToggle = async (mode) => {
   // Sold select
   const soldToggle = document.createElement("div");
   soldToggle.className = "drop-down-half";
@@ -241,12 +247,16 @@ export const buildAdminSoldToggle = async () => {
   const soldLabel = document.createElement("label");
   soldLabel.className = "form-label";
   soldLabel.textContent = "Sold?";
-  soldLabel.setAttribute("for", "sold");
+  soldLabel.setAttribute("for", mode === "add" ? "sold" : "edit-sold");
 
   const soldSelect = document.createElement("select");
   soldSelect.className = "form-select";
-  soldSelect.id = "sold";
-  soldSelect.name = "sold";
+  soldSelect.id = mode === "add" ? "sold" : "edit-sold";
+  soldSelect.name = mode === "add" ? "sold" : "edit-sold";
+
+  if (mode === "edit") {
+    soldSelect.disabled = true;
+  }
 
   const soldOptions = [
     { value: "yes", text: "Yes" },
@@ -271,45 +281,80 @@ export const buildAdminSoldToggle = async () => {
 
 //---------------------
 
-export const buildAdminUpload = async () => {
+export const buildAdminUpload = async (mode) => {
   const uploadSection = document.createElement("div");
   uploadSection.className = "upload-section";
 
   const uploadLabel = document.createElement("label");
   uploadLabel.className = "upload-label";
-  uploadLabel.textContent = "Image";
+  uploadLabel.textContent = mode === "add" ? "Image" : "Replace Image";
+  uploadSection.append(uploadLabel);
+
+  // Current image preview (only for edit mode) //FIX
+  let currentImagePreview = null;
+  if (mode === "edit") {
+    currentImagePreview = document.createElement("div");
+    currentImagePreview.className = "current-image-preview";
+    currentImagePreview.id = "current-image-preview";
+    currentImagePreview.style.display = "none";
+
+    const currentImageLabel = document.createElement("span");
+    currentImageLabel.className = "current-image-label";
+    currentImageLabel.textContent = "Current Image:";
+
+    const currentImage = document.createElement("img");
+    currentImage.id = "current-image";
+    currentImage.className = "current-image";
+    currentImage.alt = "Current product image";
+
+    currentImagePreview.append(currentImageLabel, currentImage);
+    uploadSection.append(currentImagePreview);
+  }
 
   // Hidden for pic upload
   const picInput = document.createElement("input");
   picInput.type = "file";
-  picInput.id = "upload-pic-input";
+  picInput.id = mode === "add" ? "upload-pic-input" : "edit-upload-pic-input";
   picInput.accept = ".jpg,.jpeg,.png,.gif,.webp";
   picInput.style.display = "none";
 
+  if (mode === "edit") {
+    picInput.disabled = true;
+  }
+
   const uploadButton = document.createElement("button");
   uploadButton.type = "button";
-  uploadButton.id = "upload-button";
+  uploadButton.id = mode === "add" ? "upload-button" : "edit-upload-button";
   uploadButton.className = "upload-btn";
-  uploadButton.textContent = "Choose Image";
-  uploadButton.setAttribute("data-label", "upload-click");
+  uploadButton.textContent = mode === "add" ? "Choose Image" : "Replace Image";
+  uploadButton.setAttribute("data-label", mode === "add" ? "upload-click" : "edit-upload-click");
+
+  if (mode === "edit") {
+    uploadButton.disabled = true;
+  }
 
   const uploadStatus = document.createElement("span");
-  uploadStatus.id = "upload-status";
+  uploadStatus.id = mode === "add" ? "upload-status" : "edit-upload-status";
   uploadStatus.className = "upload-status";
   uploadStatus.style.marginLeft = "10px";
   uploadStatus.style.display = "none";
 
-  uploadSection.append(uploadLabel, picInput, uploadButton, uploadStatus);
+  uploadSection.append(picInput, uploadButton, uploadStatus);
 
   return uploadSection;
 };
 
-export const buildAdminSubmit = async () => {
+export const buildAdminSubmit = async (mode) => {
   const submitButton = document.createElement("button");
   submitButton.type = "submit";
   submitButton.className = "submit-btn";
-  submitButton.textContent = "Submit";
-  submitButton.setAttribute("data-label", "new-product-submit");
+  submitButton.id = mode === "add" ? "submit-button" : "edit-submit-button";
+  submitButton.textContent = mode === "add" ? "Submit" : "Update";
+  submitButton.setAttribute("data-label", mode === "add" ? "new-product-submit" : "edit-product-submit");
+
+  if (mode === "edit") {
+    submitButton.disabled = true;
+  }
 
   return submitButton;
 };
