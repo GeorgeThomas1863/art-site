@@ -1,6 +1,7 @@
 import { EYE_OPEN_SVG, EYE_CLOSED_SVG } from "./util/define-things.js";
 import { sendToBack, sendToBackFile } from "./util/api-front.js";
 import { getNewProductParams } from "./util/params.js";
+import { displayPopup } from "./util/popup.js";
 
 export const runAuthSubmit = async () => {
   const authPwInput = document.getElementById("auth-pw-input");
