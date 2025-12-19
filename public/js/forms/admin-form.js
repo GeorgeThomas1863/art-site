@@ -26,7 +26,7 @@ export const buildAdminForm = async () => {
 
   const adminProductTypeSection = document.createElement("div");
   adminProductTypeSection.className = "product-type-section";
-  adminProductTypeSection.className = "form-field";
+  adminProductTypeSection.classList.add("form-field");
 
   const productTypeLabel = document.createElement("label");
   productTypeLabel.className = "form-label";
@@ -62,8 +62,8 @@ export const buildAdminForm = async () => {
   // Create two-column select row for Display and Sold
   const dropDownRow = document.createElement("li");
   dropDownRow.className = "drop-down-row";
-  dropDownRow.className = "form-field";
-
+  dropDownRow.classList.add("form-field");
+  
   // Display select
   const displayFieldWrapper = document.createElement("div");
   displayFieldWrapper.className = "drop-down-half";
