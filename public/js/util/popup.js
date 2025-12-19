@@ -53,22 +53,10 @@ export const displayPopup = async (message, type = "success") => {
 
   popup.style.display = "flex";
 
-  // Trigger animation
-  //   setTimeout(() => {
-  //     popup.classList.add("popup-visible");
-  //   }, 10);
-
-  //   // Auto-remove after 5 seconds
-  //   setTimeout(() => {
-  //     if (popup && popup.parentElement) {
-  //       popup.classList.add("popup-fade-out");
-  //       setTimeout(() => {
-  //         if (popup && popup.parentElement) {
-  //           popup.remove();
-  //         }
-  //       }, 300);
-  //     }
-  //   }, 5000);
+  // Auto-remove after 10 seconds
+  setTimeout(() => {
+    popup.style.display = "none";
+  }, 10000);
 };
 
 export const closePopup = async () => {

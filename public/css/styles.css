@@ -217,7 +217,8 @@
 .popup-notification {
   position: fixed;
   top: 2rem;
-  right: 2rem;
+  left: 50%;
+  transform: translateX(-50%);
   background: #ffffff;
   border-radius: 8px;
   padding: 1.2rem 1.5rem;
