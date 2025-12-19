@@ -97,7 +97,7 @@
   font-size: 1.5rem;
   font-weight: 300;
   letter-spacing: 2px;
-  margin-bottom: 1rem;
+  margin-bottom: 1.5rem;
   text-align: center;
   color: #000000;
 }
@@ -123,6 +123,7 @@
   display: flex;
   gap: 1.5rem;
   list-style: none;
+  margin-bottom: 2rem; 
 }
 
 .drop-down-half {
