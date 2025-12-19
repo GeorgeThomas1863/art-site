@@ -5,8 +5,8 @@ export const buildAdminForm = async () => {
   const adminTitle = await buildAdminTitle();
   const adminName = await buildAdminName();
   const adminProductType = await buildAdminProductType();
-  const adminDropDownRow = await buildAdminDropDownRow(); //includes display and sold toggles
   const adminFormInput = await buildAdminFormInput(); //includes price and description fields
+  const adminDropDownRow = await buildAdminDropDownRow(); //includes display and sold toggles
   const adminUpload = await buildAdminUpload();
   const adminSubmit = await buildAdminSubmit();
 
@@ -29,7 +29,7 @@ export const buildAdminName = async () => {
 
   const nameLabel = document.createElement("label");
   nameLabel.className = "form-label";
-  nameLabel.textContent = "New Product Name";
+  nameLabel.textContent = "Product Name";
   nameLabel.setAttribute("for", "name");
 
   const nameInput = document.createElement("input");
