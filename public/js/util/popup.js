@@ -56,7 +56,7 @@ export const displayPopup = async (message, type = "success") => {
   // Auto-remove after 10 seconds
   setTimeout(() => {
     popup.style.display = "none";
-  }, 10000);
+  }, 5000);
 };
 
 export const closePopup = async () => {
