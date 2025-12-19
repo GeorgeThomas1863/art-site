@@ -104,7 +104,7 @@ export const runAddNewProduct = async () => {
 
   console.log("DATA");
   console.dir(data);
-  const popupText = `Product [${data.name}] added successfully`;
+  const popupText = `Product "${data.name}" added successfully`;
 
   await displayPopup(popupText, "success");
 
