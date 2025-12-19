@@ -13,7 +13,7 @@ export const buildAdminForm = async () => {
 
   const nameLabel = document.createElement("label");
   nameLabel.className = "form-label";
-  nameLabel.textContent = "Name";
+  nameLabel.textContent = "Product Name";
   nameLabel.setAttribute("for", "name");
 
   const nameInput = document.createElement("input");
@@ -30,7 +30,7 @@ export const buildAdminForm = async () => {
 
   const productTypeLabel = document.createElement("label");
   productTypeLabel.className = "form-label";
-  productTypeLabel.textContent = "Product Type";
+  productTypeLabel.textContent = "Type";
   productTypeLabel.setAttribute("for", "product-type");
 
   const productTypeSelect = document.createElement("select");
