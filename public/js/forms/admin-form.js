@@ -81,6 +81,49 @@ export const buildAdminProductType = async () => {
   return adminProductType;
 };
 
+//------------------
+
+export const buildAdminFormInput = async () => {
+  // Create fields containe
+  const adminFormInputList = document.createElement("ul");
+  adminFormInputList.className = "admin-form-input-list";
+
+  // Form fields configuration
+  const fields = [
+    { name: "price", label: "Price", type: "text", required: true },
+    { name: "description", label: "Description", type: "textarea" },
+  ];
+
+  // Create each form field
+  for (let i = 0; i < fields.length; i++) {
+    const field = fields[i];
+    const fieldWrapper = document.createElement("li");
+    fieldWrapper.className = "form-field";
+
+    const label = document.createElement("label");
+    label.className = "form-label";
+    label.textContent = field.label;
+    label.setAttribute("for", field.name);
+
+    let input;
+    if (field.type === "textarea") {
+      input = document.createElement("textarea");
+      input.className = "form-textarea";
+    } else {
+      input = document.createElement("input");
+      input.className = "form-input";
+      input.type = field.type;
+    }
+
+    input.id = field.name;
+    input.name = field.name;
+
+    fieldWrapper.append(label, input);
+    adminFormInputList.append(fieldWrapper);
+  }
+
+  return adminFormInputList;
+};
 //-----------------------
 
 export const buildAdminDropDownRow = async () => {
@@ -167,49 +210,7 @@ export const buildAdminSoldToggle = async () => {
   return soldToggle;
 };
 
-//------------------
-
-export const buildAdminFormInput = async () => {
-  // Create fields containe
-  const adminFormInputList = document.createElement("ul");
-  adminFormInputList.className = "admin-form-input-list";
-
-  // Form fields configuration
-  const fields = [
-    { name: "price", label: "Price", type: "text", required: true },
-    { name: "description", label: "Description", type: "textarea" },
-  ];
-
-  // Create each form field
-  for (let i = 0; i < fields.length; i++) {
-    const field = fields[i];
-    const fieldWrapper = document.createElement("li");
-    fieldWrapper.className = "form-field";
-
-    const label = document.createElement("label");
-    label.className = "form-label";
-    label.textContent = field.label;
-    label.setAttribute("for", field.name);
-
-    let input;
-    if (field.type === "textarea") {
-      input = document.createElement("textarea");
-      input.className = "form-textarea";
-    } else {
-      input = document.createElement("input");
-      input.className = "form-input";
-      input.type = field.type;
-    }
-
-    input.id = field.name;
-    input.name = field.name;
-
-    fieldWrapper.append(label, input);
-    adminFormInputList.append(fieldWrapper);
-  }
-
-  return adminFormInputList;
-};
+//---------------------
 
 export const buildAdminUpload = async () => {
   const uploadSection = document.createElement("div");
