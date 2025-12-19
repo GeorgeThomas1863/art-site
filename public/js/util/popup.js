@@ -51,6 +51,8 @@ export const displayPopup = async (message, type = "success") => {
   popup.append(icon, messageText, closeBtn);
   adminElement.append(popup);
 
+  popup.style.display = "flex";
+
   // Trigger animation
   //   setTimeout(() => {
   //     popup.classList.add("popup-visible");
@@ -73,7 +75,7 @@ export const closePopup = async () => {
   const popup = document.getElementById("popup-notification");
   if (!popup) return null;
 
-  popup.classList.add("popup-fade-out");
+  popup.style.display = "none";
   setTimeout(() => {
     popup.remove();
   }, 300);
