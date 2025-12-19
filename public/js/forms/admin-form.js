@@ -62,6 +62,7 @@ export const buildAdminForm = async () => {
   // Create two-column select row for Display and Sold
   const dropDownRow = document.createElement("li");
   dropDownRow.className = "drop-down-row";
+  dropDownRow.className = "form-field";
 
   // Display select
   const displayFieldWrapper = document.createElement("div");
