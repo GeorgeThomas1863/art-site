@@ -2,11 +2,40 @@ export const buildAdminForm = async () => {
   const adminFormWrapper = document.createElement("div");
   adminFormWrapper.className = "admin-form-wrapper";
 
+  const tabNav = await buildTabNav();
   const addTab = await buildAdminTab("add");
   const editTab = await buildAdminTab("edit");
-  adminFormWrapper.append(addTab, editTab);
+  adminFormWrapper.append(tabNav, addTab, editTab);
 
   return adminFormWrapper;
+};
+
+//navigation buttons at top
+export const buildTabNav = async () => {
+  const tabContainer = document.createElement("div");
+  tabContainer.className = "admin-tab-container";
+
+  const tabWrapper = document.createElement("div");
+  tabWrapper.className = "admin-tab-wrapper";
+
+  // Add Product Tab Button
+  const addTabButton = document.createElement("button");
+  addTabButton.className = "admin-tab-button active";
+  addTabButton.id = "add-tab-button";
+  addTabButton.textContent = "Add Product";
+  addTabButton.setAttribute("data-tab", "add");
+
+  // Edit Product Tab Button
+  const editTabButton = document.createElement("button");
+  editTabButton.className = "admin-tab-button";
+  editTabButton.id = "edit-tab-button";
+  editTabButton.textContent = "Edit Product";
+  editTabButton.setAttribute("data-tab", "edit");
+
+  tabWrapper.append(addTabButton, editTabButton);
+  tabContainer.append(tabWrapper);
+
+  return tabContainer;
 };
 
 export const buildAdminTab = async (mode = "add") => {
