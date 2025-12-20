@@ -52,6 +52,10 @@ export const changeHandler = async (e) => {
   const changeElement = e.target;
   const changeId = changeElement.id;
 
+  console.log("CHANGE HANDLER");
+  console.dir(changeElement);
+  console.log(changeId);
+
   if (changeId !== "upload-pic-input") return null;
 
   const pic = e.target.files[0];

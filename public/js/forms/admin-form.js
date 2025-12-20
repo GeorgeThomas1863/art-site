@@ -409,9 +409,9 @@ export const populateAdminProductSelector = async (productData) => {
   for (let i = 0; i < productData.length; i++) {
     const product = productData[i];
     const option = document.createElement("option");
-    option.value = product._id; // or product.productId
+    option.value = product.productId;
     option.textContent = `${product.name} - ${product.productType}`;
-    option.setAttribute("data-product", JSON.stringify(product)); // Store full product data
+    option.productData = product; //stores product data to then display on select
     productSelector.append(option);
   }
 
