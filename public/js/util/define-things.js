@@ -18,4 +18,14 @@ export const COLLAPSE_ARROW_ICON = `
         <polyline points="6,9 12,15 18,9"></polyline>
       </svg>`;
 
-
+export const ADMIN_EDIT_DEFAULT_ARRAY = [
+  "edit-name",
+  "edit-product-type",
+  "edit-price",
+  "edit-description",
+  "edit-display",
+  "edit-sold",
+  "edit-upload-pic-input",
+  "edit-upload-button",
+  "edit-submit-button",
+];

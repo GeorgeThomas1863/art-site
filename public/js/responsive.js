@@ -1,6 +1,6 @@
 import { runPwToggle, runAuthSubmit, runAddNewProduct, runUploadClick, runUploadPic, runTabClick } from "./run.js";
 import { closePopup } from "./util/popup.js";
-import { changeAdminProductSelector } from "./admin.js";
+import { changeAdminProductSelector } from "./helpers/admin-data.js";
 
 const authElement = document.getElementById("auth-element");
 const displayElement = document.getElementById("display-element");

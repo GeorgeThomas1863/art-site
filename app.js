@@ -1,4 +1,4 @@
-//TO DO: - HOOK THE FILE UPLOAD TO MONGO
+//TO DO: MAKE EDIT ITEMS WORK / HOOK TO MONGO
 
 // - BUILD FRONTEND (just so have something to show)
 
