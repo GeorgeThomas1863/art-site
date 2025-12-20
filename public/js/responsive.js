@@ -54,6 +54,7 @@ export const changeHandler = async (e) => {
 
   console.log("CHANGE HANDLER");
   console.dir(changeElement);
+  console.log("CHANGE ID");
   console.log(changeId);
 
   if (changeId !== "upload-pic-input") return null;
