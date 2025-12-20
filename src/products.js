@@ -40,3 +40,11 @@ export const runAddNewProduct = async (inputParams) => {
 
   return params;
 };
+
+export const runGetProductData = async () => {
+  const { productsCollection } = CONFIG;
+
+  const dataModel = new dbModel("", productsCollection);
+  const data = await dataModel.getAll();
+  return data;
+};

@@ -24,6 +24,19 @@ class dbModel {
     const updateData = await dbGet().collection(this.collection).updateOne({ [keyToLookup]: itemValue }, { $set: { ...updateObj } }); //prettier-ignore
     return updateData;
   }
+
+  //---------------
+
+  async getAll() {
+    const arrayData = await dbGet().collection(this.collection).find().toArray();
+    return arrayData;
+  }
+
+  async getUniqueItem() {
+    const { keyToLookup, itemValue } = this.dataObject;
+    const dataArray = await dbGet().collection(this.collection).findOne({ [keyToLookup]: itemValue }); //prettier-ignore
+    return dataArray;
+  }
 }
 
 export default dbModel;

@@ -1,5 +1,5 @@
 import { EYE_OPEN_SVG, EYE_CLOSED_SVG } from "./util/define-things.js";
-import { sendToBack, sendToBackFile } from "./util/api-front.js";
+import { sendToBack, sendToBackFile, sendToBackGET } from "./util/api-front.js";
 import { getNewProductParams } from "./util/params.js";
 import { displayPopup } from "./util/popup.js";
 
@@ -57,6 +57,10 @@ export const runTabClick = async (clickElement) => {
 
   addTab.style.display = "none";
   editTab.style.display = "block";
+
+  const productData = await sendToBackGET({ route: "/get-product-data-route" });
+  console.log("PRODUCT DATA");
+  console.dir(productData);
 
   return true;
 };

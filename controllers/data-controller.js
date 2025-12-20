@@ -1,4 +1,4 @@
-import { runAddNewProduct } from "../src/add-product.js";
+import { runAddNewProduct, runGetProductData } from "../src/products.js";
 
 export const uploadPicController = async (req, res) => {
   console.log("AHHHH");
@@ -24,5 +24,11 @@ export const addNewProductController = async (req, res) => {
   if (!inputParams) return res.status(500).json({ error: "No input parameters" });
 
   const data = await runAddNewProduct(inputParams);
+  return res.json(data);
+};
+
+//returns data for all products
+export const getProductDataController = async (req, res) => {
+  const data = await runGetProductData();
   return res.json(data);
 };
