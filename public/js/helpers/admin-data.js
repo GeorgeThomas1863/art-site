@@ -117,3 +117,57 @@ export const clearAdminEditFields = async () => {
 
   return true;
 };
+
+export const clearAdminAddFields = async () => {
+  const clearFieldsArray = ["name", "price", "description"];
+
+  for (let i = 0; i < clearFieldsArray.length; i++) {
+    const field = document.getElementById(clearFieldsArray[i]);
+    if (field) {
+      field.value = "";
+    }
+  }
+
+  // Reset select dropdowns to defaults
+  const productTypeSelect = document.getElementById("product-type");
+  if (productTypeSelect) {
+    productTypeSelect.selectedIndex = 0; // Reset to first option (Acorns)
+  }
+
+  const displaySelect = document.getElementById("display");
+  if (displaySelect) {
+    displaySelect.value = "yes"; // Reset to default
+  }
+
+  const soldSelect = document.getElementById("sold");
+  if (soldSelect) {
+    soldSelect.value = "no"; // Reset to default
+  }
+
+  // Clear image preview
+  const currentImagePreview = document.getElementById("current-image-preview");
+  if (currentImagePreview) {
+    currentImagePreview.style.display = "none";
+  }
+
+  // Reset upload button and status
+  const uploadButton = document.getElementById("upload-button");
+  const uploadStatus = document.getElementById("upload-status");
+  const uploadInput = document.getElementById("upload-pic-input");
+
+  if (uploadButton) {
+    uploadButton.uploadData = null;
+    uploadButton.textContent = "Choose Image";
+  }
+
+  if (uploadStatus) {
+    uploadStatus.textContent = "";
+    uploadStatus.style.display = "none";
+  }
+
+  if (uploadInput) {
+    uploadInput.value = ""; // Clear the file input
+  }
+
+  return true;
+};
