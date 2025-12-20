@@ -2,7 +2,7 @@ import { EYE_OPEN_SVG, EYE_CLOSED_SVG } from "./util/define-things.js";
 import { sendToBack, sendToBackFile, sendToBackGET } from "./util/api-front.js";
 import { getNewProductParams } from "./util/params.js";
 import { displayPopup } from "./util/popup.js";
-import { populateAdminProductSelector } from "./forms/admin-form.js";
+import { populateAdminProductSelector } from "./admin.js";
 
 export const runAuthSubmit = async () => {
   const authPwInput = document.getElementById("auth-pw-input");

@@ -389,31 +389,3 @@ export const buildAdminSubmit = async (mode) => {
 
   return submitButton;
 };
-
-//-------------------------
-
-export const populateAdminProductSelector = async (productData) => {
-  if (!productData || !productData.length) return null;
-
-  const productSelector = document.getElementById("product-selector");
-  if (!productSelector) return;
-
-  // Clear existing options except the default one
-  const defaultOption = productSelector.querySelector("option[disabled]");
-  productSelector.innerHTML = "";
-  if (defaultOption) {
-    productSelector.append(defaultOption);
-  }
-
-  // Add all products as options
-  for (let i = 0; i < productData.length; i++) {
-    const product = productData[i];
-    const option = document.createElement("option");
-    option.value = product.productId;
-    option.textContent = `${product.name} - ${product.productType}`;
-    option.productData = product; //stores product data to then display on select
-    productSelector.append(option);
-  }
-
-  return true;
-};

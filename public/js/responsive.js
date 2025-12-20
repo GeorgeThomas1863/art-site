@@ -1,5 +1,6 @@
 import { runPwToggle, runAuthSubmit, runAddNewProduct, runUploadClick, runUploadPic, runTabClick } from "./run.js";
 import { closePopup } from "./util/popup.js";
+import { changeAdminProductSelector } from "./admin.js";
 
 const authElement = document.getElementById("auth-element");
 const displayElement = document.getElementById("display-element");
@@ -56,6 +57,8 @@ export const changeHandler = async (e) => {
   console.dir(changeElement);
   console.log("CHANGE ID");
   console.log(changeId);
+
+  if (changeId === "product-selector") await changeAdminProductSelector(changeElement);
 
   if (changeId !== "upload-pic-input") return null;
 
