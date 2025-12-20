@@ -166,6 +166,21 @@ export const runUpdateProduct = async () => {
   const popupText = `Product "${data.name}" updated successfully`;
   await displayPopup(popupText, "success");
 
+  // Refresh the product data to reflect changes
+  const productData = await sendToBackGET({ route: "/get-product-data-route" });
+  if (productData) {
+    await populateAdminProductSelector(productData);
+
+    // Re-select the product that was just updated so user can see the changes
+    productSelector.value = productId;
+
+    // Re-populate the form with the updated data
+    const updatedOption = productSelector.options[productSelector.selectedIndex];
+    if (updatedOption && updatedOption.productData) {
+      await populateAdminEditForm(updatedOption.productData);
+    }
+  }
+
   return data;
 };
 
