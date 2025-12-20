@@ -312,69 +312,6 @@ export const buildSoldToggle = async (mode) => {
 
 //---------------------
 
-// export const buildAdminUpload = async (mode) => {
-//   const uploadSection = document.createElement("div");
-//   uploadSection.className = "upload-section";
-
-//   const uploadLabel = document.createElement("label");
-//   uploadLabel.className = "upload-label";
-//   uploadLabel.textContent = mode === "add" ? "Image" : "Replace Image";
-//   uploadSection.append(uploadLabel);
-
-//   // Current image preview (only for edit mode) //FIX
-//   let currentImagePreview = null;
-//   if (mode === "edit") {
-//     currentImagePreview = document.createElement("div");
-//     currentImagePreview.className = "current-image-preview";
-//     currentImagePreview.id = "current-image-preview";
-//     currentImagePreview.style.display = "none";
-
-//     const currentImageLabel = document.createElement("span");
-//     currentImageLabel.className = "current-image-label";
-//     currentImageLabel.textContent = "Current Image:";
-
-//     const currentImage = document.createElement("img");
-//     currentImage.id = "current-image";
-//     currentImage.className = "current-image";
-//     currentImage.alt = "Current product image";
-
-//     currentImagePreview.append(currentImageLabel, currentImage);
-//     uploadSection.append(currentImagePreview);
-//   }
-
-//   // Hidden for pic upload
-//   const picInput = document.createElement("input");
-//   picInput.type = "file";
-//   picInput.id = mode === "add" ? "upload-pic-input" : "edit-upload-pic-input";
-//   picInput.accept = ".jpg,.jpeg,.png,.gif,.webp";
-//   picInput.style.display = "none";
-
-//   if (mode === "edit") {
-//     picInput.disabled = true;
-//   }
-
-//   const uploadButton = document.createElement("button");
-//   uploadButton.type = "button";
-//   uploadButton.id = mode === "add" ? "upload-button" : "edit-upload-button";
-//   uploadButton.className = "upload-btn";
-//   uploadButton.textContent = mode === "add" ? "Choose Image" : "Replace Image";
-//   uploadButton.setAttribute("data-label", mode === "add" ? "upload-click" : "edit-upload-click");
-
-//   if (mode === "edit") {
-//     uploadButton.disabled = true;
-//   }
-
-//   const uploadStatus = document.createElement("span");
-//   uploadStatus.id = mode === "add" ? "upload-status" : "edit-upload-status";
-//   uploadStatus.className = "upload-status";
-//   uploadStatus.style.marginLeft = "10px";
-//   uploadStatus.style.display = "none";
-
-//   uploadSection.append(picInput, uploadButton, uploadStatus);
-
-//   return uploadSection;
-// };
-
 export const buildAdminUpload = async (mode) => {
   const uploadSection = document.createElement("div");
   uploadSection.className = "upload-section";

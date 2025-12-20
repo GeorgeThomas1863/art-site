@@ -36,58 +36,34 @@ export const runPwToggle = async () => {
 
 //---------------------
 
-export const runUploadClick = async () => {
-  const picInput = document.getElementById("upload-pic-input");
-  if (!picInput) return null;
+export const runUploadClick = async (clickedElement) => {
+  if (!clickedElement) return null;
 
+  const mode = clickedElement.id.includes("edit") ? "edit" : "add";
+  const picInputId = mode === "add" ? "upload-pic-input" : "edit-upload-pic-input";
+  const picInput = document.getElementById(picInputId);
+
+  if (!picInput) return null;
   picInput.click();
-  // return true;
 };
 
-// export const runUploadPic = async (pic) => {
-//   if (!pic) return null;
-
-//   console.log("PIC");
-//   console.log(pic);
-
-//   const uploadStatus = document.getElementById("upload-status");
-//   const uploadButton = document.getElementById("upload-button");
-//   uploadButton.uploadData = null;
-
-//   uploadStatus.textContent = "Uploading...";
-//   uploadStatus.style.display = "inline";
-//   uploadButton.disabled = true;
-
-//   const formData = new FormData();
-//   formData.append("image", pic);
-
-//   const data = await sendToBackFile({ route: "/upload-pic-route", formData: formData });
-//   if (data === "FAIL") {
-//     uploadStatus.textContent = "✗ Upload failed";
-//     uploadStatus.style.color = "red";
-//     uploadButton.uploadData = null;
-//     return null;
-//   }
-
-//   uploadStatus.textContent = `✓ ${pic.name}`;
-//   uploadStatus.style.color = "green";
-//   uploadButton.textContent = "Change Image";
-//   uploadButton.disabled = false;
-//   uploadButton.uploadData = data;
-
-//   return data;
-// };
-
-export const runUploadPic = async (pic) => {
+export const runUploadPic = async (pic, mode = "add") => {
   if (!pic) return null;
 
-  console.log("PIC");
+  console.log(`${mode.toUpperCase()} PIC`);
   console.log(pic);
 
-  const uploadStatus = document.getElementById("upload-status");
-  const uploadButton = document.getElementById("upload-button");
-  uploadButton.uploadData = null;
+  const uploadStatusId = mode === "add" ? "upload-status" : "edit-upload-status";
+  const uploadButtonId = mode === "add" ? "upload-button" : "edit-upload-button";
+  const currentImageId = mode === "add" ? "current-image" : "edit-current-image";
+  const currentImagePreviewId = mode === "add" ? "current-image-preview" : "edit-current-image-preview";
 
+  const uploadStatus = document.getElementById(uploadStatusId);
+  const uploadButton = document.getElementById(uploadButtonId);
+
+  if (!uploadStatus || !uploadButton) return null;
+
+  uploadButton.uploadData = null;
   uploadStatus.textContent = "Uploading...";
   uploadStatus.style.display = "inline";
   uploadButton.disabled = true;
@@ -96,10 +72,12 @@ export const runUploadPic = async (pic) => {
   formData.append("image", pic);
 
   const data = await sendToBackFile({ route: "/upload-pic-route", formData: formData });
+
   if (data === "FAIL") {
     uploadStatus.textContent = "✗ Upload failed";
     uploadStatus.style.color = "red";
     uploadButton.uploadData = null;
+    uploadButton.disabled = false;
     return null;
   }
 
@@ -109,9 +87,9 @@ export const runUploadPic = async (pic) => {
   uploadButton.disabled = false;
   uploadButton.uploadData = data;
 
-  // NEW: Show the image preview
-  const currentImage = document.getElementById("current-image");
-  const currentImagePreview = document.getElementById("current-image-preview");
+  // Show the image preview
+  const currentImage = document.getElementById(currentImageId);
+  const currentImagePreview = document.getElementById(currentImagePreviewId);
 
   if (currentImage && currentImagePreview && data && data.filename) {
     currentImage.src = `/pics/${data.filename}`;
@@ -150,6 +128,46 @@ export const runAddNewProduct = async () => {
   console.dir(data);
   const popupText = `Product "${data.name}" added successfully`;
 
+  await displayPopup(popupText, "success");
+
+  return data;
+};
+
+export const runUpdateProduct = async () => {
+  // Need to get the selected product ID first
+  const productSelector = document.getElementById("product-selector");
+  const selectedOption = productSelector.options[productSelector.selectedIndex];
+
+  if (!selectedOption || !selectedOption.value) {
+    await displayPopup("Please select a product to update", "error");
+    return null;
+  }
+
+  const productId = selectedOption.value;
+  const updateProductParams = await getEditProductParams(); // Different function
+
+  // Different validation - maybe only check if CHANGED fields are valid
+  if (!updateProductParams) {
+    await displayPopup("Please make changes before updating", "error");
+    return null;
+  }
+
+  // Edit mode: image is optional (only if replacing)
+  const uploadButton = document.getElementById("edit-upload-button");
+  if (uploadButton.uploadData) {
+    updateProductParams.newImageData = uploadButton.uploadData;
+  }
+
+  updateProductParams.route = "/update-product-route";
+  updateProductParams.productId = productId;
+
+  const data = await sendToBack(updateProductParams);
+  if (!data || !data.success) {
+    await displayPopup("Failed to update product", "error");
+    return null;
+  }
+
+  const popupText = `Product "${data.name}" updated successfully`;
   await displayPopup(popupText, "success");
 
   return data;

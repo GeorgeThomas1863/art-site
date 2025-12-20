@@ -48,36 +48,6 @@ export const changeAdminProductSelector = async (changeElement) => {
   await populateAdminEditForm(productObj);
 };
 
-// export const populateAdminEditForm = async (inputObj) => {
-//   if (!inputObj) return null;
-//   const { name, productType, price, description, display, sold, picData } = inputObj;
-
-//   const adminEditMapArray = [
-//     { id: "edit-name", value: name },
-//     { id: "edit-product-type", value: productType },
-//     { id: "edit-price", value: price },
-//     { id: "edit-description", value: description },
-//     { id: "edit-display", value: display },
-//     { id: "edit-sold", value: sold },
-//   ];
-
-//   for (let i = 0; i < adminEditMapArray.length; i++) {
-//     const field = document.getElementById(adminEditMapArray[i].id);
-//     if (field) {
-//       field.value = adminEditMapArray[i].value || "";
-//     }
-//   }
-
-//   // Image preview
-//   if (!picData || !picData.filename) return null;
-//   const currentImage = document.getElementById("current-image");
-//   const currentImagePreview = document.getElementById("current-image-preview");
-//   if (!currentImage || !currentImagePreview) return null;
-
-//   currentImage.src = `/pics/${picData.filename}`;
-//   currentImagePreview.style.display = "flex";
-// };
-
 export const populateAdminEditForm = async (inputObj) => {
   if (!inputObj) return null;
   const { name, productType, price, description, display, sold, picData } = inputObj;
@@ -129,24 +99,6 @@ export const disableAdminEditFields = async () => {
 
   return true;
 };
-
-// export const clearAdminEditFields = async () => {
-//   const clearFieldsArray = ["edit-name", "edit-price", "edit-description"];
-
-//   for (let i = 0; i < clearFieldsArray.length; i++) {
-//     const field = document.getElementById(clearFieldsArray[i]);
-//     if (field) {
-//       field.value = "";
-//     }
-//   }
-
-//   const currentImagePreview = document.getElementById("current-image-preview");
-//   if (currentImagePreview) {
-//     currentImagePreview.style.display = "none";
-//   }
-
-//   return true;
-// };
 
 export const clearAdminEditFields = async () => {
   const clearFieldsArray = ["edit-name", "edit-price", "edit-description"];

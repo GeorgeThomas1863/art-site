@@ -1,4 +1,4 @@
-import { runPwToggle, runAuthSubmit, runAddNewProduct, runUploadClick, runUploadPic, runTabClick } from "./run.js";
+import { runPwToggle, runAuthSubmit, runAddNewProduct, runUploadClick, runUploadPic, runTabClick, runUpdateProduct } from "./run.js";
 import { closePopup } from "./util/popup.js";
 import { changeAdminProductSelector } from "./helpers/admin-data.js";
 
@@ -18,14 +18,13 @@ export const clickHandler = async (e) => {
   console.log(clickType);
 
   if (clickType === "auth-submit") await runAuthSubmit();
-  if (clickType === "upload-click" || clickType === "edit-upload-click") await runUploadClick();
+  if (clickType === "upload-click" || clickType === "edit-upload-click") {
+    await runUploadClick(clickElement);
+  }
   if (clickType === "new-product-submit") await runAddNewProduct();
+  if (clickType === "edit-product-submit") await runUpdateProduct();
   if (clickType === "popup-close") await closePopup();
-
   if (clickType === "pwToggle") await runPwToggle();
-  // if (clickType === "advancedToggle") await runAdvancedToggle();
-  // if (clickType === "make-pretty") await runPrettyToggle(clickId);
-  // if (clickType === "copy-return-data") await runCopyReturnData();
 
   if (tabType) await runTabClick(clickElement);
 };
@@ -42,13 +41,9 @@ export const keyHandler = async (e) => {
 
   if (keyId === "auth-pw-input") await runAuthSubmit();
 
-  // if (!displayElement) return null;
-  // await runMainSubmit();
-
   return true;
 };
 
-//for file upload
 export const changeHandler = async (e) => {
   const changeElement = e.target;
   const changeId = changeElement.id;
@@ -58,16 +53,20 @@ export const changeHandler = async (e) => {
   console.log("CHANGE ID");
   console.log(changeId);
 
-  if (changeId === "product-selector") await changeAdminProductSelector(changeElement);
+  if (changeId === "product-selector") {
+    await changeAdminProductSelector(changeElement);
+    return;
+  }
 
-  if (changeId !== "upload-pic-input") return null;
+  // Handle both add and edit upload inputs
+  if (changeId === "upload-pic-input" || changeId === "edit-upload-pic-input") {
+    const pic = e.target.files[0];
+    if (!pic) return null;
 
-  const pic = e.target.files[0];
-  // console.log("PIC");
-  // console.log(pic);
-  if (!pic) return null;
-
-  await runUploadPic(pic);
+    const mode = changeId.includes("edit") ? "edit" : "add";
+    await runUploadPic(pic, mode);
+    return;
+  }
 };
 
 if (authElement) {
@@ -78,7 +77,6 @@ if (authElement) {
 if (displayElement) {
   displayElement.addEventListener("click", clickHandler);
   displayElement.addEventListener("keydown", keyHandler);
-  // displayElement.addEventListener("change", changeHandler);
 }
 
 if (adminElement) {
