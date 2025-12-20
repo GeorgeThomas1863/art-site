@@ -151,6 +151,8 @@ export const runUpdateProduct = async () => {
     return null;
   }
 
+  //FIX THE PIC HERE
+
   const productId = selectedOption.value;
   updateProductParams.productId = productId;
   updateProductParams.route = "/update-product-route";
