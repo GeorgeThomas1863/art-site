@@ -41,6 +41,41 @@ export const runAddNewProduct = async (inputParams) => {
   return params;
 };
 
+export const runUpdateProduct = async (inputParams) => {
+  const { productsCollection } = CONFIG;
+
+  const { route: _, ...params } = inputParams;
+
+  const checkParams = {
+    keyToLookup: "productId",
+    itemValue: params.productId,
+  };
+
+  const checkModel = new dbModel(checkParams, productsCollection);
+  const checkData = await checkModel.getUniqueItem();
+  if (!checkData) return { success: false, message: "Product not found" };
+  console.log("CHECK DATA");
+  console.log(checkData);
+
+  //otherwise update
+  const updateParams = {
+    keyToLookup: "productId",
+    itemValue: params.productId,
+    updateObj: params,
+  };
+
+  const updateModel = new dbModel(updateParams, productsCollection);
+  const updateData = await updateModel.updateObjItem();
+  if (!updateData) return { success: false, message: "Failed to update product" };
+  console.log("UPDATE DATA");
+  console.log(updateData);
+
+  params.success = true;
+  params.message = "Product updated successfully";
+
+  return params;
+};
+
 export const runGetProductData = async () => {
   const { productsCollection } = CONFIG;
 

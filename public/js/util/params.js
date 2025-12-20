@@ -10,3 +10,18 @@ export const getNewProductParams = async () => {
   };
   return params;
 };
+
+export const getEditProductParams = async () => {
+  //product id and route added later
+  const params = {
+    name: document.getElementById("edit-name").value,
+    productType: document.getElementById("edit-product-type").value,
+    price: document.getElementById("edit-price").value,
+    description: document.getElementById("edit-description").value,
+    display: document.getElementById("edit-display").value,
+    sold: document.getElementById("edit-sold").value,
+    picData: document.getElementById("edit-upload-button").uploadData,
+  };
+
+  return params;
+};

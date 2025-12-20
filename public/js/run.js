@@ -1,6 +1,6 @@
 import { EYE_OPEN_SVG, EYE_CLOSED_SVG } from "./util/define-things.js";
 import { sendToBack, sendToBackFile, sendToBackGET } from "./util/api-front.js";
-import { getNewProductParams } from "./util/params.js";
+import { getNewProductParams, getEditProductParams } from "./util/params.js";
 import { displayPopup } from "./util/popup.js";
 import { populateAdminProductSelector, clearAdminAddFields } from "./helpers/admin-data.js";
 
@@ -145,24 +145,17 @@ export const runUpdateProduct = async () => {
     await displayPopup("Please select a product to update", "error");
     return null;
   }
-
-  const productId = selectedOption.value;
-  const updateProductParams = await getEditProductParams(); // Different function
-
-  // Different validation - maybe only check if CHANGED fields are valid
-  if (!updateProductParams) {
-    await displayPopup("Please make changes before updating", "error");
+  const updateProductParams = await getEditProductParams();
+  if (!updateProductParams || !updateProductParams.name || !updateProductParams.price) {
+    await displayPopup("Please fill in all product fields before submitting", "error");
     return null;
   }
 
-  // Edit mode: image is optional (only if replacing)
-  const uploadButton = document.getElementById("edit-upload-button");
-  if (uploadButton.uploadData) {
-    updateProductParams.newImageData = uploadButton.uploadData;
-  }
-
-  updateProductParams.route = "/update-product-route";
+  const productId = selectedOption.value;
   updateProductParams.productId = productId;
+  updateProductParams.route = "/update-product-route";
+  console.log("UPDATE PRODUCT PARAMS");
+  console.dir(updateProductParams);
 
   const data = await sendToBack(updateProductParams);
   if (!data || !data.success) {
