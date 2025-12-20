@@ -44,6 +44,40 @@ export const runUploadClick = async () => {
   // return true;
 };
 
+// export const runUploadPic = async (pic) => {
+//   if (!pic) return null;
+
+//   console.log("PIC");
+//   console.log(pic);
+
+//   const uploadStatus = document.getElementById("upload-status");
+//   const uploadButton = document.getElementById("upload-button");
+//   uploadButton.uploadData = null;
+
+//   uploadStatus.textContent = "Uploading...";
+//   uploadStatus.style.display = "inline";
+//   uploadButton.disabled = true;
+
+//   const formData = new FormData();
+//   formData.append("image", pic);
+
+//   const data = await sendToBackFile({ route: "/upload-pic-route", formData: formData });
+//   if (data === "FAIL") {
+//     uploadStatus.textContent = "✗ Upload failed";
+//     uploadStatus.style.color = "red";
+//     uploadButton.uploadData = null;
+//     return null;
+//   }
+
+//   uploadStatus.textContent = `✓ ${pic.name}`;
+//   uploadStatus.style.color = "green";
+//   uploadButton.textContent = "Change Image";
+//   uploadButton.disabled = false;
+//   uploadButton.uploadData = data;
+
+//   return data;
+// };
+
 export const runUploadPic = async (pic) => {
   if (!pic) return null;
 
@@ -74,6 +108,15 @@ export const runUploadPic = async (pic) => {
   uploadButton.textContent = "Change Image";
   uploadButton.disabled = false;
   uploadButton.uploadData = data;
+
+  // NEW: Show the image preview
+  const currentImage = document.getElementById("current-image");
+  const currentImagePreview = document.getElementById("current-image-preview");
+
+  if (currentImage && currentImagePreview && data && data.filename) {
+    currentImage.src = `/pics/${data.filename}`;
+    currentImagePreview.style.display = "flex";
+  }
 
   return data;
 };
