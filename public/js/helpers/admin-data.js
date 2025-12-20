@@ -115,6 +115,25 @@ export const clearAdminEditFields = async () => {
     currentImagePreview.style.display = "none";
   }
 
+  // Clear upload data
+  const uploadButton = document.getElementById("edit-upload-button");
+  const uploadStatus = document.getElementById("edit-upload-status");
+  const uploadInput = document.getElementById("edit-upload-pic-input");
+
+  if (uploadButton) {
+    uploadButton.uploadData = null;
+    uploadButton.textContent = "Replace Image";
+  }
+
+  if (uploadStatus) {
+    uploadStatus.textContent = "";
+    uploadStatus.style.display = "none";
+  }
+
+  if (uploadInput) {
+    uploadInput.value = "";
+  }
+
   return true;
 };
 
