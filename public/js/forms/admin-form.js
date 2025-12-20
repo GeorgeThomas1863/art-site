@@ -49,8 +49,8 @@ export const buildAdminTab = async (mode = "add") => {
   // Hide edit form by default
   if (mode === "edit") {
     tabWrapper.style.display = "none";
-    const productSelector = await buildProductSelector();
-    tabWrapper.append(productSelector);
+    const adminProductSelector = await buildAdminProductSelector();
+    tabWrapper.append(adminProductSelector);
   }
 
   const adminName = await buildName(mode);
@@ -74,7 +74,7 @@ export const buildTabTitle = async (mode) => {
   return tabTitle;
 };
 
-export const buildProductSelector = async () => {
+export const buildAdminProductSelector = async () => {
   const selectorWrapper = document.createElement("li");
   selectorWrapper.className = "form-field product-selector-field";
 
@@ -186,10 +186,12 @@ export const buildFormInputList = async (mode) => {
     const fieldWrapper = document.createElement("li");
     fieldWrapper.className = "form-field";
 
+    const fieldId = mode === "edit" ? `edit-${field.name}` : field.name;
+
     const label = document.createElement("label");
     label.className = "form-label";
     label.textContent = field.label;
-    label.setAttribute("for", field.name);
+    label.setAttribute("for", fieldId);
 
     let input;
     if (field.type === "textarea") {
@@ -201,8 +203,8 @@ export const buildFormInputList = async (mode) => {
       input.type = field.type;
     }
 
-    input.id = field.name;
-    input.name = field.name;
+    input.id = fieldId;
+    input.name = fieldId;
 
     if (mode === "edit") {
       input.disabled = true;
@@ -386,4 +388,32 @@ export const buildAdminSubmit = async (mode) => {
   }
 
   return submitButton;
+};
+
+//-------------------------
+
+export const populateAdminProductSelector = async (productData) => {
+  if (!productData || !productData.length) return null;
+
+  const productSelector = document.getElementById("product-selector");
+  if (!productSelector) return;
+
+  // Clear existing options except the default one
+  const defaultOption = productSelector.querySelector("option[disabled]");
+  productSelector.innerHTML = "";
+  if (defaultOption) {
+    productSelector.append(defaultOption);
+  }
+
+  // Add all products as options
+  for (let i = 0; i < productData.length; i++) {
+    const product = productData[i];
+    const option = document.createElement("option");
+    option.value = product._id; // or product.productId
+    option.textContent = `${product.name} - ${product.productType}`;
+    option.setAttribute("data-product", JSON.stringify(product)); // Store full product data
+    productSelector.append(option);
+  }
+
+  return true;
 };
