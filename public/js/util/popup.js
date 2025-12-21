@@ -39,21 +39,13 @@ export const displayPopup = async (message, type = "success") => {
   closeBtn.innerHTML = "×";
   closeBtn.setAttribute("data-label", "popup-close");
 
-  // Add click handler for close button
-  //   closeBtn.onclick = () => {
-  //     popup.classList.add("popup-fade-out");
-  //     setTimeout(() => {
-  //       popup.remove();
-  //     }, 300);
-  //   };
-
   // Append elements
   popup.append(icon, messageText, closeBtn);
   adminElement.append(popup);
 
   popup.style.display = "flex";
 
-  // Auto-remove after 10 seconds
+  // Auto-remove after 5 seconds
   setTimeout(() => {
     popup.style.display = "none";
   }, 5000);

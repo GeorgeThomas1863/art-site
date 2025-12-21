@@ -1,7 +1,6 @@
 import { runTabClick, runUploadClick, runUploadPic, runAddNewProduct, runEditProduct, changeAdminProductSelector } from "./helpers/admin-run.js";
 import { runAuthSubmit, runPwToggle } from "./auth.js";
 import { closePopup } from "./util/popup.js";
-import { changeAdminProductSelector } from "./helpers/admin-run.js";
 
 const authElement = document.getElementById("auth-element");
 const displayElement = document.getElementById("display-element");
@@ -19,8 +18,8 @@ export const clickHandler = async (e) => {
   console.log(clickType);
 
   if (clickType === "auth-submit") await runAuthSubmit();
-  if (clickType === "popup-close") await closePopup();
   if (clickType === "pwToggle") await runPwToggle();
+  if (clickType === "popup-close") await closePopup();
 
   if (tabType) await runTabClick(clickElement);
   if (clickType === "upload-click" || clickType === "edit-upload-click") await runUploadClick(clickElement);
