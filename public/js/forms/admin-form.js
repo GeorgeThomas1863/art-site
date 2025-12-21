@@ -96,7 +96,26 @@ export const buildAdminProductSelector = async () => {
   defaultOption.disabled = true;
   productSelect.append(defaultOption);
 
-  selectorWrapper.append(selectorLabel, productSelect);
+  //NEW delete option
+  const productActionsRow = document.createElement("div");
+  productActionsRow.className = "product-actions-row";
+  productActionsRow.style.display = "none"; // Hidden until product selected
+
+  const productInfo = document.createElement("span");
+  productInfo.className = "product-info";
+  productInfo.id = "product-info-text";
+  productInfo.textContent = ""; // Will be populated when product is selected
+
+  const deleteLink = document.createElement("a");
+  deleteLink.href = "#";
+  deleteLink.className = "delete-link-small";
+  deleteLink.id = "delete-product-link";
+  deleteLink.textContent = "Delete Product";
+  deleteLink.setAttribute("data-label", "delete-product-link");
+
+  productActionsRow.append(productInfo, deleteLink);
+
+  selectorWrapper.append(selectorLabel, productSelect, productActionsRow);
 
   return selectorWrapper;
 };
