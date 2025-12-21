@@ -268,10 +268,14 @@ export const populateAdminEditForm = async (inputObj) => {
 
   // Image preview - UPDATED IDs
   if (!picData || !picData.filename) return null;
+
   const currentImage = document.getElementById("edit-current-image");
   const currentImagePreview = document.getElementById("edit-current-image-preview");
-  if (!currentImage || !currentImagePreview) return null;
+  const editUploadButton = document.getElementById("edit-upload-button");
+  if (!currentImage || !currentImagePreview || !editUploadButton) return null;
 
+  //set pic data to upload button (to get correct pic when submitting edit)
+  editUploadButton.uploadData = picData;
   currentImage.src = `/pics/${picData.filename}`;
   currentImagePreview.style.display = "flex";
 };
