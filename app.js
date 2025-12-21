@@ -1,5 +1,3 @@
-//TO DO: BUILD DELETE FUNCTIONALITY [WITH POPUP]
-
 //ADD REAL DATA AND BUILD FRONTEND
 
 import express from "express";
