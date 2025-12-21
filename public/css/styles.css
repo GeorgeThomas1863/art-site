@@ -139,7 +139,7 @@
 
 .admin-tab-title-wrapper {
   position: relative;
-  margin-bottom: 1.5rem;
+  margin-bottom: 1rem;
 }
 
 .delete-btn-header {
@@ -190,11 +190,11 @@
   display: flex;
   flex-direction: column;
   gap: 0.5rem;
-  margin-bottom: 1.5rem;
+  margin-bottom: 1rem;
 }
 
 .product-selector-field {
-  margin-bottom: 1.5rem;
+  margin-bottom: 1rem;
 }
 
 .drop-down-row {
@@ -250,16 +250,16 @@
 }
 
 .form-textarea {
-  min-height: 120px;
+  min-height: 100px;
   resize: vertical;
-  line-height: 1.8;
+  line-height: 1.5;
 }
 
 .upload-section {
   display: flex;
   flex-direction: column;
   gap: 1rem;
-  margin-top: 3rem;
+  margin-top: 2rem;
   margin-bottom: 4rem;
 }
 
