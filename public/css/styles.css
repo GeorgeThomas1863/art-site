@@ -258,6 +258,7 @@
   border: 1px solid #e0e0e0;
   border-radius: 4px;
   margin-bottom: 1rem;
+  min-height: 420px;
 }
 
 .current-image-label {
@@ -269,8 +270,8 @@
 }
 
 .current-image {
-  max-width: 150px;
-  max-height: 150px;
+  max-width: 400px;
+  max-height: 400px;
   object-fit: contain;
   border: 1px solid #ddd;
   border-radius: 4px;
