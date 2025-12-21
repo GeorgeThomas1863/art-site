@@ -133,7 +133,7 @@
 }
 
 .admin-tab {
-  padding: 1.5rem;
+  padding: 2rem 1.5rem;
   background: #fafbfc;
   border-radius: 0;
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
@@ -313,6 +313,7 @@
   cursor: pointer;
   transition: all 0.3s;
   text-transform: uppercase;
+  border-radius: 4px;
 }
 
 .upload-btn:hover:not(:disabled) {
@@ -344,7 +345,8 @@
   transition: all 0.3s;
   text-transform: uppercase;
   width: 100%;
-  margin-bottom: 2rem;
+  /* margin-bottom: 2rem; */
+  border-radius: 4px;
 }
 
 .submit-btn:hover:not(:disabled) {
