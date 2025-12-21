@@ -282,7 +282,7 @@ export const populateAdminProductSelector = async (inputArray) => {
     const product = inputArray[i];
     const option = document.createElement("option");
     option.value = product.productId;
-    option.textContent = `${product.name} - ${product.productType}`;
+    option.textContent = `${product.name}`;
     option.productData = product; //stores product data to then display on select
     productSelector.append(option);
   }
