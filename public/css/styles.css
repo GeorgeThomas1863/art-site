@@ -82,13 +82,19 @@
 /* ---------------------------------------------- */
 
 /* ADMIN FORM STYLES */
+.admin-form-wrapper {
+  margin: 1.5rem auto;
+  max-width: 600px;
+  width: 100%;
+  border-radius: 8px;
+}
 
-.admin-tab-container {
-  margin: 1.5rem auto 0; /* 0 on bottom */
+/* .admin-tab-container {
+  margin: 1.5rem auto 0; 
   max-width: 600px;
   width: 100%;
   border-radius: 8px 8px 0 0;
-}
+} */
 
 .admin-tab-wrapper {
   display: flex;
@@ -124,11 +130,7 @@
   font-weight: 500;
 }
 
-.admin-form-wrapper {
-  margin: 0 auto;
-  max-width: 600px;
-  width: 100%;
-}
+
 
 .admin-tab {
   padding: 1.5rem;
