@@ -138,20 +138,22 @@
 }
 
 .admin-tab-title-wrapper {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
+  position: relative;
   margin-bottom: 1.5rem;
 }
 
 .delete-btn-header {
-  font-size: 0.75rem;
+  position: absolute;
+  top: 50%;
+  right: 0;
+  transform: translateY(-50%);
+  font-size: 0.65rem;
   font-weight: 300;
-  letter-spacing: 1.5px;
+  letter-spacing: 1px;
   color: #dc2626;
   background-color: transparent;
   border: 1px solid #dc2626;
-  padding: 0.5rem 1rem;
+  padding: 0.35rem 0.7rem;
   cursor: pointer;
   transition: all 0.3s;
   text-transform: uppercase;
@@ -165,14 +167,13 @@
 
 .delete-btn-header:active {
   background-color: #fecaca;
-  transform: translateY(1px);
+  transform: translateY(-50%) translateY(1px);
 }
 
 .admin-tab-title {
   font-size: 1.5rem;
   font-weight: 300;
   letter-spacing: 2px;
-  margin-bottom: 1.5rem;
   text-align: center;
   color: #000000;
 }
