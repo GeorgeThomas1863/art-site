@@ -257,6 +257,7 @@
   min-height: 110px;
   resize: vertical;
   line-height: 1.8;
+  padding: 0.5rem 1rem;
 }
 
 .upload-section {
