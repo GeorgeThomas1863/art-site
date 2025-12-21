@@ -481,20 +481,7 @@
   gap: 1.5rem;
   min-width: 400px;
   max-width: 500px;
-  border-left: 4px solid #f59e0b;
-}
-
-.confirm-icon {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 48px;
-  height: 48px;
-  border-radius: 50%;
-  font-size: 1.8rem;
-  font-weight: 600;
-  background-color: #fef3c7;
-  color: #d97706;
+  border-left: 4px solid #333;
 }
 
 .confirm-message {
@@ -527,6 +514,22 @@
   border-radius: 4px;
 }
 
+.confirm-btn-yes {
+  background-color: #dc2626;
+  border: 1px solid #dc2626;
+  color: #ffffff;
+}
+
+.confirm-btn-yes:hover {
+  background-color: #b91c1c;
+  border-color: #b91c1c;
+}
+
+.confirm-btn-yes:active {
+  background-color: #991b1b;
+  transform: translateY(1px);
+}
+
 .confirm-btn-no {
   background-color: transparent;
   border: 1px solid #333;
@@ -543,20 +546,15 @@
   transform: translateY(1px);
 }
 
-.confirm-btn-yes {
-  background-color: #dc2626;
-  border: 1px solid #dc2626;
-  color: #ffffff;
+/* Default button styling (focused state) */
+.confirm-btn-default {
+  outline: 2px solid #164388;
+  outline-offset: 2px;
 }
 
-.confirm-btn-yes:hover {
-  background-color: #b91c1c;
-  border-color: #b91c1c;
-}
-
-.confirm-btn-yes:active {
-  background-color: #991b1b;
-  transform: translateY(1px);
+.confirm-btn:focus {
+  outline: 2px solid #164388;
+  outline-offset: 2px;
 }
 
 /* -------------------------------------------------------- */

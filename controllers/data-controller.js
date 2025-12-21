@@ -36,9 +36,6 @@ export const editProductController = async (req, res) => {
 };
 
 export const deleteProductController = async (req, res) => {
-  console.log("DELETE PRODUCT CONTROLLER");
-  console.log(req.body);
-
   const productId = req.body.productId;
   if (!productId) return res.status(500).json({ error: "No product ID" });
 

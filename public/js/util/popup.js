@@ -107,11 +107,6 @@ export const buildConfirmDialog = async (message) => {
   const dialogContent = document.createElement("div");
   dialogContent.className = "confirm-dialog-content";
 
-  // Create icon
-  const icon = document.createElement("span");
-  icon.className = "confirm-icon";
-  icon.innerHTML = "?";
-
   // Create message
   const messageText = document.createElement("p");
   messageText.className = "confirm-message";
@@ -135,8 +130,11 @@ export const buildConfirmDialog = async (message) => {
 
   // Append elements
   buttonContainer.append(noBtn, yesBtn);
-  dialogContent.append(icon, messageText, buttonContainer);
+  dialogContent.append(messageText, buttonContainer);
   dialog.append(dialogContent);
+
+  // Auto-focus the No button when dialog appears
+  setTimeout(() => noBtn.focus(), 0);
 
   return dialog;
 };
