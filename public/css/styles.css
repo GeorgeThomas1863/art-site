@@ -139,7 +139,7 @@
 
 .admin-tab-title-wrapper {
   position: relative;
-  margin-bottom: 1.5rem;
+  margin-bottom: 2rem;
 }
 
 .delete-btn-header {
@@ -147,12 +147,13 @@
   top: 50%;
   right: 0;
   transform: translateY(-50%);
-  font-size: 0.65rem;
+  font-size: 0.6rem;
   font-weight: 300;
   letter-spacing: 1px;
   color: #dc2626;
   background-color: transparent;
   border: 1px solid #dc2626;
+  border-radius: 4px;
   padding: 0.35rem 0.7rem;
   cursor: pointer;
   transition: all 0.3s;
@@ -193,9 +194,7 @@
 }
 
 .product-selector-field {
-  padding-bottom: 1.5rem;
-  border-bottom: 1px solid #e0e0e0;
-  margin-bottom: 2.5rem;
+  margin-bottom: 2rem;
 }
 
 .drop-down-row {
