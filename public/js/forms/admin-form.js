@@ -354,7 +354,7 @@ export const buildAdminUpload = async (mode) => {
   uploadButton.type = "button";
   uploadButton.id = mode === "add" ? "upload-button" : "edit-upload-button";
   uploadButton.className = "upload-btn";
-  uploadButton.textContent = mode === "add" ? "Choose Image" : "";
+  uploadButton.textContent = mode === "add" ? "Choose Image" : "Change Image";
   uploadButton.setAttribute("data-label", mode === "add" ? "upload-click" : "edit-upload-click");
 
   if (mode === "edit") {

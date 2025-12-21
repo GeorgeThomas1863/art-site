@@ -374,7 +374,7 @@ export const clearAdminEditFields = async () => {
 
   if (uploadButton) {
     uploadButton.uploadData = null;
-    uploadButton.textContent = "Replace Image";
+    uploadButton.textContent = "Change Image";
   }
 
   if (uploadStatus) {
