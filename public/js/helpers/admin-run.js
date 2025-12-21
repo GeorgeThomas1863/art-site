@@ -219,13 +219,20 @@ export const runDeleteProduct = async () => {
   const popupText = `Product "${productName}" deleted successfully`;
   await displayPopup(popupText, "success");
 
-  await clearAdminEditFields();
-
   // Refresh the product data to reflect changes
   const productData = await sendToBackGET({ route: "/get-product-data-route" });
   if (productData) {
     await populateAdminProductSelector(productData);
   }
+
+  // Clear the form fields
+  await clearAdminEditFields();
+
+  // Disable all edit fields
+  await disableAdminEditFields();
+
+  // Reset product selector to default option
+  productSelector.value = "";
 
   return data;
 };
