@@ -1,7 +1,7 @@
 import { ADMIN_EDIT_DEFAULT_ARRAY } from "../util/define-things.js";
 import { sendToBackFile, sendToBack, sendToBackGET } from "../util/api-front.js";
 import { getNewProductParams, getEditProductParams } from "../util/params.js";
-import { displayPopup } from "../util/popup.js";
+import { displayPopup, displayConfirmDialog } from "../util/popup.js";
 
 //EVENT HANDLERS
 export const runTabClick = async (clickElement) => {
