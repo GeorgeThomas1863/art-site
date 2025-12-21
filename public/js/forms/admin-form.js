@@ -318,10 +318,10 @@ export const buildAdminUpload = async (mode) => {
 
   const uploadLabel = document.createElement("label");
   uploadLabel.className = "upload-label";
-  uploadLabel.textContent = mode === "add" ? "Image" : "Change Image";
+  uploadLabel.textContent = mode === "add" ? "Image" : "";
   uploadSection.append(uploadLabel);
 
-  // Current image preview - NOW ENABLED FOR BOTH MODES
+  // Current image preview
   const currentImagePreview = document.createElement("div");
   currentImagePreview.className = "current-image-preview";
   currentImagePreview.id = mode === "add" ? "current-image-preview" : "edit-current-image-preview";
