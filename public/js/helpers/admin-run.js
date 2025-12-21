@@ -266,6 +266,13 @@ export const populateAdminEditForm = async (inputObj) => {
     }
   }
 
+  const productActionsRow = document.querySelector(".product-actions-row");
+  const productInfoText = document.getElementById("product-info-text");
+  if (productActionsRow && productInfoText) {
+    productActionsRow.style.display = "flex";
+    productInfoText.textContent = `Selected: ${name}`;
+  }
+
   // Image preview - UPDATED IDs
   if (!picData || !picData.filename) return null;
 
