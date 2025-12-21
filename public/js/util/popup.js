@@ -129,7 +129,7 @@ export const buildConfirmDialog = async (message) => {
   noBtn.setAttribute("data-label", "confirm-no");
 
   // Append elements
-  buttonContainer.append(noBtn, yesBtn);
+  buttonContainer.append(yesBtn, noBtn);
   dialogContent.append(messageText, buttonContainer);
   dialog.append(dialogContent);
 
