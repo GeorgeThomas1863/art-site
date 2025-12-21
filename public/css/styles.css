@@ -84,7 +84,7 @@
 /* ADMIN FORM STYLES */
 
 .admin-tab-container {
-  margin: 1rem auto;
+  margin: 1.5rem auto;
   max-width: 600px;
   width: 100%;
 }
@@ -139,7 +139,7 @@
 
 .admin-tab-title-wrapper {
   position: relative;
-  margin-bottom: 2rem;
+  margin-bottom: 1.5rem;
 }
 
 .delete-btn-header {
@@ -190,18 +190,17 @@
   display: flex;
   flex-direction: column;
   gap: 0.5rem;
-  margin-bottom: 2rem;
+  margin-bottom: 1.5rem;
 }
 
 .product-selector-field {
-  margin-bottom: 2rem;
+  margin-bottom: 1.5rem;
 }
 
 .drop-down-row {
   display: flex;
   gap: 1.5rem;
   list-style: none;
-  /* margin-bottom: 2rem; */
 }
 
 .drop-down-half {
