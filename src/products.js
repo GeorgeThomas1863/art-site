@@ -41,7 +41,7 @@ export const runAddNewProduct = async (inputParams) => {
   return params;
 };
 
-export const runUpdateProduct = async (inputParams) => {
+export const runEditProduct = async (inputParams) => {
   const { productsCollection } = CONFIG;
 
   const { route: _, ...params } = inputParams;
@@ -58,20 +58,50 @@ export const runUpdateProduct = async (inputParams) => {
   console.log(checkData);
 
   //otherwise update
-  const updateParams = {
+  const editParams = {
     keyToLookup: "productId",
     itemValue: params.productId,
     updateObj: params,
   };
 
-  const updateModel = new dbModel(updateParams, productsCollection);
-  const updateData = await updateModel.updateObjItem();
-  if (!updateData) return { success: false, message: "Failed to update product" };
-  console.log("UPDATE DATA");
-  console.log(updateData);
+  const editModel = new dbModel(editParams, productsCollection);
+  const editData = await editModel.updateObjItem();
+  if (!editData) return { success: false, message: "Failed to update product" };
+  console.log("EDIT DATA");
+  console.log(editData);
 
   params.success = true;
   params.message = "Product updated successfully";
+
+  return params;
+};
+
+export const runDeleteProduct = async (productId) => {
+  const { productsCollection } = CONFIG;
+
+  const checkParams = {
+    keyToLookup: "productId",
+    itemValue: productId,
+  };
+
+  const checkModel = new dbModel(checkParams, productsCollection);
+  const checkData = await checkModel.getUniqueItem();
+  if (!checkData) return { success: false, message: "Product not found" };
+  console.log("CHECK DATA");
+  console.log(checkData);
+
+  const params = {
+    keyToLookup: "productId",
+    itemValue: productId,
+  };
+
+  const deleteModel = new dbModel(params, productsCollection);
+  const deleteData = await deleteModel.deleteItem();
+  if (!deleteData) return { success: false, message: "Failed to delete product" };
+
+  params.success = true;
+  params.message = "Product deleted successfully";
+  params.productId = productId; //for tracking
 
   return params;
 };

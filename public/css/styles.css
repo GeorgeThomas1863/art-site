@@ -456,6 +456,109 @@
   color: #333;
 }
 
+/* Confirmation Dialog Styles */
+.confirm-dialog {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: none;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.confirm-dialog-content {
+  background: #ffffff;
+  border-radius: 8px;
+  padding: 2rem 2.5rem;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.5rem;
+  min-width: 400px;
+  max-width: 500px;
+  border-left: 4px solid #f59e0b;
+}
+
+.confirm-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  font-size: 1.8rem;
+  font-weight: 600;
+  background-color: #fef3c7;
+  color: #d97706;
+}
+
+.confirm-message {
+  font-size: 1rem;
+  font-weight: 400;
+  letter-spacing: 0.5px;
+  color: #1a1a1a;
+  text-align: center;
+  line-height: 1.5;
+  margin: 0;
+}
+
+.confirm-button-container {
+  display: flex;
+  gap: 1rem;
+  width: 100%;
+  margin-top: 0.5rem;
+}
+
+.confirm-btn {
+  flex: 1;
+  font-family: "Georgia", serif;
+  font-size: 0.9rem;
+  font-weight: 400;
+  letter-spacing: 2px;
+  padding: 0.9rem 2rem;
+  cursor: pointer;
+  transition: all 0.3s;
+  text-transform: uppercase;
+  border-radius: 4px;
+}
+
+.confirm-btn-no {
+  background-color: transparent;
+  border: 1px solid #333;
+  color: #333;
+}
+
+.confirm-btn-no:hover {
+  background-color: #f5f5f5;
+  color: #1a1a1a;
+}
+
+.confirm-btn-no:active {
+  background-color: #e5e5e5;
+  transform: translateY(1px);
+}
+
+.confirm-btn-yes {
+  background-color: #dc2626;
+  border: 1px solid #dc2626;
+  color: #ffffff;
+}
+
+.confirm-btn-yes:hover {
+  background-color: #b91c1c;
+  border-color: #b91c1c;
+}
+
+.confirm-btn-yes:active {
+  background-color: #991b1b;
+  transform: translateY(1px);
+}
+
 /* -------------------------------------------------------- */
 
 /* CLASSES */

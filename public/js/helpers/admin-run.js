@@ -152,8 +152,8 @@ export const runEditProduct = async () => {
     await displayPopup("Please select a product to update", "error");
     return null;
   }
-  const updateProductParams = await getEditProductParams();
-  if (!updateProductParams || !updateProductParams.name || !updateProductParams.price) {
+  const editProductParams = await getEditProductParams();
+  if (!editProductParams || !editProductParams.name || !editProductParams.price) {
     await displayPopup("Please fill in all product fields before submitting", "error");
     return null;
   }
@@ -161,12 +161,12 @@ export const runEditProduct = async () => {
   //FIX THE PIC HERE
 
   const productId = selectedOption.value;
-  updateProductParams.productId = productId;
-  updateProductParams.route = "/update-product-route";
+  editProductParams.productId = productId;
+  editProductParams.route = "/edit-product-route";
   console.log("UPDATE PRODUCT PARAMS");
-  console.dir(updateProductParams);
+  console.dir(editProductParams);
 
-  const data = await sendToBack(updateProductParams);
+  const data = await sendToBack(editProductParams);
   if (!data || !data.success) {
     await displayPopup("Failed to update product", "error");
     return null;
@@ -189,6 +189,35 @@ export const runEditProduct = async () => {
       await populateAdminEditForm(updatedOption.productData);
     }
   }
+
+  return data;
+};
+
+export const runDeleteProduct = async () => {
+  const productSelector = document.getElementById("product-selector");
+  const selectedOption = productSelector.options[productSelector.selectedIndex];
+
+  if (!selectedOption || !selectedOption.value) {
+    await displayPopup("Please select a product to delete", "error");
+    return null;
+  }
+
+  const productName = document.getElementById("edit-name").value;
+  const confirmMessage = `Are you sure you want to delete ${productName}? This action cannot be undone.`;
+  const confirmDialog = await displayConfirmDialog(confirmMessage);
+
+  if (!confirmDialog) return null;
+
+  const productId = selectedOption.value;
+
+  const data = await sendToBack({ route: "/delete-product-route", productId: productId });
+  if (!data || !data.success) {
+    await displayPopup("Failed to delete product", "error");
+    return null;
+  }
+
+  const popupText = `Product "${productName}" deleted successfully`;
+  await displayPopup(popupText, "success");
 
   return data;
 };

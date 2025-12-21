@@ -37,6 +37,14 @@ class dbModel {
     const dataArray = await dbGet().collection(this.collection).findOne({ [keyToLookup]: itemValue }); //prettier-ignore
     return dataArray;
   }
+
+  //--------------
+
+  async deleteItem() {
+    const { keyToLookup, itemValue } = this.dataObject;
+    const deleteData = await dbGet().collection(this.collection).deleteOne({ [keyToLookup]: itemValue }); //prettier-ignore
+    return deleteData;
+  }
 }
 
 export default dbModel;

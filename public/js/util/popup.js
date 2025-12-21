@@ -60,3 +60,83 @@ export const closePopup = async () => {
     popup.remove();
   }, 300);
 };
+
+//---------------------------
+
+export const displayConfirmDialog = async (message) => {
+  const adminElement = document.getElementById("admin-element");
+  if (!adminElement) return null;
+
+  // Remove any existing dialogs
+  const existingDialog = document.getElementById("confirm-dialog");
+  if (existingDialog) {
+    existingDialog.remove();
+  }
+
+  const dialog = await buildConfirmDialog(message);
+  adminElement.append(dialog);
+  dialog.style.display = "flex";
+
+  // Return a promise that will be resolved by the click handler
+  return new Promise((resolve) => {
+    // Store the resolve function so clickHandler can access it
+    window.confirmDialogResolve = resolve;
+  });
+};
+
+export const closeConfirmDialog = async (result) => {
+  const dialog = document.getElementById("confirm-dialog");
+  if (!dialog) return null;
+
+  dialog.remove();
+
+  // Resolve the promise if it exists
+  if (window.confirmDialogResolve) {
+    window.confirmDialogResolve(result);
+    window.confirmDialogResolve = null;
+  }
+};
+
+export const buildConfirmDialog = async (message) => {
+  // Create dialog container
+  const dialog = document.createElement("div");
+  dialog.id = "confirm-dialog";
+  dialog.className = "confirm-dialog";
+
+  // Create dialog content wrapper
+  const dialogContent = document.createElement("div");
+  dialogContent.className = "confirm-dialog-content";
+
+  // Create icon
+  const icon = document.createElement("span");
+  icon.className = "confirm-icon";
+  icon.innerHTML = "?";
+
+  // Create message
+  const messageText = document.createElement("p");
+  messageText.className = "confirm-message";
+  messageText.textContent = message;
+
+  // Create button container
+  const buttonContainer = document.createElement("div");
+  buttonContainer.className = "confirm-button-container";
+
+  // Create Yes button
+  const yesBtn = document.createElement("button");
+  yesBtn.className = "confirm-btn confirm-btn-yes";
+  yesBtn.textContent = "Yes";
+  yesBtn.setAttribute("data-label", "confirm-yes");
+
+  // Create No button
+  const noBtn = document.createElement("button");
+  noBtn.className = "confirm-btn confirm-btn-no";
+  noBtn.textContent = "No";
+  noBtn.setAttribute("data-label", "confirm-no");
+
+  // Append elements
+  buttonContainer.append(noBtn, yesBtn);
+  dialogContent.append(icon, messageText, buttonContainer);
+  dialog.append(dialogContent);
+
+  return dialog;
+};

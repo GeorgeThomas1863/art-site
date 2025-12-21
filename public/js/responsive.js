@@ -1,6 +1,6 @@
-import { runTabClick, runUploadClick, runUploadPic, runAddNewProduct, runEditProduct, changeAdminProductSelector } from "./helpers/admin-run.js";
+import { runTabClick, runUploadClick, runUploadPic, runAddNewProduct, runEditProduct, runDeleteProduct, changeAdminProductSelector } from "./helpers/admin-run.js"; //prettier-ignore
 import { runAuthSubmit, runPwToggle } from "./auth.js";
-import { closePopup } from "./util/popup.js";
+import { closePopup, closeConfirmDialog } from "./util/popup.js";
 
 const authElement = document.getElementById("auth-element");
 const displayElement = document.getElementById("display-element");
@@ -20,12 +20,15 @@ export const clickHandler = async (e) => {
   if (clickType === "auth-submit") await runAuthSubmit();
   if (clickType === "pwToggle") await runPwToggle();
   if (clickType === "popup-close") await closePopup();
+  if (clickType === "confirm-yes") await closeConfirmDialog(true);
+  if (clickType === "confirm-no") await closeConfirmDialog(false);
 
   if (tabType) await runTabClick(clickElement);
   if (clickType === "upload-click" || clickType === "edit-upload-click") await runUploadClick(clickElement);
 
   if (clickType === "new-product-submit") await runAddNewProduct();
   if (clickType === "edit-product-submit") await runEditProduct();
+  if (clickType === "delete-product-submit") await runDeleteProduct();
 };
 
 export const keyHandler = async (e) => {

@@ -4,7 +4,7 @@ import express from "express";
 import requireAuth from "./auth.js";
 import { authController } from "../controllers/auth-controller.js";
 import { mainDisplay, adminDisplay, display404, display500, display401 } from "../controllers/display-controller.js";
-import { uploadPicController, addNewProductController, updateProductController, getProductDataController } from "../controllers/data-controller.js";
+import { uploadPicController, addNewProductController, editProductController, deleteProductController, getProductDataController } from "../controllers/data-controller.js"; //prettier-ignore
 import { upload } from "../src/upload-pic.js";
 
 const router = express.Router();
@@ -20,7 +20,9 @@ router.post("/upload-pic-route", requireAuth, upload.single("image"), uploadPicC
 
 router.post("/add-new-product-route", requireAuth, addNewProductController);
 
-router.post("/update-product-route", requireAuth, updateProductController);
+router.post("/edit-product-route", requireAuth, editProductController);
+
+router.post("/delete-product-route", requireAuth, deleteProductController);
 
 router.get("/get-product-data-route", requireAuth, getProductDataController);
 

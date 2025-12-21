@@ -82,7 +82,7 @@ export const buildTabTitle = async (mode) => {
   deleteButton.className = "delete-btn-header";
   deleteButton.id = "delete-product-button";
   deleteButton.textContent = "Delete Product";
-  deleteButton.setAttribute("data-label", "delete-product-button");
+  deleteButton.setAttribute("data-label", "delete-product-submit");
   deleteButton.style.display = "none"; // Hidden by default
 
   titleWrapper.append(deleteButton);

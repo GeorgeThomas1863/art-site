@@ -1,4 +1,4 @@
-import { runAddNewProduct, runUpdateProduct, runGetProductData } from "../src/products.js";
+import { runAddNewProduct, runEditProduct, runDeleteProduct, runGetProductData } from "../src/products.js";
 
 export const uploadPicController = async (req, res) => {
   console.log("AHHHH");
@@ -27,11 +27,22 @@ export const addNewProductController = async (req, res) => {
   return res.json(data);
 };
 
-export const updateProductController = async (req, res) => {
+export const editProductController = async (req, res) => {
   const inputParams = req.body;
   if (!inputParams) return res.status(500).json({ error: "No input parameters" });
 
-  const data = await runUpdateProduct(inputParams);
+  const data = await runEditProduct(inputParams);
+  return res.json(data);
+};
+
+export const deleteProductController = async (req, res) => {
+  console.log("DELETE PRODUCT CONTROLLER");
+  console.log(req.body);
+
+  const productId = req.body.productId;
+  if (!productId) return res.status(500).json({ error: "No product ID" });
+
+  const data = await runDeleteProduct(productId);
   return res.json(data);
 };
 
