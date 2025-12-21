@@ -139,12 +139,12 @@
 
 .admin-tab-title-wrapper {
   position: relative;
-  margin-bottom: 2rem;
+  margin-bottom: 2.5rem;
 }
 
 .delete-btn-header {
   position: absolute;
-  top: 50%;
+  top: 40%;
   right: 0;
   transform: translateY(-50%);
   font-size: 0.6rem;
