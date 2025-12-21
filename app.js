@@ -1,10 +1,6 @@
 //TO DO: BUILD DELETE FUNCTIONALITY
 
-//REFACTOR FROM RUN TO HELPER ADD FUNCTIONS
-
-// - BUILD FRONTEND (just so have something to show)
-
-// - ADD EDIT ITEM / VIEW ITEM BUTTONS / FUNCTIONS
+//ADD REAL DATA AND BUILD FRONTEND
 
 import express from "express";
 import session from "express-session";
