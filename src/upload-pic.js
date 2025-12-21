@@ -4,7 +4,7 @@ import multer from "multer";
 
 import CONFIG from "../config/config.js";
 
-const uploadDir = CONFIG.picPath;
+const uploadDir = CONFIG.productsPicPath;
 
 // Create directory if it doesn't exist
 if (!fs.existsSync(uploadDir)) {

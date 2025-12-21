@@ -94,7 +94,7 @@ export const runUploadPic = async (pic, mode = "add") => {
   const currentImagePreview = document.getElementById(currentImagePreviewId);
 
   if (currentImage && currentImagePreview && data && data.filename) {
-    currentImage.src = `/pics/${data.filename}`;
+    currentImage.src = `/pics/products/${data.filename}`;
     currentImagePreview.style.display = "flex";
   }
 
@@ -325,7 +325,7 @@ export const populateAdminEditForm = async (inputObj) => {
 
   //set pic data to upload button (to get correct pic when submitting edit)
   editUploadButton.uploadData = picData;
-  currentImage.src = `/pics/${picData.filename}`;
+  currentImage.src = `/pics/products/${picData.filename}`;
   currentImagePreview.style.display = "flex";
 };
 
