@@ -6,14 +6,13 @@ import routes from "./routes/router.js";
 
 import CONFIG from "./config/config.js";
 
-const { expressProductsPicPath, expressBackgroundPicPath, productsPicPath, backgroundPicPath, port } = CONFIG;
+const { expressPicPath, picPath, port } = CONFIG;
 
 const app = express();
 
 app.use(session(CONFIG.buildSessionConfig()));
 
-app.use(expressProductsPicPath, express.static(productsPicPath));
-app.use(expressBackgroundPicPath, express.static(backgroundPicPath));
+app.use(expressPicPath, express.static(picPath));
 
 //standard public path
 app.use(express.static("public"));
