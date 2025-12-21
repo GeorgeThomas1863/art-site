@@ -1,5 +1,7 @@
 //PUT PICS IN IMAGES FOLDER AND DONT SAVE TO GITHUB
 
+//Alphabetize select product drop down
+
 //ADD REAL DATA AND BUILD FRONTEND
 
 import express from "express";
