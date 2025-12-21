@@ -139,7 +139,7 @@
 
 .admin-tab-title-wrapper {
   position: relative;
-  margin-bottom: 1rem;
+  margin-bottom: 1.5rem;
 }
 
 .delete-btn-header {
@@ -190,11 +190,11 @@
   display: flex;
   flex-direction: column;
   gap: 0.5rem;
-  margin-bottom: 1rem;
+  margin-bottom: 1.5rem;
 }
 
 .product-selector-field {
-  margin-bottom: 1rem;
+  margin-bottom: 1.5rem;
 }
 
 .drop-down-row {
@@ -225,7 +225,7 @@
   font-size: 1rem;
   border: 1px solid #333;
   /* padding: 1rem 1rem; */
-  padding: 0.75rem 1rem;
+  padding: 0.8rem 1rem;
   transition: border-color 0.3s;
   border-radius: 4px;
 }
@@ -259,7 +259,7 @@
   display: flex;
   flex-direction: column;
   gap: 1rem;
-  margin-top: 2rem;
+  margin-top: 4rem;
   margin-bottom: 4rem;
 }
 
@@ -279,7 +279,7 @@
   background: #ffffff;
   border: 1px solid #e0e0e0;
   border-radius: 4px;
-  margin-bottom: 1rem;
+  margin-bottom: 1.5rem;
   min-height: 420px;
 }
 
