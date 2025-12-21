@@ -145,7 +145,7 @@
 .delete-btn-header {
   position: absolute;
   top: 0;
-  right: 0;
+  right: 100%;
   transform: translateY(-50%);
   font-size: 0.6rem;
   font-weight: 300;
