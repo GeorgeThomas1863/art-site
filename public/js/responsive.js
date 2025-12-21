@@ -1,6 +1,7 @@
-import { runPwToggle, runAuthSubmit, runAddNewProduct, runUploadClick, runUploadPic, runTabClick, runUpdateProduct } from "./run.js";
+import { runTabClick, runUploadClick, runUploadPic, runAddNewProduct, runEditProduct, changeAdminProductSelector } from "./helpers/admin-run.js";
+import { runAuthSubmit, runPwToggle } from "./auth.js";
 import { closePopup } from "./util/popup.js";
-import { changeAdminProductSelector } from "./helpers/admin-data.js";
+import { changeAdminProductSelector } from "./helpers/admin-run.js";
 
 const authElement = document.getElementById("auth-element");
 const displayElement = document.getElementById("display-element");
@@ -18,15 +19,14 @@ export const clickHandler = async (e) => {
   console.log(clickType);
 
   if (clickType === "auth-submit") await runAuthSubmit();
-  if (clickType === "upload-click" || clickType === "edit-upload-click") {
-    await runUploadClick(clickElement);
-  }
-  if (clickType === "new-product-submit") await runAddNewProduct();
-  if (clickType === "edit-product-submit") await runUpdateProduct();
   if (clickType === "popup-close") await closePopup();
   if (clickType === "pwToggle") await runPwToggle();
 
   if (tabType) await runTabClick(clickElement);
+  if (clickType === "upload-click" || clickType === "edit-upload-click") await runUploadClick(clickElement);
+
+  if (clickType === "new-product-submit") await runAddNewProduct();
+  if (clickType === "edit-product-submit") await runEditProduct();
 };
 
 export const keyHandler = async (e) => {
@@ -53,19 +53,20 @@ export const changeHandler = async (e) => {
   console.log("CHANGE ID");
   console.log(changeId);
 
-  if (changeId === "product-selector") {
-    await changeAdminProductSelector(changeElement);
-    return;
-  }
-
-  // Handle both add and edit upload inputs
+  //Upload / Edit pic
   if (changeId === "upload-pic-input" || changeId === "edit-upload-pic-input") {
     const pic = e.target.files[0];
     if (!pic) return null;
 
     const mode = changeId.includes("edit") ? "edit" : "add";
     await runUploadPic(pic, mode);
-    return;
+    return true;
+  }
+
+  //Product selector
+  if (changeId === "product-selector") {
+    await changeAdminProductSelector(changeElement);
+    return true;
   }
 };
 
