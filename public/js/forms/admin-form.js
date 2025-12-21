@@ -316,11 +316,6 @@ export const buildAdminUpload = async (mode) => {
   const uploadSection = document.createElement("div");
   uploadSection.className = "upload-section";
 
-  const uploadLabel = document.createElement("label");
-  uploadLabel.className = "upload-label";
-  uploadLabel.textContent = mode === "add" ? "Image" : "";
-  uploadSection.append(uploadLabel);
-
   // Current image preview
   const currentImagePreview = document.createElement("div");
   currentImagePreview.className = "current-image-preview";
