@@ -224,7 +224,8 @@
   font-family: "Georgia", serif;
   font-size: 1rem;
   border: 1px solid #333;
-  padding: 1rem 1rem;
+  /* padding: 1rem 1rem; */
+  padding: 0.5rem 1rem;
   transition: border-color 0.3s;
   border-radius: 4px;
 }
