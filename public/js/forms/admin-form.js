@@ -67,11 +67,27 @@ export const buildAdminTab = async (mode = "add") => {
 };
 
 export const buildTabTitle = async (mode) => {
+  const titleWrapper = document.createElement("div");
+  titleWrapper.className = "admin-tab-title-wrapper";
+
   const tabTitle = document.createElement("h1");
   tabTitle.className = "admin-tab-title";
   tabTitle.textContent = mode === "add" ? "Add New Product" : "Edit Product";
 
-  return tabTitle;
+  titleWrapper.append(tabTitle);
+  if (mode !== "edit") return titleWrapper;
+
+  const deleteButton = document.createElement("button");
+  deleteButton.type = "button";
+  deleteButton.className = "delete-btn-header";
+  deleteButton.id = "delete-product-button";
+  deleteButton.textContent = "Delete Product";
+  deleteButton.setAttribute("data-label", "delete-product-button");
+  deleteButton.style.display = "none"; // Hidden by default
+
+  titleWrapper.append(deleteButton);
+
+  return titleWrapper;
 };
 
 export const buildAdminProductSelector = async () => {
@@ -96,26 +112,7 @@ export const buildAdminProductSelector = async () => {
   defaultOption.disabled = true;
   productSelect.append(defaultOption);
 
-  //NEW delete option
-  const productActionsRow = document.createElement("div");
-  productActionsRow.className = "product-actions-row";
-  productActionsRow.style.display = "none"; // Hidden until product selected
-
-  const productInfo = document.createElement("span");
-  productInfo.className = "product-info";
-  productInfo.id = "product-info-text";
-  productInfo.textContent = ""; // Will be populated when product is selected
-
-  const deleteLink = document.createElement("a");
-  deleteLink.href = "#";
-  deleteLink.className = "delete-link-small";
-  deleteLink.id = "delete-product-link";
-  deleteLink.textContent = "Delete Product";
-  deleteLink.setAttribute("data-label", "delete-product-link");
-
-  productActionsRow.append(productInfo, deleteLink);
-
-  selectorWrapper.append(selectorLabel, productSelect, productActionsRow);
+  selectorWrapper.append(selectorLabel, productSelect);
 
   return selectorWrapper;
 };

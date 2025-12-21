@@ -266,11 +266,9 @@ export const populateAdminEditForm = async (inputObj) => {
     }
   }
 
-  const productActionsRow = document.querySelector(".product-actions-row");
-  const productInfoText = document.getElementById("product-info-text");
-  if (productActionsRow && productInfoText) {
-    productActionsRow.style.display = "flex";
-    productInfoText.textContent = `Selected: ${name}`;
+  const deleteButton = document.getElementById("delete-product-button");
+  if (deleteButton) {
+    deleteButton.style.display = "block";
   }
 
   // Image preview - UPDATED IDs
@@ -395,6 +393,11 @@ export const clearAdminEditFields = async () => {
 
   if (uploadInput) {
     uploadInput.value = "";
+  }
+
+  const deleteButton = document.getElementById("delete-product-button");
+  if (deleteButton) {
+    deleteButton.style.display = "none";
   }
 
   return true;
