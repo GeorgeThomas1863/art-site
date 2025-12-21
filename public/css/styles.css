@@ -144,10 +144,10 @@
 
 .delete-btn-header {
   position: absolute;
-  top: 30%;
+  top: 10%;
   right: 0;
   transform: translateY(-50%);
-  font-size: 0.7rem;
+  font-size: 0.6rem;
   font-weight: 300;
   letter-spacing: 1px;
   color: #dc2626;
