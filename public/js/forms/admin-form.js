@@ -318,7 +318,7 @@ export const buildAdminUpload = async (mode) => {
 
   const uploadLabel = document.createElement("label");
   uploadLabel.className = "upload-label";
-  uploadLabel.textContent = mode === "add" ? "Image" : "Replace Image";
+  uploadLabel.textContent = mode === "add" ? "Image" : "Change Image";
   uploadSection.append(uploadLabel);
 
   // Current image preview - NOW ENABLED FOR BOTH MODES
@@ -354,7 +354,7 @@ export const buildAdminUpload = async (mode) => {
   uploadButton.type = "button";
   uploadButton.id = mode === "add" ? "upload-button" : "edit-upload-button";
   uploadButton.className = "upload-btn";
-  uploadButton.textContent = mode === "add" ? "Choose Image" : "Replace Image";
+  uploadButton.textContent = mode === "add" ? "Choose Image" : "";
   uploadButton.setAttribute("data-label", mode === "add" ? "upload-click" : "edit-upload-click");
 
   if (mode === "edit") {
