@@ -30,12 +30,6 @@ export const uploadFile = async (file) => {
       return null;
     }
 
-    // await checkFile();
-
-    // uploadStatus.textContent = `✓ ${file.name}`;
-    // uploadStatus.style.color = "green";
-    // uploadButton.textContent = "Change Resume";
-    // uploadButton.dataset.uploadedFile = result.filename;
     return result;
   } catch (error) {
     console.error("Upload failed:", error);
@@ -46,23 +40,3 @@ export const uploadFile = async (file) => {
     uploadButton.disabled = false;
   }
 };
-
-// export const checkFile = async () => {
-//   const uploadStatus = document.getElementById("upload-status");
-//   const uploadButton = document.getElementById("upload-button");
-//   if (!uploadStatus || !uploadButton) return null;
-
-//   const checkRoute = await sendToBack({ route: "/get-backend-value-route", key: "checkRoute" });
-//   const fileData = await sendToBackGET({ route: checkRoute });
-//   if (!fileData || !fileData.success) return null;
-//   console.log("CHECK FILE FILE DATA");
-//   console.log(fileData);
-
-//   uploadStatus.textContent = `✓ ${fileData.filename}`;
-//   uploadStatus.style.color = "green";
-//   uploadButton.textContent = "Change Resume";
-//   uploadStatus.style.display = "inline";
-//   uploadButton.dataset.uploadedFile = fileData.filename;
-
-//   return fileData;
-// };

@@ -1,35 +1,15 @@
 import path from "path";
 import fs from "fs";
-
 import multer from "multer";
 
 import CONFIG from "../config/config.js";
 
-// import { fileURLToPath } from "url";
-// import { dirname } from "path";
-
-// const __filename = fileURLToPath(import.meta.url);
-// const __dirname = dirname(__filename);
-
-// // Define upload directory //CHANGE
-// const uploadDir = path.join(__dirname, "../public/images");
 const uploadDir = CONFIG.picPath;
 
 // Create directory if it doesn't exist
 if (!fs.existsSync(uploadDir)) {
   fs.mkdirSync(uploadDir, { recursive: true });
 }
-
-// Helper function to clear all files in upload directory
-// export const clearUploadDirectory = () => {
-//   const files = fs.readdirSync(uploadDir);
-//   files.forEach((file) => {
-//     const filePath = path.join(uploadDir, file);
-//     if (fs.statSync(filePath).isFile()) {
-//       fs.unlinkSync(filePath);
-//     }
-//   });
-// };
 
 // Configure storage
 const storage = multer.diskStorage({
