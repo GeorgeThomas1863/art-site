@@ -24,9 +24,9 @@ router.post("/edit-product-route", requireAuth, editProductController);
 
 router.post("/delete-product-route", requireAuth, deleteProductController);
 
-router.get("/get-product-data-route", requireAuth, getProductDataController);
-
 //------------------------
+
+router.get("/get-product-data-route", getProductDataController);
 
 router.get("/products", productsDisplay);
 
