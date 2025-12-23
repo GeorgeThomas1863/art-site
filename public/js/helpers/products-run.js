@@ -66,7 +66,8 @@ export const changeProductsFilter = async (changeElement) => {
   // console.log("CHANGE PRODUCTS FILTER ELEMENT");
   // console.dir(changeElement);
 
-  const selectedOption = changeElement.options[changeElement.selectedIndex];
-  console.log("SELECTED OPTION");
-  console.dir(selectedOption);
+  // const selectedOption = changeElement.options[changeElement.selectedIndex];
+  const selectedValue = changeElement.value;
+  console.log("SELECTED VALUE");
+  console.log(selectedValue);
 };
