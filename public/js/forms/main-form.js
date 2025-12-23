@@ -32,7 +32,7 @@ export const buildNavBar = async () => {
 
   const navItems = [
     { text: "Welcome", href: "#index" },
-    { text: "All Products", href: "#products" },
+    { text: "Products", href: "#products" },
     { text: "About", href: "#about" },
     { text: "Events", href: "#events" },
   ];
