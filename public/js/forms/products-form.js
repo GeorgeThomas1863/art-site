@@ -1,3 +1,4 @@
+import { buildNavBar } from "./main-form.js";
 import { formatProductType } from "../helpers/products-run.js";
 
 // Build the entire products page
@@ -5,11 +6,12 @@ export const buildProductsForm = async () => {
   const productsContainer = document.createElement("div");
   productsContainer.className = "products-container";
 
+  const navElement = await buildNavBar();
   const pageHeader = await buildProductsPageHeader();
   const filterBar = await buildProductsFilterBar();
   const productsGrid = await buildProductsGrid();
 
-  productsContainer.append(pageHeader, filterBar, productsGrid);
+  productsContainer.append(navElement, pageHeader, filterBar, productsGrid);
 
   return productsContainer;
 };
