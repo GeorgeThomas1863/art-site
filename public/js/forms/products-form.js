@@ -1,3 +1,5 @@
+import { formatProductType } from "../helpers/products-run.js";
+
 // Build the entire products page
 export const buildProductsForm = async () => {
   const productsContainer = document.createElement("div");
@@ -172,7 +174,7 @@ export const buildProductTypeBadge = async (productData) => {
   productType.className = "product-type";
 
   // Convert camelCase to readable format
-  const typeText = formatProductType(productData.productType);
+  const typeText = await formatProductType(productData.productType);
   productType.textContent = typeText;
 
   return productType;

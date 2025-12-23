@@ -40,7 +40,7 @@ export const filterProducts = async (productsArray, category) => {
 };
 
 // Helper function to format product type from camelCase to readable text
-export const formatProductType = (productType) => {
+export const formatProductType = async (productType) => {
   // Handle special cases
   const specialCases = {
     mountainTreasureBaskets: "Mountain Treasure Baskets",
