@@ -98,19 +98,19 @@ export const buildProductCard = async (productData) => {
 
 // Build product image element
 export const buildProductImage = async (productData) => {
+  const { picData } = productData;
+  if (!picData) return null;
+
   const productImage = document.createElement("img");
   productImage.className = "product-image";
   productImage.alt = productData.name;
 
-  console.log("PRODUCT DATA");
-  console.dir(productData);
+  console.log("PIC DATA");
+  console.dir(picData);
 
   // Use the actual image path from the product data
-  if (productData.picData && productData.picData.path) {
-    productImage.src = productData.picData.path;
-  } else {
-    // Fallback placeholder if no image
-    productImage.src = "https://placehold.co/400x400/e0e0e0/666666?text=No+Image";
+  if (picData && picData.path) {
+    productImage.src = picData.path;
   }
 
   return productImage;
