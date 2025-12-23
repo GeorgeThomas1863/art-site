@@ -81,6 +81,8 @@ export const buildProductsGrid = async () => {
   return productsGrid;
 };
 
+//---------------------------------
+
 // Build individual product card
 export const buildProductCard = async (productData) => {
   const productCard = document.createElement("div");
@@ -118,14 +120,49 @@ export const buildProductInfo = async (productData) => {
   const productInfo = document.createElement("div");
   productInfo.className = "product-info";
 
+  const productHeader = await buildProductHeader(productData);
   const productName = await buildProductName(productData);
   const productPrice = await buildProductPrice(productData);
   const productDescription = await buildProductDescription(productData);
-  const productFooter = await buildProductFooter(productData);
 
-  productInfo.append(productName, productPrice, productDescription, productFooter);
+  productInfo.append(productHeader, productName, productPrice, productDescription);
 
   return productInfo;
+};
+
+// Build product footer with type badge and add to cart button
+export const buildProductHeader = async (productData) => {
+  const productHeader = document.createElement("div");
+  productHeader.className = "product-header";
+
+  const productType = await buildProductTypeBadge(productData);
+  const addToCartBtn = await buildAddToCartButton(productData);
+
+  productHeader.append(productType, addToCartBtn);
+
+  return productHeader;
+};
+
+// Build product type badge
+export const buildProductTypeBadge = async (productData) => {
+  const productType = document.createElement("span");
+  productType.className = "product-type";
+
+  // Convert camelCase to readable format
+  const typeText = await formatProductType(productData.productType);
+  productType.textContent = typeText;
+
+  return productType;
+};
+
+// Build add to cart button
+export const buildAddToCartButton = async (productData) => {
+  const addToCartBtn = document.createElement("button");
+  addToCartBtn.className = "add-to-cart-btn";
+  addToCartBtn.textContent = "Add to Cart";
+  addToCartBtn.setAttribute("data-product-id", productData.productId);
+
+  return addToCartBtn;
 };
 
 // Build product name
@@ -153,39 +190,4 @@ export const buildProductDescription = async (productData) => {
   productDescription.textContent = productData.description;
 
   return productDescription;
-};
-
-// Build product footer with type badge and add to cart button
-export const buildProductFooter = async (productData) => {
-  const productFooter = document.createElement("div");
-  productFooter.className = "product-footer";
-
-  const productType = await buildProductTypeBadge(productData);
-  const addToCartBtn = await buildAddToCartButton(productData);
-
-  productFooter.append(productType, addToCartBtn);
-
-  return productFooter;
-};
-
-// Build product type badge
-export const buildProductTypeBadge = async (productData) => {
-  const productType = document.createElement("span");
-  productType.className = "product-type";
-
-  // Convert camelCase to readable format
-  const typeText = await formatProductType(productData.productType);
-  productType.textContent = typeText;
-
-  return productType;
-};
-
-// Build add to cart button
-export const buildAddToCartButton = async (productData) => {
-  const addToCartBtn = document.createElement("button");
-  addToCartBtn.className = "add-to-cart-btn";
-  addToCartBtn.textContent = "Add to Cart";
-  addToCartBtn.setAttribute("data-product-id", productData.productId);
-
-  return addToCartBtn;
 };
