@@ -686,7 +686,6 @@
 }
 
 .product-header {
-  /* padding-bottom: 1rem; */
   border-bottom: 1px solid #e0e0e0;
 }
 
@@ -719,7 +718,8 @@
   color: #000000;
   display: block;
   width: fit-content;
-  margin: 0 auto 1.2rem auto;
+  /* margin: 0 auto 1.2rem auto; */
+  margin: 0 auto;
 }
 
 .add-to-cart-btn:hover {
