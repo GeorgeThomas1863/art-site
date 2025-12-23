@@ -31,10 +31,10 @@ export const buildNavBar = async () => {
   ul.className = "nav-links";
 
   const navItems = [
-    { text: "Welcome", href: "#index" },
-    { text: "Products", href: "#products" },
-    { text: "About", href: "#about" },
-    { text: "Events", href: "#events" },
+    { text: "Welcome", href: "/" },
+    { text: "Products", href: "/products" },
+    { text: "About", href: "/about" },
+    { text: "Events", href: "/events" },
   ];
 
   for (let i = 0; i < navItems.length; i++) {

@@ -3,7 +3,7 @@ import express from "express";
 // import CONFIG from "../config/config.js";
 import requireAuth from "./auth.js";
 import { authController } from "../controllers/auth-controller.js";
-import { mainDisplay, adminDisplay, display404, display500, display401 } from "../controllers/display-controller.js";
+import { mainDisplay, adminDisplay, productsDisplay, display404, display500, display401 } from "../controllers/display-controller.js";
 import { uploadPicController, addNewProductController, editProductController, deleteProductController, getProductDataController } from "../controllers/data-controller.js"; //prettier-ignore
 import { upload } from "../src/upload-pic.js";
 
@@ -25,6 +25,10 @@ router.post("/edit-product-route", requireAuth, editProductController);
 router.post("/delete-product-route", requireAuth, deleteProductController);
 
 router.get("/get-product-data-route", requireAuth, getProductDataController);
+
+//------------------------
+
+router.get("/products", productsDisplay);
 
 router.get("/", mainDisplay);
 

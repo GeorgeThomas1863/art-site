@@ -13,6 +13,10 @@ export const adminDisplay = (req, res) => {
   res.sendFile(path.join(__dirname, "../html/admin.html"));
 };
 
+export const productsDisplay = (req, res) => {
+  res.sendFile(path.join(__dirname, "../html/products.html"));
+};
+
 export const display401 = (req, res) => {
   res.status(401).sendFile(path.join(__dirname, "../html/401.html"));
 };
