@@ -1,8 +1,13 @@
 import { buildProductCard } from "../forms/products-form.js";
 
+//store locally for filtering
+let productsArray = [];
+
 // Populate the products grid with product cards
 export const populateProductsGrid = async (inputArray) => {
   if (!inputArray || !inputArray.length) return null;
+
+  productsArray = inputArray;
 
   const productsGrid = document.getElementById("products-grid");
 
@@ -23,14 +28,14 @@ export const populateProductsGrid = async (inputArray) => {
 };
 
 // Filter products by category
-export const filterProducts = async (productsArray, category) => {
+export const filterProducts = async (inputArray, category) => {
   if (category === "all") {
-    return productsArray;
+    return inputArray;
   }
 
   const filteredProducts = [];
-  for (let i = 0; i < productsArray.length; i++) {
-    const product = productsArray[i];
+  for (let i = 0; i < inputArray.length; i++) {
+    const product = inputArray[i];
     if (product.productType === category) {
       filteredProducts.push(product);
     }
@@ -63,11 +68,30 @@ export const formatProductType = async (productType) => {
 export const changeProductsFilter = async (changeElement) => {
   if (!changeElement) return null;
 
-  // console.log("CHANGE PRODUCTS FILTER ELEMENT");
-  // console.dir(changeElement);
-
   // const selectedOption = changeElement.options[changeElement.selectedIndex];
-  const selectedValue = changeElement.value;
-  console.log("SELECTED VALUE");
-  console.log(selectedValue);
+  const categoryFilter = changeElement.value;
+  console.log("FILTERING BY CATEGORY:");
+  console.log(categoryFilter);
+
+  const filteredArray = await filterProducts(productsArray, categoryFilter);
+
+  // Repopulate the grid with filtered products
+  const productsGrid = document.getElementById("products-grid");
+
+  if (!productsGrid) {
+    console.error("Products grid not found");
+    return;
+  }
+
+  // Clear existing products
+  productsGrid.innerHTML = "";
+
+  // Build and append each filtered product card
+  for (let i = 0; i < filteredArray.length; i++) {
+    const product = filteredArray[i];
+    const productCard = await buildProductCard(product);
+    productsGrid.append(productCard);
+  }
+
+  return true;
 };
