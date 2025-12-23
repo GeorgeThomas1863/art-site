@@ -10,7 +10,7 @@ export const buildMainDisplay = async () => {
   if (!displayElement) return null;
   //   const { isFirstLoad } = stateFront;
 
-  const data = await buildMainForm(inputArray);
+  const data = await buildMainForm();
   displayElement.append(data);
 
   return true;
