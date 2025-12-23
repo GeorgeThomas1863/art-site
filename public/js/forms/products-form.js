@@ -120,15 +120,26 @@ export const buildProductInfo = async (productData) => {
   const productInfo = document.createElement("div");
   productInfo.className = "product-info";
 
-  const addToCartBtn = await buildAddToCartButton(productData);
+  const productHeader = await buildProductHeader(productData);
   const productName = await buildProductName(productData);
   const productPrice = await buildProductPrice(productData);
   const productDescription = await buildProductDescription(productData);
   const productType = await buildProductTypeBadge(productData);
 
-  productInfo.append(addToCartBtn, productName, productPrice, productDescription, productType);
+  productInfo.append(productHeader, productName, productPrice, productDescription, productType);
 
   return productInfo;
+};
+
+export const buildProductHeader = async (productData) => {
+  const productHeader = document.createElement("div");
+  productHeader.className = "product-header";
+
+  const addToCartBtn = await buildAddToCartButton(productData);
+
+  productHeader.append(addToCartBtn);
+
+  return productHeader;
 };
 
 export const buildAddToCartButton = async (productData) => {
