@@ -1,4 +1,4 @@
-import { buildMainForm } from "./forms/main-form.js";
+import { buildMainForm, buildNavBar } from "./forms/main-form.js";
 import { buildProductsForm } from "./forms/products-form.js";
 import { sendToBackGET } from "./util/api-front.js";
 import { populateProductsGrid } from "./helpers/products-run.js";
@@ -22,8 +22,9 @@ export const buildMainDisplay = async () => {
 export const buildProductsDisplay = async () => {
   if (!productsElement) return null;
 
+  const navElement = await buildNavBar();
   const productForm = await buildProductsForm();
-  productsElement.append(productForm);
+  productsElement.append(navElement, productForm);
 
   const productData = await sendToBackGET({ route: "/get-product-data-route" });
   console.log("PRODUCT DATA");
