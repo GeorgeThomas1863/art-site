@@ -1,12 +1,10 @@
-//BUILD THE FUCKING FRONTEND
+//Repopulate the site / readd products
 
-//PUT PICS IN IMAGES FOLDER AND DONT SAVE TO GITHUB
+//Make product sorts work
 
-//Alphabetize select product drop down
+//Build model or popup for product details
 
-//BUILD WAY TO UPLOAD MULTIPLE PICS PER PRODUCT
-
-//ADD REAL DATA AND BUILD FRONTEND
+//BUILD shopping cart
 
 import express from "express";
 import session from "express-session";
