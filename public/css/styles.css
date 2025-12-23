@@ -690,7 +690,7 @@
 }
 
 .product-type {
-  margin-top: 1rem;
+  /* margin-top: 1rem; */
   display: inline-block;
   font-size: 0.75rem;
   font-weight: 400;
@@ -702,7 +702,6 @@
   border-radius: 4px;
   border: 1px solid #e0e0e0;
   margin-top: auto;
-  padding-top: 1rem;
 }
 
 .add-to-cart-btn {
