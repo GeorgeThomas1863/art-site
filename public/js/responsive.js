@@ -1,4 +1,5 @@
 import { runTabClick, runUploadClick, runUploadPic, runAddNewProduct, runEditProduct, runDeleteProduct, changeAdminProductSelector } from "./helpers/admin-run.js"; //prettier-ignore
+import { changeProductsFilter } from "./helpers/products-run.js";
 import { runAuthSubmit, runPwToggle } from "./auth.js";
 import { closePopup, closeConfirmDialog } from "./util/popup.js";
 
@@ -67,10 +68,9 @@ export const changeHandler = async (e) => {
   }
 
   //Product selector
-  if (changeId === "product-selector") {
-    await changeAdminProductSelector(changeElement);
-    return true;
-  }
+  if (changeId === "product-selector") await changeAdminProductSelector(changeElement);
+
+  if (changeId === "category-filter") await changeProductsFilter(changeElement);
 };
 
 if (authElement) {

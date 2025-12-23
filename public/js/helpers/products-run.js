@@ -57,3 +57,12 @@ export const formatProductType = async (productType) => {
   // Default: capitalize first letter
   return productType.charAt(0).toUpperCase() + productType.slice(1);
 };
+
+//----------------------------
+
+export const changeProductsFilter = async (changeElement) => {
+  if (!changeElement) return null;
+
+  console.log("CHANGE PRODUCTS FILTER ELEMENT");
+  console.dir(changeElement);
+}
