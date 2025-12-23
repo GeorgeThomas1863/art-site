@@ -105,13 +105,10 @@ export const buildProductImage = async (productData) => {
   productImage.className = "product-image";
   productImage.alt = productData.name;
 
-  console.log("PIC DATA");
-  console.dir(picData);
+  const picPath = `/images/products/${picData.filename}`;
+  if (!picPath) return null;
 
-  // Use the actual image path from the product data
-  if (picData && picData.path) {
-    productImage.src = picData.path;
-  }
+  productImage.src = picPath;
 
   return productImage;
 };
