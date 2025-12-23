@@ -5,6 +5,7 @@ import { closePopup, closeConfirmDialog } from "./util/popup.js";
 const authElement = document.getElementById("auth-element");
 const displayElement = document.getElementById("display-element");
 const adminElement = document.getElementById("admin-element");
+const productsElement = document.getElementById("products-element");
 
 export const clickHandler = async (e) => {
   const clickElement = e.target;
@@ -86,4 +87,10 @@ if (adminElement) {
   adminElement.addEventListener("click", clickHandler);
   adminElement.addEventListener("keydown", keyHandler);
   adminElement.addEventListener("change", changeHandler);
+}
+
+if (productsElement) {
+  productsElement.addEventListener("click", clickHandler);
+  productsElement.addEventListener("keydown", keyHandler);
+  productsElement.addEventListener("change", changeHandler);
 }
