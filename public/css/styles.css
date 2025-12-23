@@ -730,6 +730,8 @@
   display: block;
   width: fit-content;
   margin: 0 auto 1.2rem auto;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid #e0e0e0;
 }
 
 .add-to-cart-btn:hover {
