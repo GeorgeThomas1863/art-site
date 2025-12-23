@@ -63,6 +63,10 @@ export const formatProductType = async (productType) => {
 export const changeProductsFilter = async (changeElement) => {
   if (!changeElement) return null;
 
-  console.log("CHANGE PRODUCTS FILTER ELEMENT");
-  console.dir(changeElement);
-}
+  // console.log("CHANGE PRODUCTS FILTER ELEMENT");
+  // console.dir(changeElement);
+
+  const selectedOption = changeElement.options[changeElement.selectedIndex];
+  console.log("SELECTED OPTION");
+  console.dir(selectedOption);
+};
