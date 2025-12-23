@@ -643,11 +643,11 @@
 }
 
 .product-info {
-  padding: 1.5rem;
+  padding: 1rem 1.5rem;
 }
 
 .product-header {
-  /* padding-bottom: 1rem; */
+  padding-bottom: 1rem;
   border-bottom: 1px solid #e0e0e0;
   margin-bottom: 1.5rem;
 }
