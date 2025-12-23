@@ -647,15 +647,9 @@
 }
 
 .product-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  /* padding-top: 1rem;
-  border-top: 1px solid #e0e0e0; */
-
-  padding-bottom: 1rem;
+  /* padding-bottom: 1rem; */
   border-bottom: 1px solid #e0e0e0;
-  margin-bottom: 1rem;
+  margin-bottom: 1.5rem;
 }
 
 .product-name {
@@ -718,7 +712,6 @@
   color: #000000;
   display: block;
   width: fit-content;
-  /* margin: 0 auto 1.2rem auto; */
   margin: 0 auto;
 }
 
