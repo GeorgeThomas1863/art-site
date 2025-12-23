@@ -3,17 +3,16 @@ import fs from "fs";
 
 import multer from "multer";
 
-import CONFIG from "../config/config.js";
+// import CONFIG from "../config/config.js";
 
-// import { fileURLToPath } from "url";
-// import { dirname } from "path";
+import { fileURLToPath } from "url";
+import { dirname } from "path";
 
-// const __filename = fileURLToPath(import.meta.url);
-// const __dirname = dirname(__filename);
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
 
-// // Define upload directory //CHANGE
-// const uploadDir = path.join(__dirname, "../public/images");
-const uploadDir = CONFIG.picPath;
+// Define upload directory //CHANGE
+const uploadDir = path.join(__dirname, "../public/images/products");
 
 // Create directory if it doesn't exist
 if (!fs.existsSync(uploadDir)) {

@@ -94,7 +94,7 @@ export const runUploadPic = async (pic, mode = "add") => {
   const currentImagePreview = document.getElementById(currentImagePreviewId);
 
   if (currentImage && currentImagePreview && data && data.filename) {
-    currentImage.src = `/pics/${data.filename}`;
+    currentImage.src = `/images/products/${data.filename}`;
     currentImagePreview.style.display = "flex";
   }
 

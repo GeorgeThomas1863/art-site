@@ -9,8 +9,11 @@ logs
 *.log
 
 # avoid storing images in repo
-public/images/*
-**/public/images/*
+public/images/products/*
+**/public/images/products/*
+
+public/images/background/*
+**/public/images/background/*
 
 # Diagnostic reports (https://nodejs.org/api/report.html)
 report.[0-9]*.[0-9]*.[0-9]*.[0-9]*.json
