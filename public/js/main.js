@@ -1,8 +1,12 @@
 import { buildMainForm } from "./forms/main-form.js";
+import { buildProductsForm } from "./forms/products-form.js";
+import { sendToBackGET } from "./util/api-front.js";
+import { populateProductsGrid } from "./helpers/products-run.js";
 
 const displayElement = document.getElementById("display-element");
+const productsElement = document.getElementById("products-element");
 
-export const buildDisplay = async () => {
+export const buildMainDisplay = async () => {
   if (!displayElement) return null;
   //   const { isFirstLoad } = stateFront;
 
@@ -12,48 +16,17 @@ export const buildDisplay = async () => {
   return true;
 };
 
-//REMOVE
-const inputArray = [
-  {
-    url: "/images/photo_2025-11-27_16-18-06.jpg",
-    title: "Alpine Solitude",
-    price: "$425",
-    description: "Captured at dawn in the Swiss Alps, this piece embodies the quiet magnificence of untouched wilderness. Museum-quality archival print on fine art paper.",
-  },
-];
+export const buildProductsDisplay = async () => {
+  if (!productsElement) return null;
 
-// const inputArray = [
-//   {
-//     url: "/images/photo_2025-11-27_16-18-06.jpg",
-//     title: "Alpine Solitude",
-//     price: "$425",
-//     description:
-//       "Captured at dawn in the Swiss Alps, this piece embodies the quiet magnificence of untouched wilderness. Museum-quality archival print on fine art paper.",
-//   },
-//   {
-//     url: "/images/photo_2025-11-27_16-18-21.jpg",
-//     title: "Emerald Path",
-//     price: "$350",
-//     description: "Limited edition print, 20x30 inches",
-//   },
-//   {
-//     url: "/images/photo_2025-11-27_16-18-24.jpg",
-//     title: "Prairie Light",
-//     price: "$375",
-//     description: "Limited edition print, 30x40 inches",
-//   },
-//   {
-//     url: "/images/photo_2025-11-27_16-18-28.jpg",
-//     title: "Horizon",
-//     price: "$325",
-//     description: "Limited edition print, 24x36 inches",
-//   },
-//   {
-//     url: "/images/photo_2025-11-27_16-18-35.jpg",
-//     title: "Dunes",
-//     price: "$400",
-//     description: "Limited edition print, 24x36 inches",
-//   },
-// ];
+  const productForm = await buildProductsForm();
+  const productData = await sendToBackGET({ route: "/get-product-data-route" });
 
-buildDisplay();
+  await populateProductsGrid(productData);
+
+  productsElement.append(productForm);
+  return true;
+};
+
+if (displayElement) buildMainDisplay();
+if (productsElement) buildProductsDisplay();

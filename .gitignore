@@ -8,6 +8,10 @@ config/
 logs
 *.log
 
+# avoid storing images in repo
+public/images/*
+**/public/images/*
+
 # Diagnostic reports (https://nodejs.org/api/report.html)
 report.[0-9]*.[0-9]*.[0-9]*.[0-9]*.json
 
