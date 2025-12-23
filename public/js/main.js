@@ -23,11 +23,13 @@ export const buildProductsDisplay = async () => {
   if (!productsElement) return null;
 
   const productForm = await buildProductsForm();
-  const productData = await sendToBackGET({ route: "/get-product-data-route" });
+  productsElement.append(productForm);
 
+  const productData = await sendToBackGET({ route: "/get-product-data-route" });
+  console.log("PRODUCT DATA");
+  console.dir(productData);
   await populateProductsGrid(productData);
 
-  productsElement.append(productForm);
   return true;
 };
 
