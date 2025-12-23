@@ -620,6 +620,9 @@
 }
 
 .product-card {
+  display: flex;
+  flex-direction: column;
+
   background: #ffffff;
   border-radius: 4px;
   overflow: hidden;
@@ -644,6 +647,9 @@
 
 .product-info {
   padding: 1rem 1.5rem;
+  display: flex;
+  flex-direction: column;
+  flex-grow: 1;
 }
 
 .product-header {
@@ -695,6 +701,8 @@
   padding: 0.4rem 0.8rem;
   border-radius: 4px;
   border: 1px solid #e0e0e0;
+  margin-top: auto;
+  padding-top: 1rem;
 }
 
 .add-to-cart-btn {
