@@ -325,7 +325,7 @@ export const populateAdminEditForm = async (inputObj) => {
 
   //set pic data to upload button (to get correct pic when submitting edit)
   editUploadButton.uploadData = picData;
-  currentImage.src = `/pics/${picData.filename}`;
+  currentImage.src = `/images/products/${picData.filename}`;
   currentImagePreview.style.display = "flex";
 };
 
