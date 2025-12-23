@@ -11,6 +11,9 @@ export const buildMainDisplay = async () => {
   //   const { isFirstLoad } = stateFront;
 
   const data = await buildMainForm();
+
+  console.log("BUILD MAIN DISPLAY");
+  console.log(data);
   displayElement.append(data);
 
   return true;
