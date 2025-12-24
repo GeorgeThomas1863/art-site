@@ -10,7 +10,8 @@ export const buildMainForm = async () => {
 
   // Create navigation
   const navElement = await buildNavBar();
-  mainContainer.append(navElement);
+  const contentSection = await buildContentSection();
+  mainContainer.append(navElement, contentSection);
 
   return mainContainer;
 };
@@ -53,104 +54,94 @@ export const buildNavBar = async () => {
   return nav;
 };
 
-// Create featured product section
-// export const createFeaturedProduct = async (pic) => {
-//   const grid = document.createElement("div");
-//   grid.className = "featured-grid";
+// Build the entire landing page
+export const buildContentSection = async () => {
+  const contentContainer = document.createElement("div");
+  contentContainer.className = "content-container";
 
-//   const img = document.createElement("img");
-//   img.src = pic.url;
-//   img.alt = pic.title;
-//   img.className = "featured-image";
+  const splitHero = await buildSplitHero();
+  const infoBar = await buildInfoBar();
 
-//   const info = document.createElement("div");
-//   info.className = "featured-info";
+  contentContainer.append(splitHero, infoBar);
 
-//   const label = document.createElement("div");
-//   label.className = "featured-label";
-//   label.textContent = "FEATURED WORK";
+  return contentContainer;
+};
 
-//   const title = document.createElement("h1");
-//   title.className = "featured-title";
-//   title.textContent = pic.title;
+// Build split hero section
+export const buildSplitHero = async () => {
+  const splitHero = document.createElement("div");
+  splitHero.className = "split-hero";
 
-//   const description = document.createElement("p");
-//   description.className = "featured-description";
-//   description.textContent = pic.description;
+  const splitContent = await buildSplitContent();
+  const splitImage = await buildSplitImage();
 
-//   const price = document.createElement("div");
-//   price.className = "featured-price";
-//   price.textContent = pic.price;
+  splitHero.append(splitContent, splitImage);
 
-//   const button = document.createElement("button");
-//   button.className = "featured-button";
-//   button.textContent = "PURCHASE PRINT";
+  return splitHero;
+};
 
-//   info.append(label, title, description, price, button);
+// Build content section (left side)
+export const buildSplitContent = async () => {
+  const splitContent = document.createElement("div");
+  splitContent.className = "split-content";
 
-//   grid.appendChild(img);
-//   grid.appendChild(info);
+  const splitTitle = await buildSplitTitle();
+  const splitText = await buildSplitText();
+  const splitCta = await buildSplitCta();
 
-//   return grid;
-// };
+  splitContent.append(splitTitle, splitText, splitCta);
 
-// // Create individual product item for grid
-// export const createProductItem = async (pic) => {
-//   const item = document.createElement("div");
-//   item.className = "product-item";
+  return splitContent;
+};
 
-//   const img = document.createElement("img");
-//   img.src = pic.url;
-//   img.alt = pic.title;
-//   img.className = "product-image";
+// Build title
+export const buildSplitTitle = async () => {
+  const splitTitle = document.createElement("h1");
+  splitTitle.className = "split-title";
+  splitTitle.textContent = "Where Nature Meets Artistry";
 
-//   const name = document.createElement("div");
-//   name.className = "product-name";
-//   name.textContent = pic.title;
+  return splitTitle;
+};
 
-//   const price = document.createElement("div");
-//   price.className = "product-price";
-//   price.textContent = pic.price;
+// Build text
+export const buildSplitText = async () => {
+  const splitText = document.createElement("p");
+  splitText.className = "split-text";
+  splitText.textContent =
+    "Creating beautiful fiber art pieces from natural materials. Each piece tells a story of craftsmanship, sustainability, and timeless beauty.";
 
-//   item.append(img, name, price);
+  return splitText;
+};
 
-//   return item;
-// };
+// Build CTA button
+export const buildSplitCta = async () => {
+  const splitCta = document.createElement("a");
+  splitCta.className = "split-cta";
+  splitCta.textContent = "Shop Now";
+  splitCta.href = "/products";
 
-//--------------------------------------
+  return splitCta;
+};
 
-// const featuredSection = document.createElement("div");
-// featuredSection.className = "featured";
+// Build image section (right side)
+export const buildSplitImage = async () => {
+  const splitImage = document.createElement("div");
+  splitImage.className = "split-image";
+  splitImage.id = "split-image";
 
-// // Create featured product display
-// const featuredContainer = document.createElement("div");
-// featuredContainer.id = "featured-container";
-// const featuredGrid = await createFeaturedProduct(inputArray[0]);
-// featuredContainer.appendChild(featuredGrid);
+  return splitImage;
+};
 
-// // Create more products section
-// const moreProducts = document.createElement("div");
-// moreProducts.className = "more-products";
+// Build info bar
+export const buildInfoBar = async () => {
+  const infoBar = document.createElement("div");
+  infoBar.className = "info-bar";
 
-// const sectionTitle = document.createElement("h2");
-// sectionTitle.className = "section-title";
-// sectionTitle.textContent = "MORE FROM THE COLLECTION";
+  const infoBarText = document.createElement("p");
+  infoBarText.className = "info-bar-text";
+  infoBarText.textContent = "Handcrafted • Sustainable • Unique";
 
-// const productsGrid = document.createElement("div");
-// productsGrid.className = "products-grid";
-// productsGrid.id = "products-grid";
+  infoBar.append(infoBarText);
 
-// // Add remaining products to grid
-// for (let i = 1; i < inputArray.length; i++) {
-//   const productItem = await createProductItem(inputArray[i]);
-//   productsGrid.appendChild(productItem);
-// }
-
-// moreProducts.appendChild(sectionTitle);
-// moreProducts.appendChild(productsGrid);
-
-// featuredSection.appendChild(featuredContainer);
-// featuredSection.appendChild(moreProducts);
-
-// homeContainer.appendChild(featuredSection);
-// return homeContainer;
+  return infoBar;
+};
