@@ -61,9 +61,10 @@ export const buildContentSection = async () => {
   contentContainer.className = "content-container";
 
   const splitHero = await buildSplitHero();
-  const infoBar = await buildInfoBar();
+  // const infoBar = await buildInfoBar();
 
-  contentContainer.append(splitHero, infoBar);
+  // contentContainer.append(splitHero, infoBar);
+  contentContainer.append(splitHero);
 
   return contentContainer;
 };
@@ -134,15 +135,15 @@ export const buildSplitImage = async () => {
 };
 
 // Build info bar
-export const buildInfoBar = async () => {
-  const infoBar = document.createElement("div");
-  infoBar.className = "info-bar";
+// export const buildInfoBar = async () => {
+//   const infoBar = document.createElement("div");
+//   infoBar.className = "info-bar";
 
-  const infoBarText = document.createElement("p");
-  infoBarText.className = "info-bar-text";
-  infoBarText.textContent = "Handcrafted • Sustainable • Unique";
+//   const infoBarText = document.createElement("p");
+//   infoBarText.className = "info-bar-text";
+//   infoBarText.textContent = "Handcrafted • Sustainable • Unique";
 
-  infoBar.append(infoBarText);
+//   infoBar.append(infoBarText);
 
-  return infoBar;
-};
+//   return infoBar;
+// };
