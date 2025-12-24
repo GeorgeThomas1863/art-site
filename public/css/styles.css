@@ -543,7 +543,7 @@ h3 {
 }
 
 .logo {
-  font-size: 1.3rem;
+  font-size: 1.5rem;
   font-weight: 400;
   letter-spacing: 3px;
   color: #f0f0f0;
@@ -558,7 +558,7 @@ h3 {
 .nav-links a {
   text-decoration: none;
   color: #ccc;
-  font-size: 0.9rem;
+  font-size: 1.2rem;
   font-weight: 400;
   letter-spacing: 1px;
   transition: color 0.3s;
