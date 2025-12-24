@@ -138,9 +138,19 @@ export const buildSplitImage = async () => {
   rotatingLeft.className = "split-image-rotating";
   rotatingLeft.id = "split-image-left";
 
+  const rotatingLeftText = document.createElement("div");
+  rotatingLeftText.className = "split-image-text";
+  rotatingLeftText.textContent = "Handcrafted with Love";
+  rotatingLeft.appendChild(rotatingLeftText);
+
   const rotatingRight = document.createElement("div");
   rotatingRight.className = "split-image-rotating";
   rotatingRight.id = "split-image-right";
+
+  const rotatingRightText = document.createElement("div");
+  rotatingRightText.className = "split-image-text";
+  rotatingRightText.textContent = "Natural Materials";
+  rotatingRight.appendChild(rotatingRightText);
 
   topRotating.append(rotatingLeft, rotatingRight);
 
@@ -160,7 +170,11 @@ export const buildSplitImage = async () => {
   staticRight.className = "split-image-static";
   staticRight.id = "split-image-static-right";
 
-  bottomStatic.append(staticLeft, staticCenter, staticRight);
+  const bottomText = document.createElement("div");
+  bottomText.className = "split-image-text split-image-text-bottom";
+  bottomText.textContent = "Sustainable Design • Timeless Beauty • Artisan Quality";
+
+  bottomStatic.append(staticLeft, staticCenter, staticRight, bottomText);
 
   splitImage.append(topRotating, bottomStatic);
 

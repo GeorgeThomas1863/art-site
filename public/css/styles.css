@@ -575,7 +575,8 @@ h3 {
 
 .split-hero {
   display: grid;
-  grid-template-columns: 55% 45%;
+  /* grid-template-columns: 55% 45%; */
+  grid-template-columns: 40% 60%;
   /* height: calc(100vh - 120px); */
   height: calc(100vh - 72.5px);
 }
@@ -602,6 +603,7 @@ h3 {
 }
 
 .split-image-bottom {
+  position: relative;
   flex: 1;
   display: grid;
   grid-template-columns: 1fr 1fr 1fr;
@@ -610,13 +612,35 @@ h3 {
 
 .split-image-rotating,
 .split-image-static {
-  background-position: center;
-  background-size: cover;
-  background-repeat: no-repeat;
+  position: relative;
 }
 
 .split-image-rotating {
   transition: background-image 1s ease-in-out;
+}
+
+.split-image-text {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  padding: 1rem 1.5rem;
+  background: rgba(0, 0, 0, 0.6);
+  color: #ffffff;
+  font-size: 0.95rem;
+  font-weight: 400;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  text-align: center;
+  backdrop-filter: blur(4px);
+}
+
+.split-image-text-bottom {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  width: 100%;
 }
 
 .split-title {

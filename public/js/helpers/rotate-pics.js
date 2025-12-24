@@ -81,12 +81,3 @@ export const setCurrentPic = async (element, picURL) => {
   if (!element) return;
   element.style.backgroundImage = `url('${picURL}')`;
 };
-
-// export const setCurrentPic = async (index) => {
-//   const splitImage = document.getElementById("split-image");
-
-//   if (!splitImage) return;
-
-//   const imageUrl = picArray[index];
-//   splitImage.style.backgroundImage = `url('${imageUrl}')`;
-// };
