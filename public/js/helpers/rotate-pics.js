@@ -24,14 +24,13 @@ export const startPicRotation = async () => {
   // Set initial image
   await setCurrentPic(picIndex);
 
-  // Rotate image every 2 seconds
   setInterval(async () => {
     picIndex++;
     if (picIndex >= picArray.length) {
       picIndex = 0;
     }
     await setCurrentPic(picIndex);
-  }, 2000); //switch to 5
+  }, 5000);
 };
 
 // Set background image
