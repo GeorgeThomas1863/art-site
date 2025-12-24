@@ -613,6 +613,9 @@ h3 {
 .split-image-rotating,
 .split-image-static {
   position: relative;
+  background-position: center;
+  background-size: cover;
+  background-repeat: no-repeat;
 }
 
 .split-image-rotating {
@@ -683,7 +686,7 @@ h3 {
   transform: translateY(1px);
 }
 
-.info-bar {
+/* .info-bar {
   background-color: #000;
   color: #fff;
   padding: 1rem;
@@ -694,7 +697,7 @@ h3 {
   font-size: 1rem;
   letter-spacing: 2px;
   text-transform: uppercase;
-}
+} */
 
 /* ++++++++++++++++++++++++++++++++++++++++++++++++++++ */
 
