@@ -596,7 +596,8 @@ h3 {
 }
 
 .split-image-top {
-  flex: 2;
+  /* flex: 2; */
+  height: 60%;
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 0;
@@ -604,7 +605,8 @@ h3 {
 
 .split-image-bottom {
   position: relative;
-  flex: 1;
+  /* flex: 1; */
+  height: 40%;
   display: grid;
   grid-template-columns: 1fr 1fr 1fr;
   gap: 0;
