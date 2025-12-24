@@ -1,6 +1,4 @@
-//Repopulate the site / readd products
-
-//Make product sorts work
+//ADD CATEGORY DESCRIPTIONS, INCLUE CUSTOM FONT
 
 //Build model or popup for product details
 
