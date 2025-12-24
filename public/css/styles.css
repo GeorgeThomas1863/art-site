@@ -598,7 +598,7 @@ h3 {
   font-size: 3rem;
   font-weight: 300;
   letter-spacing: 4px;
-  margin-bottom: 2rem;
+  margin-bottom: 1rem;
   line-height: 1.2;
 }
 
@@ -610,6 +610,7 @@ h3 {
 }
 
 .split-cta {
+  margin: 0 auto;
   font-size: 0.9rem;
   font-weight: 400;
   letter-spacing: 2px;
