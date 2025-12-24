@@ -577,7 +577,8 @@ h3 {
   display: grid;
   grid-template-columns: 55% 45%;
   /* height: calc(100vh - 120px); */
-  height: calc(100vh - 20px);
+  /* calc below exactly */
+  height: calc(100vh - 30px);
 }
 
 .split-content {
