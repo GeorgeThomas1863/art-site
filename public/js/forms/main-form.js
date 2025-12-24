@@ -24,7 +24,7 @@ export const buildNavBar = async () => {
   const navContainer = document.createElement("div");
   navContainer.className = "nav-container";
 
-  const logo = document.createElement("div");
+  const logo = document.createElement("a");
   logo.className = "logo";
   logo.textContent = "Two Sisters Fiber Art";
   logo.href = "/";
