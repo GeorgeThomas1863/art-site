@@ -575,10 +575,9 @@ h3 {
 
 .split-hero {
   display: grid;
-  /* grid-template-columns: 1fr 1fr; */
   grid-template-columns: 60% 40%;
   /* height: calc(100vh - 80px); */
-  height: 100%;
+  height: calc(100vh - 160px);
 }
 
 .split-content {
