@@ -134,18 +134,20 @@ export const buildSplitImage = async () => {
   const topRotating = document.createElement("div");
   topRotating.className = "split-image-top";
 
-  const rotatingLeft = document.createElement("div");
+  const rotatingLeft = document.createElement("a");
   rotatingLeft.className = "split-image-rotating";
   rotatingLeft.id = "split-image-left";
+  rotatingLeft.href = "/products";
 
   const rotatingLeftText = document.createElement("div");
   rotatingLeftText.className = "split-image-text";
-  rotatingLeftText.textContent = "Handcrafted with Love";
+  rotatingLeftText.textContent = "Unique Products";
   rotatingLeft.appendChild(rotatingLeftText);
 
-  const rotatingRight = document.createElement("div");
+  const rotatingRight = document.createElement("a");
   rotatingRight.className = "split-image-rotating";
   rotatingRight.id = "split-image-right";
+  rotatingRight.href = "/products";
 
   const rotatingRightText = document.createElement("div");
   rotatingRightText.className = "split-image-text";
@@ -155,8 +157,9 @@ export const buildSplitImage = async () => {
   topRotating.append(rotatingLeft, rotatingRight);
 
   // Bottom static section with 3 images
-  const bottomStatic = document.createElement("div");
+  const bottomStatic = document.createElement("a");
   bottomStatic.className = "split-image-bottom";
+  bottomStatic.href = "/about";
 
   const staticLeft = document.createElement("div");
   staticLeft.className = "split-image-static";

@@ -5,9 +5,6 @@ const picArrayLeft = [
   "/images/background/matted1.jpg",
   "/images/background/matted2.jpg",
   "/images/background/mtb1.jpg",
-  "/images/background/beach1.jpg",
-  "/images/background/beach2.jpg",
-  "/images/background/beach3.jpg",
 ];
 
 const picArrayRight = [
@@ -15,6 +12,9 @@ const picArrayRight = [
   "/images/background/mountains2.jpg",
   "/images/background/mountains3.jpg",
   "/images/background/mountains4.jpg",
+  "/images/background/beach1.jpg",
+  "/images/background/beach2.jpg",
+  "/images/background/beach3.jpg",
 ];
 
 const staticPics = {
