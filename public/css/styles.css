@@ -575,7 +575,7 @@ h3 {
 
 .split-hero {
   display: grid;
-  grid-template-columns: 55% 45%;
+  grid-template-columns: 60% 40%;
   /* height: calc(100vh - 120px); */
   height: calc(100vh - 20px);
 }
@@ -597,7 +597,7 @@ h3 {
 
 .split-title {
   font-size: 3.5rem;
-  font-weight: 500;
+  font-weight: 600;
   letter-spacing: 4px;
   margin-bottom: 1rem;
   line-height: 1.2;
