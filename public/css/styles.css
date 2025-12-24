@@ -599,7 +599,7 @@ h3 {
   font-size: 3.5rem;
   font-weight: 300;
   letter-spacing: 4px;
-  margin-bottom: 1rem;
+  /* margin-bottom: 1rem; */
   line-height: 1.2;
 }
 
@@ -611,7 +611,7 @@ h3 {
 }
 
 .split-cta {
-  margin: 0 auto;
+  /* margin: 0 auto; */
   font-size: 0.9rem;
   font-weight: 400;
   letter-spacing: 2px;
@@ -638,7 +638,7 @@ h3 {
 .info-bar {
   background-color: #000;
   color: #fff;
-  padding: 2rem;
+  padding: 1rem;
   text-align: center;
 }
 
