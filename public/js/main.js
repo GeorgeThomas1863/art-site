@@ -2,6 +2,7 @@ import { buildMainForm, buildNavBar } from "./forms/main-form.js";
 import { buildProductsForm } from "./forms/products-form.js";
 import { sendToBackGET } from "./util/api-front.js";
 import { populateProductsGrid } from "./helpers/products-run.js";
+import { startPicRotation } from "./helpers/rotate-pics.js";
 
 const displayElement = document.getElementById("display-element");
 const productsElement = document.getElementById("products-element");
@@ -15,6 +16,8 @@ export const buildMainDisplay = async () => {
   console.log("BUILD MAIN DISPLAY");
   console.log(data);
   displayElement.append(data);
+
+  await startPicRotation();
 
   return true;
 };
