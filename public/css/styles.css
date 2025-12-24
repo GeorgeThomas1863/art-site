@@ -551,9 +551,9 @@ h3 {
 
 .nav-links {
   display: flex;
-  gap: 7rem;
+  gap: 5rem;
   list-style: none;
-  margin-right: 10rem;
+  margin-right: 5rem;
 }
 
 .nav-links a {
@@ -595,7 +595,7 @@ h3 {
 }
 
 .split-title {
-  font-size: 3.5rem;
+  font-size: 3rem;
   font-weight: 300;
   letter-spacing: 4px;
   margin-bottom: 2rem;
