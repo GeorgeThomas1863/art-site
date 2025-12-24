@@ -129,21 +129,40 @@ export const buildSplitCta = async () => {
 export const buildSplitImage = async () => {
   const splitImage = document.createElement("div");
   splitImage.className = "split-image";
-  splitImage.id = "split-image";
+
+  // Top rotating section with 2 images
+  const topRotating = document.createElement("div");
+  topRotating.className = "split-image-top";
+
+  const rotatingLeft = document.createElement("div");
+  rotatingLeft.className = "split-image-rotating";
+  rotatingLeft.id = "split-image-left";
+
+  const rotatingRight = document.createElement("div");
+  rotatingRight.className = "split-image-rotating";
+  rotatingRight.id = "split-image-right";
+
+  topRotating.append(rotatingLeft, rotatingRight);
+
+  // Bottom static section with 3 images
+  const bottomStatic = document.createElement("div");
+  bottomStatic.className = "split-image-bottom";
+
+  const staticLeft = document.createElement("div");
+  staticLeft.className = "split-image-static";
+  staticLeft.id = "split-image-static-left";
+
+  const staticCenter = document.createElement("div");
+  staticCenter.className = "split-image-static";
+  staticCenter.id = "split-image-static-center";
+
+  const staticRight = document.createElement("div");
+  staticRight.className = "split-image-static";
+  staticRight.id = "split-image-static-right";
+
+  bottomStatic.append(staticLeft, staticCenter, staticRight);
+
+  splitImage.append(topRotating, bottomStatic);
 
   return splitImage;
 };
-
-// Build info bar
-// export const buildInfoBar = async () => {
-//   const infoBar = document.createElement("div");
-//   infoBar.className = "info-bar";
-
-//   const infoBarText = document.createElement("p");
-//   infoBarText.className = "info-bar-text";
-//   infoBarText.textContent = "Handcrafted • Sustainable • Unique";
-
-//   infoBar.append(infoBarText);
-
-//   return infoBar;
-// };

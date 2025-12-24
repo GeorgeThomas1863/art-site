@@ -589,9 +589,33 @@ h3 {
 }
 
 .split-image {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.split-image-top {
+  flex: 2;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0;
+}
+
+.split-image-bottom {
+  flex: 1;
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 0;
+}
+
+.split-image-rotating,
+.split-image-static {
   background-position: center;
   background-size: cover;
   background-repeat: no-repeat;
+}
+
+.split-image-rotating {
   transition: background-image 1s ease-in-out;
 }
 
