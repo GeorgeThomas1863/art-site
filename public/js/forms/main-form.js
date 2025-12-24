@@ -27,6 +27,7 @@ export const buildNavBar = async () => {
   const logo = document.createElement("div");
   logo.className = "logo";
   logo.textContent = "Two Sisters Fiber Art";
+  logo.href = "/";
 
   const ul = document.createElement("ul");
   ul.className = "nav-links";
