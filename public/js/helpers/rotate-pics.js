@@ -1,5 +1,10 @@
 // Array of image URLs to rotate through
 const picArray = [
+  "/images/background/acorn1.jpg",
+  "/images/background/acorn2.jpg",
+  "/images/background/matted1.jpg",
+  "/images/background/matted2.jpg",
+  "/images/background/mtb1.jpg",
   "/images/background/beach1.jpg",
   "/images/background/beach2.jpg",
   "/images/background/beach3.jpg",
@@ -8,6 +13,8 @@ const picArray = [
   "/images/background/mountains3.jpg",
   "/images/background/mountains4.jpg",
   "/images/background/selfie1.jpg",
+  "/images/background/selfie2.jpg",
+  "/images/background/selfie3.jpg",
 ];
 
 let picIndex = 0;
