@@ -553,6 +553,7 @@ h3 {
   display: flex;
   gap: 5rem;
   list-style: none;
+  margin-right: 5rem;
 }
 
 .nav-links a {
