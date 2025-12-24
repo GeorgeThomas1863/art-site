@@ -551,7 +551,7 @@ h3 {
 
 .nav-links {
   display: flex;
-  gap: 3rem;
+  gap: 5rem;
   list-style: none;
 }
 
