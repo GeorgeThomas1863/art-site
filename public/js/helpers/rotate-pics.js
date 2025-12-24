@@ -24,18 +24,18 @@ export const startPicRotation = async () => {
   // Set initial image
   await setCurrentPic(picIndex);
 
-  // Rotate image every 5 seconds
+  // Rotate image every 2 seconds
   setInterval(async () => {
     picIndex++;
     if (picIndex >= picArray.length) {
       picIndex = 0;
     }
     await setCurrentPic(picIndex);
-  }, 5000);
+  }, 2000); //switch to 5
 };
 
 // Set background image
-export const setLandingImage = async (index) => {
+export const setCurrentPic = async (index) => {
   const splitImage = document.getElementById("split-image");
 
   if (!splitImage) return;
