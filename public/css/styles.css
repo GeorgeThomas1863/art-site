@@ -577,8 +577,8 @@ h3 {
   display: grid;
   grid-template-columns: 55% 45%;
   /* height: calc(100vh - 120px); */
-  /* calc below exactly */
-  height: calc(100vh - 30px);
+  /* navbar is 72.5px */
+  height: calc(100vh - 70px);
 }
 
 .split-content {
