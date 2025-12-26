@@ -24,6 +24,8 @@
 
 // tax location RESEARCH
 
+//ask about 3 pics or 2 pics on main page
+
 import express from "express";
 import session from "express-session";
 import routes from "./routes/router.js";
