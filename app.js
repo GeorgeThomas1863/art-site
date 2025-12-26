@@ -1,8 +1,26 @@
-//ADD CATEGORY DESCRIPTIONS, INCLUE CUSTOM FONT
+//switch product filter to buttons; include type descriptions on click
+
+//BUILD shopping cart
 
 //Build model or popup for product details
 
-//BUILD shopping cart
+//add in facebook and insta connections
+
+//add about and events display pages
+
+//add events create and mailing list to ADMIN
+
+//ADD CATEGORY DESCRIPTIONS
+
+// email mailing list
+
+// contact us form
+
+// event upload / newslettre
+
+// rotating pics on about
+
+// tax location RESEARCH
 
 import express from "express";
 import session from "express-session";
