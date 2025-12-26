@@ -1,3 +1,5 @@
+//add dates to product upload
+
 //switch product filter to buttons; include type descriptions on click
 
 //BUILD shopping cart
@@ -8,7 +10,7 @@
 
 //add about and events display pages
 
-//add events create and mailing list to ADMIN
+//add events create and mailing list to ADMIN / Mongo
 
 //ADD CATEGORY DESCRIPTIONS
 

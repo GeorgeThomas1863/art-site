@@ -2,25 +2,33 @@
 const picArrayLeft = [
   "/images/background/acorn1.jpg",
   "/images/background/acorn2.jpg",
+  "/images/background/mtb1.jpg",
   "/images/background/matted1.jpg",
   "/images/background/matted2.jpg",
-  "/images/background/mtb1.jpg",
 ];
 
+// const picArrayRight = [
+//   "/images/background/mountains1.jpg",
+//   "/images/background/mountains2.jpg",
+//   "/images/background/mountains3.jpg",
+//   "/images/background/mountains4.jpg",
+//   "/images/background/beach1.jpg",
+//   "/images/background/beach2.jpg",
+//   "/images/background/beach3.jpg",
+// ];
+
 const picArrayRight = [
-  "/images/background/mountains1.jpg",
-  "/images/background/mountains2.jpg",
-  "/images/background/mountains3.jpg",
-  "/images/background/mountains4.jpg",
-  "/images/background/beach1.jpg",
-  "/images/background/beach2.jpg",
-  "/images/background/beach3.jpg",
+  "/images/background/mtb1.jpg",
+  "/images/background/matted1.jpg",
+  "/images/background/matted2.jpg",
+  "/images/background/acorn1.jpg",
+  "/images/background/acorn2.jpg",
 ];
 
 const staticPics = {
   left: "/images/background/selfie1.jpg",
-  center: "/images/background/selfie2.jpg",
-  right: "/images/background/selfie3.jpg",
+  // center: "/images/background/selfie2.jpg",
+  // right: "/images/background/selfie3.jpg",
 };
 
 let picIndexLeft = 0;
@@ -31,9 +39,10 @@ export const startPicRotation = async () => {
   // const splitImage = document.getElementById("split-image");
   const splitImageLeft = document.getElementById("split-image-left");
   const splitImageRight = document.getElementById("split-image-right");
-  const staticLeft = document.getElementById("split-image-static-left");
-  const staticCenter = document.getElementById("split-image-static-center");
-  const staticRight = document.getElementById("split-image-static-right");
+  const staticImage = document.getElementById("split-image-static");
+  // const staticLeft = document.getElementById("split-image-static-left");
+  // const staticCenter = document.getElementById("split-image-static-center");
+  // const staticRight = document.getElementById("split-image-static-right");
 
   // if (!splitImage) {
   //   console.error("Current pic element not found");
@@ -43,10 +52,11 @@ export const startPicRotation = async () => {
   // Set initial image
   await setCurrentPic(splitImageLeft, picArrayLeft[picIndexLeft]);
   await setCurrentPic(splitImageRight, picArrayRight[picIndexRight]);
+  await setCurrentPic(staticImage, staticPics.left);
 
-  if (staticLeft) await setCurrentPic(staticLeft, staticPics.left);
-  if (staticCenter) await setCurrentPic(staticCenter, staticPics.center);
-  if (staticRight) await setCurrentPic(staticRight, staticPics.right);
+  // if (staticLeft) await setCurrentPic(staticLeft, staticPics.left);
+  // if (staticCenter) await setCurrentPic(staticCenter, staticPics.center);
+  // if (staticRight) await setCurrentPic(staticRight, staticPics.right);
 
   setInterval(async () => {
     picIndexLeft++;

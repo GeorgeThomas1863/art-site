@@ -1,7 +1,7 @@
 * {
-  font-family: "Georgia", serif;
+  /* font-family: "Georgia", serif; */
   /* CUSTOM FONT */
-  /* font-family: "Indie Flower", cursive; */
+  font-family: "Indie Flower", cursive;
   margin: 0;
   padding: 0;
   box-sizing: border-box;
@@ -39,6 +39,7 @@ h3 {
 /* AUTH FORM STYLES */
 
 #auth-form-wrapper {
+  font-family: "Georgia", serif;
   margin: 1.5rem auto;
   max-width: 500px;
   padding: 1.5rem 2rem;
@@ -69,6 +70,7 @@ h3 {
 
 /* ADMIN FORM STYLES */
 .admin-form-wrapper {
+  font-family: "Georgia", serif;
   margin: 1.5rem auto;
   max-width: 600px;
   width: 100%;
@@ -577,8 +579,8 @@ h3 {
 
 .split-hero {
   display: grid;
-  /* grid-template-columns: 55% 45%; */
-  grid-template-columns: 40% 60%;
+  grid-template-columns: 60% 40%;
+  /* grid-template-columns: 45% 55%; */
   /* height: calc(100vh - 120px); */
   height: calc(100vh - 72.5px);
 }
@@ -599,7 +601,7 @@ h3 {
 
 .split-image-top {
   /* flex: 2; */
-  height: 60%;
+  height: 50%;
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 0;
@@ -607,12 +609,17 @@ h3 {
 
 .split-image-bottom {
   position: relative;
-  /* flex: 1; */
+  height: 50%;
+  display: block;
+}
+
+/* .split-image-bottom {
+  position: relative;
   height: 40%;
   display: grid;
   grid-template-columns: 1fr 1fr 1fr;
   gap: 0;
-}
+} */
 
 .split-image-rotating,
 .split-image-static {
@@ -620,6 +627,11 @@ h3 {
   background-position: center;
   background-size: cover;
   background-repeat: no-repeat;
+}
+
+.split-image-static {
+  height: 100%;
+  background-position: 50% 30%;
 }
 
 .split-image-rotating {

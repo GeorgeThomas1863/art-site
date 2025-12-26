@@ -161,23 +161,29 @@ export const buildSplitImage = async () => {
   bottomStatic.className = "split-image-bottom";
   bottomStatic.href = "/about";
 
-  const staticLeft = document.createElement("div");
-  staticLeft.className = "split-image-static";
-  staticLeft.id = "split-image-static-left";
+  const staticImage = document.createElement("div");
+  staticImage.className = "split-image-static";
+  staticImage.id = "split-image-static";
 
-  const staticCenter = document.createElement("div");
-  staticCenter.className = "split-image-static";
-  staticCenter.id = "split-image-static-center";
+  // const staticLeft = document.createElement("div");
+  // staticLeft.className = "split-image-static";
+  // staticLeft.id = "split-image-static-left";
 
-  const staticRight = document.createElement("div");
-  staticRight.className = "split-image-static";
-  staticRight.id = "split-image-static-right";
+  // const staticCenter = document.createElement("div");
+  // staticCenter.className = "split-image-static";
+  // staticCenter.id = "split-image-static-center";
+
+  // const staticRight = document.createElement("div");
+  // staticRight.className = "split-image-static";
+  // staticRight.id = "split-image-static-right";
 
   const bottomText = document.createElement("div");
   bottomText.className = "split-image-text split-image-text-bottom";
   bottomText.textContent = "Sustainable Design • Timeless Beauty • Artisan Quality";
 
-  bottomStatic.append(staticLeft, staticCenter, staticRight, bottomText);
+  // bottomStatic.append(staticLeft, staticCenter, staticRight, bottomText);
+
+  bottomStatic.append(staticImage, bottomText);
 
   splitImage.append(topRotating, bottomStatic);
 
