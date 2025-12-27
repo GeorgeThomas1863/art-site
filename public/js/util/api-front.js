@@ -4,7 +4,7 @@ export const sendToBack = async (inputParams, method = "POST") => {
   try {
     const res = await fetch(route, {
       method: method,
-      body: JSON.stringify(inputParams),
+      body: method === "POST" ? JSON.stringify(inputParams) : inputParams,
       headers: {
         "Content-Type": "application/json",
       },
