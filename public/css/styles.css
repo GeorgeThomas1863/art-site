@@ -1,6 +1,6 @@
 * {
   /* font-family: "Georgia", serif; */
-  /* CUSTOM FONT */
+  /* CUSTOM FONT [put on each element] */
   font-family: "Indie Flower", cursive;
   margin: 0;
   padding: 0;
@@ -38,6 +38,10 @@ h3 {
 
 /* AUTH FORM STYLES */
 
+#auth-element {
+  font-family: "Georgia", serif;
+}
+
 #auth-form-wrapper {
   font-family: "Georgia", serif;
   margin: 1.5rem auto;
@@ -69,6 +73,10 @@ h3 {
 /* ---------------------------------------------- */
 
 /* ADMIN FORM STYLES */
+#admin-element {
+  font-family: "Georgia", serif;
+}
+
 .admin-form-wrapper {
   font-family: "Georgia", serif;
   margin: 1.5rem auto;
