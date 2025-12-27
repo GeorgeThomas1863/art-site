@@ -2,18 +2,23 @@ export const sendToBack = async (inputParams, method = "POST") => {
   const { route } = inputParams;
 
   try {
-    const res = await fetch(route, {
+    const params = {
       method: method,
-      body: method === "POST" ? JSON.stringify(inputParams) : inputParams,
       headers: {
         "Content-Type": "application/json",
       },
-    });
+    };
 
+    if (method !== "GET" && method !== "HEAD") {
+      params.body = JSON.stringify(inputParams);
+    }
+
+    const res = await fetch(route, params);
     const data = await res.json();
     return data;
   } catch (error) {
     console.log(error);
+    return "FAIL";
   }
 };
 
