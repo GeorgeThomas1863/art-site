@@ -1,5 +1,8 @@
 export const sendToBack = async (inputParams, method = "POST") => {
   const { route } = inputParams;
+  console.log("SEND TO BACK");
+  console.log(inputParams);
+  console.log(method);
 
   try {
     const params = {
