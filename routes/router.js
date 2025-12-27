@@ -1,6 +1,6 @@
 import express from "express";
 
-import { mainDisplay, productsDisplay, aboutDisplay, eventsDisplay, cartDisplay, display404, display500, display401 } from "../controllers/display-controller.js"; //prettier-ignore
+import { mainDisplay, authDisplay, productsDisplay, aboutDisplay, eventsDisplay, cartDisplay, display404, display500, display401 } from "../controllers/display-controller.js"; //prettier-ignore
 import { getProductDataController } from "../controllers/data-controller.js"; //prettier-ignore
 
 const router = express.Router();
@@ -8,6 +8,8 @@ const router = express.Router();
 //------------------------
 
 router.get("/get-product-data-route", getProductDataController);
+
+router.get("/auth", authDisplay);
 
 router.get("/cart", cartDisplay);
 

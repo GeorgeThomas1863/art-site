@@ -9,6 +9,10 @@ export const mainDisplay = async (req, res) => {
   res.sendFile(path.join(__dirname, "../html/index.html"));
 };
 
+export const authDisplay = (req, res) => {
+  res.sendFile(path.join(__dirname, "../html/auth.html"));
+};
+
 export const adminDisplay = (req, res) => {
   res.sendFile(path.join(__dirname, "../html/admin.html"));
 };
@@ -28,7 +32,6 @@ export const eventsDisplay = (req, res) => {
 export const cartDisplay = (req, res) => {
   res.sendFile(path.join(__dirname, "../html/cart.html"));
 };
-
 
 //------------------
 
