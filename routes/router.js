@@ -1,13 +1,17 @@
 import express from "express";
 
-import { mainDisplay, productsDisplay, aboutDisplay, eventsDisplay, cartDisplay, display404, display500, display401 } from "../controllers/display-controller.js"; //prettier-ignore
-import { getProductDataController } from "../controllers/data-controller.js"; //prettier-ignore
+import requireAuth from "../middleware/auth-middle.js";
+import { authController } from "../controllers/auth-controller.js";
+import { mainDisplay, adminDisplay, productsDisplay, aboutDisplay, eventsDisplay, cartDisplay, display404, display500, display401 } from "../controllers/display-controller.js"; //prettier-ignore
 
 const router = express.Router();
 
-//------------------------
+router.post("/site-auth-route", authController);
+router.get("/401", display401);
 
-router.get("/get-product-data-route", getProductDataController);
+router.get("/admin", requireAuth, adminDisplay);
+
+//------------------------
 
 router.get("/cart", cartDisplay);
 
@@ -18,8 +22,6 @@ router.get("/about", aboutDisplay);
 router.get("/products", productsDisplay);
 
 router.get("/", mainDisplay);
-
-router.get("/401", display401);
 
 router.use(display404);
 

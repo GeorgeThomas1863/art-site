@@ -1,3 +1,5 @@
+//COULD REFACTOR TO DATA ROUTES
+
 import express from "express";
 import requireAuth from "../middleware/auth-middle.js";
 
@@ -8,10 +10,10 @@ import { upload } from "../src/upload-pic.js";
 
 const router = express.Router();
 
-// Login AUTH route
-router.post("/admin/site-auth-route", authController);
+router.get("/data/get-product-data-route", getProductDataController);
 
-router.get("/admin", requireAuth, adminDisplay);
+// Login AUTH route
+
 
 router.post("/admin/upload-pic-route", requireAuth, upload.single("image"), uploadPicController);
 
