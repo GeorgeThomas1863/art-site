@@ -9,7 +9,7 @@ import { upload } from "../src/upload-pic.js";
 const router = express.Router();
 
 // Login AUTH route
-router.post("/admin/site-auth-route", authController);
+router.post("/site-auth-route", authController);
 
 router.get("/admin", requireAuth, adminDisplay);
 
