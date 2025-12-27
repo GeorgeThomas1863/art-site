@@ -2,7 +2,7 @@ import express from "express";
 import requireAuth from "../middleware/auth-middle.js";
 
 import { authController } from "../controllers/auth-controller.js";
-import {  adminDisplay } from "../controllers/display-controller.js"; //prettier-ignore
+import { adminDisplay } from "../controllers/display-controller.js";
 import { uploadPicController, addNewProductController, editProductController, deleteProductController } from "../controllers/data-controller.js"; //prettier-ignore
 import { upload } from "../src/upload-pic.js";
 
