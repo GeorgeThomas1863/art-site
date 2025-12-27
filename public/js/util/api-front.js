@@ -1,8 +1,5 @@
 export const sendToBack = async (inputParams, method = "POST") => {
   const { route } = inputParams;
-  console.log("SEND TO BACK");
-  console.log(inputParams);
-  console.log(method);
 
   try {
     const params = {
@@ -18,8 +15,7 @@ export const sendToBack = async (inputParams, method = "POST") => {
 
     const res = await fetch(route, params);
     const data = await res.json();
-    console.log("DATA");
-    console.log(data);
+
     return data;
   } catch (error) {
     console.log(error);
