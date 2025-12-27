@@ -91,6 +91,8 @@ export const updateCartItem = async (req, res) => {
 export const removeFromCart = async (req, res) => {
   await buildCart(req);
 
+  const { productId } = req.params;
+
   let newCart = [];
   for (let i = 0; i < req.session.cart.length; i++) {
     if (req.session.cart[i].productId !== productId) {
