@@ -1,7 +1,7 @@
 * {
   /* font-family: "Georgia", serif; */
   /* CUSTOM FONT [put on each element] */
-  font-family: "Indie Flower", cursive;
+  /* font-family: "Indie Flower", cursive; */
   margin: 0;
   padding: 0;
   box-sizing: border-box;
@@ -536,6 +536,10 @@ h3 {
 /* ++++++++++++++++++++++++++++++++++++++++++++++++++++ */
 
 /* MAIN FORM STYLES */
+
+#display-element {
+  font-family: "Indie Flower", cursive;
+}
 
 .navbar {
   background-color: rgba(0, 0, 0, 0.95);
