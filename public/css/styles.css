@@ -38,8 +38,11 @@ h3 {
 
 /* AUTH FORM STYLES */
 
-#auth-form-wrapper {
+#auth-element {
   font-family: "Georgia", serif;
+}
+
+#auth-form-wrapper {
   margin: 1.5rem auto;
   max-width: 500px;
   padding: 1.5rem 2rem;
@@ -69,6 +72,11 @@ h3 {
 /* ---------------------------------------------- */
 
 /* ADMIN FORM STYLES */
+
+#admin-element {
+  font-family: "Georgia", serif;
+}
+
 .admin-form-wrapper {
   font-family: "Georgia", serif;
   margin: 1.5rem auto;
