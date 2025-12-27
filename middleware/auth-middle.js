@@ -9,7 +9,8 @@ const requireAuth = (req, res, next) => {
   if (req.session.authenticated) {
     next();
   } else {
-    res.sendFile(path.join(process.cwd(), "html", "auth.html"));
+    res.sendFile(path.join(__dirname, "../html/auth.html"));
+    // res.sendFile(path.join(process.cwd(), "html", "auth.html"));
     // res.redirect("/auth");
     return;
   }
