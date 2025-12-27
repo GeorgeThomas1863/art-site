@@ -103,7 +103,7 @@ export const runAddToCart = async (productId) => {
   console.log("ADD TO CART CLICKED");
   console.log("Product ID:", productId);
 
-  // Find product data from the DOM
+  // Find product data from the DOM //UNFUCK THIS
   const productCard = document.querySelector(`[data-product-id="${productId}"]`);
   if (!productCard) {
     console.error("Product card not found");

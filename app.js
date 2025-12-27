@@ -1,3 +1,5 @@
+//FIX WAY PRODUCT INFO IS PASSED TO CART
+
 //add dates to product upload
 
 //switch product filter to buttons; include type descriptions on click
