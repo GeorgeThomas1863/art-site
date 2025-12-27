@@ -1,0 +1,257 @@
+// helpers/cart-run.js
+import { sendToBackGET, sendToBackPOST, sendToBackPUT, sendToBackDELETE } from "../util/api-front.js";
+import { buildCartItem, buildEmptyCart } from "../forms/cart-form.js";
+import { displayPopup } from "../util/popup.js";
+
+// Load and display cart
+export const populateCart = async () => {
+  const data = await sendToBackGET({ route: "/cart/data" });
+
+  if (!data || !data.cart) {
+    console.error("Failed to load cart");
+    return null;
+  }
+
+  await displayCart(data.cart);
+  await updateCartSummary();
+
+  return true;
+};
+
+// Display cart items
+export const displayCart = async (cartItems) => {
+  const cartItemsContainer = document.getElementById("cart-items-container");
+
+  if (!cartItemsContainer) {
+    console.error("Cart items container not found");
+    return null;
+  }
+
+  // Clear existing items
+  cartItemsContainer.innerHTML = "";
+
+  // If cart is empty, show empty state
+  if (!cartItems || cartItems.length === 0) {
+    const emptyCart = await buildEmptyCart();
+    cartItemsContainer.append(emptyCart);
+
+    // Disable checkout button
+    const checkoutBtn = document.getElementById("cart-checkout-btn");
+    if (checkoutBtn) {
+      checkoutBtn.disabled = true;
+    }
+
+    return true;
+  }
+
+  // Build and append cart items
+  for (let i = 0; i < cartItems.length; i++) {
+    const item = cartItems[i];
+    const cartItem = await buildCartItem(item);
+    cartItemsContainer.append(cartItem);
+  }
+
+  // Enable checkout button if cart has items
+  const checkoutBtn = document.getElementById("cart-checkout-btn");
+  if (checkoutBtn) {
+    checkoutBtn.disabled = false;
+  }
+
+  return true;
+};
+
+// Update cart summary (totals, item count)
+export const updateCartSummary = async () => {
+  const response = await sendToBackGET({ route: "/cart/summary" });
+
+  if (!response) {
+    console.error("Failed to get cart summary");
+    return null;
+  }
+
+  const { itemCount, total } = response;
+
+  // Update item count
+  const itemCountElement = document.getElementById("cart-summary-item-count");
+  if (itemCountElement) {
+    itemCountElement.textContent = itemCount;
+  }
+
+  // Update subtotal
+  const subtotalElement = document.getElementById("cart-summary-subtotal");
+  if (subtotalElement) {
+    subtotalElement.textContent = `$${total.toFixed(2)}`;
+  }
+
+  // Update total
+  const totalElement = document.getElementById("cart-summary-total");
+  if (totalElement) {
+    totalElement.textContent = `$${total.toFixed(2)}`;
+  }
+
+  return true;
+};
+
+// Update navbar cart count
+export const updateNavbarCart = async () => {
+  const response = await sendToBackGET({ route: "/cart/summary" });
+
+  if (!response) return null;
+
+  const { itemCount } = response;
+
+  const cartContainer = document.getElementById("nav-cart-container");
+  const cartCountElement = document.getElementById("nav-cart-count");
+
+  if (!cartContainer || !cartCountElement) return null;
+
+  // Show/hide cart button based on item count
+  if (itemCount > 0) {
+    cartContainer.style.display = "block";
+    cartCountElement.textContent = itemCount;
+  } else {
+    cartContainer.style.display = "none";
+  }
+
+  return true;
+};
+
+// Add item to cart
+export const addToCart = async (productData) => {
+  const { productId, name, price, image } = productData;
+
+  const response = await sendToBackPOST({
+    route: "/cart/add",
+    body: {
+      productId,
+      name,
+      price,
+      image,
+      quantity: 1,
+    },
+  });
+
+  if (!response || !response.success) {
+    await displayPopup("Failed to add item to cart", "error");
+    return null;
+  }
+
+  await displayPopup("Item added to cart!", "success");
+  await updateNavbarCart();
+
+  return true;
+};
+
+// Increase item quantity
+export const increaseQuantity = async (productId) => {
+  // Get current quantity
+  const quantityElement = document.getElementById(`quantity-${productId}`);
+  if (!quantityElement) return null;
+
+  const currentQuantity = parseInt(quantityElement.textContent);
+  const newQuantity = currentQuantity + 1;
+
+  const response = await sendToBackPUT({
+    route: `/cart/update/${productId}`,
+    body: { quantity: newQuantity },
+  });
+
+  if (!response || !response.success) {
+    await displayPopup("Failed to update quantity", "error");
+    return null;
+  }
+
+  // Update display
+  quantityElement.textContent = newQuantity;
+  await updateItemTotal(productId, newQuantity);
+  await updateCartSummary();
+  await updateNavbarCart();
+
+  return true;
+};
+
+// Decrease item quantity
+export const decreaseQuantity = async (productId) => {
+  // Get current quantity
+  const quantityElement = document.getElementById(`quantity-${productId}`);
+  if (!quantityElement) return null;
+
+  const currentQuantity = parseInt(quantityElement.textContent);
+
+  if (currentQuantity <= 1) {
+    // Remove item if quantity would be 0
+    await removeFromCart(productId);
+    return true;
+  }
+
+  const newQuantity = currentQuantity - 1;
+
+  const response = await sendToBackPUT({
+    route: `/cart/update/${productId}`,
+    body: { quantity: newQuantity },
+  });
+
+  if (!response || !response.success) {
+    await displayPopup("Failed to update quantity", "error");
+    return null;
+  }
+
+  // Update display
+  quantityElement.textContent = newQuantity;
+  await updateItemTotal(productId, newQuantity);
+  await updateCartSummary();
+  await updateNavbarCart();
+
+  return true;
+};
+
+// Update item total display
+export const updateItemTotal = async (productId, quantity) => {
+  const itemTotalElement = document.getElementById(`item-total-${productId}`);
+  if (!itemTotalElement) return null;
+
+  // Get price from cart item
+  const cartItem = document.querySelector(`[data-product-id="${productId}"]`);
+  if (!cartItem) return null;
+
+  const priceElement = cartItem.querySelector(".cart-item-price");
+  if (!priceElement) return null;
+
+  const priceText = priceElement.textContent;
+  const price = parseFloat(priceText.replace("$", ""));
+
+  const total = price * quantity;
+  itemTotalElement.textContent = `$${total.toFixed(2)}`;
+
+  return true;
+};
+
+// Remove item from cart
+export const removeFromCart = async (productId) => {
+  const response = await sendToBackDELETE({
+    route: `/cart/remove/${productId}`,
+  });
+
+  if (!response || !response.success) {
+    await displayPopup("Failed to remove item", "error");
+    return null;
+  }
+
+  // Remove item from DOM
+  const cartItem = document.querySelector(`[data-product-id="${productId}"]`);
+  if (cartItem) {
+    cartItem.remove();
+  }
+
+  // Check if cart is now empty
+  const response2 = await sendToBackGET({ route: "/cart/data" });
+  if (response2 && response2.cart && response2.cart.length === 0) {
+    await displayCart([]);
+  }
+
+  await updateCartSummary();
+  await updateNavbarCart();
+  await displayPopup("Item removed from cart", "success");
+
+  return true;
+};

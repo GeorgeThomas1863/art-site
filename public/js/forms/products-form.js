@@ -146,6 +146,7 @@ export const buildAddToCartButton = async (productData) => {
   const addToCartBtn = document.createElement("button");
   addToCartBtn.className = "add-to-cart-btn";
   addToCartBtn.textContent = "Add to Cart";
+  addToCartBtn.setAttribute("data-label", "add-to-cart");
   addToCartBtn.setAttribute("data-product-id", productData.productId);
 
   return addToCartBtn;

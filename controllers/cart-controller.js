@@ -9,7 +9,7 @@ export const buildCart = async (req) => {
 //-------------------
 
 //cart routes
-export const getCart = async (req, res) => {
+export const getCartData = async (req, res) => {
   await buildCart(req);
   res.json({ cart: req.session.cart });
 };

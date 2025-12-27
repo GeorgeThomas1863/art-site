@@ -48,6 +48,28 @@ export const buildNavBar = async () => {
     ul.appendChild(li);
   }
 
+  // Add cart button
+  const cartLi = document.createElement("li");
+  cartLi.id = "nav-cart-container";
+  cartLi.style.display = "none"; // Hidden by default
+
+  const cartLink = document.createElement("a");
+  cartLink.href = "/cart";
+  cartLink.className = "nav-cart-link";
+
+  const cartIcon = document.createElement("span");
+  cartIcon.className = "cart-icon";
+  cartIcon.textContent = "🛒";
+
+  const cartCount = document.createElement("span");
+  cartCount.className = "cart-count";
+  cartCount.id = "nav-cart-count";
+  cartCount.textContent = "0";
+
+  cartLink.append(cartIcon, cartCount);
+  cartLi.appendChild(cartLink);
+  ul.appendChild(cartLi);
+
   navContainer.appendChild(logo);
   navContainer.appendChild(ul);
   nav.appendChild(navContainer);

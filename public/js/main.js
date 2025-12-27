@@ -1,11 +1,14 @@
 import { buildMainForm, buildNavBar } from "./forms/main-form.js";
 import { buildProductsForm } from "./forms/products-form.js";
+import { buildCartForm } from "./forms/cart-form.js";
 import { sendToBackGET } from "./util/api-front.js";
 import { populateProductsGrid } from "./helpers/products-run.js";
+import { populateCart, updateNavbarCart } from "./helpers/cart-run.js";
 import { startPicRotation } from "./helpers/rotate-pics.js";
 
 const displayElement = document.getElementById("display-element");
 const productsElement = document.getElementById("products-element");
+const cartElement = document.getElementById("cart-element");
 
 export const buildMainDisplay = async () => {
   if (!displayElement) return null;
@@ -18,6 +21,8 @@ export const buildMainDisplay = async () => {
   displayElement.append(data);
 
   await startPicRotation();
+
+  await updateNavbarCart();
 
   return true;
 };
@@ -34,11 +39,26 @@ export const buildProductsDisplay = async () => {
   console.dir(productData);
   await populateProductsGrid(productData);
 
+  await updateNavbarCart();
+
+  return true;
+};
+
+export const buildCartDisplay = async () => {
+  if (!cartElement) return null;
+
+  const navElement = await buildNavBar();
+  const cartForm = await buildCartForm();
+  cartElement.append(navElement, cartForm);
+
+  await populateCart();
+
   return true;
 };
 
 if (displayElement) buildMainDisplay();
 if (productsElement) buildProductsDisplay();
+if (cartElement) buildCartDisplay();
 
 //DESCRIPTIONS TO ADD
 

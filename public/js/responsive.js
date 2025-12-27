@@ -1,5 +1,5 @@
 import { runTabClick, runUploadClick, runUploadPic, runAddNewProduct, runEditProduct, runDeleteProduct, changeAdminProductSelector } from "./helpers/admin-run.js"; //prettier-ignore
-import { changeProductsFilter } from "./helpers/products-run.js";
+import { changeProductsFilter, runAddToCart } from "./helpers/products-run.js";
 import { runAuthSubmit, runPwToggle } from "./auth.js";
 import { closePopup, closeConfirmDialog } from "./util/popup.js";
 
@@ -7,6 +7,7 @@ const authElement = document.getElementById("auth-element");
 const displayElement = document.getElementById("display-element");
 const adminElement = document.getElementById("admin-element");
 const productsElement = document.getElementById("products-element");
+const cartElement = document.getElementById("cart-element");
 
 export const clickHandler = async (e) => {
   const clickElement = e.target;
@@ -27,6 +28,8 @@ export const clickHandler = async (e) => {
 
   if (tabType) await runTabClick(clickElement);
   if (clickType === "upload-click" || clickType === "edit-upload-click") await runUploadClick(clickElement);
+
+  if (clickType === "add-to-cart") await runAddToCart(clickElement);
 
   if (clickType === "new-product-submit") await runAddNewProduct();
   if (clickType === "edit-product-submit") await runEditProduct();
@@ -93,4 +96,9 @@ if (productsElement) {
   productsElement.addEventListener("click", clickHandler);
   productsElement.addEventListener("keydown", keyHandler);
   productsElement.addEventListener("change", changeHandler);
+}
+
+if (cartElement) {
+  cartElement.addEventListener("click", clickHandler);
+  // cartElement.addEventListener("keydown", keyHandler);
 }

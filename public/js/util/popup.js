@@ -1,7 +1,18 @@
+//MOVE TO HELPERS
 const adminElement = document.getElementById("admin-element");
+const productsElement = document.getElementById("products-element");
+const cartElement = document.getElementById("cart-element");
 
 export const displayPopup = async (message, type = "success") => {
   if (!adminElement) return null;
+
+  //CHANGE BELOW TO BE NON RETARDED
+  let targetElement = null;
+  if (adminElement) targetElement = adminElement;
+  else if (productsElement) targetElement = productsElement;
+  else if (cartElement) targetElement = cartElement;
+
+  if (!targetElement) return null;
 
   console.log("DISPLAY POPUP");
   console.log(message);
@@ -41,7 +52,7 @@ export const displayPopup = async (message, type = "success") => {
 
   // Append elements
   popup.append(icon, messageText, closeBtn);
-  adminElement.append(popup);
+  targetElement.append(popup);
 
   popup.style.display = "flex";
 
