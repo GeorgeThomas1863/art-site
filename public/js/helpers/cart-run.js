@@ -1,11 +1,12 @@
 // helpers/cart-run.js
-import { sendToBackGET, sendToBackPOST, sendToBackPUT, sendToBackDELETE } from "../util/api-front.js";
+// import { sendToBackGET, sendToBackPOST, sendToBackPUT, sendToBackDELETE } from "../util/api-front.js";
+import { sendToBack } from "../util/api-front.js";
 import { buildCartItem, buildEmptyCart } from "../forms/cart-form.js";
 import { displayPopup } from "../util/popup.js";
 
 // Load and display cart
 export const populateCart = async () => {
-  const data = await sendToBackGET({ route: "/cart/data" });
+  const data = await sendToBack({ route: "/cart/data" }, "GET");
 
   if (!data || !data.cart) {
     console.error("Failed to load cart");
@@ -62,7 +63,7 @@ export const displayCart = async (cartItems) => {
 
 // Update cart summary (totals, item count)
 export const updateCartSummary = async () => {
-  const response = await sendToBackGET({ route: "/cart/summary" });
+  const response = await sendToBack({ route: "/cart/summary" }, "GET");
 
   if (!response) {
     console.error("Failed to get cart summary");
@@ -94,7 +95,7 @@ export const updateCartSummary = async () => {
 
 // Update navbar cart count
 export const updateNavbarCart = async () => {
-  const response = await sendToBackGET({ route: "/cart/summary" });
+  const response = await sendToBack({ route: "/cart/summary" }, "GET");
 
   if (!response) return null;
 
@@ -120,7 +121,7 @@ export const updateNavbarCart = async () => {
 export const addToCart = async (productData) => {
   const { productId, name, price, image } = productData;
 
-  const response = await sendToBackPOST({
+  const response = await sendToBack({
     route: "/cart/add",
     body: {
       productId,
@@ -186,10 +187,13 @@ export const decreaseQuantity = async (productId) => {
 
   const newQuantity = currentQuantity - 1;
 
-  const response = await sendToBackPUT({
-    route: `/cart/update/${productId}`,
-    body: { quantity: newQuantity },
-  });
+  const response = await sendToBack(
+    {
+      route: `/cart/update/${productId}`,
+      body: { quantity: newQuantity },
+    },
+    "PUT"
+  );
 
   if (!response || !response.success) {
     await displayPopup("Failed to update quantity", "error");
@@ -228,9 +232,12 @@ export const updateItemTotal = async (productId, quantity) => {
 
 // Remove item from cart
 export const removeFromCart = async (productId) => {
-  const response = await sendToBackDELETE({
-    route: `/cart/remove/${productId}`,
-  });
+  const response = await sendToBack(
+    {
+      route: `/cart/remove/${productId}`,
+    },
+    "DELETE"
+  );
 
   if (!response || !response.success) {
     await displayPopup("Failed to remove item", "error");
@@ -244,7 +251,7 @@ export const removeFromCart = async (productId) => {
   }
 
   // Check if cart is now empty
-  const response2 = await sendToBackGET({ route: "/cart/data" });
+  const response2 = await sendToBack({ route: "/cart/data" }, "GET");
   if (response2 && response2.cart && response2.cart.length === 0) {
     await displayCart([]);
   }

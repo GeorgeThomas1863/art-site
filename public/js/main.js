@@ -1,7 +1,7 @@
 import { buildMainForm, buildNavBar } from "./forms/main-form.js";
 import { buildProductsForm } from "./forms/products-form.js";
 import { buildCartForm } from "./forms/cart-form.js";
-import { sendToBackGET } from "./util/api-front.js";
+import { sendToBack } from "./util/api-front.js";
 import { populateProductsGrid } from "./helpers/products-run.js";
 import { populateCart, updateNavbarCart } from "./helpers/cart-run.js";
 import { startPicRotation } from "./helpers/rotate-pics.js";
@@ -34,7 +34,7 @@ export const buildProductsDisplay = async () => {
   const productForm = await buildProductsForm();
   productsElement.append(navElement, productForm);
 
-  const productData = await sendToBackGET({ route: "/get-product-data-route" });
+  const productData = await sendToBack({ route: "/get-product-data-route" }, "GET");
   console.log("PRODUCT DATA");
   console.dir(productData);
   await populateProductsGrid(productData);

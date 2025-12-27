@@ -1,9 +1,9 @@
-export const sendToBack = async (inputParams) => {
+export const sendToBack = async (inputParams, method = "POST") => {
   const { route } = inputParams;
 
   try {
     const res = await fetch(route, {
-      method: "POST",
+      method: method,
       body: JSON.stringify(inputParams),
       headers: {
         "Content-Type": "application/json",
@@ -41,18 +41,18 @@ export const sendToBackFile = async (inputParams) => {
   }
 };
 
-export const sendToBackGET = async (inputParams) => {
-  const { route } = inputParams;
+// export const sendToBackGET = async (inputParams) => {
+//   const { route } = inputParams;
 
-  try {
-    const res = await fetch(route, {
-      method: "GET",
-    });
+//   try {
+//     const res = await fetch(route, {
+//       method: "GET",
+//     });
 
-    const data = await res.json();
-    return data;
-  } catch (e) {
-    console.log(e);
-    return "FAIL";
-  }
-};
+//     const data = await res.json();
+//     return data;
+//   } catch (e) {
+//     console.log(e);
+//     return "FAIL";
+//   }
+// };

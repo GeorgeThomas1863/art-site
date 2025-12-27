@@ -1,5 +1,5 @@
 import { ADMIN_EDIT_DEFAULT_ARRAY } from "../util/define-things.js";
-import { sendToBackFile, sendToBack, sendToBackGET } from "../util/api-front.js";
+import { sendToBackFile, sendToBack } from "../util/api-front.js";
 import { getNewProductParams, getEditProductParams } from "../util/params.js";
 import { displayPopup, displayConfirmDialog } from "../util/popup.js";
 
@@ -27,7 +27,7 @@ export const runTabClick = async (clickElement) => {
   addTab.style.display = "none";
   editTab.style.display = "block";
 
-  const productData = await sendToBackGET({ route: "/get-product-data-route" });
+  const productData = await sendToBack({ route: "/get-product-data-route" }, "GET");
 
   console.log("PRODUCT DATA");
   console.dir(productData);
@@ -176,7 +176,7 @@ export const runEditProduct = async () => {
   await displayPopup(popupText, "success");
 
   // Refresh the product data to reflect changes
-  const productData = await sendToBackGET({ route: "/get-product-data-route" });
+  const productData = await sendToBack({ route: "/get-product-data-route" }, "GET");
   if (productData) {
     await populateAdminProductSelector(productData);
 
@@ -220,7 +220,7 @@ export const runDeleteProduct = async () => {
   await displayPopup(popupText, "success");
 
   // Refresh the product data to reflect changes
-  const productData = await sendToBackGET({ route: "/get-product-data-route" });
+  const productData = await sendToBack({ route: "/get-product-data-route" }, "GET");
   if (productData) {
     await populateAdminProductSelector(productData);
   }
