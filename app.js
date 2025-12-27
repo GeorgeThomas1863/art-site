@@ -29,7 +29,6 @@
 import express from "express";
 import session from "express-session";
 import routes from "./routes/router.js";
-import adminRoutes from "./routes/admin-routes.js";
 import cartRoutes from "./routes/cart-routes.js";
 
 import CONFIG from "./config/config.js";
@@ -51,7 +50,6 @@ app.use(express.json());
 
 //routes
 app.use(routes);
-app.use(adminRoutes);
 app.use(cartRoutes);
 
 app.listen(port);

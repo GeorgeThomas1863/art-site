@@ -25,10 +25,6 @@ export const eventsDisplay = (req, res) => {
   res.sendFile(path.join(__dirname, "../html/events.html"));
 };
 
-export const cartDisplay = (req, res) => {
-  res.sendFile(path.join(__dirname, "../html/cart.html"));
-};
-
 //------------------
 
 export const display401 = (req, res) => {

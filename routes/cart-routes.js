@@ -4,21 +4,21 @@ import { getCart, addToCart, updateCartItem, removeFromCart, clearCart, getCartS
 const router = express.Router();
 
 // GET cart contents
-router.get("/data/cart", getCart);
+router.get("/cart", getCart);
 
 // ADD item to cart
-router.post("/data/cart/add", addToCart);
+router.post("/cart/add", addToCart);
 
 // UPDATE item quantity
-router.put("/data/cart/update/:productId", updateCartItem);
+router.put("/cart/update/:productId", updateCartItem);
 
 // REMOVE item from cart
-router.delete("/data/cart/remove/:productId", removeFromCart);
+router.delete("/cart/remove/:productId", removeFromCart);
 
 // CLEAR entire cart
-router.delete("/data/cart/clear", clearCart);
+router.delete("/cart/clear", clearCart);
 
 // GET cart summary
-router.get("/data/cart/summary", getCartSummary);
+router.get("/cart/summary", getCartSummary);
 
 export default router;

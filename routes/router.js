@@ -1,19 +1,32 @@
 import express from "express";
 
-import requireAuth from "../middleware/auth-middle.js";
+// import CONFIG from "../config/config.js";
+import requireAuth from "./auth.js";
 import { authController } from "../controllers/auth-controller.js";
-import { mainDisplay, adminDisplay, productsDisplay, aboutDisplay, eventsDisplay, cartDisplay, display404, display500, display401 } from "../controllers/display-controller.js"; //prettier-ignore
+import { mainDisplay, adminDisplay, productsDisplay, aboutDisplay, eventsDisplay, display404, display500, display401 } from "../controllers/display-controller.js"; //prettier-ignore
+import { uploadPicController, addNewProductController, editProductController, deleteProductController, getProductDataController } from "../controllers/data-controller.js"; //prettier-ignore
+import { upload } from "../src/upload-pic.js";
 
 const router = express.Router();
 
+// Login AUTH route
 router.post("/site-auth-route", authController);
+
 router.get("/401", display401);
 
 router.get("/admin", requireAuth, adminDisplay);
 
+router.post("/upload-pic-route", requireAuth, upload.single("image"), uploadPicController);
+
+router.post("/add-new-product-route", requireAuth, addNewProductController);
+
+router.post("/edit-product-route", requireAuth, editProductController);
+
+router.post("/delete-product-route", requireAuth, deleteProductController);
+
 //------------------------
 
-router.get("/cart", cartDisplay);
+router.get("/get-product-data-route", getProductDataController);
 
 router.get("/events", eventsDisplay);
 
