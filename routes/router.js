@@ -1,7 +1,7 @@
 import express from "express";
 
 // import CONFIG from "../config/config.js";
-import requireAuth from "./auth.js";
+import requireAuth from "../middleware/auth-middle.js";
 import { authController } from "../controllers/auth-controller.js";
 import { mainDisplay, adminDisplay, productsDisplay, aboutDisplay, eventsDisplay, display404, display500, display401 } from "../controllers/display-controller.js"; //prettier-ignore
 import { uploadPicController, addNewProductController, editProductController, deleteProductController, getProductDataController } from "../controllers/data-controller.js"; //prettier-ignore

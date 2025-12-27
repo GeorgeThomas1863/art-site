@@ -4,7 +4,7 @@ import { getCart, addToCart, updateCartItem, removeFromCart, clearCart, getCartS
 const router = express.Router();
 
 // GET cart contents
-router.get("/cart", getCart);
+router.get("/cart/view", getCart);
 
 // ADD item to cart
 router.post("/cart/add", addToCart);
