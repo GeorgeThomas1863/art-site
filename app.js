@@ -49,7 +49,7 @@ app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 
 //routes
-app.use(routes);
 app.use(cartRoutes);
+app.use(routes);
 
 app.listen(port);
