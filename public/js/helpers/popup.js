@@ -4,27 +4,14 @@ const productsElement = document.getElementById("products-element");
 const cartElement = document.getElementById("cart-element");
 
 export const displayPopup = async (message, type = "success") => {
-  console.log("DISPLAY POPUP");
-  console.log(message);
-  console.log(type);
+  if (!message) return null;
 
-  //CHANGE BELOW TO BE NON RETARDED
-  let targetElement = null;
-  if (adminElement) targetElement = adminElement;
-  else if (productsElement) targetElement = productsElement;
-  else if (cartElement) targetElement = cartElement;
-
+  const targetElement = await getTargetElement();
   if (!targetElement) return null;
-
-  console.log("DISPLAY POPUP");
-  console.log(message);
-  console.log(type);
 
   // Remove any existing popup
   const existingPopup = document.getElementById("popup-notification");
-  if (existingPopup) {
-    existingPopup.remove();
-  }
+  if (existingPopup) existingPopup.remove();
 
   // Create popup container
   const popup = document.createElement("div");
@@ -75,6 +62,14 @@ export const closePopup = async () => {
 };
 
 //---------------------------
+
+export const getTargetElement = async () => {
+  if (adminElement) return adminElement;
+  if (productsElement) return productsElement;
+  if (cartElement) return cartElement;
+
+  return null;
+};
 
 export const displayConfirmDialog = async (message) => {
   const adminElement = document.getElementById("admin-element");
