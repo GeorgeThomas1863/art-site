@@ -1,10 +1,8 @@
-//FIX WAY PRODUCT INFO IS PASSED TO CART
+//make cart buttons work
 
 //add dates to product upload
 
 //switch product filter to buttons; include type descriptions on click
-
-//BUILD shopping cart
 
 //Build model or popup for product details
 
