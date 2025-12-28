@@ -1,5 +1,6 @@
 import { runTabClick, runUploadClick, runUploadPic, runAddNewProduct, runEditProduct, runDeleteProduct, changeAdminProductSelector } from "./helpers/admin-run.js"; //prettier-ignore
-import { changeProductsFilter, runAddToCart } from "./helpers/products-run.js";
+import { changeProductsFilter } from "./helpers/products-run.js";
+import { runAddToCart } from "./helpers/cart-run.js";
 import { runAuthSubmit, runPwToggle } from "./auth.js";
 import { closePopup, closeConfirmDialog } from "./util/popup.js";
 
