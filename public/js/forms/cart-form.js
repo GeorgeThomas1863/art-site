@@ -154,11 +154,12 @@ export const buildCartItemDetails = async (itemData) => {
   name.className = "cart-item-name";
   name.textContent = itemData.name;
 
-  const price = document.createElement("div");
-  price.className = "cart-item-price";
-  price.textContent = `$${itemData.price}`;
+  // const price = document.createElement("div");
+  // price.className = "cart-item-price";
+  // price.textContent = `$${itemData.price}`;
 
-  details.append(name, price);
+  // details.append(name, price);
+  details.append(name);
 
   return details;
 };
@@ -167,11 +168,11 @@ export const buildCartItemActions = async (itemData) => {
   const actions = document.createElement("div");
   actions.className = "cart-item-actions";
 
+  const itemTotal = await buildItemTotal(itemData);
   const quantityControl = await buildQuantityControl(itemData);
   const removeBtn = await buildRemoveButton(itemData);
-  const itemTotal = await buildItemTotal(itemData);
 
-  actions.append(quantityControl, itemTotal, removeBtn);
+  actions.append(itemTotal, quantityControl, removeBtn);
 
   return actions;
 };
