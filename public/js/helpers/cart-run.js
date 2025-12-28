@@ -117,10 +117,12 @@ export const updateNavbarCart = async () => {
   return true;
 };
 
-export const runAddToCart = async (productId) => {
+export const runAddToCart = async (clickElement) => {
   console.log("ADD TO CART CLICKED");
   console.log("Product ID:");
-  console.log(productId);
+  console.log(clickElement);
+
+  const productId = clickElement.productId;
 
   // Find product data from the DOM //UNFUCK THIS
   const productCard = document.querySelector(`[data-product-id="${productId}"]`);
