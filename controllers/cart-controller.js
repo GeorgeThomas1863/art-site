@@ -16,10 +16,8 @@ export const getCartData = async (req, res) => {
 
 export const addToCart = async (req, res) => {
   await buildCart(req);
-  console.log("ADD TO CART");
-  console.log(req.session.cart);
 
-  const { productId, quantity, name, price, image } = req.body;
+  const { productId, quantity, name, price, image } = req.body.data;
 
   let existingItem = null;
   for (let i = 0; i < req.session.cart.length; i++) {
@@ -39,14 +37,11 @@ export const addToCart = async (req, res) => {
     existingItem.quantity += quantity;
   } else {
     // Add new item
-    req.session.cart.push({
-      productId,
-      name,
-      price,
-      image,
-      quantity,
-    });
+    req.session.cart.push(req.body.data);
   }
+
+  console.log("ADD TO CART");
+  console.log(req.session.cart);
 
   res.json({
     success: true,
@@ -126,5 +121,5 @@ export const getCartSummary = async (req, res) => {
     total += req.session.cart[i].price * req.session.cart[i].quantity;
   }
 
-  res.json({ itemCount, total });
+  res.json({ itemCount, total, success: true });
 };

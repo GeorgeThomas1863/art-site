@@ -25,7 +25,7 @@ export const runAddToCart = async (clickElement) => {
 
   const res = await sendToBack({
     route: "/cart/add",
-    body: {
+    data: {
       productId,
       name,
       price,
@@ -63,6 +63,10 @@ export const updateNavbarCart = async () => {
 
   const cartContainer = document.getElementById("nav-cart-container");
   const cartCountElement = document.getElementById("nav-cart-count");
+  console.log("CART CONTAINER:");
+  console.log(cartContainer);
+  console.log("CART COUNT ELEMENT:");
+  console.log(cartCountElement);
 
   if (!cartContainer || !cartCountElement) return null;
 
