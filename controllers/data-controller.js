@@ -45,9 +45,9 @@ export const deleteProductController = async (req, res) => {
 
 //returns data for all products
 export const getProductDataController = async (req, res) => {
-  console.log("GET PRODUCT DATA CONTROLLER");
+  // console.log("GET PRODUCT DATA CONTROLLER");
   const data = await runGetProductData();
-  console.log("DATA");
-  console.dir(data);
+  // console.log("DATA");
+  // console.dir(data);
   return res.json(data);
 };
