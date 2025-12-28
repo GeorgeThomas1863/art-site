@@ -147,6 +147,9 @@ export const runAddToCart = async (clickElement) => {
     },
   });
 
+  console.log("ADD TO CART RES:");
+  console.log(res);
+
   if (!res || !res.success) {
     await displayPopup("Failed to add item to cart", "error");
     return null;
