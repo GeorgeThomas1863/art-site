@@ -42,6 +42,8 @@ export const runAddToCart = async (clickElement) => {
     return null;
   }
 
+  console.log("ITEM ADDED TO CART");
+
   await displayPopup("Item added to cart!", "success");
   await updateNavbarCart();
 
