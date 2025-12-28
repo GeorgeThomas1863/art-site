@@ -2,7 +2,7 @@ import { runTabClick, runUploadClick, runUploadPic, runAddNewProduct, runEditPro
 import { changeProductsFilter } from "./helpers/products-run.js";
 import { runAddToCart } from "./helpers/cart-run.js";
 import { runAuthSubmit, runPwToggle } from "./auth.js";
-import { closePopup, closeConfirmDialog } from "./util/popup.js";
+import { closePopup, closeConfirmDialog } from "./helpers/popup.js";
 
 const authElement = document.getElementById("auth-element");
 const displayElement = document.getElementById("display-element");
