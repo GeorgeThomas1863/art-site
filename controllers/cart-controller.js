@@ -16,6 +16,8 @@ export const getCartData = async (req, res) => {
 
 export const addToCart = async (req, res) => {
   await buildCart(req);
+  console.log("ADD TO CART");
+  console.log(req.session.cart);
 
   const { productId, quantity, name, price, image } = req.body;
 
