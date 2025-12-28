@@ -4,8 +4,6 @@ const productsElement = document.getElementById("products-element");
 const cartElement = document.getElementById("cart-element");
 
 export const displayPopup = async (message, type = "success") => {
-  if (!adminElement) return null;
-
   console.log("DISPLAY POPUP");
   console.log(message);
   console.log(type);
