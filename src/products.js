@@ -111,7 +111,7 @@ export const runGetProductData = async () => {
 
   const dataModel = new dbModel("", productsCollection);
   const data = await dataModel.getAll();
-  console.log("DATA");
-  console.dir(data);
+  // console.log("DATA");
+  // console.dir(data);
   return data;
 };
