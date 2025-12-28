@@ -111,7 +111,7 @@ export const clearCart = async (req, res) => {
 // GET cart summary (item count, total)
 export const getCartSummary = async (req, res) => {
   console.log("GET CART SUMMARY");
-  console.log(req)
+  console.log(req.session.cart);
   await buildCart(req);
 
   let itemCount = 0;
