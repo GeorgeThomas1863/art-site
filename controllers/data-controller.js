@@ -1,15 +1,13 @@
 import { runAddNewProduct, runEditProduct, runDeleteProduct, runGetProductData } from "../src/products.js";
+import { buildCart, runAddToCart } from "../src/cart.js";
 
 //returns data for all products
-export const getProductDataController = async (req, res) => {
+export const getProductDataControl = async (req, res) => {
   const data = await runGetProductData();
   return res.json(data);
 };
 
-export const uploadPicController = async (req, res) => {
-  // console.log("AHHHH");
-  // console.log(req.file);
-
+export const uploadPicControl = async (req, res) => {
   if (!req.file) {
     return res.status(400).json({ error: "No file uploaded" });
   }
@@ -25,7 +23,7 @@ export const uploadPicController = async (req, res) => {
   return res.json(data);
 };
 
-export const addNewProductController = async (req, res) => {
+export const addNewProductControl = async (req, res) => {
   const inputParams = req.body;
   if (!inputParams) return res.status(500).json({ error: "No input parameters" });
 
@@ -33,7 +31,7 @@ export const addNewProductController = async (req, res) => {
   return res.json(data);
 };
 
-export const editProductController = async (req, res) => {
+export const editProductControl = async (req, res) => {
   const inputParams = req.body;
   if (!inputParams) return res.status(500).json({ error: "No input parameters" });
 
@@ -41,7 +39,7 @@ export const editProductController = async (req, res) => {
   return res.json(data);
 };
 
-export const deleteProductController = async (req, res) => {
+export const deleteProductControl = async (req, res) => {
   const productId = req.body.productId;
   if (!productId) return res.status(500).json({ error: "No product ID" });
 
@@ -51,57 +49,41 @@ export const deleteProductController = async (req, res) => {
 
 //---------------------
 
-//CART controller
-export const buildCart = async (req) => {
-  if (!req.session.cart) {
-    req.session.cart = [];
-  }
-  return req.session.cart;
-};
+//CART CONTROLLER
 
-//cart routes
-export const getCartData = async (req, res) => {
+export const getCartDataControl = async (req, res) => {
   await buildCart(req);
   res.json({ cart: req.session.cart });
 };
 
-export const addToCart = async (req, res) => {
+export const getCartStatsControl = async (req, res) => {
+  console.log("GET CART SUMMARY");
+  console.log(req.session.cart);
   await buildCart(req);
-
-  const { productId, quantity, name, price, image } = req.body.data;
-
-  let existingItem = null;
-  for (let i = 0; i < req.session.cart.length; i++) {
-    if (req.session.cart[i].productId !== productId) continue;
-
-    existingItem = req.session.cart[i];
-    break;
-  }
 
   let itemCount = 0;
   for (let i = 0; i < req.session.cart.length; i++) {
     itemCount += req.session.cart[i].quantity;
   }
 
-  // Update quantity if already exists
-  if (existingItem) {
-    existingItem.quantity += quantity;
-  } else {
-    // Add new item
-    req.session.cart.push(req.body.data);
+  let total = 0;
+  for (let i = 0; i < req.session.cart.length; i++) {
+    total += req.session.cart[i].price * req.session.cart[i].quantity;
   }
 
-  console.log("ADD TO CART");
-  console.log(req.session.cart);
-
-  res.json({
-    success: true,
-    cart: req.session.cart,
-    itemCount: itemCount,
-  });
+  res.json({ itemCount, total, success: true });
 };
 
-export const updateCartItem = async (req, res) => {
+export const addToCartControl = async (req, res) => {
+  if (!req || !req.body || !req.body.data) return res.status(500).json({ error: "No input parameters" });
+
+  const data = await runAddToCart(req);
+  if (!data || !data.success) return res.status(500).json({ error: "Failed to add item to cart" });
+
+  res.json(data);
+};
+
+export const updateCartItemControl = async (req, res) => {
   await buildCart(req);
 
   const { productId } = req.params;
@@ -136,7 +118,7 @@ export const updateCartItem = async (req, res) => {
 };
 
 // REMOVE item from cart
-export const removeFromCart = async (req, res) => {
+export const removeFromCartControl = async (req, res) => {
   await buildCart(req);
 
   let newCart = [];
@@ -151,26 +133,7 @@ export const removeFromCart = async (req, res) => {
 };
 
 // CLEAR entire cart
-export const clearCart = async (req, res) => {
+export const clearCartControl = async (req, res) => {
   req.session.cart = [];
   res.json({ success: true, cart: [] });
-};
-
-// GET cart summary (item count, total)
-export const getCartSummary = async (req, res) => {
-  console.log("GET CART SUMMARY");
-  console.log(req.session.cart);
-  await buildCart(req);
-
-  let itemCount = 0;
-  for (let i = 0; i < req.session.cart.length; i++) {
-    itemCount += req.session.cart[i].quantity;
-  }
-
-  let total = 0;
-  for (let i = 0; i < req.session.cart.length; i++) {
-    total += req.session.cart[i].price * req.session.cart[i].quantity;
-  }
-
-  res.json({ itemCount, total, success: true });
 };

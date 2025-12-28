@@ -50,7 +50,7 @@ export const runAddToCart = async (clickElement) => {
 
 // Update navbar cart count
 export const updateNavbarCart = async () => {
-  const res = await sendToBack({ route: "/cart/summary" }, "GET");
+  const res = await sendToBack({ route: "/cart/stats" }, "GET");
 
   console.log("UPDATE NAVBAR CART RESPONSE:");
   console.log(res);
@@ -138,7 +138,7 @@ export const populateCart = async () => {
 
 // Update cart summary (totals, item count)
 export const updateCartSummary = async () => {
-  const response = await sendToBack({ route: "/cart/summary" }, "GET");
+  const response = await sendToBack({ route: "/cart/stats" }, "GET");
 
   if (!response) {
     console.error("Failed to get cart summary");
