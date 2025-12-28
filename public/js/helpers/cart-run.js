@@ -50,17 +50,29 @@ export const runAddToCart = async (clickElement) => {
   return true;
 };
 
-// Load and display cart
-export const populateCart = async () => {
-  const data = await sendToBack({ route: "/cart/data" }, "GET");
+// Update navbar cart count
+export const updateNavbarCart = async () => {
+  const res = await sendToBack({ route: "/cart/summary" }, "GET");
 
-  if (!data || !data.cart) {
-    console.error("Failed to load cart");
-    return null;
+  console.log("UPDATE NAVBAR CART RESPONSE:");
+  console.log(res);
+
+  if (!res || !res.success) return null;
+
+  const { itemCount } = res;
+
+  const cartContainer = document.getElementById("nav-cart-container");
+  const cartCountElement = document.getElementById("nav-cart-count");
+
+  if (!cartContainer || !cartCountElement) return null;
+
+  // Show/hide cart button based on item count
+  if (itemCount > 0) {
+    cartContainer.style.display = "block";
+    cartCountElement.textContent = itemCount;
+  } else {
+    cartContainer.style.display = "none";
   }
-
-  await displayCart(data.cart);
-  await updateCartSummary();
 
   return true;
 };
@@ -107,6 +119,21 @@ export const displayCart = async (cartItems) => {
   return true;
 };
 
+// Load and display cart
+export const populateCart = async () => {
+  const data = await sendToBack({ route: "/cart/data" }, "GET");
+
+  if (!data || !data.cart) {
+    console.error("Failed to load cart");
+    return null;
+  }
+
+  await displayCart(data.cart);
+  await updateCartSummary();
+
+  return true;
+};
+
 // Update cart summary (totals, item count)
 export const updateCartSummary = async () => {
   const response = await sendToBack({ route: "/cart/summary" }, "GET");
@@ -134,30 +161,6 @@ export const updateCartSummary = async () => {
   const totalElement = document.getElementById("cart-summary-total");
   if (totalElement) {
     totalElement.textContent = `$${total.toFixed(2)}`;
-  }
-
-  return true;
-};
-
-// Update navbar cart count
-export const updateNavbarCart = async () => {
-  const response = await sendToBack({ route: "/cart/summary" }, "GET");
-
-  if (!response) return null;
-
-  const { itemCount } = response;
-
-  const cartContainer = document.getElementById("nav-cart-container");
-  const cartCountElement = document.getElementById("nav-cart-count");
-
-  if (!cartContainer || !cartCountElement) return null;
-
-  // Show/hide cart button based on item count
-  if (itemCount > 0) {
-    cartContainer.style.display = "block";
-    cartCountElement.textContent = itemCount;
-  } else {
-    cartContainer.style.display = "none";
   }
 
   return true;
