@@ -4,6 +4,50 @@ import { sendToBack } from "../util/api-front.js";
 import { buildCartItem, buildEmptyCart } from "../forms/cart-form.js";
 import { displayPopup } from "../util/popup.js";
 
+export const runAddToCart = async (clickElement) => {
+  console.log("ADD TO CART CLICKED");
+  console.log("Product ID:");
+  console.log(clickElement);
+
+  const productId = clickElement.productId;
+
+  // Find product data from the DOM //UNFUCK THIS
+  const productCard = document.querySelector(`[data-product-id="${productId}"]`);
+  if (!productCard) {
+    console.error("Product card not found");
+    return null;
+  }
+
+  const name = productCard.querySelector(".product-name")?.textContent;
+  const priceText = productCard.querySelector(".product-price")?.textContent;
+  const price = priceText ? parseFloat(priceText.replace("$", "")) : 0;
+  const image = productCard.querySelector(".product-image")?.src;
+
+  const res = await sendToBack({
+    route: "/cart/add",
+    body: {
+      productId,
+      name,
+      price,
+      image,
+      quantity: 1,
+    },
+  });
+
+  console.log("ADD TO CART RES:");
+  console.log(res);
+
+  if (!res || !res.success) {
+    await displayPopup("Failed to add item to cart", "error");
+    return null;
+  }
+
+  await displayPopup("Item added to cart!", "success");
+  await updateNavbarCart();
+
+  return true;
+};
+
 // Load and display cart
 export const populateCart = async () => {
   const data = await sendToBack({ route: "/cart/data" }, "GET");
@@ -113,50 +157,6 @@ export const updateNavbarCart = async () => {
   } else {
     cartContainer.style.display = "none";
   }
-
-  return true;
-};
-
-export const runAddToCart = async (clickElement) => {
-  console.log("ADD TO CART CLICKED");
-  console.log("Product ID:");
-  console.log(clickElement);
-
-  const productId = clickElement.productId;
-
-  // Find product data from the DOM //UNFUCK THIS
-  const productCard = document.querySelector(`[data-product-id="${productId}"]`);
-  if (!productCard) {
-    console.error("Product card not found");
-    return null;
-  }
-
-  const name = productCard.querySelector(".product-name")?.textContent;
-  const priceText = productCard.querySelector(".product-price")?.textContent;
-  const price = priceText ? parseFloat(priceText.replace("$", "")) : 0;
-  const image = productCard.querySelector(".product-image")?.src;
-
-  const res = await sendToBack({
-    route: "/cart/add",
-    body: {
-      productId,
-      name,
-      price,
-      image,
-      quantity: 1,
-    },
-  });
-
-  console.log("ADD TO CART RES:");
-  console.log(res);
-
-  if (!res || !res.success) {
-    await displayPopup("Failed to add item to cart", "error");
-    return null;
-  }
-
-  await displayPopup("Item added to cart!", "success");
-  await updateNavbarCart();
 
   return true;
 };
