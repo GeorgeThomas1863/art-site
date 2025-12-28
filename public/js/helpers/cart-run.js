@@ -117,11 +117,24 @@ export const updateNavbarCart = async () => {
   return true;
 };
 
-// Add item to cart
-export const addToCart = async (productData) => {
-  const { productId, name, price, image } = productData;
+export const runAddToCart = async (productId) => {
+  console.log("ADD TO CART CLICKED");
+  console.log("Product ID:");
+  console.log(productId);
 
-  const response = await sendToBack({
+  // Find product data from the DOM //UNFUCK THIS
+  const productCard = document.querySelector(`[data-product-id="${productId}"]`);
+  if (!productCard) {
+    console.error("Product card not found");
+    return null;
+  }
+
+  const name = productCard.querySelector(".product-name")?.textContent;
+  const priceText = productCard.querySelector(".product-price")?.textContent;
+  const price = priceText ? parseFloat(priceText.replace("$", "")) : 0;
+  const image = productCard.querySelector(".product-image")?.src;
+
+  const res = await sendToBack({
     route: "/cart/add",
     body: {
       productId,
@@ -132,7 +145,7 @@ export const addToCart = async (productData) => {
     },
   });
 
-  if (!response || !response.success) {
+  if (!res || !res.success) {
     await displayPopup("Failed to add item to cart", "error");
     return null;
   }

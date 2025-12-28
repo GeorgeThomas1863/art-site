@@ -96,33 +96,3 @@ export const changeProductsFilter = async (changeElement) => {
 
   return true;
 };
-
-//----------
-
-export const runAddToCart = async (productId) => {
-  console.log("ADD TO CART CLICKED");
-  console.log("Product ID:", productId);
-
-  // Find product data from the DOM //UNFUCK THIS
-  const productCard = document.querySelector(`[data-product-id="${productId}"]`);
-  if (!productCard) {
-    console.error("Product card not found");
-    return null;
-  }
-
-  const name = productCard.querySelector(".product-name")?.textContent;
-  const priceText = productCard.querySelector(".product-price")?.textContent;
-  const price = priceText ? parseFloat(priceText.replace("$", "")) : 0;
-  const image = productCard.querySelector(".product-image")?.src;
-
-  const productData = {
-    productId,
-    name,
-    price,
-    image
-  };
-
-  await addToCart(productData);
-
-  return true;
-};
