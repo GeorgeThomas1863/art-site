@@ -1,5 +1,3 @@
-// helpers/cart-run.js
-// import { sendToBackGET, sendToBackPOST, sendToBackPUT, sendToBackDELETE } from "../util/api-front.js";
 import { sendToBack } from "../util/api-front.js";
 import { buildCartItem, buildEmptyCart } from "../forms/cart-form.js";
 import { displayPopup } from "./popup.js";

@@ -31,7 +31,6 @@
 import express from "express";
 import session from "express-session";
 import routes from "./routes/router.js";
-import cartRoutes from "./routes/cart-routes.js";
 
 import CONFIG from "./config/config.js";
 
@@ -51,7 +50,6 @@ app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 
 //routes
-app.use(cartRoutes);
 app.use(routes);
 
 app.listen(port);

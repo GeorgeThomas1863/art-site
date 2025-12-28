@@ -3,9 +3,33 @@ import express from "express";
 // import CONFIG from "../config/config.js";
 import requireAuth from "../middleware/auth-middle.js";
 import { authController } from "../controllers/auth-controller.js";
-import { mainDisplay, adminDisplay, productsDisplay, cartDisplay, aboutDisplay, eventsDisplay, display404, display500, display401 } from "../controllers/display-controller.js"; //prettier-ignore
-import { uploadPicController, addNewProductController, editProductController, deleteProductController, getProductDataController } from "../controllers/data-controller.js"; //prettier-ignore
 import { upload } from "../src/upload-pic.js";
+
+import {
+  mainDisplay,
+  adminDisplay,
+  productsDisplay,
+  cartDisplay,
+  aboutDisplay,
+  eventsDisplay,
+  display404,
+  display500,
+  display401,
+} from "../controllers/display-controller.js";
+
+import {
+  uploadPicController,
+  addNewProductController,
+  editProductController,
+  deleteProductController,
+  getProductDataController,
+  getCartData,
+  addToCart,
+  updateCartItem,
+  removeFromCart,
+  clearCart,
+  getCartSummary,
+} from "../controllers/data-controller.js";
 
 const router = express.Router();
 
@@ -14,6 +38,9 @@ router.post("/site-auth-route", authController);
 
 router.get("/401", display401);
 
+//------------------------
+
+//ADMIN ROUTES
 router.get("/admin", requireAuth, adminDisplay);
 
 router.post("/upload-pic-route", requireAuth, upload.single("image"), uploadPicController);
@@ -26,6 +53,22 @@ router.post("/delete-product-route", requireAuth, deleteProductController);
 
 //------------------------
 
+//CART ROUTES
+router.get("/cart/data", getCartData);
+
+router.post("/cart/add", addToCart);
+
+router.put("/cart/update/:productId", updateCartItem);
+
+router.delete("/cart/remove/:productId", removeFromCart);
+
+router.delete("/cart/clear", clearCart);
+
+router.get("/cart/summary", getCartSummary);
+
+//---------------------
+
+//Main routes
 router.get("/get-product-data-route", getProductDataController);
 
 router.get("/cart", cartDisplay);
