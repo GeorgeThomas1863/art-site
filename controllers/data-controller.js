@@ -1,8 +1,8 @@
 import { runAddNewProduct, runEditProduct, runDeleteProduct, runGetProductData } from "../src/products.js";
 
 export const uploadPicController = async (req, res) => {
-  console.log("AHHHH");
-  console.log(req.file);
+  // console.log("AHHHH");
+  // console.log(req.file);
 
   if (!req.file) {
     return res.status(400).json({ error: "No file uploaded" });
