@@ -1,5 +1,5 @@
 import { buildProductCard } from "../forms/products-form.js";
-import { addToCart } from "./cart-run.js";
+// import { addToCart } from "./cart-run.js";
 
 //store locally for filtering
 let productsArray = [];
