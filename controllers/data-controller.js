@@ -1,5 +1,5 @@
 import { runAddNewProduct, runEditProduct, runDeleteProduct, runGetProductData } from "../src/products.js";
-import { buildCart, runAddToCart } from "../src/cart.js";
+import { buildCart, runGetCartStats, runAddToCart, runUpdateCartItem, runRemoveFromCart } from "../src/cart.js";
 
 //returns data for all products
 export const getProductDataControl = async (req, res) => {
@@ -57,21 +57,12 @@ export const getCartDataControl = async (req, res) => {
 };
 
 export const getCartStatsControl = async (req, res) => {
-  console.log("GET CART SUMMARY");
-  console.log(req.session.cart);
-  await buildCart(req);
+  if (!req || !req.session || !req.session.cart) return res.status(500).json({ error: "No cart data" });
 
-  let itemCount = 0;
-  for (let i = 0; i < req.session.cart.length; i++) {
-    itemCount += req.session.cart[i].quantity;
-  }
+  const data = await runGetCartStats(req);
+  if (!data || !data.success) return res.status(500).json({ error: "Failed to get cart stats" });
 
-  let total = 0;
-  for (let i = 0; i < req.session.cart.length; i++) {
-    total += req.session.cart[i].price * req.session.cart[i].quantity;
-  }
-
-  res.json({ itemCount, total, success: true });
+  res.json(data);
 };
 
 export const addToCartControl = async (req, res) => {
@@ -84,52 +75,22 @@ export const addToCartControl = async (req, res) => {
 };
 
 export const updateCartItemControl = async (req, res) => {
-  await buildCart(req);
+  if (!req || !req.params || !req.params.productId || !req.body || !req.body.quantity) return res.status(500).json({ error: "No input parameters" });
 
-  const { productId } = req.params;
-  const { quantity } = req.body;
+  const data = await runUpdateCartItem(req);
+  if (!data || !data.success) return res.status(500).json({ error: "Failed to update cart item" });
 
-  let item = null;
-  for (let i = 0; i < req.session.cart.length; i++) {
-    if (req.session.cart[i].productId !== productId) continue;
-
-    item = req.session.cart[i];
-    break;
-  }
-
-  if (!item) {
-    return res.json({ success: true, cart: req.session.cart });
-  }
-
-  if (quantity <= 0) {
-    // Remove item if quantity is 0 or less
-    let newCart = [];
-    for (let i = 0; i < req.session.cart.length; i++) {
-      if (req.session.cart[i].productId !== productId) {
-        newCart.push(req.session.cart[i]);
-      }
-    }
-    req.session.cart = newCart;
-  } else {
-    item.quantity = quantity;
-  }
-
-  res.json({ success: true, cart: req.session.cart });
+  res.json(data);
 };
 
 // REMOVE item from cart
 export const removeFromCartControl = async (req, res) => {
-  await buildCart(req);
+  if (!req || !req.params || !req.params.productId) return res.status(500).json({ error: "No input parameters" });
 
-  let newCart = [];
-  for (let i = 0; i < req.session.cart.length; i++) {
-    if (req.session.cart[i].productId !== productId) {
-      newCart.push(req.session.cart[i]);
-    }
-  }
-  req.session.cart = newCart;
+  const data = await runRemoveFromCart(req);
+  if (!data || !data.success) return res.status(500).json({ error: "Failed to remove item from cart" });
 
-  res.json({ success: true, cart: req.session.cart });
+  res.json(data);
 };
 
 // CLEAR entire cart
