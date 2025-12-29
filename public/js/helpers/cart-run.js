@@ -3,9 +3,10 @@ import { buildCartItem, buildEmptyCart } from "../forms/cart-form.js";
 import { displayPopup } from "./popup.js";
 
 export const runAddToCart = async (clickElement) => {
-  console.log("ADD TO CART CLICKED");
-  console.log("Product ID:");
-  console.log(clickElement);
+  if (!clickElement) return null;
+  // console.log("ADD TO CART CLICKED");
+  // console.log("Product ID:");
+  // console.log(clickElement);
 
   const productId = clickElement.productId;
 
@@ -48,6 +49,130 @@ export const runAddToCart = async (clickElement) => {
   return true;
 };
 
+// Increase item quantity
+export const runIncreaseQuantity = async (clickElement) => {
+  if (!clickElement) return null;
+  const productId = clickElement.productId;
+
+  console.log("INCREASE QUANTITY CLICKED");
+  console.log("Product ID:");
+  console.log(productId);
+
+  // Get current quantity
+  const quantityElement = document.getElementById(`quantity-${productId}`);
+  if (!quantityElement) return null;
+
+  console.log("QUANTITY ELEMENT:");
+  console.log(quantityElement);
+
+  const currentQuantity = parseInt(quantityElement.textContent);
+  const newQuantity = currentQuantity + 1;
+
+  console.log("CURRENT QUANTITY:");
+  console.log(currentQuantity);
+
+  console.log("NEW QUANTITY:");
+  console.log(newQuantity);
+
+  const res = await sendToBack(
+    {
+      route: `/cart/update/${productId}`,
+      body: { quantity: newQuantity },
+    },
+    "PUT"
+  );
+
+  if (!res || !res.success) {
+    await displayPopup("Failed to update quantity", "error");
+    return null;
+  }
+
+  // Update display
+  quantityElement.textContent = newQuantity;
+  await updateItemTotal(productId, newQuantity);
+  await updateCartSummary();
+  await updateNavbarCart();
+
+  return true;
+};
+
+export const runDecreaseQuantity = async (clickElement) => {
+  if (!clickElement) return null;
+  const productId = clickElement.productId;
+  // Get current quantity
+  const quantityElement = document.getElementById(`quantity-${productId}`);
+  if (!quantityElement) return null;
+
+  const currentQuantity = parseInt(quantityElement.textContent);
+
+  if (currentQuantity <= 1) {
+    // Remove item if quantity would be 0
+    await runRemoveFromCart(clickElement);
+    return true;
+  }
+
+  const newQuantity = currentQuantity - 1;
+
+  const res = await sendToBack(
+    {
+      route: `/cart/update/${productId}`,
+      body: { quantity: newQuantity },
+    },
+    "PUT"
+  );
+
+  if (!res || !res.success) {
+    await displayPopup("Failed to update quantity", "error");
+    return null;
+  }
+
+  // Update display
+  quantityElement.textContent = newQuantity;
+  await updateItemTotal(productId, newQuantity);
+  await updateCartSummary();
+  await updateNavbarCart();
+
+  return true;
+};
+
+// Remove item from cart
+export const runRemoveFromCart = async (clickElement) => {
+  if (!clickElement) return null;
+  const productId = clickElement.productId;
+
+  const res = await sendToBack(
+    {
+      route: `/cart/remove/${productId}`,
+    },
+    "DELETE"
+  );
+
+  if (!res || !res.success) {
+    await displayPopup("Failed to remove item", "error");
+    return null;
+  }
+
+  // Remove item from DOM
+  const cartItem = document.querySelector(`[data-product-id="${productId}"]`);
+  if (cartItem) {
+    cartItem.remove();
+  }
+
+  // Check if cart is now empty
+  const res2 = await sendToBack({ route: "/cart/data" }, "GET");
+  if (res2 && res2.cart && res2.cart.length === 0) {
+    await displayCart([]);
+  }
+
+  await updateCartSummary();
+  await updateNavbarCart();
+  await displayPopup("Item removed from cart", "success");
+
+  return true;
+};
+
+//---------------------------
+
 // Update navbar cart count
 export const updateNavbarCart = async () => {
   const res = await sendToBack({ route: "/cart/stats" }, "GET");
@@ -75,6 +200,21 @@ export const updateNavbarCart = async () => {
   } else {
     cartContainer.style.display = "none";
   }
+
+  return true;
+};
+
+// Load and display cart
+export const populateCart = async () => {
+  const data = await sendToBack({ route: "/cart/data" }, "GET");
+
+  if (!data || !data.cart) {
+    console.error("Failed to load cart");
+    return null;
+  }
+
+  await displayCart(data.cart);
+  await updateCartSummary();
 
   return true;
 };
@@ -121,21 +261,6 @@ export const displayCart = async (cartItems) => {
   return true;
 };
 
-// Load and display cart
-export const populateCart = async () => {
-  const data = await sendToBack({ route: "/cart/data" }, "GET");
-
-  if (!data || !data.cart) {
-    console.error("Failed to load cart");
-    return null;
-  }
-
-  await displayCart(data.cart);
-  await updateCartSummary();
-
-  return true;
-};
-
 // Update cart summary (totals, item count)
 export const updateCartSummary = async () => {
   const response = await sendToBack({ route: "/cart/stats" }, "GET");
@@ -168,71 +293,7 @@ export const updateCartSummary = async () => {
   return true;
 };
 
-// Increase item quantity
-export const increaseQuantity = async (productId) => {
-  // Get current quantity
-  const quantityElement = document.getElementById(`quantity-${productId}`);
-  if (!quantityElement) return null;
-
-  const currentQuantity = parseInt(quantityElement.textContent);
-  const newQuantity = currentQuantity + 1;
-
-  const response = await sendToBackPUT({
-    route: `/cart/update/${productId}`,
-    body: { quantity: newQuantity },
-  });
-
-  if (!response || !response.success) {
-    await displayPopup("Failed to update quantity", "error");
-    return null;
-  }
-
-  // Update display
-  quantityElement.textContent = newQuantity;
-  await updateItemTotal(productId, newQuantity);
-  await updateCartSummary();
-  await updateNavbarCart();
-
-  return true;
-};
-
 // Decrease item quantity
-export const decreaseQuantity = async (productId) => {
-  // Get current quantity
-  const quantityElement = document.getElementById(`quantity-${productId}`);
-  if (!quantityElement) return null;
-
-  const currentQuantity = parseInt(quantityElement.textContent);
-
-  if (currentQuantity <= 1) {
-    // Remove item if quantity would be 0
-    await removeFromCart(productId);
-    return true;
-  }
-
-  const newQuantity = currentQuantity - 1;
-
-  const response = await sendToBack(
-    {
-      route: `/cart/update/${productId}`,
-      body: { quantity: newQuantity },
-    },
-    "PUT"
-  );
-
-  if (!response || !response.success) {
-    await displayPopup("Failed to update quantity", "error");
-    return null;
-  }
-
-  // Update display
-  quantityElement.textContent = newQuantity;
-  await updateItemTotal(productId, newQuantity);
-  await updateCartSummary();
-  await updateNavbarCart();
-
-  return true;
-};
 
 // Update item total display
 export const updateItemTotal = async (productId, quantity) => {
@@ -251,39 +312,6 @@ export const updateItemTotal = async (productId, quantity) => {
 
   const total = price * quantity;
   itemTotalElement.textContent = `$${total.toFixed(2)}`;
-
-  return true;
-};
-
-// Remove item from cart
-export const removeFromCart = async (productId) => {
-  const response = await sendToBack(
-    {
-      route: `/cart/remove/${productId}`,
-    },
-    "DELETE"
-  );
-
-  if (!response || !response.success) {
-    await displayPopup("Failed to remove item", "error");
-    return null;
-  }
-
-  // Remove item from DOM
-  const cartItem = document.querySelector(`[data-product-id="${productId}"]`);
-  if (cartItem) {
-    cartItem.remove();
-  }
-
-  // Check if cart is now empty
-  const response2 = await sendToBack({ route: "/cart/data" }, "GET");
-  if (response2 && response2.cart && response2.cart.length === 0) {
-    await displayCart([]);
-  }
-
-  await updateCartSummary();
-  await updateNavbarCart();
-  await displayPopup("Item removed from cart", "success");
 
   return true;
 };

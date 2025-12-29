@@ -1,6 +1,6 @@
 import { runTabClick, runUploadClick, runUploadPic, runAddNewProduct, runEditProduct, runDeleteProduct, changeAdminProductSelector } from "./helpers/admin-run.js"; //prettier-ignore
 import { changeProductsFilter } from "./helpers/products-run.js";
-import { runAddToCart } from "./helpers/cart-run.js";
+import { runAddToCart, runIncreaseQuantity, runDecreaseQuantity, runRemoveFromCart } from "./helpers/cart-run.js";
 import { runAuthSubmit, runPwToggle } from "./auth.js";
 import { closePopup, closeConfirmDialog } from "./helpers/popup.js";
 
@@ -31,6 +31,9 @@ export const clickHandler = async (e) => {
   if (clickType === "upload-click" || clickType === "edit-upload-click") await runUploadClick(clickElement);
 
   if (clickType === "add-to-cart") await runAddToCart(clickElement);
+  if (clickType === "increase-quantity") await runIncreaseQuantity(clickElement);
+  if (clickType === "decrease-quantity") await runDecreaseQuantity(clickElement);
+  if (clickType === "remove-from-cart") await runRemoveFromCart(clickElement);
 
   if (clickType === "new-product-submit") await runAddNewProduct();
   if (clickType === "edit-product-submit") await runEditProduct();
