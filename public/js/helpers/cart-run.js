@@ -52,7 +52,10 @@ export const runAddToCart = async (clickElement) => {
 // Increase item quantity
 export const runIncreaseQuantity = async (clickElement) => {
   if (!clickElement) return null;
-  const productId = clickElement.productId;
+  const productId = clickElement.dataset.productId;
+
+  console.log("CLICK ELEMENT:");
+  console.log(clickElement);
 
   console.log("INCREASE QUANTITY CLICKED");
   console.log("Product ID:");
@@ -61,9 +64,6 @@ export const runIncreaseQuantity = async (clickElement) => {
   // Get current quantity
   const quantityElement = document.getElementById(`quantity-${productId}`);
   if (!quantityElement) return null;
-
-  console.log("QUANTITY ELEMENT:");
-  console.log(quantityElement);
 
   const currentQuantity = parseInt(quantityElement.textContent);
   const newQuantity = currentQuantity + 1;
@@ -98,7 +98,7 @@ export const runIncreaseQuantity = async (clickElement) => {
 
 export const runDecreaseQuantity = async (clickElement) => {
   if (!clickElement) return null;
-  const productId = clickElement.productId;
+  const productId = clickElement.dataset.productId;
   // Get current quantity
   const quantityElement = document.getElementById(`quantity-${productId}`);
   if (!quantityElement) return null;
@@ -138,7 +138,7 @@ export const runDecreaseQuantity = async (clickElement) => {
 // Remove item from cart
 export const runRemoveFromCart = async (clickElement) => {
   if (!clickElement) return null;
-  const productId = clickElement.productId;
+  const productId = clickElement.dataset.productId;
 
   const res = await sendToBack(
     {

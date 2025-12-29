@@ -75,9 +75,16 @@ export const addToCartControl = async (req, res) => {
 };
 
 export const updateCartItemControl = async (req, res) => {
+  console.log("UPDATE CART ITEM CONTROL");
+  console.log("REQUEST PARAMS:");
+  console.log(req.params);
+  console.log("REQUEST BODY:");
+  console.log(req.body);
   if (!req || !req.params || !req.params.productId || !req.body || !req.body.quantity) return res.status(500).json({ error: "No input parameters" });
 
   const data = await runUpdateCartItem(req);
+  console.log("UPDATE CART ITEM DATA:");
+  console.log(data);
   if (!data || !data.success) return res.status(500).json({ error: "Failed to update cart item" });
 
   res.json(data);
