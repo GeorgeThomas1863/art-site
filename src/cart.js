@@ -86,6 +86,8 @@ export const runUpdateCartItem = async (req) => {
 };
 
 export const runRemoveFromCart = async (req) => {
+  const { productId } = req.body;
+  if (!productId) return { success: false, error: "No product ID" };
   await buildCart(req);
 
   let newCart = [];

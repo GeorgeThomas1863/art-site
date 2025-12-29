@@ -113,13 +113,13 @@ export const runDecreaseQuantity = async (clickElement) => {
 
   const newQuantity = currentQuantity - 1;
 
-  const res = await sendToBack(
-    {
-      route: `/cart/update/${productId}`,
-      body: { quantity: newQuantity },
-    },
-    "PUT"
-  );
+  const params = {
+    route: "/cart/update",
+    quantity: newQuantity,
+    productId: productId,
+  };
+
+  const res = await sendToBack(params);
 
   if (!res || !res.success) {
     await displayPopup("Failed to update quantity", "error");
@@ -140,12 +140,12 @@ export const runRemoveFromCart = async (clickElement) => {
   if (!clickElement) return null;
   const productId = clickElement.dataset.productId;
 
-  const res = await sendToBack(
-    {
-      route: `/cart/remove/${productId}`,
-    },
-    "DELETE"
-  );
+  const params = {
+    route: "/cart/remove",
+    productId: productId,
+  };
+
+  const res = await sendToBack(params);
 
   if (!res || !res.success) {
     await displayPopup("Failed to remove item", "error");

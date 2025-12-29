@@ -75,11 +75,6 @@ export const addToCartControl = async (req, res) => {
 };
 
 export const updateCartItemControl = async (req, res) => {
-  console.log("UPDATE CART ITEM CONTROL");
-  console.log("REQUEST PARAMS:");
-  console.log(req.params);
-  console.log("REQUEST BODY:");
-  console.log(req.body);
   if (!req || !req.body) return res.status(500).json({ error: "No input parameters" });
 
   const data = await runUpdateCartItem(req);
@@ -92,7 +87,7 @@ export const updateCartItemControl = async (req, res) => {
 
 // REMOVE item from cart
 export const removeFromCartControl = async (req, res) => {
-  if (!req || !req.params || !req.params.productId) return res.status(500).json({ error: "No input parameters" });
+  if (!req || !req.body) return res.status(500).json({ error: "No input parameters" });
 
   const data = await runRemoveFromCart(req);
   if (!data || !data.success) return res.status(500).json({ error: "Failed to remove item from cart" });
