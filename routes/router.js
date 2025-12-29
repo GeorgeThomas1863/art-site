@@ -56,15 +56,15 @@ router.post("/delete-product-route", requireAuth, deleteProductControl);
 //CART ROUTES
 router.get("/cart/data", getCartDataControl);
 
+router.get("/cart/stats", getCartStatsControl);
+
 router.post("/cart/add", addToCartControl);
 
-router.put("/cart/update/:productId", updateCartItemControl);
+router.post("/cart/update", updateCartItemControl);
 
-router.delete("/cart/remove/:productId", removeFromCartControl);
+router.post("/cart/remove", removeFromCartControl);
 
-router.delete("/cart/clear", clearCartControl);
-
-router.get("/cart/stats", getCartStatsControl);
+router.post("/cart/clear", clearCartControl);
 
 //---------------------
 

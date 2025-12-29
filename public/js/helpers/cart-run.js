@@ -74,13 +74,13 @@ export const runIncreaseQuantity = async (clickElement) => {
   console.log("NEW QUANTITY:");
   console.log(newQuantity);
 
-  const res = await sendToBack(
-    {
-      route: `/cart/update/${productId}`,
-      body: { quantity: newQuantity },
-    },
-    "PUT"
-  );
+  const params = {
+    route: "/cart/update",
+    quantity: newQuantity,
+    productId: productId,
+  };
+
+  const res = await sendToBack(params);
 
   if (!res || !res.success) {
     await displayPopup("Failed to update quantity", "error");

@@ -54,10 +54,8 @@ export const runGetCartStats = async (req) => {
 };
 
 export const runUpdateCartItem = async (req) => {
+  const { quantity, productId } = req.body;
   await buildCart(req);
-
-  const { productId } = req.params;
-  const { quantity } = req.body;
 
   let item = null;
   for (let i = 0; i < req.session.cart.length; i++) {
