@@ -1,5 +1,6 @@
 import { sendToBack } from "../util/api-front.js";
 import { buildCheckoutItem } from "../forms/checkout-form.js";
+import { buildSquarePayment, tokenizePaymentMethod } from "./square-payment.js";
 
 // Load and display checkout data
 export const populateCheckout = async () => {
@@ -20,6 +21,8 @@ export const populateCheckout = async () => {
 
   await displayCheckoutItems(data.cart);
   await updateCheckoutSummary();
+
+  await buildSquarePayment();
 
   return true;
 };
@@ -77,6 +80,84 @@ export const updateCheckoutSummary = async () => {
   const totalElement = document.getElementById("checkout-total");
   if (totalElement) {
     totalElement.textContent = `$${finalTotal.toFixed(2)}`;
+  }
+
+  return true;
+};
+
+//--------
+
+export const runPlaceOrder = async () => {
+  console.log("RUN PLACE ORDER");
+
+  // Validate customer info form
+  const customerForm = document.getElementById("customer-info-form");
+  if (!customerForm.checkValidity()) {
+    customerForm.reportValidity();
+    return null;
+  }
+
+  // Disable button to prevent double-clicks
+  const placeOrderBtn = document.getElementById("checkout-place-order-btn");
+  placeOrderBtn.disabled = true;
+  placeOrderBtn.textContent = "Processing...";
+
+  try {
+    // Get payment token from Square
+    const paymentToken = await tokenizePaymentMethod();
+
+    if (!paymentToken) {
+      // Error already displayed by tokenizePaymentMethod
+      placeOrderBtn.disabled = false;
+      placeOrderBtn.textContent = "Place Order";
+      return null;
+    }
+
+    // Gather customer data
+    const customerData = {
+      firstName: document.getElementById("first-name").value,
+      lastName: document.getElementById("last-name").value,
+      email: document.getElementById("email").value,
+      phone: document.getElementById("phone").value,
+      address: document.getElementById("address").value,
+      city: document.getElementById("city").value,
+      state: document.getElementById("state").value,
+      zip: document.getElementById("zip").value,
+    };
+
+    // Send to backend
+    const response = await sendToBack(
+      {
+        route: "/checkout/process",
+        body: {
+          paymentToken: paymentToken,
+          customerData: customerData,
+        },
+      },
+      "POST"
+    );
+
+    if (response.success) {
+      // Redirect to success page
+      window.location.href = `/order-confirmation/${response.orderId}`;
+    } else {
+      const errorContainer = document.getElementById("payment-error");
+      if (errorContainer) {
+        errorContainer.textContent = response.message || "Order processing failed";
+        errorContainer.style.display = "block";
+      }
+      placeOrderBtn.disabled = false;
+      placeOrderBtn.textContent = "Place Order";
+    }
+  } catch (error) {
+    console.error("Error processing order:", error);
+    const errorContainer = document.getElementById("payment-error");
+    if (errorContainer) {
+      errorContainer.textContent = "An error occurred. Please try again.";
+      errorContainer.style.display = "block";
+    }
+    placeOrderBtn.disabled = false;
+    placeOrderBtn.textContent = "Place Order";
   }
 
   return true;

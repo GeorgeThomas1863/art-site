@@ -3,7 +3,7 @@
 let card;
 let payments;
 
-export const initializeSquarePayment = async () => {
+export const buildSquarePayment = async () => {
   if (!window.Square) {
     throw new Error("Square.js failed to load properly");
   }

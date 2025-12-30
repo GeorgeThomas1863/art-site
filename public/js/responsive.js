@@ -2,6 +2,7 @@ import { runTabClick, runAddNewProduct, runEditProduct, runDeleteProduct, change
 import { runUploadClick, runUploadPic } from "./helpers/upload-pic.js";
 import { changeProductsFilter } from "./helpers/products-run.js";
 import { runAddToCart, runIncreaseQuantity, runDecreaseQuantity, runRemoveFromCart } from "./helpers/cart-run.js";
+import { runPlaceOrder } from "./helpers/checkout-run.js";
 import { runAuthSubmit, runPwToggle } from "./auth.js";
 import { closePopup, closeConfirmDialog } from "./helpers/popup.js";
 
@@ -10,6 +11,7 @@ const displayElement = document.getElementById("display-element");
 const adminElement = document.getElementById("admin-element");
 const productsElement = document.getElementById("products-element");
 const cartElement = document.getElementById("cart-element");
+const checkoutElement = document.getElementById("checkout-element");
 
 export const clickHandler = async (e) => {
   const clickElement = e.target;
@@ -37,6 +39,7 @@ export const clickHandler = async (e) => {
   if (clickType === "remove-from-cart") await runRemoveFromCart(clickElement);
 
   if (clickType === "checkout-btn") window.location.href = "/checkout";
+  if (clickType === "place-order") await runPlaceOrder();
 
   if (clickType === "new-product-submit") await runAddNewProduct();
   if (clickType === "edit-product-submit") await runEditProduct();
@@ -108,4 +111,9 @@ if (productsElement) {
 if (cartElement) {
   cartElement.addEventListener("click", clickHandler);
   // cartElement.addEventListener("keydown", keyHandler);
+}
+
+if (checkoutElement) {
+  checkoutElement.addEventListener("click", clickHandler);
+  // checkoutElement.addEventListener("keydown", keyHandler);
 }
