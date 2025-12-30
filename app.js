@@ -1,4 +1,4 @@
-//make cart buttons work
+//test purchases with my square acct
 
 //add dates to product upload
 
