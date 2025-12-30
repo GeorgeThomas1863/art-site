@@ -114,11 +114,18 @@ export const buildPaymentCard = async () => {
   paymentContainer.className = "checkout-payment-container";
   paymentContainer.id = "payment-container";
 
-  const paymentPlaceholder = document.createElement("div");
-  paymentPlaceholder.className = "checkout-payment-placeholder";
-  paymentPlaceholder.textContent = "Payment form will be loaded here";
+  // Create container for Square's card input
+  const cardInputContainer = document.createElement("div");
+  cardInputContainer.id = "card-container";
+  cardInputContainer.className = "square-card-container";
 
-  paymentContainer.append(paymentPlaceholder);
+  // Create container for error messages
+  const errorContainer = document.createElement("div");
+  errorContainer.id = "payment-error";
+  errorContainer.className = "payment-error-message";
+  errorContainer.style.display = "none";
+
+  paymentContainer.append(cardInputContainer, errorContainer);
 
   card.append(cardTitle, paymentContainer);
 

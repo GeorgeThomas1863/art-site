@@ -1,4 +1,5 @@
-import { runTabClick, runUploadClick, runUploadPic, runAddNewProduct, runEditProduct, runDeleteProduct, changeAdminProductSelector } from "./helpers/admin-run.js"; //prettier-ignore
+import { runTabClick, runAddNewProduct, runEditProduct, runDeleteProduct, changeAdminProductSelector } from "./helpers/admin-run.js"; //prettier-ignore
+import { runUploadClick, runUploadPic } from "./helpers/upload-pic.js";
 import { changeProductsFilter } from "./helpers/products-run.js";
 import { runAddToCart, runIncreaseQuantity, runDecreaseQuantity, runRemoveFromCart } from "./helpers/cart-run.js";
 import { runAuthSubmit, runPwToggle } from "./auth.js";

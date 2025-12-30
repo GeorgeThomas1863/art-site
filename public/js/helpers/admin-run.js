@@ -1,5 +1,5 @@
 import { ADMIN_EDIT_DEFAULT_ARRAY } from "../util/define-things.js";
-import { sendToBackFile, sendToBack } from "../util/api-front.js";
+import { sendToBack } from "../util/api-front.js";
 import { getNewProductParams, getEditProductParams } from "../util/params.js";
 import { displayPopup, displayConfirmDialog } from "./popup.js";
 
@@ -35,70 +35,6 @@ export const runTabClick = async (clickElement) => {
   await populateAdminProductSelector(productData); //in admin form
 
   return true;
-};
-
-//PIC
-export const runUploadClick = async (clickedElement) => {
-  if (!clickedElement) return null;
-
-  const mode = clickedElement.id.includes("edit") ? "edit" : "add";
-  const picInputId = mode === "add" ? "upload-pic-input" : "edit-upload-pic-input";
-  const picInput = document.getElementById(picInputId);
-
-  if (!picInput) return null;
-  picInput.click();
-};
-
-export const runUploadPic = async (pic, mode = "add") => {
-  if (!pic) return null;
-
-  console.log(`${mode.toUpperCase()} PIC`);
-  console.log(pic);
-
-  const uploadStatusId = mode === "add" ? "upload-status" : "edit-upload-status";
-  const uploadButtonId = mode === "add" ? "upload-button" : "edit-upload-button";
-  const currentImageId = mode === "add" ? "current-image" : "edit-current-image";
-  const currentImagePreviewId = mode === "add" ? "current-image-preview" : "edit-current-image-preview";
-
-  const uploadStatus = document.getElementById(uploadStatusId);
-  const uploadButton = document.getElementById(uploadButtonId);
-
-  if (!uploadStatus || !uploadButton) return null;
-
-  uploadButton.uploadData = null;
-  uploadStatus.textContent = "Uploading...";
-  uploadStatus.style.display = "inline";
-  uploadButton.disabled = true;
-
-  const formData = new FormData();
-  formData.append("image", pic);
-
-  const data = await sendToBackFile({ route: "/upload-pic-route", formData: formData });
-
-  if (data === "FAIL") {
-    uploadStatus.textContent = "✗ Upload failed";
-    uploadStatus.style.color = "red";
-    uploadButton.uploadData = null;
-    uploadButton.disabled = false;
-    return null;
-  }
-
-  uploadStatus.textContent = `✓ ${pic.name}`;
-  uploadStatus.style.color = "green";
-  uploadButton.textContent = "Change Image";
-  uploadButton.disabled = false;
-  uploadButton.uploadData = data;
-
-  // Show the image preview
-  const currentImage = document.getElementById(currentImageId);
-  const currentImagePreview = document.getElementById(currentImagePreviewId);
-
-  if (currentImage && currentImagePreview && data && data.filename) {
-    currentImage.src = `/images/products/${data.filename}`;
-    currentImagePreview.style.display = "flex";
-  }
-
-  return data;
 };
 
 //------
