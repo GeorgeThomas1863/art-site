@@ -4,6 +4,7 @@ let card;
 let payments;
 
 export const buildSquarePayment = async () => {
+  console.log("BUILD SQUARE PAYMENT");
   if (!window.Square) {
     throw new Error("Square.js failed to load properly");
   }
