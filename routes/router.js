@@ -10,6 +10,7 @@ import {
   adminDisplay,
   productsDisplay,
   cartDisplay,
+  checkoutDisplay,
   aboutDisplay,
   eventsDisplay,
   display404,
@@ -70,6 +71,8 @@ router.post("/cart/clear", clearCartControl);
 
 //Main routes
 router.get("/get-product-data-route", getProductDataControl);
+
+router.get("/checkout", checkoutDisplay);
 
 router.get("/cart", cartDisplay);
 

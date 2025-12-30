@@ -21,6 +21,10 @@ export const cartDisplay = (req, res) => {
   res.sendFile(path.join(__dirname, "../html/cart.html"));
 };
 
+export const checkoutDisplay = (req, res) => {
+  res.sendFile(path.join(__dirname, "../html/checkout.html"));
+};
+
 export const aboutDisplay = (req, res) => {
   res.sendFile(path.join(__dirname, "../html/about.html"));
 };

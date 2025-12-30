@@ -1,3 +1,5 @@
+import { STATES_ARRAY } from "../util/define-things.js";
+
 export const buildCheckoutForm = async () => {
   const checkoutContainer = document.createElement("div");
   checkoutContainer.className = "checkout-container";
@@ -88,7 +90,7 @@ export const buildCustomerInfoCard = async () => {
   locationRow.className = "checkout-form-row";
 
   const cityField = await buildFormField("City", "text", "city", "city", true);
-  const stateField = await buildFormField("State", "text", "state", "state", true);
+  const stateField = await buildStateField();
   const zipField = await buildFormField("ZIP Code", "text", "zip", "zip", true);
 
   locationRow.append(cityField, stateField, zipField);
@@ -121,29 +123,6 @@ export const buildPaymentCard = async () => {
   card.append(cardTitle, paymentContainer);
 
   return card;
-};
-
-export const buildFormField = async (label, type, name, id, required = false) => {
-  const field = document.createElement("div");
-  field.className = "checkout-form-field";
-
-  const labelElement = document.createElement("label");
-  labelElement.className = "checkout-form-label";
-  labelElement.textContent = label;
-  labelElement.setAttribute("for", id);
-
-  const input = document.createElement("input");
-  input.className = "checkout-form-input";
-  input.type = type;
-  input.name = name;
-  input.id = id;
-  if (required) {
-    input.required = true;
-  }
-
-  field.append(labelElement, input);
-
-  return field;
 };
 
 // Right side - Order summary
@@ -254,4 +233,61 @@ export const buildCheckoutItem = async (itemData) => {
   checkoutItem.append(itemImage, itemDetails, itemPrice);
 
   return checkoutItem;
+};
+
+//--------------
+
+export const buildFormField = async (label, type, name, id, required = false) => {
+  const field = document.createElement("div");
+  field.className = "checkout-form-field";
+
+  const labelElement = document.createElement("label");
+  labelElement.className = "checkout-form-label";
+  labelElement.textContent = label;
+  labelElement.setAttribute("for", id);
+
+  const input = document.createElement("input");
+  input.className = "checkout-form-input";
+  input.type = type;
+  input.name = name;
+  input.id = id;
+  if (required) {
+    input.required = true;
+  }
+
+  field.append(labelElement, input);
+
+  return field;
+};
+
+export const buildStateField = async () => {
+  const field = document.createElement("div");
+  field.className = "checkout-form-field";
+
+  const labelElement = document.createElement("label");
+  labelElement.className = "checkout-form-label";
+  labelElement.textContent = "State";
+  labelElement.setAttribute("for", "state");
+
+  const select = document.createElement("select");
+  select.className = "checkout-form-input";
+  select.name = "state";
+  select.id = "state";
+  select.required = true;
+
+  // Build options
+  for (let i = 0; i < STATES_ARRAY.length; i++) {
+    const option = document.createElement("option");
+    option.value = STATES_ARRAY[i].value;
+    option.textContent = STATES_ARRAY[i].text;
+    if (i === 0) {
+      option.disabled = true;
+      option.selected = true;
+    }
+    select.append(option);
+  }
+
+  field.append(labelElement, select);
+
+  return field;
 };
