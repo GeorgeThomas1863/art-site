@@ -1388,8 +1388,13 @@ h3 {
   gap: 1.5rem;
 }
 
-.checkout-form-row:has(.checkout-form-field:nth-child(3)) {
-  grid-template-columns: 2fr 1fr 1fr;
+.checkout-form-row-location .checkout-form-input {
+  min-width: 0;
+  width: 100%;
+}
+
+.checkout-form-row-location {
+  grid-template-columns: 3fr 1fr 0.75fr;
 }
 
 .checkout-form-field {

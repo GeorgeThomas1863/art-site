@@ -87,7 +87,7 @@ export const buildCustomerInfoCard = async () => {
 
   // City, State, Zip row
   const locationRow = document.createElement("div");
-  locationRow.className = "checkout-form-row";
+  locationRow.className = "checkout-form-row checkout-form-row-location";
 
   const cityField = await buildFormField("City", "text", "city", "city", true);
   const stateField = await buildStateField();
