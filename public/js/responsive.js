@@ -35,6 +35,8 @@ export const clickHandler = async (e) => {
   if (clickType === "decrease-quantity") await runDecreaseQuantity(clickElement);
   if (clickType === "remove-from-cart") await runRemoveFromCart(clickElement);
 
+  if (clickType === "checkout-btn") window.location.href = "/checkout";
+
   if (clickType === "new-product-submit") await runAddNewProduct();
   if (clickType === "edit-product-submit") await runEditProduct();
   if (clickType === "delete-product-submit") await runDeleteProduct();

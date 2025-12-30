@@ -86,6 +86,7 @@ export const buildCartSummarySection = async () => {
   checkoutBtn.className = "cart-checkout-btn";
   checkoutBtn.id = "cart-checkout-btn";
   checkoutBtn.textContent = "Proceed to Checkout";
+  checkoutBtn.setAttribute("data-label", "checkout-btn");
   checkoutBtn.disabled = true;
 
   const continueShoppingLink = document.createElement("a");
