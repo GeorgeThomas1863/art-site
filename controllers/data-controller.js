@@ -100,3 +100,16 @@ export const clearCartControl = async (req, res) => {
   req.session.cart = [];
   res.json({ success: true, cart: [] });
 };
+
+//-----------------------
+
+//ORDERS CONTROLLER
+
+export const placeOrderControl = async (req, res) => {
+  if (!req || !req.body) return res.status(500).json({ error: "No input parameters" });
+  if (!req.body.paymentToken || !req.body.customerData) return res.status(500).json({ error: "No payment token or customer data" });
+  if (!req.body.cart) return res.status(500).json({ error: "No cart data" });
+
+  const data = await runPlaceOrder(req);
+  return res.json(data);
+};

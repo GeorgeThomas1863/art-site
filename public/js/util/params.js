@@ -25,3 +25,18 @@ export const getEditProductParams = async () => {
 
   return params;
 };
+
+export const getCustomerParams = async () => {
+  const params = {
+    firstName: document.getElementById("first-name").value,
+    lastName: document.getElementById("last-name").value,
+    email: document.getElementById("email").value,
+    phone: document.getElementById("phone").value,
+    address: document.getElementById("address").value,
+    city: document.getElementById("city").value,
+    state: document.getElementById("state").value,
+    zip: document.getElementById("zip").value,
+  };
+
+  return params;
+};

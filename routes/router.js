@@ -30,6 +30,7 @@ import {
   removeFromCartControl,
   clearCartControl,
   getCartStatsControl,
+  placeOrderControl,
 } from "../controllers/data-controller.js";
 
 const router = express.Router();
@@ -68,6 +69,11 @@ router.post("/cart/remove", removeFromCartControl);
 router.post("/cart/clear", clearCartControl);
 
 //---------------------
+
+//ORDER ROUTES
+router.post("/order/create", placeOrderControl);
+
+//-----------------
 
 //Main routes
 router.get("/get-product-data-route", getProductDataControl);
