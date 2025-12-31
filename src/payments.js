@@ -1,9 +1,14 @@
-import squareClient from "../config/square-client.js";
+import SQ from "../config/square-config.js";
 import { randomUUID } from "crypto";
 
-export const processPayment = async (totalCost, inputParams) => {
-  if (!totalCost || !inputParams) return null;
-  const { paymentToken, address, city, state, zip, firstName, lastName } = inputParams;
+export const processPayment = async (cost, inputParams) => {
+  if (!cost || !inputParams) return null;
+  const { paymentToken, address, city, state, zip, firstName, lastName, email } = inputParams;
+
+  //FIGURE OUT TAXES, put in CONFIG
+  const taxRate = 0.08;
+  const tax = cost * taxRate;
+  const totalCost = cost + tax;
 
   const costInCents = Math.round(totalCost * 100);
 
@@ -14,7 +19,8 @@ export const processPayment = async (totalCost, inputParams) => {
       amount: BigInt(costInCents),
       currency: "USD",
     },
-    buyerEmailAddress: customerData.email,
+    locationId: "LMD9YKFJWX7P0", //SET FOR PROD
+    buyerEmailAddress: email,
     billingAddress: {
       addressLine1: address,
       locality: city,
@@ -26,18 +32,21 @@ export const processPayment = async (totalCost, inputParams) => {
     note: `Order from ${firstName} ${lastName} for ${totalCost}`,
   };
 
-  const res = await squareClient.paymentsApi.createPayment(paymentParams);
+  console.log("PAYMENT PARAMS");
+  console.log(paymentParams);
 
+  const data = await SQ.payments.create(paymentParams);
   console.log("PAYMENT RESPONSE");
-  console.log(res);
+  console.log(data);
 
   //throw error?
-  if (!res || !res.result || !res.result.payment) {
+  if (!data || !data.payment) {
     console.error("PAYMENT FAILED WHEN SENT TO SQUARE");
     console.error(res);
     return null;
   }
+  data.success = true;
 
   //maybe send entire payment obj back
-  return { success: true, paymentId: res.result.payment.id, paymentStatus: res.result.payment.status };
+  return data;
 };

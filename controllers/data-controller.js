@@ -107,9 +107,6 @@ export const clearCartControl = async (req, res) => {
 //ORDERS CONTROLLER
 
 export const placeOrderControl = async (req, res) => {
-  console.log("PLACE ORDER CONTROLLER");
-  console.log("REQ BODY");
-  console.dir(req.body);
   if (!req || !req.body) return res.status(500).json({ error: "No input parameters" });
   if (!req.body.paymentToken) return res.status(500).json({ error: "No payment token" });
 
