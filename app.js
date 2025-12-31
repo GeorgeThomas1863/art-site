@@ -1,3 +1,7 @@
+//GET BACKEND OF CHECKOUT WORKING
+
+//fix square styles for card input
+
 //test purchases with my square acct
 
 //add dates to product upload

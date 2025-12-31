@@ -12,8 +12,8 @@ export const buildSquarePayment = async () => {
   try {
     // Initialize Square Payments
     payments = window.Square.payments(
-      "YOUR_APPLICATION_ID", // You'll get this from Square Dashboard
-      "YOUR_LOCATION_ID" // You'll get this from Square Dashboard
+      "sandbox-sq0idb-47M2yMYCAcisSRPLrPzRzA", // You'll get this from Square Dashboard
+      "LMD9YKFJWX7P0" // You'll get this from Square Dashboard
     );
 
     // Initialize Card payment method

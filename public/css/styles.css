@@ -1427,7 +1427,7 @@ h3 {
 
 /* Payment Container */
 .checkout-payment-container {
-  min-height: 200px;
+  min-height: 100px;
   padding: 1.5rem;
   background: #fafafa;
   border: 1px solid #e0e0e0;
@@ -1621,9 +1621,16 @@ h3 {
 
 /* Square Payment Form Styles */
 .square-card-container {
-  min-height: 100px;
   padding: 1rem 0;
 }
+
+/* .square-card-container {
+  min-height: 150px; 
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 1rem 0;
+} */
 
 .payment-error-message {
   margin-top: 1rem;
