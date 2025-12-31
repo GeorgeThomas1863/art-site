@@ -1,4 +1,6 @@
+import { tokenizePaymentMethod } from "./square-payment.js";
 import { getCustomerParams } from "../util/params.js";
+import { sendToBack } from "../util/api-front.js";
 
 export const runPlaceOrder = async () => {
   console.log("RUN PLACE ORDER");
@@ -18,6 +20,8 @@ export const runPlaceOrder = async () => {
   try {
     // Get payment token from Square
     const paymentToken = await tokenizePaymentMethod();
+    console.log("PAYMENT TOKEN");
+    console.log(paymentToken);
 
     if (!paymentToken) {
       // Error already displayed by tokenizePaymentMethod
@@ -30,6 +34,9 @@ export const runPlaceOrder = async () => {
     const customerParams = await getCustomerParams();
     customerParams.route = "/checkout/place-order";
     customerParams.paymentToken = paymentToken;
+
+    console.log("CUSTOMER PARAMS");
+    console.dir(customerParams);
 
     // Send to backend
     const data = await sendToBack(customerParams);

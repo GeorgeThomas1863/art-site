@@ -71,7 +71,7 @@ router.post("/cart/clear", clearCartControl);
 //---------------------
 
 //ORDER ROUTES
-router.post("/order/create", placeOrderControl);
+router.post("/checkout/place-order", placeOrderControl);
 
 //-----------------
 

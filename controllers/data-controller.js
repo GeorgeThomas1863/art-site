@@ -1,5 +1,6 @@
 import { runAddNewProduct, runEditProduct, runDeleteProduct, runGetProductData } from "../src/products.js";
 import { buildCart, runGetCartStats, runAddToCart, runUpdateCartItem, runRemoveFromCart } from "../src/cart.js";
+import { runPlaceOrder } from "../src/orders.js";
 
 //returns data for all products
 export const getProductDataControl = async (req, res) => {
@@ -106,9 +107,11 @@ export const clearCartControl = async (req, res) => {
 //ORDERS CONTROLLER
 
 export const placeOrderControl = async (req, res) => {
+  console.log("PLACE ORDER CONTROLLER");
+  console.log("REQ BODY");
+  console.dir(req.body);
   if (!req || !req.body) return res.status(500).json({ error: "No input parameters" });
-  if (!req.body.paymentToken || !req.body.customerData) return res.status(500).json({ error: "No payment token or customer data" });
-  if (!req.body.cart) return res.status(500).json({ error: "No cart data" });
+  if (!req.body.paymentToken) return res.status(500).json({ error: "No payment token" });
 
   const data = await runPlaceOrder(req);
   return res.json(data);

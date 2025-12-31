@@ -99,6 +99,16 @@ export const buildCustomerInfoCard = async () => {
 
   card.append(cardTitle, form);
 
+  //!!! REMOVE, DEFAULT DATA FOR TESTING
+  firstNameField.querySelector("input").value = "John";
+  lastNameField.querySelector("input").value = "Doe";
+  emailField.querySelector("input").value = "john.doe@example.com";
+  phoneField.querySelector("input").value = "+1234567890";
+  addressField.querySelector("input").value = "123 Main St";
+  cityField.querySelector("input").value = "Anytown";
+  stateField.querySelector("select").value = "CA"; // select instead of input for state
+  zipField.querySelector("input").value = "12345";
+
   return card;
 };
 
