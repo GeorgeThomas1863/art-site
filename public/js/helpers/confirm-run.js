@@ -13,6 +13,9 @@ export const populateConfirmOrder = async () => {
 
   const data = JSON.parse(orderDataStr);
 
+  console.log("DATA");
+  console.dir(data);
+
   sessionStorage.removeItem("orderData");
 
   await displayOrderDetails(data);
@@ -21,68 +24,54 @@ export const populateConfirmOrder = async () => {
   return true;
 };
 
-export const displayOrderDetails = async (orderData) => {
-  if (!orderData) return null;
+export const displayOrderDetails = async (inputData) => {
+  if (!inputData || !inputData.orderData || !inputData.customerData) return null;
+  const { orderId, orderDate, paymentStatus, itemCost, tax, totalCost } = inputData.orderData;
+  const { firstName, lastName, email, address, city, state, zip } = inputData.customerData;
 
-  const { orderId, orderDate, paymentStatus, customerData, itemCost, tax, totalCost } = orderData;
+  const formElements = {
+    orderNumber: "order-number",
+    orderDate: "order-date",
+    paymentStatus: "payment-status",
+    email: "customer-email",
+    shippingAddress: "shipping-address",
+    subtotal: "confirm-subtotal",
+    tax: "confirm-tax",
+    total: "confirm-total",
+  };
 
-  // Order Number
-  const orderNumberElement = document.getElementById("order-number");
-  if (orderNumberElement) {
-    orderNumberElement.textContent = orderId;
+  //ensure elements load, better way of doing this
+  const obj = {};
+  for (const key in formElements) {
+    obj[key] = document.getElementById(formElements[key]);
+    if (!obj[key]) {
+      console.error(`ELEMENT FAILED TO LOAD: ${formElements[key]}`);
+      return null;
+    }
   }
 
-  // Order Date
-  const orderDateElement = document.getElementById("order-date");
-  if (orderDateElement) {
-    const date = new Date(orderDate);
-    orderDateElement.textContent = date.toLocaleDateString("en-US", {
-      year: "numeric",
-      month: "long",
-      day: "numeric",
-    });
-  }
+  obj.orderNumberElement.textContent = orderId;
+  obj.orderDateElement.textContent = new Date(orderDate).toLocaleDateString("en-US", {
+    year: "numeric",
+    month: "long",
+    day: "numeric",
+  });
 
-  // Payment Status
-  const paymentStatusElement = document.getElementById("payment-status");
-  if (paymentStatusElement) {
-    paymentStatusElement.textContent = paymentStatus || "Completed";
-    paymentStatusElement.style.color = "#22c55e";
-    paymentStatusElement.style.fontWeight = "500";
-  }
+  obj.paymentStatusElement.textContent = paymentStatus || "Completed";
+  obj.paymentStatusElement.style.color = "#22c55e";
+  obj.paymentStatusElement.style.fontWeight = "500";
 
-  // Customer Email
-  const emailElement = document.getElementById("customer-email");
-  if (emailElement) {
-    emailElement.textContent = customerData.email;
-  }
+  obj.emailElement.textContent = email;
 
-  // Shipping Address
-  const shippingAddressElement = document.getElementById("shipping-address");
-  if (shippingAddressElement) {
-    const { firstName, lastName, address, city, state, zip } = customerData;
-    shippingAddressElement.innerHTML = `
+  obj.shippingAddressElement.innerHTML = `
       ${firstName} ${lastName}<br>
       ${address}<br>
       ${city}, ${state} ${zip}
     `;
-  }
 
-  // Order Summary
-  const subtotalElement = document.getElementById("confirm-subtotal");
-  if (subtotalElement) {
-    subtotalElement.textContent = `$${itemCost.toFixed(2)}`;
-  }
-
-  const taxElement = document.getElementById("confirm-tax");
-  if (taxElement) {
-    taxElement.textContent = `$${tax.toFixed(2)}`;
-  }
-
-  const totalElement = document.getElementById("confirm-total");
-  if (totalElement) {
-    totalElement.textContent = `$${totalCost.toFixed(2)}`;
-  }
+  obj.subtotalElement.textContent = `$${itemCost.toFixed(2)}`;
+  obj.taxElement.textContent = `$${tax.toFixed(2)}`;
+  obj.totalElement.textContent = `$${totalCost.toFixed(2)}`;
 
   return true;
 };

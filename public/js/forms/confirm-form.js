@@ -74,11 +74,11 @@ export const buildConfirmDetails = async () => {
 
   // Shipping Address Section
   const shippingTitle = document.createElement("h3");
-  shippingTitle.className = "confirmation-subsection-title";
+  shippingTitle.className = "confirm-subsection-title";
   shippingTitle.textContent = "Shipping Address";
 
   const shippingAddress = document.createElement("div");
-  shippingAddress.className = "confirmation-address";
+  shippingAddress.className = "confirm-address";
   shippingAddress.id = "shipping-address";
   shippingAddress.textContent = "Loading...";
 
@@ -101,14 +101,14 @@ export const buildConfirmItemsSection = async () => {
 
   const itemsContainer = document.createElement("div");
   itemsContainer.className = "confirm-items-container";
-  itemsContainer.id = "confirmation-items-container";
+  itemsContainer.id = "confirm-items-container";
 
   // Order totals
   const summaryDetails = document.createElement("div");
   summaryDetails.className = "confirm-summary-details";
 
-  const subtotalRow = await buildSummaryRow("Subtotal:", "$0.00", "confirmation-subtotal");
-  const taxRow = await buildSummaryRow("Tax:", "$0.00", "confirmation-tax");
+  const subtotalRow = await buildSummaryRow("Subtotal:", "$0.00", "confirm-subtotal");
+  const taxRow = await buildSummaryRow("Tax:", "$0.00", "confirm-tax");
 
   const totalRow = document.createElement("div");
   totalRow.className = "confirm-summary-row confirm-summary-total";
