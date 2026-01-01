@@ -27,6 +27,15 @@ class dbModel {
 
   //---------------
 
+  async matchMultiItems() {
+    const { keyToLookup1, keyToLookup2, keyToLookup3, itemValue1, itemValue2, itemValue3 } = this.dataObject;
+
+    const matchData = await dbGet().collection(this.collection).findOne({ [keyToLookup1]: itemValue1, [keyToLookup2]: itemValue2, [keyToLookup3]: itemValue3 }); //prettier-ignore
+    return matchData;
+  }
+
+  //----------------
+
   async getAll() {
     const arrayData = await dbGet().collection(this.collection).find().toArray();
     return arrayData;

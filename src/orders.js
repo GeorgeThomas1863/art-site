@@ -27,6 +27,17 @@ export const runPlaceOrder = async (req) => {
   console.log(orderData);
 
   const customerData = await storeCustomerData(inputParams, orderData);
+  if (!customerData) return { success: false, message: "Failed to store customer data" };
+
+  const returnParams = {
+    success: true,
+    message: "Order placed successfully",
+    paymentData: data.payment,
+    orderData: orderData,
+    customerData: customerData,
+  };
+
+  return returnParams;
 };
 
 export const storeOrderData = async (payment, cart, inputParams) => {
@@ -36,12 +47,6 @@ export const storeOrderData = async (payment, cart, inputParams) => {
   const { route, paymentToken, ...customerObj } = inputParams;
   const { total, itemCount } = cart;
   const { id: paymentId, orderId: squareOrderId, status, createdAt, totalMoney, approvedMoney, billingAddress, riskEvaluation, delayAction, delayedUntil, receiptNumber, receiptUrl } = payment; //prettier-ignore
-
-  // console.log("ORDERS COLLECTION");
-  // console.log(ordersCollection);
-
-  console.log("CART");
-  console.log(cart);
 
   const startParams = {
     itemCost: Number(total).toFixed(2),
@@ -54,19 +59,15 @@ export const storeOrderData = async (payment, cart, inputParams) => {
   const orderStartModel = new dbModel(startParams, ordersCollection);
   const orderStartData = await orderStartModel.storeAny();
   if (!orderStartData) return { success: false, message: "Failed to store order start" };
-  // console.log("ORDER START DATA");
-  // console.log(orderStartData);
 
   //set order id to mongo id
   const orderId = orderStartData.insertedId?.toString() || null;
+  if (!orderId) return { success: false, message: "Failed to get order start id" };
   console.log("ORDER ID");
   console.log(orderId);
 
-  if (!orderId) return { success: false, message: "Failed to get order start id" };
-
   //build rest of order data
   const updateParams = {
-    //----------
     orderId: orderId,
     paymentId: paymentId,
     squareOrderId: squareOrderId,
@@ -96,10 +97,76 @@ export const storeOrderData = async (payment, cart, inputParams) => {
 
 export const storeCustomerData = async (inputParams, orderData) => {
   if (!inputParams || !orderData) return null;
+  const { firstName, lastName, email, phone, address, city, state, zip } = inputParams;
+  const { orderId, orderDate, amountPaid, itemCount } = orderData;
+  const { customersCollection } = CONFIG;
 
-  //check if customer already exists
+  const customerParams = {
+    firstName: firstName,
+    lastName: lastName,
+    email: email,
+    phone: phone,
+    address: address,
+    city: city,
+    state: state,
+    zip: zip,
+    lastOrderId: orderId,
+    lastOrderDate: orderDate,
+    lastAmountPaid: amountPaid,
+    totalPaid: amountPaid,
+    totalItemsPurchased: itemCount,
+    totalOrders: 1,
+  };
 
-  //if not get new customer id
+  //check if customer already exists, returns null if not
+  const updateData = await updateCustomerData(customerParams);
+  if (updateData) return updateData;
 
-  //build rest of customer data adn store
+  //otherwise create new customer
+  const newCustomerModel = new dbModel({ firstOrderDate: orderDate }, customersCollection);
+  const newCustomerData = await newCustomerModel.storeAny();
+  if (!newCustomerData) return null;
+  const customerId = newCustomerData.insertedId?.toString() || null;
+  if (!customerId) return null;
+
+  customerParams.customerId = customerId;
+
+  const storeModel = new dbModel({ keyToLookup: "customerId", itemValue: customerId, updateObj: customerParams }, customersCollection);
+  const storeData = await storeModel.storeAny();
+  if (!storeData) return null;
+  return customerParams;
+};
+
+export const updateCustomerData = async (inputParams) => {
+  if (!inputParams) return null;
+  const { firstName, lastName, address, orderId, orderDate, amountPaid, itemCount } = inputParams;
+  const { customersCollection } = CONFIG;
+
+  const checkParams = {
+    keyToLookup1: "customerData.firstName",
+    keyToLookup2: "customerData.lastName",
+    keyToLookup3: "customerData.address",
+    itemValue1: firstName,
+    itemValue2: lastName,
+    itemValue3: address,
+  };
+
+  const checkModel = new dbModel(checkParams, customersCollection);
+  const checkData = await checkModel.matchMultiItems();
+  if (!checkData) return null;
+
+  //otherwise update
+  const updateParams = {
+    lastOrderId: orderId,
+    lastOrderDate: orderDate,
+    lastAmountPaid: amountPaid,
+    totalPaid: Number(checkData.totalPaid) + Number(amountPaid),
+    totalItemsPurchased: Number(checkData.totalItemsPurchased) + Number(itemCount),
+    totalOrders: Number(checkData.totalOrders) + 1,
+  };
+
+  const updateModel = new dbModel({ keyToLookup: "customerId", itemValue: checkData.customerId, updateObj: updateParams }, customersCollection);
+  const updateData = await updateModel.updateObjItem();
+  if (!updateData) return null;
+  return updateParams;
 };
