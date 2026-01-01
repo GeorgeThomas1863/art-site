@@ -1,5 +1,7 @@
 //BUILD CONFIRMATION.html for order confirmation, pass in correct data from backend
 
+//BUGS: price of items in cart needs to changed based on quantity
+
 //fix square styles for card input
 
 //test purchases with my square acct

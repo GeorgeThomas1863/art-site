@@ -40,8 +40,8 @@ export const placeNewOrder = async (req) => {
     cartData: req.session.cart, //TEST
   };
 
-  // console.log("RETURN PARAMS");
-  // console.log(returnParams);
+  console.log("RETURN PARAMS");
+  console.log(returnParams);
 
   return returnParams;
 };

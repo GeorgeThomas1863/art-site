@@ -41,9 +41,9 @@ export const runPlaceOrder = async () => {
     // Send to backend
     const data = await sendToBack(customerParams);
     console.log("DATA");
-    console.log(data);
+    console.dir(data);
 
-    if (data.success) {
+    if (data && data.success) {
       console.log("DATA SUCCESS");
       console.log(data);
 
@@ -55,7 +55,7 @@ export const runPlaceOrder = async () => {
     } else {
       const errorContainer = document.getElementById("payment-error");
       if (errorContainer) {
-        errorContainer.textContent = response.message || "Order processing failed";
+        errorContainer.textContent = data.message || "Order processing failed";
         errorContainer.style.display = "block";
       }
       placeOrderBtn.disabled = false;

@@ -111,7 +111,9 @@ export const placeOrderControl = async (req, res) => {
   if (!req.body.paymentToken) return res.status(500).json({ error: "No payment token" });
 
   const data = await placeNewOrder(req);
-  console.log("PLACE ORDER DATA:");
-  console.log(data);
-  return res.json(data);
+
+  //json throws error with "bigint" type, converting to numbers
+  const jsonData = JSON.parse(JSON.stringify(data, (key, value) => (typeof value === "bigint" ? Number(value) : value)));
+
+  return res.json(jsonData);
 };
