@@ -154,7 +154,7 @@ export const buildAddToCartButton = async (productData) => {
 
 // Build product name
 export const buildProductName = async (productData) => {
-  const productName = document.createElement("h3");
+  const productName = document.createElement("h2");
   productName.className = "product-name";
   productName.textContent = productData.name;
 

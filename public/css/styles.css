@@ -17,7 +17,6 @@ p {
 a {
   text-decoration: none;
   color: black;
-  display: block;
 }
 
 ul {
@@ -833,7 +832,9 @@ h3 {
   font-weight: 400;
   letter-spacing: 1px;
   color: #000000;
-  margin-bottom: 0.8rem;
+  margin: 1rem 0;
+  /* margin-bottom: 0.8rem; */
+  text-align: center;
 }
 
 .product-price {
@@ -842,6 +843,7 @@ h3 {
   letter-spacing: 2px;
   color: #000000;
   margin-bottom: 1rem;
+  text-align: center;
 }
 
 .product-description {
@@ -1763,6 +1765,7 @@ h3 {
   background: #fafafa;
   border: 1px solid #e0e0e0;
   border-radius: 4px;
+  text-align: center;
 }
 
 /* Order Items */
@@ -1857,6 +1860,34 @@ h3 {
   font-weight: 500;
   letter-spacing: 2px;
   color: #000000;
+}
+
+.confirm-receipt-link {
+  width: fit-content;
+  font-family: "Georgia", serif;
+  font-size: 0.85rem;
+  font-weight: 400;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: #000000;
+  background-color: transparent;
+  border: 1px solid #333;
+  padding: 0.8rem 2rem;
+  text-decoration: none;
+  display: inline-block;
+  transition: all 0.3s;
+  border-radius: 4px;
+  margin-top: 1.5rem;
+}
+
+.confirm-receipt-link:hover {
+  background-color: #f0f0f0;
+  color: #1a1a1a;
+}
+
+.confirm-receipt-link:active {
+  background-color: #e5e5e5;
+  transform: translateY(1px);
 }
 
 /* Actions Section */

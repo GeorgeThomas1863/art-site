@@ -125,7 +125,16 @@ export const buildConfirmItemsSection = async () => {
   totalRow.append(totalLabel, totalValue);
   summaryDetails.append(subtotalRow, taxRow, totalRow);
 
-  itemsCard.append(cardTitle, itemsContainer, summaryDetails);
+    // Receipt Link
+    const receiptLink = document.createElement("a");
+    receiptLink.className = "confirm-receipt-link";
+    receiptLink.id = "receipt-link";
+    receiptLink.href = "#";
+    receiptLink.target = "_blank";
+    receiptLink.textContent = "View Receipt on Square";
+    receiptLink.style.display = "none"; // Hidden until URL is set
+
+  itemsCard.append(cardTitle, itemsContainer, summaryDetails, receiptLink);
   itemsSection.append(itemsCard);
 
   return itemsSection;
