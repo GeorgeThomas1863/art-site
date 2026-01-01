@@ -1,4 +1,4 @@
-//GET BACKEND OF CHECKOUT WORKING
+//BUILD CONFIRMATION.html for order confirmation, pass in correct data from backend
 
 //fix square styles for card input
 

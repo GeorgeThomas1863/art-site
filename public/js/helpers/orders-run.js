@@ -44,6 +44,8 @@ export const runPlaceOrder = async () => {
     console.log(data);
 
     if (data.success) {
+      console.log("DATA SUCCESS");
+      console.log(data);
       // Redirect to success page
       window.location.href = `/order-confirmation/${response.orderId}`;
     } else {

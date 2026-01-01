@@ -3,7 +3,7 @@ import { runGetCartStats } from "./cart.js";
 import { processPayment } from "./payments.js";
 import dbModel from "../models/db-model.js";
 
-export const runPlaceOrder = async (req) => {
+export const placeNewOrder = async (req) => {
   if (!req || !req.body) return { success: false, message: "No input parameters" };
   const inputParams = req.body;
 
@@ -23,10 +23,12 @@ export const runPlaceOrder = async (req) => {
   if (!data || !data.success) return { success: false, message: "Failed to process payment" };
 
   const orderData = await storeOrderData(data.payment, cart, inputParams);
-  console.log("STORE ORDER DATA");
-  console.log(orderData);
+  // console.log("STORE ORDER DATA");
+  // console.log(orderData);
 
-  const customerData = await storeCustomerData(inputParams, orderData);
+  const customerData = await storeCustomerData(orderData, cart, inputParams);
+  // console.log("CUSTOMER DATA");
+  // console.log(customerData);
   if (!customerData) return { success: false, message: "Failed to store customer data" };
 
   const returnParams = {
@@ -36,6 +38,9 @@ export const runPlaceOrder = async (req) => {
     orderData: orderData,
     customerData: customerData,
   };
+
+  // console.log("RETURN PARAMS");
+  // console.log(returnParams);
 
   return returnParams;
 };
@@ -49,9 +54,9 @@ export const storeOrderData = async (payment, cart, inputParams) => {
   const { id: paymentId, orderId: squareOrderId, status, createdAt, totalMoney, approvedMoney, billingAddress, riskEvaluation, delayAction, delayedUntil, receiptNumber, receiptUrl } = payment; //prettier-ignore
 
   const startParams = {
-    itemCost: Number(total).toFixed(2),
-    tax: (Number(total) * 0.08).toFixed(2),
-    itemCount: itemCount,
+    itemCost: +Number(total).toFixed(2),
+    tax: +(Number(total) * 0.08).toFixed(2),
+    itemCount: +itemCount,
     customerData: customerObj,
   };
 
@@ -73,8 +78,8 @@ export const storeOrderData = async (payment, cart, inputParams) => {
     squareOrderId: squareOrderId,
     paymentStatus: status,
     orderDate: createdAt,
-    totalCost: (Number(totalMoney.amount) / 100).toFixed(2), //convert to dollars
-    amountPaid: (Number(approvedMoney.amount) / 100).toFixed(2), //convert to dollars
+    totalCost: +(Number(totalMoney.amount) / 100).toFixed(2), //convert to dollars
+    amountPaid: +(Number(approvedMoney.amount) / 100).toFixed(2), //convert to dollars
     currency: approvedMoney.currency,
     billingAddress: billingAddress,
     risk: riskEvaluation.riskLevel,
@@ -95,10 +100,11 @@ export const storeOrderData = async (payment, cart, inputParams) => {
   return updateParams;
 };
 
-export const storeCustomerData = async (inputParams, orderData) => {
-  if (!inputParams || !orderData) return null;
+export const storeCustomerData = async (orderData, cart, inputParams) => {
+  if (!inputParams || !orderData || !cart) return null;
   const { firstName, lastName, email, phone, address, city, state, zip } = inputParams;
-  const { orderId, orderDate, amountPaid, itemCount } = orderData;
+  const { orderId, orderDate, amountPaid } = orderData;
+  const { itemCount } = cart;
   const { customersCollection } = CONFIG;
 
   const customerParams = {
@@ -112,9 +118,9 @@ export const storeCustomerData = async (inputParams, orderData) => {
     zip: zip,
     lastOrderId: orderId,
     lastOrderDate: orderDate,
-    lastAmountPaid: amountPaid,
-    totalPaid: amountPaid,
-    totalItemsPurchased: itemCount,
+    lastAmountPaid: +amountPaid,
+    totalPaid: +amountPaid,
+    totalItemsPurchased: +itemCount,
     totalOrders: 1,
   };
 
@@ -125,27 +131,33 @@ export const storeCustomerData = async (inputParams, orderData) => {
   //otherwise create new customer
   const newCustomerModel = new dbModel({ firstOrderDate: orderDate }, customersCollection);
   const newCustomerData = await newCustomerModel.storeAny();
+
+  console.log("NEW CUSTOMER DATA");
+  console.log(newCustomerData);
   if (!newCustomerData) return null;
   const customerId = newCustomerData.insertedId?.toString() || null;
   if (!customerId) return null;
 
+  console.log("CUSTOMER ID");
+  console.log(customerId);
+
   customerParams.customerId = customerId;
 
-  const storeModel = new dbModel({ keyToLookup: "customerId", itemValue: customerId, updateObj: customerParams }, customersCollection);
-  const storeData = await storeModel.storeAny();
+  const storeModel = new dbModel({ keyToLookup: "_id", itemValue: newCustomerData.insertedId, updateObj: customerParams }, customersCollection); //prettier-ignore
+  const storeData = await storeModel.updateObjItem();
   if (!storeData) return null;
   return customerParams;
 };
 
 export const updateCustomerData = async (inputParams) => {
   if (!inputParams) return null;
-  const { firstName, lastName, address, orderId, orderDate, amountPaid, itemCount } = inputParams;
+  const { firstName, lastName, address, lastOrderId, lastOrderDate, lastAmountPaid, totalPaid, totalItemsPurchased } = inputParams;
   const { customersCollection } = CONFIG;
 
   const checkParams = {
-    keyToLookup1: "customerData.firstName",
-    keyToLookup2: "customerData.lastName",
-    keyToLookup3: "customerData.address",
+    keyToLookup1: "firstName",
+    keyToLookup2: "lastName",
+    keyToLookup3: "address",
     itemValue1: firstName,
     itemValue2: lastName,
     itemValue3: address,
@@ -153,16 +165,19 @@ export const updateCustomerData = async (inputParams) => {
 
   const checkModel = new dbModel(checkParams, customersCollection);
   const checkData = await checkModel.matchMultiItems();
+
+  console.log("CHECK DATA");
+  console.log(checkData);
   if (!checkData) return null;
 
   //otherwise update
   const updateParams = {
-    lastOrderId: orderId,
-    lastOrderDate: orderDate,
-    lastAmountPaid: amountPaid,
-    totalPaid: Number(checkData.totalPaid) + Number(amountPaid),
-    totalItemsPurchased: Number(checkData.totalItemsPurchased) + Number(itemCount),
-    totalOrders: Number(checkData.totalOrders) + 1,
+    lastOrderId: lastOrderId,
+    lastOrderDate: lastOrderDate,
+    lastAmountPaid: +lastAmountPaid,
+    totalPaid: +(Number(checkData.totalPaid || 0) + Number(totalPaid)),
+    totalItemsPurchased: +(Number(checkData.totalItemsPurchased || 0) + Number(totalItemsPurchased)),
+    totalOrders: +(Number(checkData.totalOrders || 0) + 1),
   };
 
   const updateModel = new dbModel({ keyToLookup: "customerId", itemValue: checkData.customerId, updateObj: updateParams }, customersCollection);
