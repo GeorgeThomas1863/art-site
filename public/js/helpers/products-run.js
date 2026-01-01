@@ -5,7 +5,7 @@ import { buildProductCard } from "../forms/products-form.js";
 let productsArray = [];
 
 // Populate the products grid with product cards
-export const populateProductsGrid = async (inputArray) => {
+export const populateProducts = async (inputArray) => {
   if (!inputArray || !inputArray.length) return null;
 
   productsArray = inputArray;

@@ -6,10 +6,9 @@ import { buildCartForm } from "./forms/cart-form.js";
 import { buildCheckoutForm } from "./forms/checkout-form.js";
 import { buildConfirmOrderForm } from "./forms/confirm-form.js";
 
-import { populateProductsGrid } from "./helpers/products-run.js";
+import { populateProducts } from "./helpers/products-run.js";
 import { populateCart, updateNavbarCart } from "./helpers/cart-run.js";
-import { populateCheckout } from "./helpers/checkout-run.js";
-import { populateConfirmOrder } from "./helpers/confirm-run.js";
+import { populateCheckout, populateConfirmOrder } from "./helpers/buy-run.js";
 import { startPicRotation } from "./helpers/rotate-pics.js";
 
 const displayElement = document.getElementById("display-element");
@@ -29,7 +28,6 @@ export const buildMainDisplay = async () => {
   displayElement.append(data);
 
   await startPicRotation();
-
   await updateNavbarCart();
 
   return true;
@@ -45,8 +43,7 @@ export const buildProductsDisplay = async () => {
   const productData = await sendToBack({ route: "/get-product-data-route" }, "GET");
   console.log("PRODUCT DATA");
   console.dir(productData);
-  await populateProductsGrid(productData);
-
+  await populateProducts(productData);
   await updateNavbarCart();
 
   return true;

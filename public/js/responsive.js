@@ -2,7 +2,7 @@ import { runTabClick, runAddNewProduct, runEditProduct, runDeleteProduct, change
 import { runUploadClick, runUploadPic } from "./helpers/upload-pic.js";
 import { changeProductsFilter } from "./helpers/products-run.js";
 import { runAddToCart, runIncreaseQuantity, runDecreaseQuantity, runRemoveFromCart } from "./helpers/cart-run.js";
-import { runPlaceOrder } from "./helpers/orders-run.js";
+import { runPlaceOrder } from "./helpers/buy-run.js";
 import { runAuthSubmit, runPwToggle } from "./auth.js";
 import { closePopup, closeConfirmDialog } from "./helpers/popup.js";
 
