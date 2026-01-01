@@ -1,4 +1,5 @@
-//BUILD CONFIRMATION.html for order confirmation, pass in correct data from backend
+//make order submission less dumb in buy.js
+
 
 //BUGS: price of items in cart needs to changed based on quantity
 
