@@ -34,16 +34,19 @@ export const storeOrderData = async (payment, cart, inputParams) => {
 
   const { ordersCollection } = CONFIG;
   const { route, paymentToken, ...customerObj } = inputParams;
-  const { total, items } = cart;
-  const { id: paymentId, orderId: squareOrderId, status, createdAt, totalMoney, approvedMoney, billingAddress, riskEvaluation, delayedAction, delayedUntil, receiptNumber, receiptUrl } = payment; //prettier-ignore
+  const { total, itemCount } = cart;
+  const { id: paymentId, orderId: squareOrderId, status, createdAt, totalMoney, approvedMoney, billingAddress, riskEvaluation, delayAction, delayedUntil, receiptNumber, receiptUrl } = payment; //prettier-ignore
 
-  console.log("ORDERS COLLECTION");
-  console.log(ordersCollection);
+  // console.log("ORDERS COLLECTION");
+  // console.log(ordersCollection);
+
+  console.log("CART");
+  console.log(cart);
 
   const startParams = {
     itemCost: Number(total).toFixed(2),
     tax: (Number(total) * 0.08).toFixed(2),
-    orderItems: items,
+    itemCount: itemCount,
     customerData: customerObj,
   };
 
@@ -51,8 +54,8 @@ export const storeOrderData = async (payment, cart, inputParams) => {
   const orderStartModel = new dbModel(startParams, ordersCollection);
   const orderStartData = await orderStartModel.storeAny();
   // if (!orderStartData) return { success: false, message: "Failed to store order start" };
-  console.log("ORDER START DATA");
-  console.log(orderStartData);
+  // console.log("ORDER START DATA");
+  // console.log(orderStartData);
 
   //set order id to mongo id
   const orderId = orderStartData.insertedId?.toString() || null;
@@ -60,8 +63,6 @@ export const storeOrderData = async (payment, cart, inputParams) => {
   console.log(orderId);
 
   if (!orderId) return { success: false, message: "Failed to get order start id" };
-
-  console.log("AHHHHHHHHHHHHHHHHHHH");
 
   //build rest of order data
   const updateParams = {
@@ -76,7 +77,7 @@ export const storeOrderData = async (payment, cart, inputParams) => {
     currency: approvedMoney.currency,
     billingAddress: billingAddress,
     risk: riskEvaluation.riskLevel,
-    delayedAction: delayedAction,
+    delayAction: delayAction,
     delayedUntil: delayedUntil,
     receiptNumber: receiptNumber,
     receiptURL: receiptUrl,
