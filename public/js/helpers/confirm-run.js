@@ -1,4 +1,3 @@
-import { sendToBack } from "../util/api-front.js";
 import { buildConfirmItem } from "../forms/confirm-form.js";
 
 export const populateConfirmOrder = async () => {
@@ -60,9 +59,6 @@ export const displayOrderDetails = async (inputData) => {
   obj.paymentStatus.textContent = paymentStatus || "Completed";
   obj.paymentStatus.style.color = "#22c55e";
   obj.paymentStatus.style.fontWeight = "500";
-
-  console.log("ORDER DATE!!!");
-  console.log(orderDate);
 
   obj.orderDate.textContent = new Date(orderDate).toLocaleDateString("en-US", {
     year: "numeric",

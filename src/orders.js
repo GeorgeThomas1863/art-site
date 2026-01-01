@@ -90,15 +90,17 @@ export const storeOrderData = async (payment, cart, inputParams) => {
     receiptURL: receiptUrl,
   };
 
-  console.log("UPDATE PARAMS");
-  console.log(updateParams);
+  // console.log("UPDATE PARAMS");
+  // console.log(updateParams);
 
   const updateModel = new dbModel({ keyToLookup: "_id", itemValue: orderStartData.insertedId, updateObj: updateParams }, ordersCollection);
   const updateData = await updateModel.updateObjItem();
-  console.log("UPDATE DATA");
-  console.log(updateData);
+  // console.log("UPDATE DATA");
+  // console.log(updateData);
 
-  return updateParams;
+  const returnObj = { ...startParams, ...updateParams };
+
+  return returnObj;
 };
 
 export const storeCustomerData = async (orderData, cart, inputParams) => {
