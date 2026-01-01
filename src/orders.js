@@ -37,6 +37,7 @@ export const placeNewOrder = async (req) => {
     paymentData: data.payment,
     orderData: orderData,
     customerData: customerData,
+    cartData: req.session.cart, //TEST
   };
 
   // console.log("RETURN PARAMS");

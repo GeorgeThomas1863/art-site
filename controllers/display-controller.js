@@ -25,6 +25,10 @@ export const checkoutDisplay = (req, res) => {
   res.sendFile(path.join(__dirname, "../html/checkout.html"));
 };
 
+export const confirmOrderDisplay = (req, res) => {
+  res.sendFile(path.join(__dirname, "../html/confirm-order.html"));
+};
+
 export const aboutDisplay = (req, res) => {
   res.sendFile(path.join(__dirname, "../html/about.html"));
 };

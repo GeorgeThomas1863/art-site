@@ -11,6 +11,7 @@ import {
   productsDisplay,
   cartDisplay,
   checkoutDisplay,
+  confirmOrderDisplay,
   aboutDisplay,
   eventsDisplay,
   display404,
@@ -77,6 +78,8 @@ router.post("/checkout/place-order", placeOrderControl);
 
 //Main routes
 router.get("/get-product-data-route", getProductDataControl);
+
+router.get("/confirm-order", confirmOrderDisplay);
 
 router.get("/checkout", checkoutDisplay);
 

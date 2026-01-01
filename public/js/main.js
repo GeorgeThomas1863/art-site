@@ -1,17 +1,22 @@
+import { sendToBack } from "./util/api-front.js";
+
 import { buildMainForm, buildNavBar } from "./forms/main-form.js";
 import { buildProductsForm } from "./forms/products-form.js";
 import { buildCartForm } from "./forms/cart-form.js";
 import { buildCheckoutForm } from "./forms/checkout-form.js";
-import { sendToBack } from "./util/api-front.js";
+import { buildConfirmOrderForm } from "./forms/confirm-form.js";
+
 import { populateProductsGrid } from "./helpers/products-run.js";
 import { populateCart, updateNavbarCart } from "./helpers/cart-run.js";
 import { populateCheckout } from "./helpers/checkout-run.js";
+import { populateConfirmOrder } from "./helpers/confirm-run.js";
 import { startPicRotation } from "./helpers/rotate-pics.js";
 
 const displayElement = document.getElementById("display-element");
 const productsElement = document.getElementById("products-element");
 const cartElement = document.getElementById("cart-element");
 const checkoutElement = document.getElementById("checkout-element");
+const confirmElement = document.getElementById("confirm-element");
 
 export const buildMainDisplay = async () => {
   if (!displayElement) return null;
@@ -71,10 +76,23 @@ export const buildCheckoutDisplay = async () => {
   return true;
 };
 
+export const buildConfirmOrderDisplay = async () => {
+  if (!confirmElement) return null;
+
+  const navElement = await buildNavBar();
+  const confirmOrderForm = await buildConfirmOrderForm();
+  confirmElement.append(navElement, confirmOrderForm);
+
+  await populateConfirmOrder();
+
+  return true;
+};
+
 if (displayElement) buildMainDisplay();
 if (productsElement) buildProductsDisplay();
 if (cartElement) buildCartDisplay();
 if (checkoutElement) buildCheckoutDisplay();
+if (confirmElement) buildConfirmOrderDisplay();
 
 //DESCRIPTIONS TO ADD
 

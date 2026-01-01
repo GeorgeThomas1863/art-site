@@ -46,8 +46,12 @@ export const runPlaceOrder = async () => {
     if (data.success) {
       console.log("DATA SUCCESS");
       console.log(data);
+
+      //claude suggestion for storing the returned data
+      sessionStorage.setItem("orderData", JSON.stringify(data));
+
       // Redirect to success page
-      window.location.href = `/order-confirmation/${response.orderId}`;
+      window.location.href = `/confirm-order`;
     } else {
       const errorContainer = document.getElementById("payment-error");
       if (errorContainer) {
