@@ -127,7 +127,7 @@ export const storeCustomerData = async (orderData, cart, inputParams) => {
 
   //check if customer already exists, returns null if not
   const updateData = await updateCustomerData(customerParams);
-  if (updateData) return updateData;
+  if (updateData) return customerParams;
 
   //otherwise create new customer
   const newCustomerModel = new dbModel({ firstOrderDate: orderDate }, customersCollection);
