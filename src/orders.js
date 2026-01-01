@@ -53,7 +53,7 @@ export const storeOrderData = async (payment, cart, inputParams) => {
   //start order to get internal id
   const orderStartModel = new dbModel(startParams, ordersCollection);
   const orderStartData = await orderStartModel.storeAny();
-  // if (!orderStartData) return { success: false, message: "Failed to store order start" };
+  if (!orderStartData) return { success: false, message: "Failed to store order start" };
   // console.log("ORDER START DATA");
   // console.log(orderStartData);
 
@@ -86,7 +86,7 @@ export const storeOrderData = async (payment, cart, inputParams) => {
   console.log("UPDATE PARAMS");
   console.log(updateParams);
 
-  const updateModel = new dbModel({ keyToLookup: "_id", itemValue: orderId, updateObj: updateParams }, ordersCollection);
+  const updateModel = new dbModel({ keyToLookup: "_id", itemValue: orderStartData.insertedId, updateObj: updateParams }, ordersCollection);
   const updateData = await updateModel.updateObjItem();
   console.log("UPDATE DATA");
   console.log(updateData);
