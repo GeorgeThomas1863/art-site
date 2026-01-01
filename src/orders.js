@@ -10,14 +10,16 @@ export const runPlaceOrder = async (req) => {
   const cart = await runGetCartStats(req);
   if (!cart || !cart.success || !cart.total) return { success: false, message: "Failed to get cart data" };
 
-  console.log("RUN PLACE ORDER");
-  console.log("INPUT PARAMS");
-  console.log(inputParams);
-  console.log("CART");
-  console.log(cart);
+  // console.log("RUN PLACE ORDER");
+  // console.log("INPUT PARAMS");
+  // console.log(inputParams);
+  // console.log("CART");
+  // console.log(cart);
 
   //TEST THIS
   const data = await processPayment(cart.total, inputParams);
+  // console.log("PROCESS PAYMENT DATA");
+  // console.log(data);
   if (!data || !data.success) return { success: false, message: "Failed to process payment" };
 
   const orderData = await storeOrderData(data.payment, cart, inputParams);
@@ -35,26 +37,42 @@ export const storeOrderData = async (payment, cart, inputParams) => {
   const { total, items } = cart;
   const { id: paymentId, orderId: squareOrderId, status, createdAt, totalMoney, approvedMoney, billingAddress, riskEvaluation, delayedAction, delayedUntil, receiptNumber, receiptUrl } = payment; //prettier-ignore
 
-  //start order to get internal id
-  const orderStartModel = new dbModel("orderStart", ordersCollection);
-  const orderStartData = await orderStartModel.storeAny();
-  if (!orderStartData) return { success: false, message: "Failed to store order start" };
+  console.log("ORDERS COLLECTION");
+  console.log(ordersCollection);
 
+  const startParams = {
+    itemCost: Number(total).toFixed(2),
+    tax: (Number(total) * 0.08).toFixed(2),
+    orderItems: items,
+    customerData: customerObj,
+  };
+
+  //start order to get internal id
+  const orderStartModel = new dbModel(startParams, ordersCollection);
+  const orderStartData = await orderStartModel.storeAny();
+  // if (!orderStartData) return { success: false, message: "Failed to store order start" };
+  console.log("ORDER START DATA");
+  console.log(orderStartData);
+
+  //set order id to mongo id
   const orderId = orderStartData.insertedId?.toString() || null;
+  console.log("ORDER ID");
+  console.log(orderId);
+
   if (!orderId) return { success: false, message: "Failed to get order start id" };
+
+  console.log("AHHHHHHHHHHHHHHHHHHH");
 
   //build rest of order data
   const updateParams = {
-    itemCost: total,
-    tax: total * 0.08,
-    orderItems: items,
     //----------
+    orderId: orderId,
     paymentId: paymentId,
     squareOrderId: squareOrderId,
     paymentStatus: status,
     orderDate: createdAt,
-    totalCost: totalMoney.amount / 100, //convert to dollars
-    amountPaid: approvedMoney.amount / 100, //convert to dollars
+    totalCost: (Number(totalMoney.amount) / 100).toFixed(2), //convert to dollars
+    amountPaid: (Number(approvedMoney.amount) / 100).toFixed(2), //convert to dollars
     currency: approvedMoney.currency,
     billingAddress: billingAddress,
     risk: riskEvaluation.riskLevel,
@@ -62,16 +80,15 @@ export const storeOrderData = async (payment, cart, inputParams) => {
     delayedUntil: delayedUntil,
     receiptNumber: receiptNumber,
     receiptURL: receiptUrl,
-    //--------
-    customerData: customerObj,
   };
+
+  console.log("UPDATE PARAMS");
+  console.log(updateParams);
 
   const updateModel = new dbModel({ keyToLookup: "_id", itemValue: orderId, updateObj: updateParams }, ordersCollection);
   const updateData = await updateModel.updateObjItem();
   console.log("UPDATE DATA");
   console.log(updateData);
-
-  updateParams.orderId = orderId;
 
   return updateParams;
 };
