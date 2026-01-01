@@ -1878,6 +1878,7 @@ h3 {
   transition: all 0.3s;
   border-radius: 4px;
   margin-top: 1.5rem;
+  margin-left: auto;
 }
 
 .confirm-receipt-link:hover {

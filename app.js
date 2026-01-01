@@ -1,21 +1,22 @@
 //make order submission less dumb in buy.js
 
+//add dates to product upload
+
+//switch product filter to buttons; include type descriptions on click
+
+//Build page or popup for product details
+
+//add in facebook and insta connections
+
+//add about and events display pages
+
+//-----------------
 
 //BUGS: price of items in cart needs to changed based on quantity
 
 //fix square styles for card input
 
 //test purchases with my square acct
-
-//add dates to product upload
-
-//switch product filter to buttons; include type descriptions on click
-
-//Build model or popup for product details
-
-//add in facebook and insta connections
-
-//add about and events display pages
 
 //add events create and mailing list to ADMIN / Mongo
 
