@@ -54,11 +54,16 @@ export const storeOrderData = async (payment, cart, inputParams) => {
   const { total, itemCount } = cart;
   const { id: paymentId, orderId: squareOrderId, status, createdAt, totalMoney, approvedMoney, billingAddress, riskEvaluation, delayAction, delayedUntil, receiptNumber, receiptUrl } = payment; //prettier-ignore
 
+  const orderNumber = await getOrderNumber();
+  console.log("ORDER NUMBER");
+  console.log(orderNumber);
+
   const startParams = {
     itemCost: +Number(total).toFixed(2),
     tax: +(Number(total) * 0.08).toFixed(2),
     itemCount: +itemCount,
     customerData: customerObj,
+    orderNumber: orderNumber,
   };
 
   //start order to get internal id
@@ -95,8 +100,8 @@ export const storeOrderData = async (payment, cart, inputParams) => {
 
   const updateModel = new dbModel({ keyToLookup: "_id", itemValue: orderStartData.insertedId, updateObj: updateParams }, ordersCollection);
   const updateData = await updateModel.updateObjItem();
-  // console.log("UPDATE DATA");
-  // console.log(updateData);
+  console.log("UPDATE DATA");
+  console.log(updateData);
 
   const returnObj = { ...startParams, ...updateParams };
 
@@ -187,4 +192,20 @@ export const updateCustomerData = async (inputParams) => {
   const updateData = await updateModel.updateObjItem();
   if (!updateData) return null;
   return updateParams;
+};
+
+//----------
+
+export const getOrderNumber = async () => {
+  const { ordersCollection } = CONFIG;
+
+  const dataModel = new dbModel({ keyToLookup: "orderNumber" }, ordersCollection);
+  const orderNumber = await dataModel.getMaxId();
+
+  console.log("ORDER NUMBER");
+  console.log(orderNumber);
+
+  if (!orderNumber) return 1;
+
+  return orderNumber + 1;
 };

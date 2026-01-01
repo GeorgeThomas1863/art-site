@@ -47,6 +47,15 @@ class dbModel {
     return dataArray;
   }
 
+  async getMaxId() {
+    const keyToLookup = this.dataObject.keyToLookup;
+    const dataObj = await dbGet().collection(this.collection).find().sort({ [keyToLookup]: -1 }).limit(1).toArray(); //prettier-ignore
+
+    if (!dataObj || !dataObj[0]) return null;
+
+    return +dataObj[0][keyToLookup];
+  }
+
   //--------------
 
   async deleteItem() {
