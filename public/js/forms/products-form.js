@@ -37,15 +37,13 @@ export const buildProductsFilterBar = async () => {
   const filterBar = document.createElement("div");
   filterBar.className = "products-filter-bar";
 
-  const filterLabel = document.createElement("label");
-  filterLabel.className = "products-filter-label";
-  filterLabel.textContent = "Filter by Category:";
-  filterLabel.setAttribute("for", "category-filter");
+  // const filterLabel = document.createElement("label");
+  // filterLabel.className = "products-filter-label";
+  // filterLabel.textContent = "Filter by Category:";
+  // filterLabel.setAttribute("for", "category-filter");
 
-  const filterSelect = document.createElement("select");
-  filterSelect.className = "products-filter-select";
-  filterSelect.id = "category-filter";
-  filterSelect.name = "category-filter";
+  const filterButtons = document.createElement("div");
+  filterButtons.className = "products-filter-buttons";
 
   const filterOptions = [
     { value: "all", text: "All Products", selected: true },
@@ -58,16 +56,20 @@ export const buildProductsFilterBar = async () => {
 
   for (let i = 0; i < filterOptions.length; i++) {
     const optionData = filterOptions[i];
-    const option = document.createElement("option");
-    option.value = optionData.value;
-    option.textContent = optionData.text;
+    const button = document.createElement("button");
+    button.className = "products-filter-btn";
+    button.setAttribute("data-label", "category-filter-btn");
+    button.setAttribute("data-category", optionData.value);
+    button.textContent = optionData.text;
+
     if (optionData.selected) {
-      option.selected = true;
+      button.classList.add("active");
     }
-    filterSelect.append(option);
+    filterButtons.append(button);
   }
 
-  filterBar.append(filterLabel, filterSelect);
+  // filterBar.append(filterLabel, filterButtons);
+  filterBar.append(filterButtons);
 
   return filterBar;
 };

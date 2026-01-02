@@ -1,36 +1,26 @@
-//add dates to product upload
+//build shipping calculator
 
-//switch product filter to buttons; include type descriptions on click
+// tax location RESEARCH
+
+//add category descriptions to products page display
 
 //Build page or popup for product details
 
 //add in facebook and insta connections
 
-//add about and events display pages
+//build backend for adding events / newsletter (email mailing list)
+
+//add about, events, contact us, newsletter  display pages
+
+//rotating pics on about
+
+//add in the color display changes they made
 
 //-----------------
 
 //BUGS: price of items in cart needs to changed based on quantity
 
 //fix square styles for card input
-
-//test purchases with my square acct
-
-//add events create and mailing list to ADMIN / Mongo
-
-//ADD CATEGORY DESCRIPTIONS
-
-// email mailing list
-
-// contact us form
-
-// event upload / newslettre
-
-// rotating pics on about
-
-// tax location RESEARCH
-
-//ask about 3 pics or 2 pics on main page
 
 import express from "express";
 import session from "express-session";

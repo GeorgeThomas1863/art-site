@@ -1,6 +1,6 @@
 import { runTabClick, runAddNewProduct, runEditProduct, runDeleteProduct, changeAdminProductSelector } from "./helpers/admin-run.js"; //prettier-ignore
 import { runUploadClick, runUploadPic } from "./helpers/upload-pic.js";
-import { changeProductsFilter } from "./helpers/products-run.js";
+import { changeProductsFilterButton } from "./helpers/products-run.js";
 import { runAddToCart, runIncreaseQuantity, runDecreaseQuantity, runRemoveFromCart } from "./helpers/cart-run.js";
 import { runPlaceOrder } from "./helpers/buy-run.js";
 import { runAuthSubmit, runPwToggle } from "./auth.js";
@@ -32,6 +32,8 @@ export const clickHandler = async (e) => {
 
   if (tabType) await runTabClick(clickElement);
   if (clickType === "upload-click" || clickType === "edit-upload-click") await runUploadClick(clickElement);
+
+  if (clickType === "category-filter-btn") await changeProductsFilterButton(clickElement);
 
   if (clickType === "add-to-cart") await runAddToCart(clickElement);
   if (clickType === "increase-quantity") await runIncreaseQuantity(clickElement);
@@ -83,7 +85,7 @@ export const changeHandler = async (e) => {
   //Product selector
   if (changeId === "product-selector") await changeAdminProductSelector(changeElement);
 
-  if (changeId === "category-filter") await changeProductsFilter(changeElement);
+  // if (changeId === "category-filter") await changeProductsFilter(changeElement);
 };
 
 if (authElement) {

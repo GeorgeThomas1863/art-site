@@ -66,13 +66,19 @@ export const formatProductType = async (productType) => {
 
 //----------------------------
 
-export const changeProductsFilter = async (changeElement) => {
-  if (!changeElement) return null;
+export const changeProductsFilterButton = async (clickElement) => {
+  if (!clickElement) return null;
 
-  // const selectedOption = changeElement.options[changeElement.selectedIndex];
-  const categoryFilter = changeElement.value;
+  const categoryFilter = clickElement.getAttribute("data-category");
   console.log("FILTERING BY CATEGORY:");
   console.log(categoryFilter);
+
+  // Update active button state
+  const allFilterButtons = document.querySelectorAll(".products-filter-btn");
+  for (let i = 0; i < allFilterButtons.length; i++) {
+    allFilterButtons[i].classList.remove("active");
+  }
+  clickElement.classList.add("active");
 
   const filteredArray = await filterProducts(productsArray, categoryFilter);
 
@@ -96,3 +102,34 @@ export const changeProductsFilter = async (changeElement) => {
 
   return true;
 };
+
+// export const changeProductsFilter = async (changeElement) => {
+//   if (!changeElement) return null;
+
+//   // const selectedOption = changeElement.options[changeElement.selectedIndex];
+//   const categoryFilter = changeElement.value;
+//   console.log("FILTERING BY CATEGORY:");
+//   console.log(categoryFilter);
+
+//   const filteredArray = await filterProducts(productsArray, categoryFilter);
+
+//   // Repopulate the grid with filtered products
+//   const productsGrid = document.getElementById("products-grid");
+
+//   if (!productsGrid) {
+//     console.error("Products grid not found");
+//     return;
+//   }
+
+//   // Clear existing products
+//   productsGrid.innerHTML = "";
+
+//   // Build and append each filtered product card
+//   for (let i = 0; i < filteredArray.length; i++) {
+//     const product = filteredArray[i];
+//     const productCard = await buildProductCard(product);
+//     productsGrid.append(productCard);
+//   }
+
+//   return true;
+// };
