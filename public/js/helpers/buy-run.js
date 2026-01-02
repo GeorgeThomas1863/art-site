@@ -6,8 +6,6 @@ import { buildConfirmItem } from "../forms/confirm-form.js";
 
 //main purchase function
 export const runPlaceOrder = async () => {
-  console.log("RUN PLACE ORDER");
-
   // Validate customer info form
   const customerForm = document.getElementById("customer-info-form");
   if (!customerForm.checkValidity()) {
@@ -46,33 +44,31 @@ export const runPlaceOrder = async () => {
     console.log("DATA");
     console.dir(data);
 
-    if (data && data.success) {
-      console.log("DATA SUCCESS");
-      console.log(data);
-
-      //claude suggestion for storing the returned data
-      sessionStorage.setItem("orderData", JSON.stringify(data));
-
-      // Redirect to success page
-      window.location.href = `/confirm-order`;
-    } else {
+    //fail
+    if (!data || !data.success) {
       const errorContainer = document.getElementById("payment-error");
-      if (errorContainer) {
-        errorContainer.textContent = data.message || "Order processing failed";
-        errorContainer.style.display = "block";
-      }
+      if (!errorContainer) return null;
+
+      errorContainer.textContent = data.message || "Order processing failed";
+      errorContainer.style.display = "block";
       placeOrderBtn.disabled = false;
       placeOrderBtn.textContent = "Place Order";
+      return null;
     }
-  } catch (error) {
-    console.error("Error processing order:", error);
+
+    //store returned data and redirect
+    sessionStorage.setItem("orderData", JSON.stringify(data));
+    window.location.href = `/confirm-order`;
+  } catch (e) {
+    console.error("Error processing order:", e);
     const errorContainer = document.getElementById("payment-error");
-    if (errorContainer) {
-      errorContainer.textContent = "An error occurred. Please try again.";
-      errorContainer.style.display = "block";
-    }
+    if (!errorContainer) return null;
+    errorContainer.textContent = "An error occurred. Please try again.";
+    errorContainer.style.display = "block";
+
     placeOrderBtn.disabled = false;
     placeOrderBtn.textContent = "Place Order";
+    return null;
   }
 
   return true;
@@ -184,6 +180,11 @@ export const populateConfirmOrder = async () => {
 
   await displayOrderDetails(data);
   await displayOrderItems(data);
+
+  //clear cart on success
+  if (data.orderData.paymentStatus === "COMPLETED") {
+    await sendToBack({ route: "/cart/clear" });
+  }
 
   return true;
 };

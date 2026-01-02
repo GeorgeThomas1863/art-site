@@ -1,5 +1,6 @@
-export const getNewProductParams = async () => {
+export const buildNewProductParams = async () => {
   const params = {
+    route: "/add-new-product-route",
     name: document.getElementById("name").value,
     productType: document.getElementById("product-type").value,
     price: document.getElementById("price").value,
@@ -7,6 +8,7 @@ export const getNewProductParams = async () => {
     display: document.getElementById("display").value,
     sold: document.getElementById("sold").value,
     picData: document.getElementById("upload-button").uploadData,
+    dateCreated: new Date().toISOString(),
   };
   return params;
 };

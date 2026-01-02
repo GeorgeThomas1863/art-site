@@ -1,6 +1,6 @@
 import { ADMIN_EDIT_DEFAULT_ARRAY } from "../util/define-things.js";
 import { sendToBack } from "../util/api-front.js";
-import { getNewProductParams, getEditProductParams } from "../util/params.js";
+import { buildNewProductParams, getEditProductParams } from "../util/params.js";
 import { displayPopup, displayConfirmDialog } from "./popup.js";
 
 //EVENT HANDLERS
@@ -39,13 +39,16 @@ export const runTabClick = async (clickElement) => {
 
 //------
 
-//Add
+//Add product
 export const runAddNewProduct = async () => {
-  const newProductParams = await getNewProductParams();
+  const newProductParams = await buildNewProductParams();
   if (!newProductParams || !newProductParams.name || !newProductParams.price) {
     await displayPopup("Please fill in all product fields before submitting", "error");
     return null;
   }
+
+  console.log("NEW PRODUCT PARAMS");
+  console.dir(newProductParams);
 
   //check if image uploaded
   const uploadButton = document.getElementById("upload-button");
@@ -53,10 +56,6 @@ export const runAddNewProduct = async () => {
     await displayPopup("Please upload an image of the product first", "error");
     return null;
   }
-
-  newProductParams.route = "/add-new-product-route";
-  console.log("NEW PRODUCT PARAMS");
-  console.dir(newProductParams);
 
   const data = await sendToBack(newProductParams);
   if (!data || !data.success) {
@@ -66,8 +65,8 @@ export const runAddNewProduct = async () => {
 
   console.log("DATA");
   console.dir(data);
-  const popupText = `Product "${data.name}" added successfully`;
 
+  const popupText = `Product "${data.name}" added successfully`;
   await displayPopup(popupText, "success");
 
   // Clear the form after successful submission
@@ -78,7 +77,7 @@ export const runAddNewProduct = async () => {
 
 //----
 
-//Edit
+//Edit product
 export const runEditProduct = async () => {
   // Need to get the selected product ID first
   const productSelector = document.getElementById("product-selector");

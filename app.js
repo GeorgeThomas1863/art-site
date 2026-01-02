@@ -1,5 +1,3 @@
-//make order submission less dumb in buy.js
-
 //add dates to product upload
 
 //switch product filter to buttons; include type descriptions on click
