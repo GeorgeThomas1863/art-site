@@ -7,6 +7,7 @@ export const buildCartForm = async () => {
   const cartContent = await buildCartContent();
 
   cartContainer.append(pageHeader, cartContent);
+  cartContainer.append(cartContent);
 
   return cartContainer;
 };
@@ -17,7 +18,7 @@ export const buildCartPageHeader = async () => {
 
   const pageTitle = document.createElement("h1");
   pageTitle.className = "cart-page-title";
-  pageTitle.textContent = "Shopping Cart";
+  pageTitle.textContent = "My Shopping Cart";
 
   pageHeader.append(pageTitle);
 

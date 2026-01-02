@@ -72,10 +72,6 @@ h3 {
 /* ---------------------------------------------- */
 
 /* ADMIN FORM STYLES */
-#admin-element {
-  font-family: "Georgia", serif;
-}
-
 .admin-form-wrapper {
   font-family: "Georgia", serif;
   margin: 1.5rem auto;
@@ -541,6 +537,7 @@ h3 {
 }
 
 .navbar {
+  font-family: "Indie Flower", cursive;
   background-color: rgba(0, 0, 0, 0.95);
   padding: 1.2rem 4rem;
   border-bottom: 1px solid #333;
@@ -716,6 +713,9 @@ h3 {
 /* ++++++++++++++++++++++++++++++++++++++++++++++++++++ */
 
 /* PRODUCTS FORM STYLES */
+#products-element {
+  font-family: "Indie Flower", cursive;
+}
 
 .products-container {
   max-width: 1400px;
@@ -1299,12 +1299,13 @@ h3 {
 
 .cart-count {
   position: absolute;
-  top: -8px;
-  right: -12px;
+  top: -12px;
+  right: -16px;
   background-color: #dc2626;
   color: #ffffff;
-  font-size: 0.75rem;
-  font-weight: 600;
+  /* font-size: 0.75rem; */
+  font-size: 1rem;
+  /* font-weight: 600; */
   padding: 0.2rem 0.5rem;
   border-radius: 50%;
   min-width: 20px;
