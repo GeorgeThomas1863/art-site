@@ -1020,16 +1020,6 @@ h3 {
   gap: 1.5rem;
 }
 
-/* .cart-item {
-  display: grid;
-  grid-template-columns: 120px 1fr auto;
-  gap: 1.5rem;
-  padding: 1.5rem;
-  border: 1px solid #e0e0e0;
-  border-radius: 4px;
-  background: #fafafa;
-} */
-
 .cart-item {
   display: flex;
   gap: 1.5rem;
@@ -1040,10 +1030,12 @@ h3 {
   max-height: 200px;
 }
 
-/* .cart-item-image-container {
-  width: 120px;
-  height: 120px;
-} */
+.cart-right-column {
+  display: flex;
+  flex-direction: column;
+  position: sticky;
+  top: 100px;
+}
 
 .cart-item-image-container {
   flex: 0 0 250px;
@@ -1376,6 +1368,109 @@ h3 {
   text-align: center;
 }
 
+/* --------------- */
+
+/* SHIPPING SECTION */
+
+/* Shipping Calculator Section */
+.shipping-calculator-card {
+  background: #ffffff;
+  border-radius: 4px;
+  padding: 1.5rem;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+  border: 1px solid #e0e0e0;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  margin-top: 2rem;
+}
+
+.shipping-calculator-title {
+  font-size: 1rem;
+  font-weight: 400;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  color: #666;
+  padding-bottom: 0.75rem;
+  border-bottom: 1px solid #e0e0e0;
+}
+
+.shipping-calculator-form {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.shipping-calculator-input {
+  margin: 0 auto;
+  width: 90%;
+  font-family: "Georgia", serif;
+  font-size: 0.9rem;
+  border: 1px solid #333;
+  padding: 0.7rem 0.9rem;
+  transition: border-color 0.3s;
+  border-radius: 4px;
+}
+
+.shipping-calculator-input:focus {
+  outline: none;
+  border-color: #bbb;
+}
+
+.shipping-calculator-input::placeholder {
+  color: #999;
+}
+
+.shipping-calculator-btn {
+  margin: 0 auto;
+  width: 90%;
+  font-family: "Georgia", serif;
+  font-size: 0.75rem;
+  font-weight: 400;
+  letter-spacing: 1px;
+  background-color: transparent;
+  border: 1px solid #333;
+  padding: 0.7rem 1.2rem;
+  cursor: pointer;
+  transition: all 0.3s;
+  text-transform: uppercase;
+  border-radius: 4px;
+}
+
+.shipping-calculator-btn:hover {
+  background-color: #f0f0f0;
+  color: #1a1a1a;
+}
+
+.shipping-calculator-btn:active {
+  background-color: #e5e5e5;
+  transform: translateY(1px);
+}
+
+.shipping-calculator-result {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.75rem;
+  background: #f5f5f5;
+  border: 1px solid #e0e0e0;
+  border-radius: 4px;
+  margin-top: 0.25rem;
+}
+
+.shipping-result-label {
+  font-weight: 400;
+  letter-spacing: 0.5px;
+  color: #666;
+  font-size: 0.85rem;
+}
+
+.shipping-result-value {
+  font-weight: 500;
+  letter-spacing: 1px;
+  color: #000000;
+  font-size: 1rem;
+}
 /* ++++++++++++++++++++++++++++++++++++++++++++++ */
 
 /* CHECKOUT FORM STYLES */

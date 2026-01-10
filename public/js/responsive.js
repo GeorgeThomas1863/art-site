@@ -2,7 +2,7 @@ import { runTabClick, runAddNewProduct, runEditProduct, runDeleteProduct, change
 import { runUploadClick, runUploadPic } from "./helpers/upload-pic.js";
 import { changeProductsFilterButton } from "./helpers/products-run.js";
 import { runAddToCart, runIncreaseQuantity, runDecreaseQuantity, runRemoveFromCart } from "./helpers/cart-run.js";
-import { runPlaceOrder } from "./helpers/buy-run.js";
+import { runPlaceOrder, runCalculateShipping } from "./helpers/buy-run.js";
 import { runAuthSubmit, runPwToggle } from "./auth.js";
 import { closePopup, closeConfirmDialog } from "./helpers/popup.js";
 
@@ -39,6 +39,8 @@ export const clickHandler = async (e) => {
   if (clickType === "increase-quantity") await runIncreaseQuantity(clickElement);
   if (clickType === "decrease-quantity") await runDecreaseQuantity(clickElement);
   if (clickType === "remove-from-cart") await runRemoveFromCart(clickElement);
+
+  if (clickType === "calculate-shipping") await runCalculateShipping(clickElement);
 
   if (clickType === "checkout-btn") window.location.href = "/checkout";
   if (clickType === "place-order") await runPlaceOrder();

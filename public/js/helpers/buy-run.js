@@ -3,6 +3,8 @@ import { buildCheckoutItem } from "../forms/checkout-form.js";
 import { buildSquarePayment, tokenizePaymentMethod } from "./square-payment.js";
 import { getCustomerParams } from "../util/params.js";
 import { buildConfirmItem } from "../forms/confirm-form.js";
+import { displayPopup } from "./popup.js";
+import { updateCartSummary } from "./cart-run.js";
 
 //main purchase function
 export const runPlaceOrder = async () => {
@@ -263,6 +265,54 @@ export const displayOrderItems = async (inputData) => {
     const confirmItem = await buildConfirmItem(item);
     itemsContainer.append(confirmItem);
   }
+
+  return true;
+};
+
+//---------------------
+
+//SHIPPING
+export const runCalculateShipping = async (clickElement) => {
+  if (!clickElement) return null;
+
+  const zipInput = document.getElementById("cart-shipping-zip-input");
+  if (!zipInput) return null;
+
+  const zip = zipInput.value.trim();
+
+  // Validate ZIP
+  if (!zip || zip.length !== 5 || !/^\d{5}$/.test(zip)) {
+    await displayPopup("Please enter a valid 5-digit ZIP code", "error");
+    return null;
+  }
+
+  // TODO: Call backend to calculate shipping
+  // For now, mock response
+  const data = await sendToBack({ route: "/checkout/shipping", zipCode: zip });
+  if (!data || !data.success) {
+    const errorMsg = data?.error || "Failed to calculate shipping";
+    await displayPopup(errorMsg, "error");
+    return null;
+  }
+
+  const shippingCost = data.cost;
+
+  // Show result in calculator
+  const resultDiv = document.getElementById("shipping-calculator-result");
+  const resultValue = document.getElementById("shipping-result-value");
+  if (resultDiv && resultValue) {
+    resultValue.textContent = `$${shippingCost.toFixed(2)}`;
+    resultDiv.style.display = "flex";
+  }
+
+  // Update summary shipping
+  const shippingElement = document.getElementById("cart-summary-shipping");
+  if (shippingElement) {
+    shippingElement.textContent = `$${shippingCost.toFixed(2)}`;
+  }
+
+  await updateCartSummary(shippingCost);
+  await displayPopup("Shipping calculated successfully", "success");
 
   return true;
 };

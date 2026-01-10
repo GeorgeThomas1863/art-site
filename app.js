@@ -1,6 +1,6 @@
-//build shipping calculator
+//ask how they want to do shipping
 
-// tax location RESEARCH
+//integrate tax cloud
 
 //add category descriptions to products page display
 

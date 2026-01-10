@@ -117,3 +117,5 @@ export const placeOrderControl = async (req, res) => {
 
   return res.json(jsonData);
 };
+
+export const calculateShippingControl = async (req, res) => {}

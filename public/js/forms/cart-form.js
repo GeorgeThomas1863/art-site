@@ -18,7 +18,7 @@ export const buildCartPageHeader = async () => {
 
   const pageTitle = document.createElement("h1");
   pageTitle.className = "cart-page-title";
-  pageTitle.textContent = "My Shopping Cart";
+  pageTitle.textContent = "Shopping Cart";
 
   pageHeader.append(pageTitle);
 
@@ -29,10 +29,17 @@ export const buildCartContent = async () => {
   const cartContent = document.createElement("div");
   cartContent.className = "cart-content";
 
+  // Create a wrapper for the right column
+  const rightColumnWrapper = document.createElement("div");
+  rightColumnWrapper.className = "cart-right-column";
+
   const cartItemsSection = await buildCartItemsSection();
   const cartSummarySection = await buildCartSummarySection();
+  const shippingSection = await buildShippingSection();
 
-  cartContent.append(cartItemsSection, cartSummarySection);
+  rightColumnWrapper.append(cartSummarySection, shippingSection);
+
+  cartContent.append(cartItemsSection, rightColumnWrapper);
 
   return cartContent;
 };
@@ -66,6 +73,9 @@ export const buildCartSummarySection = async () => {
 
   const itemCountRow = await buildSummaryRow("Items:", "0", "cart-summary-item-count");
   const subtotalRow = await buildSummaryRow("Subtotal:", "$0.00", "cart-summary-subtotal");
+  const shippingRow = await buildSummaryRow("Shipping:", "[Calculated at checkout]", "cart-summary-shipping");
+
+  // const shippingSection = await buildShippingSection();
 
   const totalRow = document.createElement("div");
   totalRow.className = "cart-summary-row cart-summary-total";
@@ -81,7 +91,7 @@ export const buildCartSummarySection = async () => {
 
   totalRow.append(totalLabel, totalValue);
 
-  summaryDetails.append(itemCountRow, subtotalRow, totalRow);
+  summaryDetails.append(itemCountRow, subtotalRow, shippingRow, totalRow);
 
   const checkoutBtn = document.createElement("button");
   checkoutBtn.className = "cart-checkout-btn";
@@ -257,4 +267,56 @@ export const buildEmptyCart = async () => {
   emptyContainer.append(emptyIcon, emptyMessage, shopLink);
 
   return emptyContainer;
+};
+
+//-------------------
+
+export const buildShippingSection = async () => {
+  const shippingSection = document.createElement("div");
+  shippingSection.className = "shipping-calculator-section";
+
+  const shippingCard = document.createElement("div");
+  shippingCard.className = "shipping-calculator-card";
+
+  const shippingTitle = document.createElement("h2");
+  shippingTitle.className = "shipping-calculator-title";
+  shippingTitle.textContent = "View Shipping Cost";
+
+  const shippingForm = document.createElement("div");
+  shippingForm.className = "shipping-calculator-form";
+
+  const zipInput = document.createElement("input");
+  zipInput.type = "text";
+  zipInput.className = "shipping-calculator-input";
+  zipInput.id = "cart-shipping-zip-input";
+  zipInput.placeholder = "Enter ZIP Code";
+  zipInput.maxLength = "5";
+
+  const calculateBtn = document.createElement("button");
+  calculateBtn.className = "shipping-calculator-btn";
+  calculateBtn.id = "cart-shipping-calculate-btn";
+  calculateBtn.textContent = "Calculate Shipping";
+  calculateBtn.setAttribute("data-label", "calculate-shipping");
+
+  const shippingResult = document.createElement("div");
+  shippingResult.className = "shipping-calculator-result";
+  shippingResult.id = "shipping-calculator-result";
+  shippingResult.style.display = "none";
+
+  const resultLabel = document.createElement("span");
+  resultLabel.className = "shipping-result-label";
+  resultLabel.textContent = "Estimated Shipping:";
+
+  const resultValue = document.createElement("span");
+  resultValue.className = "shipping-result-value";
+  resultValue.id = "shipping-result-value";
+  resultValue.textContent = "$0.00";
+
+  shippingResult.append(resultLabel, resultValue);
+
+  shippingForm.append(zipInput, calculateBtn, shippingResult);
+  shippingCard.append(shippingTitle, shippingForm);
+  shippingSection.append(shippingCard);
+
+  return shippingSection;
 };

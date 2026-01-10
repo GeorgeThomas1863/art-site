@@ -261,8 +261,8 @@ export const displayCart = async (cartItems) => {
   return true;
 };
 
-// Update cart summary (totals, item count)
-export const updateCartSummary = async () => {
+// Update cart summary (totals, item count), remove param
+export const updateCartSummary = async (shippingCost = 0) => {
   const response = await sendToBack({ route: "/cart/stats" }, "GET");
 
   if (!response) {
@@ -283,11 +283,14 @@ export const updateCartSummary = async () => {
   if (subtotalElement) {
     subtotalElement.textContent = `$${total.toFixed(2)}`;
   }
+  
+  //can prob remove
+  const finalTotal = total + shippingCost;
 
   // Update total
   const totalElement = document.getElementById("cart-summary-total");
   if (totalElement) {
-    totalElement.textContent = `$${total.toFixed(2)}`;
+    totalElement.textContent = `$${finalTotal.toFixed(2)}`;
   }
 
   return true;
