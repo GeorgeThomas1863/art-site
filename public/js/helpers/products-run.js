@@ -1,5 +1,4 @@
-import { buildProductCard } from "../forms/products-form.js";
-// import { addToCart } from "./cart-run.js";
+import { buildProductCard, buildCategoryDescription } from "../forms/products-form.js";
 
 //store locally for filtering
 let productsArray = [];
@@ -82,7 +81,6 @@ export const changeProductsFilterButton = async (clickElement) => {
 
   const filteredArray = await filterProducts(productsArray, categoryFilter);
 
-  // Repopulate the grid with filtered products
   const productsGrid = document.getElementById("products-grid");
 
   if (!productsGrid) {
@@ -90,7 +88,6 @@ export const changeProductsFilterButton = async (clickElement) => {
     return;
   }
 
-  // Clear existing products
   productsGrid.innerHTML = "";
 
   // Build and append each filtered product card
@@ -100,36 +97,22 @@ export const changeProductsFilterButton = async (clickElement) => {
     productsGrid.append(productCard);
   }
 
+  await updateCategoryDescription(categoryFilter);
+
   return true;
 };
 
-// export const changeProductsFilter = async (changeElement) => {
-//   if (!changeElement) return null;
+export const updateCategoryDescription = async (category) => {
+  // Remove existing description if present
+  const existingDescription = document.querySelector(".category-description-container");
+  if (existingDescription) existingDescription.remove();
 
-//   // const selectedOption = changeElement.options[changeElement.selectedIndex];
-//   const categoryFilter = changeElement.value;
-//   console.log("FILTERING BY CATEGORY:");
-//   console.log(categoryFilter);
+  // Build new description for this category
+  const newDescription = await buildCategoryDescription(category);
+  if (!newDescription) return null;
 
-//   const filteredArray = await filterProducts(productsArray, categoryFilter);
+  const filterBar = document.querySelector(".products-filter-bar");
+  if (filterBar) filterBar.insertAdjacentElement("afterend", newDescription);
 
-//   // Repopulate the grid with filtered products
-//   const productsGrid = document.getElementById("products-grid");
-
-//   if (!productsGrid) {
-//     console.error("Products grid not found");
-//     return;
-//   }
-
-//   // Clear existing products
-//   productsGrid.innerHTML = "";
-
-//   // Build and append each filtered product card
-//   for (let i = 0; i < filteredArray.length; i++) {
-//     const product = filteredArray[i];
-//     const productCard = await buildProductCard(product);
-//     productsGrid.append(productCard);
-//   }
-
-//   return true;
-// };
+  return true;
+};

@@ -46,6 +46,8 @@ export const buildProductsDisplay = async () => {
   await populateProducts(productData);
   await updateNavbarCart();
 
+  await updateCategoryDescription("all");
+
   return true;
 };
 

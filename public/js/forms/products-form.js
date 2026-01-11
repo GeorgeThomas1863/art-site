@@ -1,4 +1,5 @@
 import { formatProductType } from "../helpers/products-run.js";
+import { buildCollapseContainer } from "../util/collapse.js";
 
 // Build the entire products page
 export const buildProductsForm = async () => {
@@ -37,11 +38,6 @@ export const buildProductsFilterBar = async () => {
   const filterBar = document.createElement("div");
   filterBar.className = "products-filter-bar";
 
-  // const filterLabel = document.createElement("label");
-  // filterLabel.className = "products-filter-label";
-  // filterLabel.textContent = "Filter by Category:";
-  // filterLabel.setAttribute("for", "category-filter");
-
   const filterButtons = document.createElement("div");
   filterButtons.className = "products-filter-buttons";
 
@@ -75,6 +71,31 @@ export const buildProductsFilterBar = async () => {
   return filterBar;
 };
 
+//---------------------
+
+export const buildCategoryDescription = async (category) => {
+  const descriptionObj = categoryDescriptions[category];
+  if (!descriptionObj) return null;
+
+  const titleElement = document.createElement("h3");
+  titleElement.textContent = `${descriptionObj.title}`;
+
+  const contentElement = document.createElement("div");
+  contentElement.textContent = descriptionObj.details;
+
+  // Build collapse container
+  const collapseContainer = await buildCollapseContainer({
+    titleElement: titleElement,
+    contentElement: contentElement,
+    isExpanded: true, // Start expanded
+    className: "category-description-container",
+  });
+
+  return collapseContainer;
+};
+
+//---------------------------------
+
 // Build the products grid container
 export const buildProductsGrid = async () => {
   const productsGrid = document.createElement("div");
@@ -83,8 +104,6 @@ export const buildProductsGrid = async () => {
 
   return productsGrid;
 };
-
-//---------------------------------
 
 // Build individual product card
 export const buildProductCard = async (productData) => {
@@ -194,15 +213,61 @@ export const buildProductTypeBadge = async (productData) => {
   return productType;
 };
 
-// // Build product footer with type badge and add to cart button
-// export const buildProductHeader = async (productData) => {
-//   const productHeader = document.createElement("div");
-//   productHeader.className = "product-header";
+//----------------------
 
-//   const productType = await buildProductTypeBadge(productData);
-//   const addToCartBtn = await buildAddToCartButton(productData);
+export const categoryDescriptions = {
+  all: {
+    title: "About Our Products",
+    details: `Handmade with love from wool and other natural materials, each product has a unique story and a special place in our hearts.
+    
+Click on the categories to learn more.`,
+  },
 
-//   productHeader.append(productType, addToCartBtn);
+  acorns: {
+    title: "Acorns",
+    details: `The acorn ornaments are created using acorn caps from the Bur Oak tree. The Bur Oak produces the largest acorns in North America. These trees can be found in many states and are very adaptable to soil and weather conditions. They are very hardy and live for centuries.  Bur Oak trees provide food and shelter to many species of wildlife.
 
-//   return productHeader;
-// };
+We are always on the search for other types of acorn caps which we use for our smaller felted acorns, jewelry, and other creations.
+    
+We have wonderful customers, family and friends who also gather acorn caps for us, it does take a village and we are so grateful to be a part of it.
+`,
+  },
+
+  animals: {
+    title: "Funky Fun Animals!",
+    details: `These whimsical creatures are designed to bring joy to all who see them.
+
+The animals are created with natural fleece, wool roving, wool locks and twists along with other embelishments.
+`,
+  },
+  geodes: {
+    title: "Geodes - Stones with a secret!!!",
+    details: `Revered by many as a connection with the earth's energy. Representing strength, hidden potential, and positive energy flow.
+
+We create our geodes with both wet felting and dry needle felting. Our geodes emerge from multiple layers created by these two methods. Once the exterior is complete the interior beauty emerges by using crystals carefully placed and enhanced with complimentary gemstones, vintage beads and more.
+`,
+  },
+  wallPieces: {
+    title: "Matted original art",
+    details: `For those who like to use their frames we have available 5 by 7 inch needle felted scenes. These are matted to 8 by 10 inches.
+
+These one of a kind scenes are created using wool, sari silk, throwsters waste, and other assorted fibers.
+`,
+  },
+  mountainTreasureBaskets: {
+    title: "Mountain Treasures Baskets",
+    details: `Created in the South Toe Valley of the Black Mountains of North Carolina using wool and natural fibers, these baskets are a beautiful way to display your treasures.
+
+I select colors representing what I have found on the forest floor, along the rivers, and in the meadows.
+
+Rich greens from the Rhododendrons, pine trees and moss. Sprinkle in wildflowers of yellow, blue, and pink. Browns from the earth, tree bark and mushrooms. Shades of gray from the rocks. Sparkles of the rainbow from the Mica and gemstones.
+
+In each basket you will find the treasure of written words, strung together invoking a message of beauty and inspiration.
+`,
+  },
+
+  other: `Other
+
+If you don't see what you are looking for, please contact us and we will see if we can create something special for you.
+`,
+};
