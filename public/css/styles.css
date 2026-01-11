@@ -814,71 +814,22 @@ h3 {
 /* CATEGORY DESCRIPTION STYLES */
 .category-description-container {
   background: #ffffff;
-  border-radius: 4px;
   margin-bottom: 2rem;
+  /* border-radius: 8px; */
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
   border: 1px solid #e0e0e0;
 }
 
-.collapse-header {
-  display: flex;
-  align-items: center;
-  gap: 1rem;
-  padding: 1.2rem 2rem;
-  cursor: pointer;
-  transition: background-color 0.3s;
-}
-
-.collapse-header:hover {
-  background-color: #f5f5f5;
-}
-
-.collapse-arrow {
-  font-size: 0.8rem;
-  color: #666;
-  transition: transform 0.3s;
-  flex-shrink: 0;
-}
-
-.collapse-arrow::before {
-  content: "▼";
-}
-
-.collapse-arrow.expanded {
-  transform: rotate(180deg);
-}
-
-.collapse-title {
-  font-size: 1rem;
-  font-weight: 400;
-  letter-spacing: 1px;
-  text-transform: uppercase;
-  color: #000000;
-  margin: 0;
-}
-
-.collapse-content {
-  max-height: 1000px;
-  overflow: hidden;
-  padding: 0 2rem 1.5rem 2rem;
-  transition: max-height 0.4s ease-out, padding 0.4s ease-out;
-}
-
-.collapse-content.hidden {
-  max-height: 0;
-  padding: 0 2rem;
-}
-
 .category-description-text {
-  font-size: 1rem;
+  font-size: 1.2rem;
   line-height: 1.8;
-  color: #333;
-  margin-bottom: 1rem;
+  /* color: #333; */
+  /* margin-bottom: 1rem; */
 }
 
-.category-description-text:last-child {
+/* .category-description-text:last-child {
   margin-bottom: 0;
-}
+} */
 
 /* Products Grid */
 .products-grid {
@@ -2137,7 +2088,7 @@ h3 {
 
 /* +++++++++++++++++++++++++++++++++++++++++++++++++ */
 
-/* CLASSES */
+/* Shared CLASSES */
 
 .password-input-wrapper {
   position: relative;
@@ -2227,4 +2178,60 @@ h3 {
   transform: translateY(0);
   background: linear-gradient(135deg, #1d5398 0%, #164388 100%);
   box-shadow: 0 2px 8px rgba(74, 144, 226, 0.25);
+}
+
+/* collapse container styles */
+.collapse-container {
+  border-radius: 8px;
+  overflow: hidden; /* This ensures content respects the border radius */
+}
+
+.collapse-header {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 1.2rem 2rem;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.collapse-header:hover {
+  background-color: #f5f5f5;
+}
+
+.collapse-arrow {
+  font-size: 0.8rem;
+  color: #666;
+  transition: transform 0.3s;
+  flex-shrink: 0;
+  transform: rotate(-90deg);
+}
+
+.collapse-arrow::before {
+  content: "▼";
+}
+
+.collapse-arrow.expanded {
+  transform: rotate(0deg);
+}
+
+.collapse-title {
+  font-size: 1rem;
+  font-weight: 400;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  color: #000000;
+  margin: 0;
+}
+
+.collapse-content {
+  max-height: 1000px;
+  overflow: hidden;
+  padding: 0 2rem 1.5rem 2rem;
+  transition: max-height 0.4s ease-out, padding 0.4s ease-out;
+}
+
+.collapse-content.hidden {
+  max-height: 0;
+  padding: 0 2rem;
 }

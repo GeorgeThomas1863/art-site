@@ -79,9 +79,11 @@ export const buildCategoryDescription = async (category) => {
 
   const titleElement = document.createElement("h3");
   titleElement.textContent = `${descriptionObj.title}`;
+  titleElement.className = "category-description-title";
 
   const contentElement = document.createElement("div");
   contentElement.textContent = descriptionObj.details;
+  contentElement.className = "category-description-text";
 
   // Build collapse container
   const collapseContainer = await buildCollapseContainer({
@@ -217,7 +219,7 @@ export const buildProductTypeBadge = async (productData) => {
 
 export const categoryDescriptions = {
   all: {
-    title: "About Our Products",
+    title: "Our Products",
     details: `Handmade with love from wool and other natural materials, each product has a unique story and a special place in our hearts.
     
 Click on the categories to learn more.`,

@@ -1,8 +1,10 @@
-//ask how they want to do shipping
+//keep going with product description styling
+
+//add in about and events pages
+
+//email about shipping and taxes with tax cloud
 
 //integrate tax cloud
-
-//add category descriptions to products page display
 
 //Build page or popup for product details
 
@@ -13,8 +15,6 @@
 //add about, events, contact us, newsletter  display pages
 
 //rotating pics on about
-
-//add in the color display changes they made
 
 //-----------------
 

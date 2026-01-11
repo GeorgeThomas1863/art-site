@@ -6,7 +6,7 @@ import { buildCartForm } from "./forms/cart-form.js";
 import { buildCheckoutForm } from "./forms/checkout-form.js";
 import { buildConfirmOrderForm } from "./forms/confirm-form.js";
 
-import { populateProducts } from "./helpers/products-run.js";
+import { populateProducts, updateCategoryDescription } from "./helpers/products-run.js";
 import { populateCart, updateNavbarCart } from "./helpers/cart-run.js";
 import { populateCheckout, populateConfirmOrder } from "./helpers/buy-run.js";
 import { startPicRotation } from "./helpers/rotate-pics.js";
