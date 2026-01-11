@@ -165,6 +165,7 @@ export const buildProductType = async (mode) => {
     { value: "geodes", text: "Geodes" },
     { value: "gnomeHouses", text: "Gnome Houses" },
     { value: "wallPieces", text: "Wall Pieces" },
+    { value: "other", text: "Other" },
   ];
 
   for (let i = 0; i < optionArray.length; i++) {

@@ -52,6 +52,7 @@ export const buildProductsFilterBar = async () => {
     { value: "geodes", text: "Geodes" },
     { value: "wallPieces", text: "Wall Pieces" },
     { value: "mountainTreasureBaskets", text: "Mountain Treasure Baskets" },
+    { value: "other", text: "Other" },
   ];
 
   for (let i = 0; i < filterOptions.length; i++) {
