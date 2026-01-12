@@ -2,6 +2,13 @@ import { runAddNewProduct, runEditProduct, runDeleteProduct, runGetProductData }
 import { buildCart, runGetCartStats, runAddToCart, runUpdateCartItem, runRemoveFromCart } from "../src/cart.js";
 import { placeNewOrder } from "../src/orders.js";
 
+// export const getBackgroundPicsControl = async (req, res) => {
+//   const pics = await runGetBackgroundPics();
+//   console.log("PICS");
+//   console.log(pics);
+//   return res.json(pics);
+// };
+
 //returns data for all products
 export const getProductDataControl = async (req, res) => {
   const data = await runGetProductData();
@@ -118,4 +125,4 @@ export const placeOrderControl = async (req, res) => {
   return res.json(jsonData);
 };
 
-export const calculateShippingControl = async (req, res) => {}
+export const calculateShippingControl = async (req, res) => {};

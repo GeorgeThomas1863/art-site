@@ -111,9 +111,9 @@ export const buildSplitContent = async () => {
 
   const splitTitle = await buildSplitTitle();
   const splitText = await buildSplitText();
-  const splitCta = await buildSplitCta();
+  const splitButtons = await buildSplitButtons();
 
-  splitContent.append(splitTitle, splitText, splitCta);
+  splitContent.append(splitTitle, splitText, splitButtons);
 
   return splitContent;
 };
@@ -138,13 +138,23 @@ export const buildSplitText = async () => {
 };
 
 // Build CTA button
-export const buildSplitCta = async () => {
-  const splitCta = document.createElement("a");
-  splitCta.className = "split-cta";
-  splitCta.textContent = "Shop Now";
-  splitCta.href = "/products";
+export const buildSplitButtons = async () => {
+  const buttonsContainer = document.createElement("div");
+  buttonsContainer.className = "split-buttons";
 
-  return splitCta;
+  const shopBtn = document.createElement("a");
+  shopBtn.className = "split-cta split-cta-primary";
+  shopBtn.textContent = "Shop Now";
+  shopBtn.href = "/products";
+
+  const storyBtn = document.createElement("a");
+  storyBtn.className = "split-cta split-cta-secondary";
+  storyBtn.textContent = "Our Story";
+  storyBtn.href = "/about";
+
+  buttonsContainer.append(shopBtn, storyBtn);
+
+  return buttonsContainer;
 };
 
 // Build image section (right side)
@@ -153,9 +163,6 @@ export const buildSplitImage = async () => {
   splitImage.className = "split-image";
 
   // Top rotating section with 2 images
-  const topRotating = document.createElement("div");
-  topRotating.className = "split-image-top";
-
   const rotatingLeft = document.createElement("a");
   rotatingLeft.className = "split-image-rotating";
   rotatingLeft.id = "split-image-left";
@@ -176,38 +183,7 @@ export const buildSplitImage = async () => {
   rotatingRightText.textContent = "Natural Materials";
   rotatingRight.appendChild(rotatingRightText);
 
-  topRotating.append(rotatingLeft, rotatingRight);
-
-  // Bottom static section with 3 images
-  const bottomStatic = document.createElement("a");
-  bottomStatic.className = "split-image-bottom";
-  bottomStatic.href = "/about";
-
-  const staticImage = document.createElement("div");
-  staticImage.className = "split-image-static";
-  staticImage.id = "split-image-static";
-
-  // const staticLeft = document.createElement("div");
-  // staticLeft.className = "split-image-static";
-  // staticLeft.id = "split-image-static-left";
-
-  // const staticCenter = document.createElement("div");
-  // staticCenter.className = "split-image-static";
-  // staticCenter.id = "split-image-static-center";
-
-  // const staticRight = document.createElement("div");
-  // staticRight.className = "split-image-static";
-  // staticRight.id = "split-image-static-right";
-
-  const bottomText = document.createElement("div");
-  bottomText.className = "split-image-text split-image-text-bottom";
-  bottomText.textContent = "Sustainable Design • Timeless Beauty • Artisan Quality";
-
-  // bottomStatic.append(staticLeft, staticCenter, staticRight, bottomText);
-
-  bottomStatic.append(staticImage, bottomText);
-
-  splitImage.append(topRotating, bottomStatic);
+  splitImage.append(rotatingLeft, rotatingRight);
 
   return splitImage;
 };

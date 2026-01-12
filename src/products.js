@@ -1,5 +1,14 @@
+import path from "path";
+import fsPromise from "fs/promises";
+
 import CONFIG from "../config/config.js";
 import dbModel from "../models/db-model.js";
+
+import { fileURLToPath } from "url";
+import { dirname } from "path";
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
 
 export const runAddNewProduct = async (inputParams) => {
   const { productsCollection } = CONFIG;
@@ -106,6 +115,8 @@ export const runDeleteProduct = async (productId) => {
   return params;
 };
 
+//---------------
+
 export const runGetProductData = async () => {
   const { productsCollection } = CONFIG;
 
@@ -115,3 +126,27 @@ export const runGetProductData = async () => {
   // console.dir(data);
   return data;
 };
+
+// export const runGetBackgroundPics = async () => {
+//   console.log("RUN GET BACKGROUND PICS");
+
+//   const picsDir = path.join(__dirname, "..", "public", "images", "products");
+//   console.log("PICS DIR");
+//   console.log(picsDir);
+//   const files = await fsPromise.readdir(picsDir);
+//   console.log("FILES");
+//   console.log(files);
+
+//   // Filter for image files only
+//   const picArray = [];
+//   for (let i = 0; i < files.length; i++) {
+//     const ext = path.extname(files[i]).toLowerCase();
+//     if (ext !== ".jpg" && ext === ".jpeg" && ext === ".png") continue;
+//     picArray.push(`/images/products/${files[i]}`);
+//   }
+
+//   console.log("PIC ARRAY");
+//   console.log(picArray);
+
+//   return picArray;
+// };

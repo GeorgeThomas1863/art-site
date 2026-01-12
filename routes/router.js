@@ -20,6 +20,7 @@ import {
 } from "../controllers/display-controller.js";
 
 import {
+  // getBackgroundPicsControl,
   uploadPicControl,
   addNewProductControl,
   editProductControl,
@@ -81,6 +82,8 @@ router.post("/checkout/shipping", calculateShippingControl);
 
 //Main routes
 router.get("/get-product-data-route", getProductDataControl);
+
+// router.get("/get-background-pics", getBackgroundPicsControl);
 
 router.get("/confirm-order", confirmOrderDisplay);
 
