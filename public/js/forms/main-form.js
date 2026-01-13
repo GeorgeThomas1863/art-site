@@ -37,6 +37,7 @@ export const buildNavBar = async () => {
     { text: "Products", href: "/products" },
     { text: "About", href: "/about" },
     { text: "Events", href: "/events" },
+    { text: "Contact", href: "/contact" },
   ];
 
   for (let i = 0; i < navItems.length; i++) {
