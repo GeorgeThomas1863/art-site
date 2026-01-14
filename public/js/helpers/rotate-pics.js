@@ -10,20 +10,22 @@ const mainPicArray = [
 ];
 
 const aboutPicArray = [
-  "/images/background/acorn1.jpg",
-  "/images/background/acorn2.jpg",
-  "/images/background/mtb1.jpg",
-  "/images/background/matted1.jpg",
-  "/images/background/matted2.jpg",
+  "/images/background/mountains1.jpg",
+  "/images/background/mountains2.jpg",
+  "/images/background/mountains3.jpg",
+  "/images/background/mountains4.jpg",
+  "/images/background/beach1.jpg",
+  "/images/background/beach2.jpg",
+  "/images/background/beach3.jpg",
 ];
 
-const aboutStaticPic = "/images/background/wool_background.jpg";
+const aboutStaticPic = "/images/background/selfie1.jpg";
 
 let mainIndexLeft = 0;
 let mainIndexRight = 3; //start at different spot to avoid overlap
 
 let aboutIndexTop = 0;
-let aboutIndexMiddle = 3;
+let aboutIndexBottom = 4;
 
 // Initialize image rotation
 export const startMainPicRotation = async () => {
@@ -55,15 +57,17 @@ export const startMainPicRotation = async () => {
   }, 2500);
 };
 
+//+++++++++++++++++++++++++
+
 export const startAboutPicRotation = async () => {
   const aboutImageTop = document.getElementById("about-image-top");
-  const aboutImageMiddle = document.getElementById("about-image-middle");
   const aboutImageBottom = document.getElementById("about-image-bottom");
+  const aboutImageStatic = document.getElementById("about-image-static");
 
   // Set initial images
   await setCurrentPic(aboutImageTop, aboutPicArray[aboutIndexTop]);
-  await setCurrentPic(aboutImageMiddle, aboutPicArray[aboutIndexMiddle]);
-  await setCurrentPic(aboutImageBottom, aboutStaticPic);
+  await setCurrentPic(aboutImageBottom, aboutPicArray[aboutIndexBottom]);
+  await setCurrentPic(aboutImageStatic, aboutStaticPic);
 
   // Rotate top image
   setInterval(async () => {
@@ -77,11 +81,11 @@ export const startAboutPicRotation = async () => {
   // Rotate middle image (offset by 2.5 seconds for visual interest)
   setTimeout(() => {
     setInterval(async () => {
-      aboutIndexMiddle++;
-      if (aboutIndexMiddle >= aboutPicArray.length) {
-        aboutIndexMiddle = 0;
+      aboutIndexBottom++;
+      if (aboutIndexBottom >= aboutPicArray.length) {
+        aboutIndexBottom = 0;
       }
-      await setCurrentPic(aboutImageMiddle, aboutPicArray[aboutIndexMiddle]);
+      await setCurrentPic(aboutImageBottom, aboutPicArray[aboutIndexBottom]);
     }, 5000);
   }, 2500);
 };
@@ -91,12 +95,3 @@ export const setCurrentPic = async (element, picURL) => {
   if (!element) return;
   element.style.backgroundImage = `url('${picURL}')`;
 };
-
-// export const getBackgroundPics = async () => {
-//   const res = await sendToBack({ route: "/get-background-pics" }, "GET");
-
-//   console.log("GET BACKGROUND PICS RES");
-//   console.log(res);
-
-//   return res;
-// };
