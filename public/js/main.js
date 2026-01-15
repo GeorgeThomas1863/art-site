@@ -15,6 +15,7 @@ import { startMainPicRotation, startAboutPicRotation } from "./helpers/rotate-pi
 const displayElement = document.getElementById("display-element");
 const productsElement = document.getElementById("products-element");
 const aboutElement = document.getElementById("about-element");
+const eventsElement = document.getElementById("events-element");
 const cartElement = document.getElementById("cart-element");
 const checkoutElement = document.getElementById("checkout-element");
 const confirmElement = document.getElementById("confirm-element");
@@ -66,6 +67,23 @@ export const buildAboutDisplay = async () => {
   return true;
 };
 
+export const buildEventsDisplay = async () => {
+  if (!eventsElement) return null;
+
+  const navElement = await buildNavBar();
+  const eventsForm = await buildEventsForm();
+  eventsElement.append(navElement, eventsForm);
+
+  // Fetch event data from backend
+  const eventData = await sendToBack({ route: "/get-event-data-route" }, "GET");
+  console.log("EVENT DATA");
+  console.dir(eventData);
+  await populateEvents(eventData);
+  // await updateNavbarCart();
+
+  return true;
+};
+
 export const buildCartDisplay = async () => {
   if (!cartElement) return null;
 
@@ -105,6 +123,7 @@ export const buildConfirmOrderDisplay = async () => {
 if (displayElement) buildMainDisplay();
 if (productsElement) buildProductsDisplay();
 if (aboutElement) buildAboutDisplay();
+if (eventsElement) buildEventsDisplay();
 if (cartElement) buildCartDisplay();
 if (checkoutElement) buildCheckoutDisplay();
 if (confirmElement) buildConfirmOrderDisplay();
