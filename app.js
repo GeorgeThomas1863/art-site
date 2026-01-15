@@ -1,4 +1,4 @@
-//keep going with product description styling
+//keep going with events admin styles / connect to backend
 
 //add in about and events pages
 
