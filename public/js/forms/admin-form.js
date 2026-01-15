@@ -2,12 +2,42 @@ export const buildAdminForm = async () => {
   const adminFormWrapper = document.createElement("div");
   adminFormWrapper.className = "admin-form-wrapper";
 
+  const entitySelector = await buildEntitySelector();
   const tabNav = await buildTabNav();
   const addTab = await buildAdminTab("add");
   const editTab = await buildAdminTab("edit");
-  adminFormWrapper.append(tabNav, addTab, editTab);
+  adminFormWrapper.append(entitySelector, tabNav, addTab, editTab);
 
   return adminFormWrapper;
+};
+
+export const buildEntitySelector = async () => {
+  const selectorBar = document.createElement("div");
+  selectorBar.className = "entity-selector-bar";
+
+  const selectorLabel = document.createElement("label");
+  selectorLabel.className = "entity-selector-label";
+  selectorLabel.textContent = "Managing:";
+  selectorLabel.setAttribute("for", "entity-type-selector");
+
+  const selectorDropdown = document.createElement("select");
+  selectorDropdown.className = "entity-selector-dropdown";
+  selectorDropdown.id = "entity-type-selector";
+  selectorDropdown.name = "entity-type-selector";
+
+  const productOption = document.createElement("option");
+  productOption.value = "products";
+  productOption.textContent = "Products";
+  productOption.selected = true;
+
+  const eventOption = document.createElement("option");
+  eventOption.value = "events";
+  eventOption.textContent = "Events";
+
+  selectorDropdown.append(productOption, eventOption);
+  selectorBar.append(selectorLabel, selectorDropdown);
+
+  return selectorBar;
 };
 
 //navigation buttons at top
@@ -397,4 +427,102 @@ export const buildAdminSubmit = async (mode) => {
   }
 
   return submitButton;
+};
+
+//++++++++++++++++++++++++
+
+export const buildAdminEventSelector = async () => {
+  const selectorWrapper = document.createElement("li");
+  selectorWrapper.className = "form-field product-selector-field";
+
+  const selectorLabel = document.createElement("label");
+  selectorLabel.className = "form-label";
+  selectorLabel.id = "event-selector-label";
+  selectorLabel.textContent = "Select Event to Edit";
+  selectorLabel.setAttribute("for", "event-selector");
+
+  const eventSelect = document.createElement("select");
+  eventSelect.className = "form-select";
+  eventSelect.id = "event-selector";
+  eventSelect.name = "event-selector";
+
+  const defaultOption = document.createElement("option");
+  defaultOption.value = "";
+  defaultOption.textContent = "-- Select an event --";
+  defaultOption.selected = true;
+  defaultOption.disabled = true;
+  eventSelect.append(defaultOption);
+
+  selectorWrapper.append(selectorLabel, eventSelect);
+
+  return selectorWrapper;
+};
+
+//Event form
+export const buildEventDate = async (mode) => {
+  const dateWrapper = document.createElement("li");
+  dateWrapper.className = "form-field";
+
+  const dateLabel = document.createElement("label");
+  dateLabel.className = "form-label";
+  dateLabel.id = mode === "add" ? "event-date-label" : "edit-event-date-label";
+  dateLabel.textContent = "Event Date";
+  dateLabel.setAttribute("for", mode === "add" ? "event-date" : "edit-event-date");
+
+  const dateInput = document.createElement("input");
+  dateInput.className = "form-input";
+  dateInput.type = "date";
+  dateInput.id = mode === "add" ? "event-date" : "edit-event-date";
+  dateInput.name = mode === "add" ? "event-date" : "edit-event-date";
+
+  if (mode === "edit") dateInput.disabled = true;
+
+  dateWrapper.append(dateLabel, dateInput);
+
+  return dateWrapper;
+};
+
+export const buildEventLocation = async (mode) => {
+  const locationWrapper = document.createElement("li");
+  locationWrapper.className = "form-field";
+
+  const locationLabel = document.createElement("label");
+  locationLabel.className = "form-label";
+  locationLabel.id = mode === "add" ? "event-location-label" : "edit-event-location-label";
+  locationLabel.textContent = "Location";
+  locationLabel.setAttribute("for", mode === "add" ? "event-location" : "edit-event-location");
+
+  const locationInput = document.createElement("input");
+  locationInput.className = "form-input";
+  locationInput.type = "text";
+  locationInput.id = mode === "add" ? "event-location" : "edit-event-location";
+  locationInput.name = mode === "add" ? "event-location" : "edit-event-location";
+
+  if (mode === "edit") locationInput.disabled = true;
+
+  locationWrapper.append(locationLabel, locationInput);
+
+  return locationWrapper;
+};
+
+export const buildEventDescription = async (mode) => {
+  const descWrapper = document.createElement("li");
+  descWrapper.className = "form-field";
+
+  const descLabel = document.createElement("label");
+  descLabel.className = "form-label";
+  descLabel.id = mode === "add" ? "event-description-label" : "edit-event-description-label";
+  descLabel.textContent = "Description";
+  descLabel.setAttribute("for", mode === "add" ? "event-description" : "edit-event-description");
+
+  const descInput = document.createElement("textarea");
+  descInput.className = "form-textarea";
+  descInput.id = mode === "add" ? "event-description" : "edit-event-description";
+  descInput.name = mode === "add" ? "event-description" : "edit-event-description";
+
+  if (mode === "edit") descInput.disabled = true;
+
+  descWrapper.append(descLabel, descInput);
+
+  return descWrapper;
 };
