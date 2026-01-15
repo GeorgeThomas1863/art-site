@@ -3,6 +3,7 @@ import { sendToBack } from "./util/api-front.js";
 import { buildMainForm, buildNavBar } from "./forms/main-form.js";
 import { buildProductsForm } from "./forms/products-form.js";
 import { buildAboutForm } from "./forms/about-form.js";
+import { buildEventsForm } from "./forms/events-form.js";
 import { buildCartForm } from "./forms/cart-form.js";
 import { buildCheckoutForm } from "./forms/checkout-form.js";
 import { buildConfirmOrderForm } from "./forms/confirm-form.js";

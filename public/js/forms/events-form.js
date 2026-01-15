@@ -74,4 +74,3 @@ export const buildEventCard = async (event) => {
 
   return eventCard;
 };
-s;
