@@ -1,6 +1,6 @@
 import { ADMIN_EDIT_DEFAULT_ARRAY } from "../util/define-things.js";
 import { sendToBack } from "../util/api-front.js";
-import { buildNewProductParams, getEditProductParams } from "../util/params.js";
+import { buildNewProductParams, getEditProductParams, buildNewEventParams, getEditEventParams } from "../util/params.js";
 import { displayPopup, displayConfirmDialog } from "./popup.js";
 import {
   buildAdminProductSelector,
@@ -16,175 +16,60 @@ import {
   buildAdminUpload,
 } from "../forms/admin-form.js";
 
-// ENTITY SWITCHING
-export const runEntityTypeChange = async (changeElement) => {
-  if (!changeElement) return null;
-
-  const entityType = changeElement.value;
-  if (!entityType || (entityType !== "products" && entityType !== "events")) return null;
-
-  // Update tab button text
-  const addTabButton = document.getElementById("add-tab-button");
-  const editTabButton = document.getElementById("edit-tab-button");
-
-  if (entityType === "products") {
-    addTabButton.textContent = "Add Product";
-    editTabButton.textContent = "Edit Product";
-  } else {
-    addTabButton.textContent = "Add Event";
-    editTabButton.textContent = "Edit Event";
-  }
-
-  // Update data attributes
-  addTabButton.setAttribute("data-entity", entityType);
-  editTabButton.setAttribute("data-entity", entityType);
-
-  // Get current active tab
-  const activeButton = document.querySelector(".admin-tab-button.active");
-  const currentMode = activeButton ? activeButton.getAttribute("data-tab") : "add";
-
-  // Rebuild the forms for the new entity type
-  await rebuildFormsForEntity(entityType, currentMode);
-
-  return true;
-};
-
-export const rebuildFormsForEntity = async (entityType, activeMode = "add") => {
-  // Get the tab containers
-  const addTab = document.getElementById("add-tab");
-  const editTab = document.getElementById("edit-tab");
-
-  if (!addTab || !editTab) return null;
-
-  // Store current visibility
-  const addTabVisible = addTab.style.display !== "none";
-  const editTabVisible = editTab.style.display !== "none";
-
-  // Update data attributes
-  addTab.setAttribute("data-entity-type", entityType);
-  editTab.setAttribute("data-entity-type", entityType);
-
-  // Rebuild Add Tab
-  await rebuildTabContent(addTab, "add", entityType);
-
-  // Rebuild Edit Tab
-  await rebuildTabContent(editTab, "edit", entityType);
-
-  // Restore visibility
-  addTab.style.display = addTabVisible ? "block" : "none";
-  editTab.style.display = editTabVisible ? "block" : "none";
-
-  // If edit tab is visible, load the appropriate data
-  if (!editTabVisible) return true;
-  if (entityType === "products") {
-    const productData = await sendToBack({ route: "/get-product-data-route" }, "GET");
-    if (!productData || !productData.length) return true;
-    await populateAdminProductSelector(productData);
-    return true;
-  }
-
-  if (entityType === "events") {
-    const eventData = await sendToBack({ route: "/get-event-data-route" }, "GET");
-    if (!eventData || !eventData.length) return true;
-    await populateAdminEventSelector(eventData);
-  }
-
-  return true;
-};
-
-export const rebuildTabContent = async (tabElement, mode, entityType) => {
-  if (!tabElement) return null;
-
-  // Clear existing content except title
-  const titleWrapper = tabElement.querySelector(".admin-tab-title-wrapper");
-  tabElement.innerHTML = "";
-  if (titleWrapper) {
-    tabElement.append(titleWrapper);
-  }
-
-  // Update title
-  const title = tabElement.querySelector(".admin-tab-title");
-  if (title) {
-    if (entityType === "products") {
-      title.textContent = mode === "add" ? "Add New Product" : "Edit Product";
-    } else {
-      title.textContent = mode === "add" ? "Add New Event" : "Edit Event";
-    }
-  }
-
-  // Add selector for edit mode
-  if (mode === "edit") {
-    if (entityType === "products") {
-      const productSelector = await buildAdminProductSelector();
-      tabElement.append(productSelector);
-    } else {
-      const eventSelector = await buildAdminEventSelector();
-      tabElement.append(eventSelector);
-    }
-  }
-
-  // Build appropriate fields based on entity type
-  if (entityType === "products") {
-    const adminName = await buildName(mode);
-    const productType = await buildProductType(mode);
-    const formInputList = await buildFormInputList(mode);
-    const dropDownRow = await buildDropDownRow(mode);
-    const adminUpload = await buildAdminUpload(mode);
-    const adminSubmit = await buildAdminSubmit(mode);
-
-    tabElement.append(adminName, productType, formInputList, dropDownRow, adminUpload, adminSubmit);
-    return true;
-  }
-
-  if (entityType === "events") {
-    const eventName = await buildName(mode);
-    const eventDate = await buildEventDate(mode);
-    const eventLocation = await buildEventLocation(mode);
-    const eventDescription = await buildEventDescription(mode);
-    const adminUpload = await buildAdminUpload(mode);
-    const adminSubmit = await buildAdminSubmit(mode);
-
-    tabElement.append(eventName, eventDate, eventLocation, eventDescription, adminUpload, adminSubmit);
-  }
-
-  return true;
-};
-
-//EVENT HANDLERS
-export const runTabClick = async (clickElement) => {
+//MODAL CONTROLS
+export const runModalTrigger = async (clickElement) => {
   if (!clickElement) return null;
-  const tabType = clickElement.getAttribute("data-tab");
-  if (!tabType || (tabType !== "add" && tabType !== "edit")) return null;
 
-  const tabButtons = document.querySelectorAll(".admin-tab-button");
-  for (let i = 0; i < tabButtons.length; i++) {
-    tabButtons[i].classList.remove("active");
+  const modalType = clickElement.getAttribute("data-modal-trigger");
+  if (!modalType) return null;
+
+  const modalId = `${modalType}-modal`;
+
+  // If it's an edit modal, load the data first
+  if (modalType.includes("edit-products")) {
+    const productData = await sendToBack({ route: "/get-product-data-route" }, "GET");
+    if (productData && productData.length) {
+      await populateAdminProductSelector(productData);
+      await updateProductStats(productData);
+    }
+  } else if (modalType.includes("edit-events")) {
+    const eventData = await sendToBack({ route: "/get-event-data-route" }, "GET");
+    if (eventData && eventData.length) {
+      await populateAdminEventSelector(eventData);
+      await updateEventStats(eventData);
+    }
   }
-  clickElement.classList.add("active");
 
-  const addTab = document.getElementById("add-tab");
-  const editTab = document.getElementById("edit-tab");
-
-  if (tabType === "add") {
-    addTab.style.display = "block";
-    editTab.style.display = "none";
-    return true;
-  }
-
-  addTab.style.display = "none";
-  editTab.style.display = "block";
-
-  const productData = await sendToBack({ route: "/get-product-data-route" }, "GET");
-
-  console.log("PRODUCT DATA");
-  console.dir(productData);
-
-  await populateAdminProductSelector(productData); //in admin form
-
+  openModal(modalId);
   return true;
 };
 
-//------
+// Run modal close
+export const runModalClose = async (clickElement) => {
+  if (!clickElement) return null;
+
+  const modalId = clickElement.getAttribute("data-modal-close");
+  if (!modalId) return null;
+
+  closeModal(modalId);
+  return true;
+};
+
+export const openModal = (modalId) => {
+  const modal = document.getElementById(modalId);
+  if (modal) {
+    modal.classList.add("visible");
+  }
+};
+
+export const closeModal = (modalId) => {
+  const modal = document.getElementById(modalId);
+  if (modal) {
+    modal.classList.remove("visible");
+  }
+};
+
+//+++++++++++++++++++++++++++++++
 
 //Add product
 export const runAddNewProduct = async () => {
@@ -218,6 +103,11 @@ export const runAddNewProduct = async () => {
 
   // Clear the form after successful submission
   await clearAdminAddFields();
+  closeModal("add-products-modal");
+
+  // Refresh stats
+  const productData = await sendToBack({ route: "/get-product-data-route" }, "GET");
+  if (productData) await updateProductStats(productData);
 
   return data;
 };
@@ -240,8 +130,6 @@ export const runEditProduct = async () => {
     return null;
   }
 
-  //FIX THE PIC HERE
-
   const productId = selectedOption.value;
   editProductParams.productId = productId;
   editProductParams.route = "/edit-product-route";
@@ -261,6 +149,7 @@ export const runEditProduct = async () => {
   const productData = await sendToBack({ route: "/get-product-data-route" }, "GET");
   if (productData) {
     await populateAdminProductSelector(productData);
+    await updateProductStats(productData);
 
     // Re-select the product that was just updated so user can see the changes
     productSelector.value = productId;
@@ -305,23 +194,20 @@ export const runDeleteProduct = async () => {
   const productData = await sendToBack({ route: "/get-product-data-route" }, "GET");
   if (productData) {
     await populateAdminProductSelector(productData);
+    await updateProductStats(productData);
   }
 
   // Clear the form fields
   await clearAdminEditFields();
-
-  // Disable all edit fields
   await disableAdminEditFields();
-
-  // Reset product selector to default option
   productSelector.value = "";
 
   return data;
 };
 
-//---------------
-//EVENT HANDLERS
+//++++++++++++++++++++++++++++
 
+//Add event
 export const runAddNewEvent = async () => {
   const newEventParams = await buildNewEventParams();
   if (!newEventParams || !newEventParams.name || !newEventParams.eventDate) {
@@ -345,6 +231,10 @@ export const runAddNewEvent = async () => {
   await displayPopup(popupText, "success");
 
   await clearAdminAddFields("events");
+  closeModal("add-events-modal");
+
+  const eventData = await sendToBack({ route: "/get-event-data-route" }, "GET");
+  if (eventData) await updateEventStats(eventData);
 
   return data;
 };
@@ -419,10 +309,11 @@ export const runDeleteEvent = async () => {
   const eventData = await sendToBack({ route: "/get-event-data-route" }, "GET");
   if (eventData) {
     await populateAdminEventSelector(eventData);
+    await updateEventStats(eventData);
   }
 
-  await clearAdminEditFields("events");
-  await disableAdminEditFields("events");
+  await clearAdminEditFields();
+  await disableAdminEditFields();
   eventSelector.value = "";
 
   return data;
@@ -447,8 +338,6 @@ export const changeAdminProductSelector = async (changeElement) => {
 
   // Enable all fields
   await enableAdminEditFields();
-
-  // Populate the form
   await populateAdminEditForm(productObj);
 };
 
@@ -457,23 +346,21 @@ export const changeAdminEventSelector = async (changeElement) => {
 
   const selectedOption = changeElement.options[changeElement.selectedIndex];
   if (!selectedOption.value) {
-    await clearAdminEditFields("events");
-    await disableAdminEditFields("events");
+    await clearAdminEditFields();
+    await disableAdminEditFields();
     return null;
   }
 
   const eventObj = selectedOption.eventData;
   if (!eventObj) return null;
 
-  await enableAdminEditFields("events");
+  await enableAdminEditFields();
   await populateAdminEditForm(eventObj, "events");
 };
 
 //+++++++++++++++++++++++++++++++++++++++++++++++
 
 //DATA
-
-//[sets data for rest of form]
 export const populateAdminProductSelector = async (inputArray) => {
   if (!inputArray || !inputArray.length) return null;
 
@@ -524,17 +411,56 @@ export const populateAdminEventSelector = async (inputArray) => {
   return true;
 };
 
-export const populateAdminEditForm = async (inputObj) => {
+export const populateAdminEditForm = async (inputObj, entityType = "products") => {
   if (!inputObj) return null;
-  const { name, productType, price, description, display, sold, picData } = inputObj;
+  if (entityType === "products") {
+    const { name, productType, price, description, display, sold, picData } = inputObj;
+
+    const adminEditMapArray = [
+      { id: "edit-name", value: name },
+      { id: "edit-product-type", value: productType },
+      { id: "edit-price", value: price },
+      { id: "edit-description", value: description },
+      { id: "edit-display", value: display },
+      { id: "edit-sold", value: sold },
+    ];
+
+    for (let i = 0; i < adminEditMapArray.length; i++) {
+      const field = document.getElementById(adminEditMapArray[i].id);
+      if (field) {
+        field.value = adminEditMapArray[i].value || "";
+      }
+    }
+
+    const deleteButton = document.getElementById("delete-product-button");
+    if (deleteButton) {
+      deleteButton.style.display = "block";
+    }
+
+    // Image preview - UPDATED IDs
+    if (!picData || !picData.filename) return null;
+
+    const currentImage = document.getElementById("edit-current-image");
+    const currentImagePreview = document.getElementById("edit-current-image-preview");
+    const editUploadButton = document.getElementById("edit-upload-button");
+    if (!currentImage || !currentImagePreview || !editUploadButton) return null;
+
+    //set pic data to upload button (to get correct pic when submitting edit)
+    editUploadButton.uploadData = picData;
+    currentImage.src = `/images/products/${picData.filename}`;
+    currentImagePreview.style.display = "flex";
+
+    return true;
+  }
+
+  //otherwise events
+  const { name, eventDate, eventLocation, eventDescription, picData } = inputObj;
 
   const adminEditMapArray = [
     { id: "edit-name", value: name },
-    { id: "edit-product-type", value: productType },
-    { id: "edit-price", value: price },
-    { id: "edit-description", value: description },
-    { id: "edit-display", value: display },
-    { id: "edit-sold", value: sold },
+    { id: "edit-event-date", value: eventDate },
+    { id: "edit-event-location", value: eventLocation },
+    { id: "edit-event-description", value: eventDescription },
   ];
 
   for (let i = 0; i < adminEditMapArray.length; i++) {
@@ -544,12 +470,11 @@ export const populateAdminEditForm = async (inputObj) => {
     }
   }
 
-  const deleteButton = document.getElementById("delete-product-button");
+  const deleteButton = document.getElementById("delete-event-button");
   if (deleteButton) {
-    deleteButton.style.display = "block";
+    deleteButton.disabled = false;
   }
 
-  // Image preview - UPDATED IDs
   if (!picData || !picData.filename) return null;
 
   const currentImage = document.getElementById("edit-current-image");
@@ -561,6 +486,8 @@ export const populateAdminEditForm = async (inputObj) => {
   editUploadButton.uploadData = picData;
   currentImage.src = `/images/products/${picData.filename}`;
   currentImagePreview.style.display = "flex";
+
+  return true;
 };
 
 //-----------------
@@ -588,7 +515,7 @@ export const disableAdminEditFields = async () => {
 };
 
 export const clearAdminAddFields = async () => {
-  const clearFieldsArray = ["name", "price", "description"];
+  const clearFieldsArray = ["name", "price", "description", "event-date", "event-location", "event-description"];
 
   for (let i = 0; i < clearFieldsArray.length; i++) {
     const field = document.getElementById(clearFieldsArray[i]);
@@ -599,25 +526,17 @@ export const clearAdminAddFields = async () => {
 
   // Reset select dropdowns to defaults
   const productTypeSelect = document.getElementById("product-type");
-  if (productTypeSelect) {
-    productTypeSelect.selectedIndex = 0; // Reset to first option (Acorns)
-  }
+  if (productTypeSelect) productTypeSelect.selectedIndex = 0; // Reset to first option (Acorns)
 
   const displaySelect = document.getElementById("display");
-  if (displaySelect) {
-    displaySelect.value = "yes"; // Reset to default
-  }
+  if (displaySelect) displaySelect.value = "yes"; // Reset to default
 
   const soldSelect = document.getElementById("sold");
-  if (soldSelect) {
-    soldSelect.value = "no"; // Reset to default
-  }
+  if (soldSelect) soldSelect.value = "no"; // Reset to default
 
   // Clear image preview
   const currentImagePreview = document.getElementById("current-image-preview");
-  if (currentImagePreview) {
-    currentImagePreview.style.display = "none";
-  }
+  if (currentImagePreview) currentImagePreview.style.display = "none";
 
   // Reset upload button and status
   const uploadButton = document.getElementById("upload-button");
@@ -634,15 +553,13 @@ export const clearAdminAddFields = async () => {
     uploadStatus.style.display = "none";
   }
 
-  if (uploadInput) {
-    uploadInput.value = ""; // Clear the file input
-  }
+  if (uploadInput) uploadInput.value = ""; // Clear the file input
 
   return true;
 };
 
 export const clearAdminEditFields = async () => {
-  const clearFieldsArray = ["edit-name", "edit-price", "edit-description"];
+  const clearFieldsArray = ["edit-name", "edit-price", "edit-description", "edit-event-date", "edit-event-location", "edit-event-description"];
 
   for (let i = 0; i < clearFieldsArray.length; i++) {
     const field = document.getElementById(clearFieldsArray[i]);
@@ -652,9 +569,7 @@ export const clearAdminEditFields = async () => {
   }
 
   const currentImagePreview = document.getElementById("edit-current-image-preview");
-  if (currentImagePreview) {
-    currentImagePreview.style.display = "none";
-  }
+  if (currentImagePreview) currentImagePreview.style.display = "none";
 
   // Clear upload data
   const uploadButton = document.getElementById("edit-upload-button");
@@ -671,14 +586,216 @@ export const clearAdminEditFields = async () => {
     uploadStatus.style.display = "none";
   }
 
-  if (uploadInput) {
-    uploadInput.value = "";
-  }
+  if (uploadInput) uploadInput.value = "";
 
   const deleteButton = document.getElementById("delete-product-button");
-  if (deleteButton) {
-    deleteButton.style.display = "none";
-  }
+  if (deleteButton) deleteButton.style.display = "none";
 
   return true;
 };
+
+//++++++++++++++++++++++++++
+
+// STATS UPDATE [REWRITE BELOW WITH LOOPS]
+export const updateProductStats = async (productData) => {
+  if (!productData || !productData.length) return null;
+
+  const totalProducts = productData.length;
+  const displayedProducts = productData.filter((p) => p.display === "yes").length;
+  const soldProducts = productData.filter((p) => p.sold === "yes").length;
+
+  const totalStat = document.getElementById("total-products-stat");
+  const displayedStat = document.getElementById("displayed-products-stat");
+  const soldStat = document.getElementById("sold-products-stat");
+
+  if (totalStat) totalStat.textContent = totalProducts;
+  if (displayedStat) displayedStat.textContent = displayedProducts;
+  if (soldStat) soldStat.textContent = soldProducts;
+
+  return true;
+};
+
+export const updateEventStats = async (eventData) => {
+  if (!eventData || !eventData.length) return null;
+
+  const upcomingEvents = eventData.filter((e) => {
+    const eventDate = new Date(e.eventDate);
+    const today = new Date();
+    return eventDate >= today;
+  }).length;
+
+  const upcomingStat = document.getElementById("upcoming-events-stat");
+  if (upcomingStat) upcomingStat.textContent = upcomingEvents;
+
+  return true;
+};
+
+//========================================
+
+// ENTITY SWITCHING
+// export const runEntityTypeChange = async (changeElement) => {
+//   if (!changeElement) return null;
+
+//   const entityType = changeElement.value;
+//   if (!entityType || (entityType !== "products" && entityType !== "events")) return null;
+
+//   // Update tab button text
+//   const addTabButton = document.getElementById("add-tab-button");
+//   const editTabButton = document.getElementById("edit-tab-button");
+
+//   if (entityType === "products") {
+//     addTabButton.textContent = "Add Product";
+//     editTabButton.textContent = "Edit Product";
+//   } else {
+//     addTabButton.textContent = "Add Event";
+//     editTabButton.textContent = "Edit Event";
+//   }
+
+//   // Update data attributes
+//   addTabButton.setAttribute("data-entity", entityType);
+//   editTabButton.setAttribute("data-entity", entityType);
+
+//   // Get current active tab
+//   const activeButton = document.querySelector(".admin-tab-button.active");
+//   const currentMode = activeButton ? activeButton.getAttribute("data-tab") : "add";
+
+//   // Rebuild the forms for the new entity type
+//   await rebuildFormsForEntity(entityType, currentMode);
+
+//   return true;
+// };
+
+// export const rebuildFormsForEntity = async (entityType, activeMode = "add") => {
+//   // Get the tab containers
+//   const addTab = document.getElementById("add-tab");
+//   const editTab = document.getElementById("edit-tab");
+
+//   if (!addTab || !editTab) return null;
+
+//   // Store current visibility
+//   const addTabVisible = addTab.style.display !== "none";
+//   const editTabVisible = editTab.style.display !== "none";
+
+//   // Update data attributes
+//   addTab.setAttribute("data-entity-type", entityType);
+//   editTab.setAttribute("data-entity-type", entityType);
+
+//   // Rebuild Add Tab
+//   await rebuildTabContent(addTab, "add", entityType);
+
+//   // Rebuild Edit Tab
+//   await rebuildTabContent(editTab, "edit", entityType);
+
+//   // Restore visibility
+//   addTab.style.display = addTabVisible ? "block" : "none";
+//   editTab.style.display = editTabVisible ? "block" : "none";
+
+//   // If edit tab is visible, load the appropriate data
+//   if (!editTabVisible) return true;
+//   if (entityType === "products") {
+//     const productData = await sendToBack({ route: "/get-product-data-route" }, "GET");
+//     if (!productData || !productData.length) return true;
+//     await populateAdminProductSelector(productData);
+//     return true;
+//   }
+
+//   if (entityType === "events") {
+//     const eventData = await sendToBack({ route: "/get-event-data-route" }, "GET");
+//     if (!eventData || !eventData.length) return true;
+//     await populateAdminEventSelector(eventData);
+//   }
+
+//   return true;
+// };
+
+// export const rebuildTabContent = async (tabElement, mode, entityType) => {
+//   if (!tabElement) return null;
+
+//   // Clear existing content except title
+//   const titleWrapper = tabElement.querySelector(".admin-tab-title-wrapper");
+//   tabElement.innerHTML = "";
+//   if (titleWrapper) {
+//     tabElement.append(titleWrapper);
+//   }
+
+//   // Update title
+//   const title = tabElement.querySelector(".admin-tab-title");
+//   if (title) {
+//     if (entityType === "products") {
+//       title.textContent = mode === "add" ? "Add New Product" : "Edit Product";
+//     } else {
+//       title.textContent = mode === "add" ? "Add New Event" : "Edit Event";
+//     }
+//   }
+
+//   // Add selector for edit mode
+//   if (mode === "edit") {
+//     if (entityType === "products") {
+//       const productSelector = await buildAdminProductSelector();
+//       tabElement.append(productSelector);
+//     } else {
+//       const eventSelector = await buildAdminEventSelector();
+//       tabElement.append(eventSelector);
+//     }
+//   }
+
+//   // Build appropriate fields based on entity type
+//   if (entityType === "products") {
+//     const adminName = await buildName(mode);
+//     const productType = await buildProductType(mode);
+//     const formInputList = await buildFormInputList(mode);
+//     const dropDownRow = await buildDropDownRow(mode);
+//     const adminUpload = await buildAdminUpload(mode);
+//     const adminSubmit = await buildAdminSubmit(mode);
+
+//     tabElement.append(adminName, productType, formInputList, dropDownRow, adminUpload, adminSubmit);
+//     return true;
+//   }
+
+//   if (entityType === "events") {
+//     const eventName = await buildName(mode);
+//     const eventDate = await buildEventDate(mode);
+//     const eventLocation = await buildEventLocation(mode);
+//     const eventDescription = await buildEventDescription(mode);
+//     const adminUpload = await buildAdminUpload(mode);
+//     const adminSubmit = await buildAdminSubmit(mode);
+
+//     tabElement.append(eventName, eventDate, eventLocation, eventDescription, adminUpload, adminSubmit);
+//   }
+
+//   return true;
+// };
+
+// //EVENT HANDLERS
+// export const runTabClick = async (clickElement) => {
+//   if (!clickElement) return null;
+//   const tabType = clickElement.getAttribute("data-tab");
+//   if (!tabType || (tabType !== "add" && tabType !== "edit")) return null;
+
+//   const tabButtons = document.querySelectorAll(".admin-tab-button");
+//   for (let i = 0; i < tabButtons.length; i++) {
+//     tabButtons[i].classList.remove("active");
+//   }
+//   clickElement.classList.add("active");
+
+//   const addTab = document.getElementById("add-tab");
+//   const editTab = document.getElementById("edit-tab");
+
+//   if (tabType === "add") {
+//     addTab.style.display = "block";
+//     editTab.style.display = "none";
+//     return true;
+//   }
+
+//   addTab.style.display = "none";
+//   editTab.style.display = "block";
+
+//   const productData = await sendToBack({ route: "/get-product-data-route" }, "GET");
+
+//   console.log("PRODUCT DATA");
+//   console.dir(productData);
+
+//   await populateAdminProductSelector(productData); //in admin form
+
+//   return true;
+// };

@@ -1,4 +1,4 @@
-import { runTabClick, runAddNewProduct, runEditProduct, runDeleteProduct, changeAdminProductSelector, runEntityTypeChange } from "./helpers/admin-run.js"; //prettier-ignore
+import { runModalTrigger, runModalClose, runAddNewProduct, runEditProduct, runDeleteProduct, changeAdminProductSelector, runEntityTypeChange } from "./helpers/admin-run.js"; //prettier-ignore
 import { runUploadClick, runUploadPic } from "./helpers/upload-pic.js";
 import { changeProductsFilterButton } from "./helpers/products-run.js";
 import { runAddToCart, runIncreaseQuantity, runDecreaseQuantity, runRemoveFromCart } from "./helpers/cart-run.js";
@@ -19,18 +19,30 @@ export const clickHandler = async (e) => {
   const clickType = clickElement.getAttribute("data-label");
   const tabType = clickElement.getAttribute("data-tab");
 
+  //get rid of
+  const modalTrigger = clickElement.getAttribute("data-modal-trigger");
+  const modalClose = clickElement.getAttribute("data-modal-close");
+
   console.log("CLICK HANDLER");
   console.log(clickId);
   console.log("CLICK TYPE");
   console.log(clickType);
+  console.log("MODAL TRIGGER");
+  console.log(modalTrigger);
+  console.log("MODAL CLOSE");
+  console.log(modalClose);
 
   if (clickType === "auth-submit") await runAuthSubmit();
   if (clickType === "pwToggle") await runPwToggle();
+
   if (clickType === "popup-close") await closePopup();
   if (clickType === "confirm-yes") await closeConfirmDialog(true);
   if (clickType === "confirm-no") await closeConfirmDialog(false);
 
-  if (tabType) await runTabClick(clickElement);
+  if (modalTrigger) await runModalTrigger(clickElement);
+  if (modalClose) await runModalClose(clickElement);
+
+  // if (tabType) await runTabClick(clickElement);
   if (clickType === "upload-click" || clickType === "edit-upload-click") await runUploadClick(clickElement);
 
   if (clickType === "category-filter-btn") await changeProductsFilterButton(clickElement);
@@ -91,6 +103,13 @@ export const changeHandler = async (e) => {
   if (changeId === "product-selector") await changeAdminProductSelector(changeElement);
 };
 
+//modal
+export const overlayClickHandler = async (e) => {
+  if (e.target.classList.contains("modal-overlay")) {
+    e.target.classList.remove("visible");
+  }
+};
+
 if (authElement) {
   authElement.addEventListener("click", clickHandler);
   authElement.addEventListener("keydown", keyHandler);
@@ -105,6 +124,7 @@ if (adminElement) {
   adminElement.addEventListener("click", clickHandler);
   adminElement.addEventListener("keydown", keyHandler);
   adminElement.addEventListener("change", changeHandler);
+  adminElement.addEventListener("click", overlayClickHandler);
 }
 
 if (productsElement) {
@@ -115,10 +135,8 @@ if (productsElement) {
 
 if (cartElement) {
   cartElement.addEventListener("click", clickHandler);
-  // cartElement.addEventListener("keydown", keyHandler);
 }
 
 if (checkoutElement) {
   checkoutElement.addEventListener("click", clickHandler);
-  // checkoutElement.addEventListener("keydown", keyHandler);
 }
