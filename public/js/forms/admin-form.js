@@ -123,16 +123,19 @@ export const buildStatsSection = async () => {
 export const buildActionCard = async (mode, entityType) => {
   const card = document.createElement("div");
   card.className = "action-card";
-  card.setAttribute("data-modal-trigger", `${mode}-${entityType}`);
+  // card.setAttribute("data-modal-trigger", `${mode}-${entityType}`);
+  card.setAttribute("data-label", `open-modal-${mode}-${entityType}`);
 
   const icon = document.createElement("div");
   icon.className = "action-icon";
   icon.textContent = mode === "add" ? "➕" : "✏️";
+  icon.setAttribute("data-label", `open-modal-${mode}-${entityType}`);
 
   const title = document.createElement("div");
   title.className = "action-title";
   const entityName = entityType === "products" ? "Product" : "Event";
   title.textContent = mode === "add" ? `Add New ${entityName}` : `Edit ${entityName}`;
+  title.setAttribute("data-label", `open-modal-${mode}-${entityType}`);
 
   const description = document.createElement("div");
   description.className = "action-description";
@@ -140,6 +143,7 @@ export const buildActionCard = async (mode, entityType) => {
     mode === "add"
       ? `Create a new ${entityName.toLowerCase()} listing with images and details`
       : `Modify or delete existing ${entityName.toLowerCase()}s`;
+  description.setAttribute("data-label", `open-modal-${mode}-${entityType}`);
 
   card.append(icon, title, description);
 
@@ -181,7 +185,8 @@ export const buildModalHeader = async (mode, entityType) => {
   closeButton.className = "modal-close";
   closeButton.textContent = "×";
   closeButton.type = "button";
-  closeButton.setAttribute("data-modal-close", `${mode}-${entityType}-modal`);
+  // closeButton.setAttribute("data-modal-close", `${mode}-${entityType}-modal`);
+  closeButton.setAttribute("data-label", `close-modal-${mode}-${entityType}`);
 
   header.append(title, closeButton);
 
@@ -245,7 +250,8 @@ export const buildModalActions = async (mode, entityType) => {
   cancelButton.className = "btn btn-cancel";
   cancelButton.type = "button";
   cancelButton.textContent = "Cancel";
-  cancelButton.setAttribute("data-modal-close", `${mode}-${entityType}-modal`);
+  // cancelButton.setAttribute("data-modal-close", `${mode}-${entityType}-modal`);
+  cancelButton.setAttribute("data-label", `close-modal-${mode}-${entityType}`);
 
   // Submit button (ridiculous from claude)
   const submitButton = document.createElement("button");

@@ -6,20 +6,27 @@ import { displayPopup, displayConfirmDialog } from "./popup.js";
 //MODAL CONTROLS
 export const runModalTrigger = async (clickElement) => {
   if (!clickElement) return null;
+  console.log("RUN MODAL TRIGGER");
+  console.log("CLICK ELEMENT");
+  console.log(clickElement);
 
-  const modalType = clickElement.getAttribute("data-modal-trigger");
+  const modalType = clickElement.getAttribute("data-label");
   if (!modalType) return null;
 
-  const modalId = `${modalType}-modal`;
+  const modalStr = modalType.split("-").slice(2).join("-");
+  const modalId = `${modalStr}-modal`;
+  if (!modalId) return null;
 
   // If it's an edit modal, load the data first
-  if (modalType.includes("edit-products")) {
+  if (modalId === "edit-products-modal") {
     const productData = await sendToBack({ route: "/get-product-data-route" }, "GET");
     if (productData && productData.length) {
       await populateAdminProductSelector(productData);
       await updateProductStats(productData);
     }
-  } else if (modalType.includes("edit-events")) {
+  }
+
+  if (modalId === "edit-events-modal") {
     const eventData = await sendToBack({ route: "/get-event-data-route" }, "GET");
     if (eventData && eventData.length) {
       await populateAdminEventSelector(eventData);
@@ -35,7 +42,11 @@ export const runModalTrigger = async (clickElement) => {
 export const runModalClose = async (clickElement) => {
   if (!clickElement) return null;
 
-  const modalId = clickElement.getAttribute("data-modal-close");
+  const modalType = clickElement.getAttribute("data-label");
+  if (!modalType) return null;
+
+  const modalStr = modalType.split("-").slice(2).join("-");
+  const modalId = `${modalStr}-modal`;
   if (!modalId) return null;
 
   closeModal(modalId);

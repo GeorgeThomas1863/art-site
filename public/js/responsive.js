@@ -17,20 +17,20 @@ export const clickHandler = async (e) => {
   const clickElement = e.target;
   const clickId = clickElement.id;
   const clickType = clickElement.getAttribute("data-label");
-  const tabType = clickElement.getAttribute("data-tab");
+  // const tabType = clickElement.getAttribute("data-tab");
 
   //get rid of
-  const modalTrigger = clickElement.getAttribute("data-modal-trigger");
-  const modalClose = clickElement.getAttribute("data-modal-close");
+  // const modalTrigger = clickElement.getAttribute("data-modal-trigger");
+  // const modalClose = clickElement.getAttribute("data-modal-close");
 
   console.log("CLICK HANDLER");
   console.log(clickId);
   console.log("CLICK TYPE");
   console.log(clickType);
-  console.log("MODAL TRIGGER");
-  console.log(modalTrigger);
-  console.log("MODAL CLOSE");
-  console.log(modalClose);
+  // console.log("MODAL TRIGGER");
+  // console.log(modalTrigger);
+  // console.log("MODAL CLOSE");
+  // console.log(modalClose);
 
   if (clickType === "auth-submit") await runAuthSubmit();
   if (clickType === "pwToggle") await runPwToggle();
@@ -39,8 +39,8 @@ export const clickHandler = async (e) => {
   if (clickType === "confirm-yes") await closeConfirmDialog(true);
   if (clickType === "confirm-no") await closeConfirmDialog(false);
 
-  if (modalTrigger) await runModalTrigger(clickElement);
-  if (modalClose) await runModalClose(clickElement);
+  if (clickType?.includes("open-modal-")) await runModalTrigger(clickElement);
+  if (clickType?.includes("close-modal-")) await runModalClose(clickElement);
 
   // if (tabType) await runTabClick(clickElement);
   if (clickType === "upload-click" || clickType === "edit-upload-click") await runUploadClick(clickElement);

@@ -15,6 +15,10 @@ export const getProductDataControl = async (req, res) => {
   return res.json(data);
 };
 
+export const getEventDataControl = async (req, res) => {
+  //BUILD
+};
+
 export const uploadPicControl = async (req, res) => {
   if (!req.file) {
     return res.status(400).json({ error: "No file uploaded" });

@@ -26,6 +26,7 @@ import {
   editProductControl,
   deleteProductControl,
   getProductDataControl,
+  getEventDataControl,
   getCartDataControl,
   addToCartControl,
   updateCartItemControl,
@@ -82,6 +83,8 @@ router.post("/checkout/shipping", calculateShippingControl);
 
 //Main routes
 router.get("/get-product-data-route", getProductDataControl);
+
+router.get("/get-event-data-route", getEventDataControl);
 
 // router.get("/get-background-pics", getBackgroundPicsControl);
 
