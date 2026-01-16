@@ -1,6 +1,4 @@
-//keep going with events admin styles / connect to backend
-
-//reformat
+//keep going with events admin styles / get working / connect to backend
 
 //add in about and events pages
 

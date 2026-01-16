@@ -28,6 +28,14 @@ export const getEditProductParams = async () => {
   return params;
 };
 
+export const buildNewEventParams = async () => {
+  //BUILD
+};
+
+export const getEditEventParams = async () => {
+  //BUILD
+};
+
 export const getCustomerParams = async () => {
   const params = {
     firstName: document.getElementById("first-name").value,

@@ -1,6 +1,6 @@
 export const buildAdminForm = async () => {
   const adminFormWrapper = document.createElement("div");
-  adminFormWrapper.className = "admin-form-wrapper";
+  adminFormWrapper.className = "admin-dashboard-wrapper";
 
   const dashboardHeader = await buildDashboardHeader();
   const productsSection = await buildProductsSection();

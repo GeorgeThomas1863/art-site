@@ -2,19 +2,6 @@ import { ADMIN_EDIT_DEFAULT_ARRAY } from "../util/define-things.js";
 import { sendToBack } from "../util/api-front.js";
 import { buildNewProductParams, getEditProductParams, buildNewEventParams, getEditEventParams } from "../util/params.js";
 import { displayPopup, displayConfirmDialog } from "./popup.js";
-import {
-  buildAdminProductSelector,
-  buildAdminEventSelector,
-  buildName,
-  buildProductType,
-  buildFormInputList,
-  buildDropDownRow,
-  buildEventDate,
-  buildEventLocation,
-  buildEventDescription,
-  buildAdminSubmit,
-  buildAdminUpload,
-} from "../forms/admin-form.js";
 
 //MODAL CONTROLS
 export const runModalTrigger = async (clickElement) => {
@@ -484,7 +471,7 @@ export const populateAdminEditForm = async (inputObj, entityType = "products") =
 
   //set pic data to upload button (to get correct pic when submitting edit)
   editUploadButton.uploadData = picData;
-  currentImage.src = `/images/products/${picData.filename}`;
+  currentImage.src = `/images/background/${picData.filename}`;
   currentImagePreview.style.display = "flex";
 
   return true;
@@ -588,8 +575,14 @@ export const clearAdminEditFields = async () => {
 
   if (uploadInput) uploadInput.value = "";
 
-  const deleteButton = document.getElementById("delete-product-button");
-  if (deleteButton) deleteButton.style.display = "none";
+  // const deleteButton = document.getElementById("delete-product-button");
+  // if (deleteButton) deleteButton.style.display = "none";
+
+  const deleteProductButton = document.getElementById("delete-product-button");
+  if (deleteProductButton) deleteProductButton.disabled = true;
+
+  const deleteEventButton = document.getElementById("delete-event-button");
+  if (deleteEventButton) deleteEventButton.disabled = true;
 
   return true;
 };
