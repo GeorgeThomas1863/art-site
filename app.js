@@ -1,5 +1,7 @@
 //keep going with events admin styles / connect to backend
 
+//reformat
+
 //add in about and events pages
 
 //email about shipping and taxes with tax cloud
