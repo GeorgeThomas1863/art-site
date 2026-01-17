@@ -211,6 +211,9 @@ export const buildModalBody = async (mode, entityType) => {
 
   // Build form fields based on entity type
   if (entityType === "products") {
+    const typePriceRow = document.createElement("div");
+    typePriceRow.className = "form-row";
+
     const nameField = await buildProductName(mode);
     const typeField = await buildProductType(mode);
     const priceField = await buildProductPrice(mode);
@@ -218,6 +221,7 @@ export const buildModalBody = async (mode, entityType) => {
     const dropDownRow = await buildProductDropDownRow(mode);
     const uploadSection = await buildAdminUpload(mode);
 
+    typePriceRow.append(typeField, priceField);
     body.append(nameField, typeField, priceField, descriptionField, dropDownRow, uploadSection);
     return body;
   }
