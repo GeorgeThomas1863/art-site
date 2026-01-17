@@ -3,13 +3,14 @@
     max-width: 1400px;
     margin: 0 auto;
     padding: 2rem;
+    font-family: "Georgia", serif;
 }
 
 .checkout-page-header {
     text-align: center;
     margin-bottom: 3rem;
-    padding-bottom: 2rem;
-    border-bottom: 1px solid #e0e0e0;
+    /* padding-bottom: 2rem;
+    border-bottom: 1px solid #e0e0e0; */
 }
 
 .checkout-page-title {
