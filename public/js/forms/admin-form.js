@@ -263,8 +263,8 @@ export const buildModalActions = async (mode, entityType) => {
         ? "submit-button"
         : "event-submit-button"
       : entityType === "products"
-      ? "edit-submit-button"
-      : "edit-event-submit-button";
+        ? "edit-submit-button"
+        : "edit-event-submit-button";
   submitButton.textContent = mode === "add" ? "Submit" : "Update";
   submitButton.setAttribute(
     "data-label",
@@ -273,8 +273,8 @@ export const buildModalActions = async (mode, entityType) => {
         ? "new-product-submit"
         : "new-event-submit"
       : entityType === "products"
-      ? "edit-product-submit"
-      : "edit-event-submit"
+        ? "edit-product-submit"
+        : "edit-event-submit"
   );
 
   if (mode === "edit") {
@@ -293,10 +293,10 @@ export const buildAdminProductSelector = async () => {
   const selectorWrapper = document.createElement("li");
   selectorWrapper.className = "form-field product-selector-field";
 
-  const selectorLabel = document.createElement("label");
-  selectorLabel.className = "form-label";
-  selectorLabel.textContent = "Select Product to Edit";
-  selectorLabel.setAttribute("for", "product-selector");
+  // const selectorLabel = document.createElement("label");
+  // selectorLabel.className = "form-label";
+  // selectorLabel.textContent = "Select Product to Edit";
+  // selectorLabel.setAttribute("for", "product-selector");
 
   const productSelect = document.createElement("select");
   productSelect.className = "form-select";
@@ -311,7 +311,9 @@ export const buildAdminProductSelector = async () => {
   defaultOption.disabled = true;
   productSelect.append(defaultOption);
 
-  selectorWrapper.append(selectorLabel, productSelect);
+  // selectorWrapper.append(selectorLabel, productSelect);
+  selectorWrapper.append(productSelect);
+
 
   return selectorWrapper;
 };

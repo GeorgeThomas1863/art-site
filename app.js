@@ -1,3 +1,5 @@
+//REFORMAT TO PUT PRICE AND TYPE ON SAME ROW IN ADMIN
+
 //keep going with events admin styles / get working / connect to backend
 
 //add in about and events pages

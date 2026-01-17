@@ -2,7 +2,8 @@
 
 .admin-dashboard-wrapper {
     font-family: "Georgia", serif;
-    margin: 1.5rem auto;
+    /* margin: 1.5rem auto; */
+    margin: 0 auto;
     max-width: 1200px;
     width: 100%;
 }
@@ -11,14 +12,14 @@
 .dashboard-header {
     background: rgba(0, 0, 0, 0.95);
     color: #ffffff;
-    padding: 2rem;
+    padding: 1.5rem;
     text-align: center;
-    border-radius: 8px;
+    border-radius: 0 0 8px 8px;
     margin-bottom: 2rem;
 }
 
 .dashboard-title {
-    font-size: 2.5rem;
+    font-size: 2rem;
     font-weight: bold;
     letter-spacing: 3px;
 }
@@ -34,7 +35,7 @@
 .category-section {
     background: #ffffff;
     border-radius: 8px;
-    padding: 2rem;
+    padding: 1.5rem 2rem;
     margin-bottom: 2rem;
     box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
     border: 1px solid #e0e0e0;
@@ -61,7 +62,7 @@
     background: linear-gradient(135deg, #f5f5f5 0%, #fafafa 100%);
     border: 2px solid #e0e0e0;
     border-radius: 8px;
-    padding: 2.5rem 2rem;
+    padding: 4rem;
     cursor: pointer;
     transition: all 0.3s;
     text-align: center;
@@ -154,7 +155,8 @@
     max-width: 700px;
     width: 100%;
     max-height: 90vh;
-    overflow-y: auto;
+    /* overflow: hidden; */
+    /* overflow-y: auto; */
     box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
     margin: auto;
 }
@@ -337,10 +339,11 @@
 
 /* Upload Section in Modal */
 .modal-body .upload-section {
+    margin-top: 2rem;
     display: flex;
     flex-direction: column;
     gap: 1rem;
-    margin-bottom: 1.5rem;
+    /* margin-bottom: 1.5rem; */
 }
 
 .modal-body .current-image-preview {
@@ -377,7 +380,7 @@
     letter-spacing: 1px;
     background-color: transparent;
     border: 1px solid #333;
-    padding: 0.8rem 1.5rem;
+    padding: 1rem 1.5rem;
     cursor: pointer;
     transition: all 0.3s;
     text-transform: uppercase;
