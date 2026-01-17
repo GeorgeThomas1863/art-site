@@ -222,7 +222,7 @@ export const buildModalBody = async (mode, entityType) => {
     const uploadSection = await buildAdminUpload(mode);
 
     typePriceRow.append(typeField, priceField);
-    body.append(nameField, typeField, priceField, descriptionField, dropDownRow, uploadSection);
+    body.append(nameField, typePriceRow, descriptionField, dropDownRow, uploadSection);
     return body;
   }
 
@@ -245,7 +245,7 @@ export const buildModalActions = async (mode, entityType) => {
   // Delete button for edit mode
   if (mode === "edit") {
     const deleteButton = document.createElement("button");
-    deleteButton.className = "btn btn-delete";
+    deleteButton.className = "btn btn-admin-delete";
     deleteButton.type = "button";
     deleteButton.id = entityType === "products" ? "delete-product-button" : "delete-event-button";
     deleteButton.textContent = "Delete";
@@ -256,7 +256,7 @@ export const buildModalActions = async (mode, entityType) => {
 
   // Cancel button
   const cancelButton = document.createElement("button");
-  cancelButton.className = "btn btn-cancel";
+  cancelButton.className = "btn btn-admin-cancel";
   cancelButton.type = "button";
   cancelButton.textContent = "Cancel";
   // cancelButton.setAttribute("data-modal-close", `${mode}-${entityType}-modal`);
@@ -264,7 +264,7 @@ export const buildModalActions = async (mode, entityType) => {
 
   // Submit button (ridiculous from claude)
   const submitButton = document.createElement("button");
-  submitButton.className = "btn btn-submit";
+  submitButton.className = "btn btn-admin-submit";
   submitButton.type = "button";
   submitButton.id =
     mode === "add"
