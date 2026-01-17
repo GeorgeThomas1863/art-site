@@ -35,6 +35,27 @@ export const uploadPicControl = async (req, res) => {
   return res.json(data);
 };
 
+export const deletePicControl = async (req, res) => {
+  const filename = req.body.filename;
+  if (!filename) return res.status(400).json({ error: "No filename provided" });
+  const data = await runDeletePic(filename)
+
+  try {
+    const filePath = path.join(uploadDir, filename);
+    
+    // Check if file exists
+    if (fs.existsSync(filePath)) {
+      fs.unlinkSync(filePath);
+      return res.json({ success: true, message: "File deleted successfully" });
+    } else {
+      return res.json({ success: true, message: "File not found (already deleted)" });
+    }
+  } catch (error) {
+    console.error("Error deleting file:", error);
+    return res.status(500).json({ error: "Failed to delete file" });
+  }
+};
+
 export const addNewProductControl = async (req, res) => {
   const inputParams = req.body;
   if (!inputParams) return res.status(500).json({ error: "No input parameters" });

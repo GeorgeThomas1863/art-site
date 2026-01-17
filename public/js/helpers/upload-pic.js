@@ -104,3 +104,52 @@ export const uploadFile = async (file) => {
     uploadButton.disabled = false;
   }
 };
+
+//----------------------
+
+export const runDeleteUploadImage = async (clickedElement) => {
+  if (!clickedElement) return null;
+
+  const mode = clickedElement.id.includes("edit") ? "edit" : "add";
+
+  const uploadStatusId = mode === "add" ? "upload-status" : "edit-upload-status";
+  const uploadButtonId = mode === "add" ? "upload-button" : "edit-upload-button";
+  const currentImageId = mode === "add" ? "current-image" : "edit-current-image";
+  const currentImagePreviewId = mode === "add" ? "current-image-preview" : "edit-current-image-preview";
+  const picInputId = mode === "add" ? "upload-pic-input" : "edit-upload-pic-input";
+
+  const uploadStatus = document.getElementById(uploadStatusId);
+  const uploadButton = document.getElementById(uploadButtonId);
+  const currentImage = document.getElementById(currentImageId);
+  const currentImagePreview = document.getElementById(currentImagePreviewId);
+  const picInput = document.getElementById(picInputId);
+
+  if (!uploadStatus || !uploadButton || !currentImage || !currentImagePreview || !picInput) return null;
+
+  // Get filename from uploadData if it exists
+  const filename = uploadButton.uploadData?.filename;
+
+  // If we have a filename, delete it from the server
+  if (filename) {
+    const result = await sendToBack({
+      route: "/delete-pic-route",
+      filename: filename,
+    });
+
+    if (result === "FAIL") {
+      console.error("Failed to delete image from server");
+      // Continue with frontend cleanup anyway
+    }
+  }
+
+  // Reset all upload-related UI elements
+  uploadButton.uploadData = null;
+  uploadButton.textContent = mode === "add" ? "Choose Image" : "Change Image";
+  uploadStatus.textContent = "";
+  uploadStatus.style.display = "none";
+  currentImage.src = "";
+  currentImagePreview.style.display = "none";
+  picInput.value = ""; // Clear the file input
+
+  console.log("Image deleted");
+};

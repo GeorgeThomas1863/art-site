@@ -673,12 +673,27 @@ export const buildAdminUpload = async (mode) => {
   currentImageLabel.className = "current-image-label";
   currentImageLabel.textContent = mode === "add" ? "Selected Image:" : "Current Image:";
 
+  //PROB REMOVE
+  const imageWrapper = document.createElement("div");
+  imageWrapper.className = "image-wrapper";
+
   const currentImage = document.createElement("img");
   currentImage.id = mode === "add" ? "current-image" : "edit-current-image";
   currentImage.className = "current-image";
   currentImage.alt = mode === "add" ? "Selected product image" : "Current product image";
 
-  currentImagePreview.append(currentImageLabel, currentImage);
+  // Delete button for the image
+  const deleteImageBtn = document.createElement("button");
+  deleteImageBtn.type = "button";
+  deleteImageBtn.className = "delete-image-btn";
+  deleteImageBtn.id = mode === "add" ? "delete-image-btn" : "edit-delete-image-btn";
+  deleteImageBtn.innerHTML = "×";
+  deleteImageBtn.title = "Delete image";
+  deleteImageBtn.setAttribute("data-label", mode === "add" ? "delete-upload-image" : "edit-delete-upload-image");
+
+  imageWrapper.append(currentImage, deleteImageBtn);
+  // currentImagePreview.append(currentImageLabel, currentImage, deleteImageBtn);
+  currentImagePreview.append(currentImageLabel, imageWrapper);
   uploadSection.append(currentImagePreview);
 
   // Hidden file input

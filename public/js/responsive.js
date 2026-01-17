@@ -1,5 +1,5 @@
 import { runModalTrigger, runModalClose, runAddNewProduct, runEditProduct, runDeleteProduct, changeAdminProductSelector } from "./helpers/admin-run.js"; //prettier-ignore
-import { runUploadClick, runUploadPic } from "./helpers/upload-pic.js";
+import { runUploadClick, runUploadPic, runDeleteUploadImage } from "./helpers/upload-pic.js";
 import { changeProductsFilterButton } from "./helpers/products-run.js";
 import { runAddToCart, runIncreaseQuantity, runDecreaseQuantity, runRemoveFromCart } from "./helpers/cart-run.js";
 import { runPlaceOrder, runCalculateShipping } from "./helpers/buy-run.js";
@@ -42,8 +42,8 @@ export const clickHandler = async (e) => {
   if (clickType?.includes("open-modal-")) await runModalTrigger(clickElement);
   if (clickType?.includes("close-modal-")) await runModalClose(clickElement);
 
-  // if (tabType) await runTabClick(clickElement);
   if (clickType === "upload-click" || clickType === "edit-upload-click") await runUploadClick(clickElement);
+  if (clickType === "delete-upload-image" || clickType === "edit-delete-upload-image") await runDeleteUploadImage(clickElement);
 
   if (clickType === "category-filter-btn") await changeProductsFilterButton(clickElement);
 

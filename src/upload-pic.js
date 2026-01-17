@@ -61,4 +61,21 @@ export const upload = multer({
   limits: { fileSize: 10 * 1024 * 1024 }, // 10MB limit
 });
 
+//-------------------
+
+export const runDeletePic = async (filename) => {
+    const filePath = path.join(uploadDir, filename);
+    
+    // Check if file exists
+    if (!fs.existsSync(filePath)) {
+        succcess: false,  message: "File not found"
+
+    }
+     }
+      
+      
+      {
+      fs.unlinkSync(filePath);
+ 
+
 export { uploadDir };
