@@ -21,7 +21,7 @@ export const buildAdminForm = async () => {
     addProductModal,
     editProductModal,
     addEventModal,
-    editEventModal
+    editEventModal,
   );
 
   return adminFormWrapper;
@@ -283,7 +283,7 @@ export const buildModalActions = async (mode, entityType) => {
         : "new-event-submit"
       : entityType === "products"
         ? "edit-product-submit"
-        : "edit-event-submit"
+        : "edit-event-submit",
   );
 
   if (mode === "edit") {
@@ -322,7 +322,6 @@ export const buildAdminProductSelector = async () => {
 
   // selectorWrapper.append(selectorLabel, productSelect);
   selectorWrapper.append(productSelect);
-
 
   return selectorWrapper;
 };

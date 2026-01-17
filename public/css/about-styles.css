@@ -1,71 +1,71 @@
 /* ABOUT FORM STYLES */
 
 .about-container {
-    width: 100%;
-    margin: 0;
-    padding: 0;
+  width: 100%;
+  margin: 0;
+  padding: 0;
 }
 
 .about-content {
-    display: grid;
-    /* grid-template-columns: 1fr 1fr; */
-    grid-template-columns: 60% 40%;
-    /* grid-template-columns: 45% 55%; */
-    gap: 0;
-    height: calc(100vh - 72.5px);
+  display: grid;
+  /* grid-template-columns: 1fr 1fr; */
+  grid-template-columns: 60% 40%;
+  /* grid-template-columns: 45% 55%; */
+  gap: 0;
+  height: calc(100vh - 72.5px);
 }
 
 /* left side - text (70%) and static image (30%) */
 .about-left {
-    display: flex;
-    flex-direction: column;
+  display: flex;
+  flex-direction: column;
 }
 
 /* right side - 2 rotating images stacked equally */
 .about-right {
-    display: grid;
-    grid-template-rows: 1fr 1fr;
-    gap: 0;
+  display: grid;
+  grid-template-rows: 1fr 1fr;
+  gap: 0;
 }
 
 .about-text {
-    /* background: rgb(190, 233, 148); */
-    padding: 4rem;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    height: 60%;
+  /* background: rgb(190, 233, 148); */
+  padding: 4rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  height: 60%;
 }
 
 .about-image-rotating,
 .about-image-static {
-    position: relative;
-    background-position: center;
-    background-size: cover;
-    background-repeat: no-repeat;
-    border: 1px solid #333;
+  position: relative;
+  background-position: center;
+  background-size: cover;
+  background-repeat: no-repeat;
+  border: 1px solid #333;
 }
 
 .about-image-static {
-    height: 40%;
-    background-position: 50% 25%;
+  height: 40%;
+  background-position: 50% 25%;
 }
 
 .about-image-rotating {
-    transition: background-image 1s ease-in-out;
+  transition: background-image 1s ease-in-out;
 }
 
 .about-title {
-    font-size: 1.5rem;
-    font-weight: bold;
-    letter-spacing: 3px;
-    margin-bottom: 1rem;
-    color: #000000;
+  font-size: 1.5rem;
+  font-weight: bold;
+  letter-spacing: 3px;
+  margin-bottom: 1rem;
+  color: #000000;
 }
 
 .about-paragraph {
-    font-size: 1.1rem;
-    line-height: 1.5;
-    margin-bottom: 1.5rem;
-    color: #000000;
+  font-size: 1.1rem;
+  line-height: 1.5;
+  margin-bottom: 1.5rem;
+  color: #000000;
 }

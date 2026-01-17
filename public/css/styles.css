@@ -532,7 +532,9 @@ h3 {
   max-height: 1000px;
   overflow: hidden;
   padding: 0 2rem 1.5rem 2rem;
-  transition: max-height 0.4s ease-out, padding 0.4s ease-out;
+  transition:
+    max-height 0.4s ease-out,
+    padding 0.4s ease-out;
 }
 
 .collapse-content.hidden {
