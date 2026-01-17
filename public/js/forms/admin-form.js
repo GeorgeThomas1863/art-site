@@ -158,6 +158,9 @@ export const buildModal = async (mode, entityType) => {
   modalOverlay.className = "modal-overlay";
   modalOverlay.id = `${mode}-${entityType}-modal`;
 
+  const modalWrapper = document.createElement("div");
+  modalWrapper.className = "modal-wrapper";
+
   const modalContent = document.createElement("div");
   modalContent.className = "modal-content";
 
@@ -165,8 +168,10 @@ export const buildModal = async (mode, entityType) => {
   const modalBody = await buildModalBody(mode, entityType);
   const modalActions = await buildModalActions(mode, entityType);
 
-  modalContent.append(modalHeader, modalBody, modalActions);
-  modalOverlay.append(modalContent);
+  modalContent.append(modalBody, modalActions);
+  modalWrapper.append(modalHeader, modalContent);
+
+  modalOverlay.append(modalWrapper);
 
   return modalOverlay;
 };
