@@ -1,4 +1,6 @@
-//REFORMAT TO PUT PRICE AND TYPE ON SAME ROW IN ADMIN
+//get event data submit working
+
+//FIGURE OUT / RESEARCH TAXES
 
 //keep going with events admin styles / get working / connect to backend
 
