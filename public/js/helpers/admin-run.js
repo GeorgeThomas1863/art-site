@@ -322,13 +322,15 @@ export const runDeleteEvent = async () => {
 export const changeAdminProductSelector = async (changeElement) => {
   if (!changeElement) return null;
 
+  await clearAdminEditFields();
   const selectedOption = changeElement.options[changeElement.selectedIndex];
   if (!selectedOption.value) {
     // User selected the default "-- Select a product --" option
-    await clearAdminEditFields();
     await disableAdminEditFields();
     return null;
   }
+
+
 
   // Get product data directly from the property
   const productObj = selectedOption.productData;

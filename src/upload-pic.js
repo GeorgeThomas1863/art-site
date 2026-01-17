@@ -64,18 +64,16 @@ export const upload = multer({
 //-------------------
 
 export const runDeletePic = async (filename) => {
-    const filePath = path.join(uploadDir, filename);
-    
-    // Check if file exists
-    if (!fs.existsSync(filePath)) {
-        succcess: false,  message: "File not found"
+  const filePath = path.join(uploadDir, filename);
 
-    }
-     }
-      
-      
-      {
-      fs.unlinkSync(filePath);
- 
+  // Check if file exists
+  if (!fs.existsSync(filePath)) {
+    return { success: false, message: "File not found" }
+  }
+
+  fs.unlinkSync(filePath);
+  return { success: true, message: "File deleted successfully" }
+}
+
 
 export { uploadDir };

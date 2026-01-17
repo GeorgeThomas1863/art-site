@@ -211,6 +211,7 @@ h3 {
 /* ++++++++++++++++++++++++++++++++++++++++++++++++++++ */
 
 .popup-notification {
+  font-family: "Georgia", serif;
   position: fixed;
   top: 5rem;
   left: 50%;

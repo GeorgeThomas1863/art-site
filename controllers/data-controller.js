@@ -1,6 +1,7 @@
 import { runAddNewProduct, runEditProduct, runDeleteProduct, runGetProductData } from "../src/products.js";
 import { buildCart, runGetCartStats, runAddToCart, runUpdateCartItem, runRemoveFromCart } from "../src/cart.js";
 import { placeNewOrder } from "../src/orders.js";
+import { runDeletePic } from "../src/upload-pic.js";
 
 // export const getBackgroundPicsControl = async (req, res) => {
 //   const pics = await runGetBackgroundPics();
@@ -38,18 +39,12 @@ export const uploadPicControl = async (req, res) => {
 export const deletePicControl = async (req, res) => {
   const filename = req.body.filename;
   if (!filename) return res.status(400).json({ error: "No filename provided" });
-  const data = await runDeletePic(filename)
 
   try {
-    const filePath = path.join(uploadDir, filename);
-    
-    // Check if file exists
-    if (fs.existsSync(filePath)) {
-      fs.unlinkSync(filePath);
-      return res.json({ success: true, message: "File deleted successfully" });
-    } else {
-      return res.json({ success: true, message: "File not found (already deleted)" });
-    }
+    const data = await runDeletePic(filename)
+    if (!data || !data.success) return res.status(500).json({ error: data.message });
+
+    return res.json(data);
   } catch (error) {
     console.error("Error deleting file:", error);
     return res.status(500).json({ error: "Failed to delete file" });
@@ -150,4 +145,4 @@ export const placeOrderControl = async (req, res) => {
   return res.json(jsonData);
 };
 
-export const calculateShippingControl = async (req, res) => {};
+export const calculateShippingControl = async (req, res) => { };
