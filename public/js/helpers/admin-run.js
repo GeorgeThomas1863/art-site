@@ -434,7 +434,8 @@ export const populateAdminEditForm = async (inputObj, entityType = "products") =
 
     const deleteButton = document.getElementById("delete-product-button");
     if (deleteButton) {
-      deleteButton.style.display = "block";
+      // deleteButton.style.display = "block";
+      deleteButton.disabled = false;
     }
 
     // Image preview - UPDATED IDs

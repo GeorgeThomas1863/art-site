@@ -290,6 +290,7 @@ h3 {
 
 /* Confirmation Dialog Styles */
 .confirm-dialog {
+  font-family: "Georgia", serif;
   position: fixed;
   top: 0;
   left: 0;
