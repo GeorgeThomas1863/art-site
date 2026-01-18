@@ -485,7 +485,7 @@ export const populateAdminEditForm = async (inputObj, entityType = "products") =
 
   //set pic data to upload button (to get correct pic when submitting edit)
   editUploadButton.uploadData = picData;
-  currentImage.src = `/images/background/${picData.filename}`;
+  currentImage.src = `/images/events/${picData.filename}`;
   currentImagePreview.style.display = "flex";
 
   return true;

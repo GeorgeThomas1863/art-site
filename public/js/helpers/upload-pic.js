@@ -12,10 +12,10 @@ export const runUploadClick = async (clickedElement) => {
   picInput.click();
 };
 
-export const runUploadPic = async (pic, mode = "add") => {
+export const runUploadPic = async (pic, mode = "add", entityType = "products") => {
   if (!pic) return null;
 
-  console.log(`${mode.toUpperCase()} PIC`);
+  console.log(`${mode.toUpperCase()} PIC (${entityType})`);
   console.log(pic);
 
   const uploadStatusId = mode === "add" ? "upload-status" : "edit-upload-status";
@@ -36,7 +36,9 @@ export const runUploadPic = async (pic, mode = "add") => {
   const formData = new FormData();
   formData.append("image", pic);
 
-  const data = await sendToBackFile({ route: "/upload-pic-route", formData: formData });
+  // Choose route based on entity type
+  const uploadRoute = entityType === "events" ? "/upload-event-pic-route" : "/upload-pic-route";
+  const data = await sendToBackFile({ route: uploadRoute, formData: formData });
 
   if (data === "FAIL") {
     uploadStatus.textContent = "✗ Upload failed";
@@ -52,12 +54,13 @@ export const runUploadPic = async (pic, mode = "add") => {
   uploadButton.disabled = false;
   uploadButton.uploadData = data;
 
-  // Show the image preview
+  // Show the image preview with correct path
   const currentImage = document.getElementById(currentImageId);
   const currentImagePreview = document.getElementById(currentImagePreviewId);
 
   if (currentImage && currentImagePreview && data && data.filename) {
-    currentImage.src = `/images/products/${data.filename}`;
+    const imagePath = entityType === "events" ? `/images/events/${data.filename}` : `/images/products/${data.filename}`;
+    currentImage.src = imagePath;
     currentImagePreview.style.display = "flex";
   }
 
@@ -107,7 +110,7 @@ export const uploadFile = async (file) => {
 
 //----------------------
 
-export const runDeleteUploadImage = async (clickedElement) => {
+export const runDeleteUploadImage = async (clickedElement, entityType = "products") => {
   if (!clickedElement) return null;
 
   const mode = clickedElement.id.includes("edit") ? "edit" : "add";
@@ -131,8 +134,9 @@ export const runDeleteUploadImage = async (clickedElement) => {
 
   // If we have a filename, delete it from the server
   if (filename) {
+    const deleteRoute = entityType === "events" ? "/delete-event-pic-route" : "/delete-pic-route";
     const result = await sendToBack({
-      route: "/delete-pic-route",
+      route: deleteRoute,
       filename: filename,
     });
 

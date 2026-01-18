@@ -29,11 +29,27 @@ export const getEditProductParams = async () => {
 };
 
 export const buildNewEventParams = async () => {
-  //BUILD
+  const params = {
+    route: "/add-new-event-route",
+    name: document.getElementById("name").value,
+    eventDate: document.getElementById("event-date").value,
+    eventLocation: document.getElementById("event-location").value,
+    eventDescription: document.getElementById("event-description").value,
+    picData: document.getElementById("upload-button").uploadData,
+    dateCreated: new Date().toISOString(),
+  };
+  return params;
 };
 
 export const getEditEventParams = async () => {
-  //BUILD
+  const params = {
+    name: document.getElementById("edit-name").value,
+    eventDate: document.getElementById("edit-event-date").value,
+    eventLocation: document.getElementById("edit-event-location").value,
+    eventDescription: document.getElementById("edit-event-description").value,
+    picData: document.getElementById("edit-upload-button").uploadData,
+  };
+  return params;
 };
 
 export const getCustomerParams = async () => {

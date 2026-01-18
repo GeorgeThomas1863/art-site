@@ -659,14 +659,16 @@ export const buildEventDescription = async (mode) => {
 
 //ADMIN UPLOAD
 
-export const buildAdminUpload = async (mode) => {
+export const buildAdminUpload = async (mode, entityType = "products") => {
+  const prefix = entityType === "events" ? "event-" : "";
+
   const uploadSection = document.createElement("div");
   uploadSection.className = "upload-section";
 
   // Current image preview
   const currentImagePreview = document.createElement("div");
   currentImagePreview.className = "current-image-preview";
-  currentImagePreview.id = mode === "add" ? "current-image-preview" : "edit-current-image-preview";
+  currentImagePreview.id = mode === "add" ? `${prefix}current-image-preview` : `edit-${prefix}current-image-preview`;
   currentImagePreview.style.display = "none";
 
   const currentImageLabel = document.createElement("span");
@@ -678,7 +680,7 @@ export const buildAdminUpload = async (mode) => {
   imageWrapper.className = "image-wrapper";
 
   const currentImage = document.createElement("img");
-  currentImage.id = mode === "add" ? "current-image" : "edit-current-image";
+  currentImage.id = mode === "add" ? `${prefix}current-image` : `edit-${prefix}current-image`;
   currentImage.className = "current-image";
   currentImage.alt = mode === "add" ? "Selected product image" : "Current product image";
 
@@ -686,7 +688,7 @@ export const buildAdminUpload = async (mode) => {
   const deleteImageBtn = document.createElement("button");
   deleteImageBtn.type = "button";
   deleteImageBtn.className = "delete-image-btn";
-  deleteImageBtn.id = mode === "add" ? "delete-image-btn" : "edit-delete-image-btn";
+  deleteImageBtn.id = mode === "add" ? `${prefix}delete-image-btn` : `edit-${prefix}delete-image-btn`;
   deleteImageBtn.innerHTML = "×";
   deleteImageBtn.title = "Delete image";
   deleteImageBtn.setAttribute("data-label", mode === "add" ? "delete-upload-image" : "edit-delete-upload-image");
@@ -699,7 +701,7 @@ export const buildAdminUpload = async (mode) => {
   // Hidden file input
   const picInput = document.createElement("input");
   picInput.type = "file";
-  picInput.id = mode === "add" ? "upload-pic-input" : "edit-upload-pic-input";
+  picInput.id = mode === "add" ? `${prefix}upload-pic-input` : `edit-${prefix}upload-pic-input`;
   picInput.accept = ".jpg,.jpeg,.png,.gif,.webp";
   picInput.style.display = "none";
 
@@ -709,7 +711,7 @@ export const buildAdminUpload = async (mode) => {
 
   const uploadButton = document.createElement("button");
   uploadButton.type = "button";
-  uploadButton.id = mode === "add" ? "upload-button" : "edit-upload-button";
+  uploadButton.id = mode === "add" ? `${prefix}upload-button` : `edit-${prefix}upload-button`;
   uploadButton.className = "upload-btn";
   uploadButton.textContent = mode === "add" ? "Choose Image" : "Change Image";
   uploadButton.setAttribute("data-label", mode === "add" ? "upload-click" : "edit-upload-click");
@@ -719,7 +721,7 @@ export const buildAdminUpload = async (mode) => {
   }
 
   const uploadStatus = document.createElement("span");
-  uploadStatus.id = mode === "add" ? "upload-status" : "edit-upload-status";
+  uploadStatus.id = mode === "add" ? `${prefix}upload-status` : `edit-${prefix}upload-status`;
   uploadStatus.className = "upload-status";
   uploadStatus.style.marginLeft = "10px";
   uploadStatus.style.display = "none";

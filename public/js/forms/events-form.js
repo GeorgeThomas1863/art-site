@@ -42,8 +42,9 @@ export const buildEventCard = async (event) => {
 
   const eventImage = document.createElement("div");
   eventImage.className = "event-image";
-  if (event.imagePath) {
-    eventImage.style.backgroundImage = `url('${event.imagePath}')`;
+  // Use picData.filename to construct image path
+  if (event.picData && event.picData.filename) {
+    eventImage.style.backgroundImage = `url('/images/events/${event.picData.filename}')`;
     eventImage.style.backgroundSize = "cover";
     eventImage.style.backgroundPosition = "center";
   } else {
@@ -55,19 +56,19 @@ export const buildEventCard = async (event) => {
 
   const eventDate = document.createElement("div");
   eventDate.className = "event-date";
-  eventDate.textContent = `📅 ${event.date}`;
+  eventDate.textContent = `📅 ${event.eventDate}`;
 
   const eventTitle = document.createElement("div");
   eventTitle.className = "event-title";
-  eventTitle.textContent = event.title;
+  eventTitle.textContent = event.name;
 
   const eventLocation = document.createElement("div");
   eventLocation.className = "event-location";
-  eventLocation.textContent = `📍 ${event.location}`;
+  eventLocation.textContent = `📍 ${event.eventLocation}`;
 
   const eventDescription = document.createElement("div");
   eventDescription.className = "event-description";
-  eventDescription.textContent = event.description;
+  eventDescription.textContent = event.eventDescription;
 
   eventContent.append(eventDate, eventTitle, eventLocation, eventDescription);
   eventCard.append(eventImage, eventContent);
