@@ -213,7 +213,7 @@ export const runAddNewEvent = async () => {
     return null;
   }
 
-  const uploadButton = document.getElementById("upload-button");
+  const uploadButton = document.getElementById("event-upload-button");
   if (!uploadButton.uploadData) {
     await displayPopup("Please upload an image for the event first", "error");
     return null;
@@ -478,9 +478,9 @@ export const populateAdminEditForm = async (inputObj, entityType = "products") =
 
   if (!picData || !picData.filename) return null;
 
-  const currentImage = document.getElementById("edit-current-image");
-  const currentImagePreview = document.getElementById("edit-current-image-preview");
-  const editUploadButton = document.getElementById("edit-upload-button");
+  const currentImage = document.getElementById("edit-event-current-image");
+  const currentImagePreview = document.getElementById("edit-event-current-image-preview");
+  const editUploadButton = document.getElementById("edit-event-upload-button");
   if (!currentImage || !currentImagePreview || !editUploadButton) return null;
 
   //set pic data to upload button (to get correct pic when submitting edit)
@@ -515,7 +515,7 @@ export const disableAdminEditFields = async () => {
   return true;
 };
 
-export const clearAdminAddFields = async () => {
+export const clearAdminAddFields = async (entityType = "products") => {
   const clearFieldsArray = ["name", "price", "description", "event-date", "event-location", "event-description"];
 
   for (let i = 0; i < clearFieldsArray.length; i++) {
@@ -536,13 +536,14 @@ export const clearAdminAddFields = async () => {
   if (soldSelect) soldSelect.value = "no"; // Reset to default
 
   // Clear image preview
-  const currentImagePreview = document.getElementById("current-image-preview");
+  const prefix = entityType === "events" ? "event-" : "";
+  const currentImagePreview = document.getElementById(`${prefix}current-image-preview`);
   if (currentImagePreview) currentImagePreview.style.display = "none";
 
   // Reset upload button and status
-  const uploadButton = document.getElementById("upload-button");
-  const uploadStatus = document.getElementById("upload-status");
-  const uploadInput = document.getElementById("upload-pic-input");
+  const uploadButton = document.getElementById(`${prefix}upload-button`);
+  const uploadStatus = document.getElementById(`${prefix}upload-status`);
+  const uploadInput = document.getElementById(`${prefix}upload-pic-input`);
 
   if (uploadButton) {
     uploadButton.uploadData = null;
@@ -569,25 +570,45 @@ export const clearAdminEditFields = async () => {
     }
   }
 
-  const currentImagePreview = document.getElementById("edit-current-image-preview");
-  if (currentImagePreview) currentImagePreview.style.display = "none";
+  // Clear image preview for both products and events
+  const productImagePreview = document.getElementById("edit-current-image-preview");
+  if (productImagePreview) productImagePreview.style.display = "none";
+  
+  const eventImagePreview = document.getElementById("edit-event-current-image-preview");
+  if (eventImagePreview) eventImagePreview.style.display = "none";
 
-  // Clear upload data
-  const uploadButton = document.getElementById("edit-upload-button");
-  const uploadStatus = document.getElementById("edit-upload-status");
-  const uploadInput = document.getElementById("edit-upload-pic-input");
+  // Clear upload data for both products and events
+  const productUploadButton = document.getElementById("edit-upload-button");
+  const productUploadStatus = document.getElementById("edit-upload-status");
+  const productUploadInput = document.getElementById("edit-upload-pic-input");
 
-  if (uploadButton) {
-    uploadButton.uploadData = null;
-    uploadButton.textContent = "Change Image";
+  if (productUploadButton) {
+    productUploadButton.uploadData = null;
+    productUploadButton.textContent = "Change Image";
   }
 
-  if (uploadStatus) {
-    uploadStatus.textContent = "";
-    uploadStatus.style.display = "none";
+  if (productUploadStatus) {
+    productUploadStatus.textContent = "";
+    productUploadStatus.style.display = "none";
   }
 
-  if (uploadInput) uploadInput.value = "";
+  if (productUploadInput) productUploadInput.value = "";
+
+  const eventUploadButton = document.getElementById("edit-event-upload-button");
+  const eventUploadStatus = document.getElementById("edit-event-upload-status");
+  const eventUploadInput = document.getElementById("edit-event-upload-pic-input");
+
+  if (eventUploadButton) {
+    eventUploadButton.uploadData = null;
+    eventUploadButton.textContent = "Change Image";
+  }
+
+  if (eventUploadStatus) {
+    eventUploadStatus.textContent = "";
+    eventUploadStatus.style.display = "none";
+  }
+
+  if (eventUploadInput) eventUploadInput.value = "";
 
   // const deleteButton = document.getElementById("delete-product-button");
   // if (deleteButton) deleteButton.style.display = "none";

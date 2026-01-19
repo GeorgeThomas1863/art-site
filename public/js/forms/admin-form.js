@@ -120,6 +120,8 @@ export const buildStatsSection = async () => {
   return section;
 };
 
+//---------------------------
+
 export const buildActionCard = async (mode, entityType) => {
   const card = document.createElement("div");
   card.className = "action-card";
@@ -230,7 +232,7 @@ export const buildModalBody = async (mode, entityType) => {
   const dateField = await buildEventDate(mode);
   const locationField = await buildEventLocation(mode);
   const descriptionField = await buildEventDescription(mode);
-  const uploadSection = await buildAdminUpload(mode);
+  const uploadSection = await buildAdminUpload(mode, entityType);
 
   body.append(nameField, dateField, locationField, descriptionField, uploadSection);
 
