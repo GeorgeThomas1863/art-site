@@ -3,7 +3,7 @@ import express from "express";
 // import CONFIG from "../config/config.js";
 import requireAuth from "../middleware/auth-middle.js";
 import { authController } from "../controllers/auth-controller.js";
-import { upload } from "../src/upload-pic.js";
+import { upload } from "../src/upload-back.js";
 
 import {
   mainDisplay,

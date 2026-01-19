@@ -1,7 +1,7 @@
 import { runAddNewProduct, runEditProduct, runDeleteProduct, runGetProductData } from "../src/products.js";
 import { buildCart, runGetCartStats, runAddToCart, runUpdateCartItem, runRemoveFromCart } from "../src/cart.js";
 import { placeNewOrder } from "../src/orders.js";
-import { runDeletePic } from "../src/upload-pic.js";
+import { runDeletePic } from "../src/upload-back.js";
 
 // export const getBackgroundPicsControl = async (req, res) => {
 //   const pics = await runGetBackgroundPics();
