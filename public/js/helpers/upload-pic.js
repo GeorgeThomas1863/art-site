@@ -68,11 +68,6 @@ export const runUploadPic = async (pic, mode = "add", entityType = "products") =
   const currentImage = document.getElementById(currentImageId);
   const currentImagePreview = document.getElementById(currentImagePreviewId);
 
-  console.log("CURRENT IMAGE");
-  console.log(currentImage);
-  console.log("CURRENT IMAGE PREVIEW");
-  console.log(currentImagePreview);
-
   if (currentImage && currentImagePreview && data && data.filename) {
     currentImage.src = `/images/${entityType}/${data.filename}`;
     currentImagePreview.style.display = "flex";
