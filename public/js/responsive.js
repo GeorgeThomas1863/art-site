@@ -107,8 +107,12 @@ export const changeHandler = async (e) => {
 //modal
 export const overlayClickHandler = async (e) => {
   if (e.target.classList.contains("modal-overlay")) {
-    e.target.classList.remove("visible");
+    e.target.remove();
   }
+
+  // if (e.target.classList.contains("modal-overlay")) {
+  //   e.target.classList.remove("visible");
+  // }
 };
 
 if (authElement) {

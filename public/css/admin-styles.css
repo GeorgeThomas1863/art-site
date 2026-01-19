@@ -132,6 +132,7 @@
 
 /* Modal Overlay */
 .modal-overlay {
+  font-family: "Georgia", serif;
   position: fixed;
   top: 0;
   left: 0;

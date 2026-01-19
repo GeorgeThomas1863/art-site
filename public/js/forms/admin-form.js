@@ -7,22 +7,24 @@ export const buildAdminForm = async () => {
   const eventsSection = await buildEventsSection();
   const statsSection = await buildStatsSection();
 
-  // Modals
-  const addProductModal = await buildModal("add", "products");
-  const editProductModal = await buildModal("edit", "products");
-  const addEventModal = await buildModal("add", "events");
-  const editEventModal = await buildModal("edit", "events");
+  adminFormWrapper.append(dashboardHeader, productsSection, eventsSection, statsSection);
 
-  adminFormWrapper.append(
-    dashboardHeader,
-    productsSection,
-    eventsSection,
-    statsSection,
-    addProductModal,
-    editProductModal,
-    addEventModal,
-    editEventModal
-  );
+  // Modals
+  // const addProductModal = await buildModal("add", "products");
+  // const editProductModal = await buildModal("edit", "products");
+  // const addEventModal = await buildModal("add", "events");
+  // const editEventModal = await buildModal("edit", "events");
+
+  // adminFormWrapper.append(
+  //   dashboardHeader,
+  //   productsSection,
+  //   eventsSection,
+  //   statsSection,
+  //   addProductModal,
+  //   editProductModal,
+  //   addEventModal,
+  //   editEventModal
+  // );
 
   return adminFormWrapper;
 };

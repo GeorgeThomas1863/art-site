@@ -2,6 +2,10 @@ import { ADMIN_EDIT_DEFAULT_ARRAY } from "../util/define-things.js";
 import { sendToBack } from "../util/api-front.js";
 import { buildNewProductParams, getEditProductParams, buildNewEventParams, getEditEventParams } from "../util/params.js";
 import { displayPopup, displayConfirmDialog } from "./popup.js";
+import { buildModal } from "../forms/admin-form.js";
+
+//PROB REMOVE
+const adminElement = document.getElementById("admin-element");
 
 //MODAL CONTROLS
 export const runModalTrigger = async (clickElement) => {
@@ -14,11 +18,13 @@ export const runModalTrigger = async (clickElement) => {
   if (!modalType) return null;
 
   const modalStr = modalType.split("-").slice(2).join("-");
-  const modalId = `${modalStr}-modal`;
-  if (!modalId) return null;
+  const [mode, entityType] = modalStr.split("-");
 
-  // If it's an edit modal, load the data first
-  if (modalId === "edit-products-modal") {
+  const modal = await buildModal(mode, entityType);
+  adminElement.append(modal);
+
+  // Load data for product edit
+  if (mode === "edit" && entityType === "products") {
     const productData = await sendToBack({ route: "/get-product-data-route" }, "GET");
     if (productData && productData.length) {
       await populateAdminProductSelector(productData);
@@ -26,7 +32,8 @@ export const runModalTrigger = async (clickElement) => {
     }
   }
 
-  if (modalId === "edit-events-modal") {
+  // Load data for event edit
+  if (mode === "edit" && entityType === "events") {
     const eventData = await sendToBack({ route: "/get-event-data-route" }, "GET");
     if (eventData && eventData.length) {
       await populateAdminEventSelector(eventData);
@@ -34,38 +41,66 @@ export const runModalTrigger = async (clickElement) => {
     }
   }
 
-  openModal(modalId);
+  modal.classList.add("visible");
+
   return true;
+
+  // const modalStr = modalType.split("-").slice(2).join("-");
+  // const modalId = `${modalStr}-modal`;
+  // if (!modalId) return null;
+
+  // If it's an edit modal, load the data first
+  // if (modalId === "edit-products-modal") {
+  //   const productData = await sendToBack({ route: "/get-product-data-route" }, "GET");
+  //   if (productData && productData.length) {
+  //     await populateAdminProductSelector(productData);
+  //     await updateProductStats(productData);
+  //   }
+  // }
+
+  // if (modalId === "edit-events-modal") {
+  //   const eventData = await sendToBack({ route: "/get-event-data-route" }, "GET");
+  //   if (eventData && eventData.length) {
+  //     await populateAdminEventSelector(eventData);
+  //     await updateEventStats(eventData);
+  //   }
+  // }
+
+  // openModal(modalId);
 };
 
 // Run modal close
 export const runModalClose = async (clickElement) => {
   if (!clickElement) return null;
 
-  const modalType = clickElement.getAttribute("data-label");
-  if (!modalType) return null;
-
-  const modalStr = modalType.split("-").slice(2).join("-");
-  const modalId = `${modalStr}-modal`;
-  if (!modalId) return null;
-
-  closeModal(modalId);
+  const modal = document.querySelector(".modal-overlay");
+  if (modal) modal.remove();
   return true;
+
+  // const modalType = clickElement.getAttribute("data-label");
+  // if (!modalType) return null;
+
+  // const modalStr = modalType.split("-").slice(2).join("-");
+  // const modalId = `${modalStr}-modal`;
+  // if (!modalId) return null;
+
+  // closeModal(modalId);
+  // return true;
 };
 
-export const openModal = (modalId) => {
-  const modal = document.getElementById(modalId);
-  if (modal) {
-    modal.classList.add("visible");
-  }
-};
+// export const openModal = (modalId) => {
+//   const modal = document.getElementById(modalId);
+//   if (modal) {
+//     modal.classList.add("visible");
+//   }
+// };
 
-export const closeModal = (modalId) => {
-  const modal = document.getElementById(modalId);
-  if (modal) {
-    modal.classList.remove("visible");
-  }
-};
+// export const closeModal = (modalId) => {
+//   const modal = document.getElementById(modalId);
+//   if (modal) {
+//     modal.classList.remove("visible");
+//   }
+// };
 
 //+++++++++++++++++++++++++++++++
 
@@ -99,9 +134,13 @@ export const runAddNewProduct = async () => {
   const popupText = `Product "${data.name}" added successfully`;
   await displayPopup(popupText, "success");
 
+  // Remove modal
+  const modal = document.querySelector(".modal-overlay");
+  if (modal) modal.remove();
+
   // Clear the form after successful submission
-  await clearAdminAddFields();
-  closeModal("add-products-modal");
+  // await clearAdminAddFields();
+  // closeModal("add-products-modal");
 
   // Refresh stats
   const productData = await sendToBack({ route: "/get-product-data-route" }, "GET");
@@ -143,21 +182,26 @@ export const runEditProduct = async () => {
   const popupText = `Product "${data.name}" updated successfully`;
   await displayPopup(popupText, "success");
 
+  const modal = document.querySelector(".modal-overlay");
+  if (modal) modal.remove();
+
+  //!!!!!FIX THIS BELOW (DONT WANT TO DESTROY ON SUBMIT)
+
   // Refresh the product data to reflect changes
-  const productData = await sendToBack({ route: "/get-product-data-route" }, "GET");
-  if (productData) {
-    await populateAdminProductSelector(productData);
-    await updateProductStats(productData);
+  // const productData = await sendToBack({ route: "/get-product-data-route" }, "GET");
+  // if (productData) {
+  //   await populateAdminProductSelector(productData);
+  //   await updateProductStats(productData);
 
-    // Re-select the product that was just updated so user can see the changes
-    productSelector.value = productId;
+  //   // Re-select the product that was just updated so user can see the changes
+  //   productSelector.value = productId;
 
-    // Re-populate the form with the updated data
-    const updatedOption = productSelector.options[productSelector.selectedIndex];
-    if (updatedOption && updatedOption.productData) {
-      await populateAdminEditForm(updatedOption.productData);
-    }
-  }
+  //   // Re-populate the form with the updated data
+  //   const updatedOption = productSelector.options[productSelector.selectedIndex];
+  //   if (updatedOption && updatedOption.productData) {
+  //     await populateAdminEditForm(updatedOption.productData);
+  //   }
+  // }
 
   return data;
 };
@@ -188,17 +232,20 @@ export const runDeleteProduct = async () => {
   const popupText = `Product "${productName}" deleted successfully`;
   await displayPopup(popupText, "success");
 
+  const modal = document.querySelector(".modal-overlay");
+  if (modal) modal.remove();
+
   // Refresh the product data to reflect changes
   const productData = await sendToBack({ route: "/get-product-data-route" }, "GET");
   if (productData) {
-    await populateAdminProductSelector(productData);
+    // await populateAdminProductSelector(productData);
     await updateProductStats(productData);
   }
 
-  // Clear the form fields
-  await clearAdminEditFields();
-  await disableAdminEditFields();
-  productSelector.value = "";
+  // // Clear the form fields
+  // await clearAdminEditFields();
+  // await disableAdminEditFields();
+  // productSelector.value = "";
 
   return data;
 };
@@ -228,8 +275,12 @@ export const runAddNewEvent = async () => {
   const popupText = `Event "${data.name}" added successfully`;
   await displayPopup(popupText, "success");
 
-  await clearAdminAddFields("events");
-  closeModal("add-events-modal");
+  // Remove modal
+  const modal = document.querySelector(".modal-overlay");
+  if (modal) modal.remove();
+
+  // await clearAdminAddFields("events");
+  // closeModal("add-events-modal");
 
   const eventData = await sendToBack({ route: "/get-event-data-route" }, "GET");
   if (eventData) await updateEventStats(eventData);
@@ -265,15 +316,20 @@ export const runEditEvent = async () => {
   const popupText = `Event "${data.name}" updated successfully`;
   await displayPopup(popupText, "success");
 
-  const eventData = await sendToBack({ route: "/get-event-data-route" }, "GET");
-  if (eventData) {
-    await populateAdminEventSelector(eventData);
-    eventSelector.value = eventId;
-    const updatedOption = eventSelector.options[eventSelector.selectedIndex];
-    if (updatedOption && updatedOption.eventData) {
-      await populateAdminEditForm(updatedOption.eventData, "events");
-    }
-  }
+  const modal = document.querySelector(".modal-overlay");
+  if (modal) modal.remove();
+
+  //!!!!!FIX THIS BELOW (DONT WANT TO DESTROY ON SUBMIT)
+
+  // const eventData = await sendToBack({ route: "/get-event-data-route" }, "GET");
+  // if (eventData) {
+  //   await populateAdminEventSelector(eventData);
+  //   eventSelector.value = eventId;
+  //   const updatedOption = eventSelector.options[eventSelector.selectedIndex];
+  //   if (updatedOption && updatedOption.eventData) {
+  //     await populateAdminEditForm(updatedOption.eventData, "events");
+  //   }
+  // }
 
   return data;
 };
@@ -304,15 +360,18 @@ export const runDeleteEvent = async () => {
   const popupText = `Event "${eventName}" deleted successfully`;
   await displayPopup(popupText, "success");
 
+  const modal = document.querySelector(".modal-overlay");
+  if (modal) modal.remove();
+
   const eventData = await sendToBack({ route: "/get-event-data-route" }, "GET");
   if (eventData) {
-    await populateAdminEventSelector(eventData);
+    // await populateAdminEventSelector(eventData);
     await updateEventStats(eventData);
   }
 
-  await clearAdminEditFields();
-  await disableAdminEditFields();
-  eventSelector.value = "";
+  // await clearAdminEditFields();
+  // await disableAdminEditFields();
+  // eventSelector.value = "";
 
   return data;
 };
@@ -329,8 +388,6 @@ export const changeAdminProductSelector = async (changeElement) => {
     await disableAdminEditFields();
     return null;
   }
-
-
 
   // Get product data directly from the property
   const productObj = selectedOption.productData;
