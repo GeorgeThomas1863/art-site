@@ -19,21 +19,16 @@ if (!fs.existsSync(uploadDir)) {
   fs.mkdirSync(uploadDir, { recursive: true });
 }
 
-// Helper function to clear all files in upload directory
-// export const clearUploadDirectory = () => {
-//   const files = fs.readdirSync(uploadDir);
-//   files.forEach((file) => {
-//     const filePath = path.join(uploadDir, file);
-//     if (fs.statSync(filePath).isFile()) {
-//       fs.unlinkSync(filePath);
-//     }
-//   });
-// };
-
 // Configure storage
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
-    cb(null, uploadDir);
+    let targetDir;
+    if (req.path === "/upload-product-pic-route") {
+      targetDir = path.join(uploadDir, "products");
+    } else if (req.path === "/upload-event-pic-route") {
+      targetDir = path.join(uploadDir, "events");
+    }
+    cb(null, targetDir);
   },
   filename: function (req, file, cb) {
     // keep the original name since we're only storing one file
@@ -68,12 +63,11 @@ export const runDeletePic = async (filename) => {
 
   // Check if file exists
   if (!fs.existsSync(filePath)) {
-    return { success: false, message: "File not found" }
+    return { success: false, message: "File not found" };
   }
 
   fs.unlinkSync(filePath);
-  return { success: true, message: "File deleted successfully" }
-}
-
+  return { success: true, message: "File deleted successfully" };
+};
 
 export { uploadDir };

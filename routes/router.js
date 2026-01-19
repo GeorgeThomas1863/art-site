@@ -35,7 +35,7 @@ import {
   clearCartControl,
   getCartStatsControl,
   placeOrderControl,
-  calculateShippingControl
+  calculateShippingControl,
 } from "../controllers/data-controller.js";
 
 const router = express.Router();
@@ -50,7 +50,9 @@ router.get("/401", display401);
 //ADMIN ROUTES
 router.get("/admin", requireAuth, adminDisplay);
 
-router.post("/upload-pic-route", requireAuth, upload.single("image"), uploadPicControl);
+router.post("/upload-product-pic-route", requireAuth, upload.single("image"), uploadPicControl);
+
+router.post("/upload-event-pic-route", requireAuth, upload.single("image"), uploadPicControl);
 
 router.post("/delete-pic-route", requireAuth, deletePicControl);
 

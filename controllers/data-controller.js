@@ -41,7 +41,7 @@ export const deletePicControl = async (req, res) => {
   if (!filename) return res.status(400).json({ error: "No filename provided" });
 
   try {
-    const data = await runDeletePic(filename)
+    const data = await runDeletePic(filename);
     if (!data || !data.success) return res.status(500).json({ error: data.message });
 
     return res.json(data);
@@ -145,4 +145,4 @@ export const placeOrderControl = async (req, res) => {
   return res.json(jsonData);
 };
 
-export const calculateShippingControl = async (req, res) => { };
+export const calculateShippingControl = async (req, res) => {};

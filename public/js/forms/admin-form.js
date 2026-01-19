@@ -21,7 +21,7 @@ export const buildAdminForm = async () => {
     addProductModal,
     editProductModal,
     addEventModal,
-    editEventModal,
+    editEventModal
   );
 
   return adminFormWrapper;
@@ -219,7 +219,7 @@ export const buildModalBody = async (mode, entityType) => {
     const priceField = await buildProductPrice(mode);
     const descriptionField = await buildProductDescription(mode);
     const dropDownRow = await buildProductDropDownRow(mode);
-    const uploadSection = await buildAdminUpload(mode);
+    const uploadSection = await buildAdminUpload(mode, entityType);
 
     typePriceRow.append(typeField, priceField);
     body.append(nameField, typePriceRow, descriptionField, dropDownRow, uploadSection);
@@ -230,7 +230,7 @@ export const buildModalBody = async (mode, entityType) => {
   const dateField = await buildEventDate(mode);
   const locationField = await buildEventLocation(mode);
   const descriptionField = await buildEventDescription(mode);
-  const uploadSection = await buildAdminUpload(mode);
+  const uploadSection = await buildAdminUpload(mode, entityType);
 
   body.append(nameField, dateField, locationField, descriptionField, uploadSection);
 
@@ -272,8 +272,8 @@ export const buildModalActions = async (mode, entityType) => {
         ? "submit-button"
         : "event-submit-button"
       : entityType === "products"
-        ? "edit-submit-button"
-        : "edit-event-submit-button";
+      ? "edit-submit-button"
+      : "edit-event-submit-button";
   submitButton.textContent = mode === "add" ? "Submit" : "Update";
   submitButton.setAttribute(
     "data-label",
@@ -282,8 +282,8 @@ export const buildModalActions = async (mode, entityType) => {
         ? "new-product-submit"
         : "new-event-submit"
       : entityType === "products"
-        ? "edit-product-submit"
-        : "edit-event-submit",
+      ? "edit-product-submit"
+      : "edit-event-submit"
   );
 
   if (mode === "edit") {
@@ -659,7 +659,7 @@ export const buildEventDescription = async (mode) => {
 
 //ADMIN UPLOAD
 
-export const buildAdminUpload = async (mode) => {
+export const buildAdminUpload = async (mode, entityType = "products") => {
   const uploadSection = document.createElement("div");
   uploadSection.className = "upload-section";
 
@@ -702,6 +702,7 @@ export const buildAdminUpload = async (mode) => {
   picInput.id = mode === "add" ? "upload-pic-input" : "edit-upload-pic-input";
   picInput.accept = ".jpg,.jpeg,.png,.gif,.webp";
   picInput.style.display = "none";
+  picInput.entityType = entityType;
 
   if (mode === "edit") {
     picInput.disabled = true;

@@ -12,11 +12,14 @@ export const runUploadClick = async (clickedElement) => {
   picInput.click();
 };
 
-export const runUploadPic = async (pic, mode = "add") => {
+export const runUploadPic = async (pic, mode = "add", entityType = "products") => {
   if (!pic) return null;
 
-  console.log(`${mode.toUpperCase()} PIC`);
+  console.log("RUN UPLOAD PIC");
+  console.log("PIC");
   console.log(pic);
+  console.log("MODE");
+  console.log(mode);
 
   const uploadStatusId = mode === "add" ? "upload-status" : "edit-upload-status";
   const uploadButtonId = mode === "add" ? "upload-button" : "edit-upload-button";
@@ -33,10 +36,12 @@ export const runUploadPic = async (pic, mode = "add") => {
   uploadStatus.style.display = "inline";
   uploadButton.disabled = true;
 
+  const route = entityType === "products" ? "/upload-product-pic-route" : "/upload-event-pic-route";
+
   const formData = new FormData();
   formData.append("image", pic);
 
-  const data = await sendToBackFile({ route: "/upload-pic-route", formData: formData });
+  const data = await sendToBackFile({ route: route, formData: formData });
 
   if (data === "FAIL") {
     uploadStatus.textContent = "✗ Upload failed";

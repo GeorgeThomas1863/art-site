@@ -92,7 +92,8 @@ export const changeHandler = async (e) => {
     if (!pic) return null;
 
     const mode = changeId.includes("edit") ? "edit" : "add";
-    await runUploadPic(pic, mode);
+    const entityType = changeElement.entityType;
+    await runUploadPic(pic, mode, entityType);
     return true;
   }
 
