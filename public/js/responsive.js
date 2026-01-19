@@ -1,4 +1,4 @@
-import { runModalTrigger, runModalClose, runAddNewProduct, runEditProduct, runDeleteProduct, changeAdminProductSelector, runAddNewEvent, runEditEvent, runDeleteEvent, changeAdminEventSelector } from "./helpers/admin-run.js"; //prettier-ignore
+import { runModalTrigger, runModalClose, runAddNewProduct, runEditProduct, runDeleteProduct, changeAdminProductSelector } from "./helpers/admin-run.js"; //prettier-ignore
 import { runUploadClick, runUploadPic, runDeleteUploadImage } from "./helpers/upload-pic.js";
 import { changeProductsFilterButton } from "./helpers/products-run.js";
 import { runAddToCart, runIncreaseQuantity, runDecreaseQuantity, runRemoveFromCart } from "./helpers/cart-run.js";
@@ -43,12 +43,7 @@ export const clickHandler = async (e) => {
   if (clickType?.includes("close-modal-")) await runModalClose(clickElement);
 
   if (clickType === "upload-click" || clickType === "edit-upload-click") await runUploadClick(clickElement);
-  if (clickType === "delete-upload-image" || clickType === "edit-delete-upload-image") {
-    // Determine entity type based on which modal is visible
-    const eventsModal = document.querySelector(".modal-overlay.visible[id*='events']");
-    const entityType = eventsModal ? "events" : "products";
-    await runDeleteUploadImage(clickElement, entityType);
-  }
+  if (clickType === "delete-upload-image" || clickType === "edit-delete-upload-image") await runDeleteUploadImage(clickElement);
 
   if (clickType === "category-filter-btn") await changeProductsFilterButton(clickElement);
 
@@ -65,10 +60,6 @@ export const clickHandler = async (e) => {
   if (clickType === "new-product-submit") await runAddNewProduct();
   if (clickType === "edit-product-submit") await runEditProduct();
   if (clickType === "delete-product-submit") await runDeleteProduct();
-
-  if (clickType === "new-event-submit") await runAddNewEvent();
-  if (clickType === "edit-event-submit") await runEditEvent();
-  if (clickType === "delete-event-submit") await runDeleteEvent();
 };
 
 export const keyHandler = async (e) => {
@@ -101,12 +92,7 @@ export const changeHandler = async (e) => {
     if (!pic) return null;
 
     const mode = changeId.includes("edit") ? "edit" : "add";
-
-    // Determine entity type based on which modal is visible
-    const eventsModal = document.querySelector(".modal-overlay.visible[id*='events']");
-    const entityType = eventsModal ? "events" : "products";
-
-    await runUploadPic(pic, mode, entityType);
+    await runUploadPic(pic, mode);
     return true;
   }
 
@@ -115,9 +101,6 @@ export const changeHandler = async (e) => {
 
   //Product selector
   if (changeId === "product-selector") await changeAdminProductSelector(changeElement);
-
-  //Event selector
-  if (changeId === "event-selector") await changeAdminEventSelector(changeElement);
 };
 
 //modal

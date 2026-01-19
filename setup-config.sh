@@ -25,5 +25,3 @@ else
 fi
 
 echo "Configuration setup complete!"
-
-# RUN by executing: setup-project [config url]

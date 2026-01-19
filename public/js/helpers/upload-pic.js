@@ -12,22 +12,16 @@ export const runUploadClick = async (clickedElement) => {
   picInput.click();
 };
 
-export const runUploadPic = async (pic, mode = "add", entityType = "products") => {
+export const runUploadPic = async (pic, mode = "add") => {
   if (!pic) return null;
 
-  console.log("RUN UPLOAD PIC");
-  console.log("PIC");
-  console.dir(pic);
-  console.log("MODE");
-  console.log(mode);
-  console.log("ENTITY TYPE");
-  console.log(entityType);
+  console.log(`${mode.toUpperCase()} PIC`);
+  console.log(pic);
 
-  const prefix = entityType === "events" ? "event-" : "";
-  const uploadStatusId = mode === "add" ? `${prefix}upload-status` : `edit-${prefix}upload-status`;
-  const uploadButtonId = mode === "add" ? `${prefix}upload-button` : `edit-${prefix}upload-button`;
-  const currentImageId = mode === "add" ? `${prefix}current-image` : `edit-${prefix}current-image`;
-  const currentImagePreviewId = mode === "add" ? `${prefix}current-image-preview` : `edit-${prefix}current-image-preview`;
+  const uploadStatusId = mode === "add" ? "upload-status" : "edit-upload-status";
+  const uploadButtonId = mode === "add" ? "upload-button" : "edit-upload-button";
+  const currentImageId = mode === "add" ? "current-image" : "edit-current-image";
+  const currentImagePreviewId = mode === "add" ? "current-image-preview" : "edit-current-image-preview";
 
   const uploadStatus = document.getElementById(uploadStatusId);
   const uploadButton = document.getElementById(uploadButtonId);
@@ -42,12 +36,7 @@ export const runUploadPic = async (pic, mode = "add", entityType = "products") =
   const formData = new FormData();
   formData.append("image", pic);
 
-  // Choose route based on entity type
-  const uploadRoute = entityType === "events" ? "/upload-event-pic-route" : "/upload-pic-route";
-  const data = await sendToBackFile({ route: uploadRoute, formData: formData });
-
-  console.log("UPLOAD PIC DATA");
-  console.dir(data);
+  const data = await sendToBackFile({ route: "/upload-pic-route", formData: formData });
 
   if (data === "FAIL") {
     uploadStatus.textContent = "✗ Upload failed";
@@ -63,13 +52,12 @@ export const runUploadPic = async (pic, mode = "add", entityType = "products") =
   uploadButton.disabled = false;
   uploadButton.uploadData = data;
 
-  // Show the image preview with correct path
+  // Show the image preview
   const currentImage = document.getElementById(currentImageId);
   const currentImagePreview = document.getElementById(currentImagePreviewId);
 
   if (currentImage && currentImagePreview && data && data.filename) {
-    const imagePath = entityType === "events" ? `/images/events/${data.filename}` : `/images/products/${data.filename}`;
-    currentImage.src = imagePath;
+    currentImage.src = `/images/products/${data.filename}`;
     currentImagePreview.style.display = "flex";
   }
 
@@ -119,17 +107,16 @@ export const uploadFile = async (file) => {
 
 //----------------------
 
-export const runDeleteUploadImage = async (clickedElement, entityType = "products") => {
+export const runDeleteUploadImage = async (clickedElement) => {
   if (!clickedElement) return null;
 
   const mode = clickedElement.id.includes("edit") ? "edit" : "add";
-  const prefix = entityType === "events" ? "event-" : "";
 
-  const uploadStatusId = mode === "add" ? `${prefix}upload-status` : `edit-${prefix}upload-status`;
-  const uploadButtonId = mode === "add" ? `${prefix}upload-button` : `edit-${prefix}upload-button`;
-  const currentImageId = mode === "add" ? `${prefix}current-image` : `edit-${prefix}current-image`;
-  const currentImagePreviewId = mode === "add" ? `${prefix}current-image-preview` : `edit-${prefix}current-image-preview`;
-  const picInputId = mode === "add" ? `${prefix}upload-pic-input` : `edit-${prefix}upload-pic-input`;
+  const uploadStatusId = mode === "add" ? "upload-status" : "edit-upload-status";
+  const uploadButtonId = mode === "add" ? "upload-button" : "edit-upload-button";
+  const currentImageId = mode === "add" ? "current-image" : "edit-current-image";
+  const currentImagePreviewId = mode === "add" ? "current-image-preview" : "edit-current-image-preview";
+  const picInputId = mode === "add" ? "upload-pic-input" : "edit-upload-pic-input";
 
   const uploadStatus = document.getElementById(uploadStatusId);
   const uploadButton = document.getElementById(uploadButtonId);
@@ -144,9 +131,8 @@ export const runDeleteUploadImage = async (clickedElement, entityType = "product
 
   // If we have a filename, delete it from the server
   if (filename) {
-    const deleteRoute = entityType === "events" ? "/delete-event-pic-route" : "/delete-pic-route";
     const result = await sendToBack({
-      route: deleteRoute,
+      route: "/delete-pic-route",
       filename: filename,
     });
 

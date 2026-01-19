@@ -1,8 +1,7 @@
 import { runAddNewProduct, runEditProduct, runDeleteProduct, runGetProductData } from "../src/products.js";
-import { runAddNewEvent, runEditEvent, runDeleteEvent, runGetEventData } from "../src/events.js";
 import { buildCart, runGetCartStats, runAddToCart, runUpdateCartItem, runRemoveFromCart } from "../src/cart.js";
 import { placeNewOrder } from "../src/orders.js";
-import { runDeletePic, runDeleteEventPic } from "../src/upload-pic.js";
+import { runDeletePic } from "../src/upload-pic.js";
 
 // export const getBackgroundPicsControl = async (req, res) => {
 //   const pics = await runGetBackgroundPics();
@@ -18,8 +17,7 @@ export const getProductDataControl = async (req, res) => {
 };
 
 export const getEventDataControl = async (req, res) => {
-  const data = await runGetEventData();
-  return res.json(data);
+  //BUILD
 };
 
 export const uploadPicControl = async (req, res) => {
@@ -53,37 +51,6 @@ export const deletePicControl = async (req, res) => {
   }
 };
 
-export const uploadEventPicControl = async (req, res) => {
-  if (!req.file) {
-    return res.status(400).json({ error: "No file uploaded" });
-  }
-
-  const data = {
-    message: "Event picture uploaded successfully",
-    filename: req.file.filename,
-    originalName: req.file.originalname,
-    path: req.file.path,
-    size: req.file.size,
-  };
-
-  return res.json(data);
-};
-
-export const deleteEventPicControl = async (req, res) => {
-  const filename = req.body.filename;
-  if (!filename) return res.status(400).json({ error: "No filename provided" });
-
-  try {
-    const data = await runDeleteEventPic(filename);
-    if (!data || !data.success) return res.status(500).json({ error: data.message });
-
-    return res.json(data);
-  } catch (error) {
-    console.error("Error deleting event file:", error);
-    return res.status(500).json({ error: "Failed to delete file" });
-  }
-};
-
 export const addNewProductControl = async (req, res) => {
   const inputParams = req.body;
   if (!inputParams) return res.status(500).json({ error: "No input parameters" });
@@ -105,30 +72,6 @@ export const deleteProductControl = async (req, res) => {
   if (!productId) return res.status(500).json({ error: "No product ID" });
 
   const data = await runDeleteProduct(productId);
-  return res.json(data);
-};
-
-export const addNewEventControl = async (req, res) => {
-  const inputParams = req.body;
-  if (!inputParams) return res.status(500).json({ error: "No input parameters" });
-
-  const data = await runAddNewEvent(inputParams);
-  return res.json(data);
-};
-
-export const editEventControl = async (req, res) => {
-  const inputParams = req.body;
-  if (!inputParams) return res.status(500).json({ error: "No input parameters" });
-
-  const data = await runEditEvent(inputParams);
-  return res.json(data);
-};
-
-export const deleteEventControl = async (req, res) => {
-  const eventId = req.body.eventId;
-  if (!eventId) return res.status(500).json({ error: "No event ID" });
-
-  const data = await runDeleteEvent(eventId);
   return res.json(data);
 };
 

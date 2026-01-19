@@ -3,7 +3,7 @@ import express from "express";
 // import CONFIG from "../config/config.js";
 import requireAuth from "../middleware/auth-middle.js";
 import { authController } from "../controllers/auth-controller.js";
-import { upload, uploadEvents } from "../src/upload-pic.js";
+import { upload } from "../src/upload-pic.js";
 
 import {
   mainDisplay,
@@ -23,16 +23,11 @@ import {
   // getBackgroundPicsControl,
   uploadPicControl,
   deletePicControl,
-  uploadEventPicControl,
-  deleteEventPicControl,
   addNewProductControl,
   editProductControl,
   deleteProductControl,
   getProductDataControl,
   getEventDataControl,
-  addNewEventControl,
-  editEventControl,
-  deleteEventControl,
   getCartDataControl,
   addToCartControl,
   updateCartItemControl,
@@ -59,21 +54,11 @@ router.post("/upload-pic-route", requireAuth, upload.single("image"), uploadPicC
 
 router.post("/delete-pic-route", requireAuth, deletePicControl);
 
-router.post("/upload-event-pic-route", requireAuth, uploadEvents.single("image"), uploadEventPicControl);
-
-router.post("/delete-event-pic-route", requireAuth, deleteEventPicControl);
-
 router.post("/add-new-product-route", requireAuth, addNewProductControl);
 
 router.post("/edit-product-route", requireAuth, editProductControl);
 
 router.post("/delete-product-route", requireAuth, deleteProductControl);
-
-router.post("/add-new-event-route", requireAuth, addNewEventControl);
-
-router.post("/edit-event-route", requireAuth, editEventControl);
-
-router.post("/delete-event-route", requireAuth, deleteEventControl);
 
 //------------------------
 

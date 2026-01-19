@@ -10,7 +10,6 @@ import { buildConfirmOrderForm } from "./forms/confirm-form.js";
 
 import { populateProducts, updateCategoryDescription } from "./helpers/products-run.js";
 import { populateCart, updateNavbarCart } from "./helpers/cart-run.js";
-import { populateEvents } from "./helpers/events-run.js";
 import { populateCheckout, populateConfirmOrder } from "./helpers/buy-run.js";
 import { startMainPicRotation, startAboutPicRotation } from "./helpers/rotate-pics.js";
 

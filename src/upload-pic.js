@@ -11,16 +11,12 @@ import { dirname } from "path";
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
-// Define upload directories
+// Define upload directory //CHANGE
 const uploadDir = path.join(__dirname, "../public/images/products");
-const eventsUploadDir = path.join(__dirname, "../public/images/events");
 
-// Create directories if they don't exist
+// Create directory if it doesn't exist
 if (!fs.existsSync(uploadDir)) {
   fs.mkdirSync(uploadDir, { recursive: true });
-}
-if (!fs.existsSync(eventsUploadDir)) {
-  fs.mkdirSync(eventsUploadDir, { recursive: true });
 }
 
 // Helper function to clear all files in upload directory
@@ -58,26 +54,9 @@ const fileFilter = (req, file, cb) => {
   }
 };
 
-// Configure multer for products
+// Configure multer
 export const upload = multer({
   storage: storage,
-  fileFilter: fileFilter,
-  limits: { fileSize: 10 * 1024 * 1024 }, // 10MB limit
-});
-
-// Configure storage for events
-const eventsStorage = multer.diskStorage({
-  destination: function (req, file, cb) {
-    cb(null, eventsUploadDir);
-  },
-  filename: function (req, file, cb) {
-    cb(null, file.originalname);
-  },
-});
-
-// Configure multer for events
-export const uploadEvents = multer({
-  storage: eventsStorage,
   fileFilter: fileFilter,
   limits: { fileSize: 10 * 1024 * 1024 }, // 10MB limit
 });
@@ -96,16 +75,5 @@ export const runDeletePic = async (filename) => {
   return { success: true, message: "File deleted successfully" }
 }
 
-export const runDeleteEventPic = async (filename) => {
-  const filePath = path.join(eventsUploadDir, filename);
 
-  if (!fs.existsSync(filePath)) {
-    return { success: false, message: "File not found" }
-  }
-
-  fs.unlinkSync(filePath);
-  return { success: true, message: "File deleted successfully" }
-}
-
-
-export { uploadDir, eventsUploadDir };
+export { uploadDir };
