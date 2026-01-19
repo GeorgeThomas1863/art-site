@@ -690,11 +690,15 @@ export const buildAdminUpload = async (mode, entityType = "products") => {
   deleteImageBtn.innerHTML = "×";
   deleteImageBtn.title = "Delete image";
   deleteImageBtn.setAttribute("data-label", mode === "add" ? "delete-upload-image" : "edit-delete-upload-image");
+  deleteImageBtn.entityType = entityType;
 
   imageWrapper.append(currentImage, deleteImageBtn);
   // currentImagePreview.append(currentImageLabel, currentImage, deleteImageBtn);
   currentImagePreview.append(currentImageLabel, imageWrapper);
   uploadSection.append(currentImagePreview);
+
+  console.log("ENTITY TYPE");
+  console.log(entityType);
 
   // Hidden file input
   const picInput = document.createElement("input");
@@ -702,7 +706,7 @@ export const buildAdminUpload = async (mode, entityType = "products") => {
   picInput.id = mode === "add" ? "upload-pic-input" : "edit-upload-pic-input";
   picInput.accept = ".jpg,.jpeg,.png,.gif,.webp";
   picInput.style.display = "none";
-  picInput.entityType = entityType;
+  // picInput.entityType = entityType;
 
   if (mode === "edit") {
     picInput.disabled = true;
@@ -714,6 +718,7 @@ export const buildAdminUpload = async (mode, entityType = "products") => {
   uploadButton.className = "upload-btn";
   uploadButton.textContent = mode === "add" ? "Choose Image" : "Change Image";
   uploadButton.setAttribute("data-label", mode === "add" ? "upload-click" : "edit-upload-click");
+  uploadButton.entityType = entityType;
 
   if (mode === "edit") {
     uploadButton.disabled = true;

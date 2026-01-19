@@ -5,21 +5,25 @@ export const runUploadClick = async (clickedElement) => {
   if (!clickedElement) return null;
 
   const mode = clickedElement.id.includes("edit") ? "edit" : "add";
+  const entityType = clickedElement.entityType;
   const picInputId = mode === "add" ? "upload-pic-input" : "edit-upload-pic-input";
   const picInput = document.getElementById(picInputId);
-
   if (!picInput) return null;
+  picInput.entityType = entityType;
+
   picInput.click();
 };
 
 export const runUploadPic = async (pic, mode = "add", entityType = "products") => {
   if (!pic) return null;
 
-  console.log("RUN UPLOAD PIC");
-  console.log("PIC");
-  console.log(pic);
-  console.log("MODE");
-  console.log(mode);
+  // console.log("RUN UPLOAD PIC");
+  // console.log("PIC");
+  // console.log(pic);
+  // console.log("MODE");
+  // console.log(mode);
+  // console.log("ENTITY TYPE");
+  // console.log(entityType);
 
   const uploadStatusId = mode === "add" ? "upload-status" : "edit-upload-status";
   const uploadButtonId = mode === "add" ? "upload-button" : "edit-upload-button";
@@ -43,6 +47,9 @@ export const runUploadPic = async (pic, mode = "add", entityType = "products") =
 
   const data = await sendToBackFile({ route: route, formData: formData });
 
+  console.log("DATA");
+  console.log(data);
+
   if (data === "FAIL") {
     uploadStatus.textContent = "✗ Upload failed";
     uploadStatus.style.color = "red";
@@ -61,54 +68,59 @@ export const runUploadPic = async (pic, mode = "add", entityType = "products") =
   const currentImage = document.getElementById(currentImageId);
   const currentImagePreview = document.getElementById(currentImagePreviewId);
 
+  console.log("CURRENT IMAGE");
+  console.log(currentImage);
+  console.log("CURRENT IMAGE PREVIEW");
+  console.log(currentImagePreview);
+
   if (currentImage && currentImagePreview && data && data.filename) {
-    currentImage.src = `/images/products/${data.filename}`;
+    currentImage.src = `/images/${entityType}/${data.filename}`;
     currentImagePreview.style.display = "flex";
   }
 
   return data;
 };
 
-export const uploadFile = async (file) => {
-  if (!file) return null;
+// export const uploadFile = async (file) => {
+//   if (!file) return null;
 
-  const uploadRoute = await sendToBack({ route: "/get-backend-value-route", key: "uploadRoute" });
-  if (!uploadRoute) return null;
+//   const uploadRoute = await sendToBack({ route: "/get-backend-value-route", key: "uploadRoute" });
+//   if (!uploadRoute) return null;
 
-  const uploadStatus = document.getElementById("upload-status");
-  const uploadButton = document.getElementById("upload-button");
+//   const uploadStatus = document.getElementById("upload-status");
+//   const uploadButton = document.getElementById("upload-button");
 
-  uploadStatus.textContent = "Uploading...";
-  uploadStatus.style.display = "inline";
-  uploadButton.disabled = true;
+//   uploadStatus.textContent = "Uploading...";
+//   uploadStatus.style.display = "inline";
+//   uploadButton.disabled = true;
 
-  const formData = new FormData();
-  formData.append("image", file);
+//   const formData = new FormData();
+//   formData.append("image", file);
 
-  try {
-    const response = await fetch(uploadRoute, {
-      method: "POST",
-      body: formData,
-    });
+//   try {
+//     const response = await fetch(uploadRoute, {
+//       method: "POST",
+//       body: formData,
+//     });
 
-    const result = await response.json();
+//     const result = await response.json();
 
-    if (result.error) {
-      uploadStatus.textContent = `✗ ${result.error}`;
-      uploadStatus.style.color = "red";
-      return null;
-    }
+//     if (result.error) {
+//       uploadStatus.textContent = `✗ ${result.error}`;
+//       uploadStatus.style.color = "red";
+//       return null;
+//     }
 
-    return result;
-  } catch (error) {
-    console.error("Upload failed:", error);
-    uploadStatus.textContent = "✗ Upload failed";
-    uploadStatus.style.color = "red";
-    return null;
-  } finally {
-    uploadButton.disabled = false;
-  }
-};
+//     return result;
+//   } catch (error) {
+//     console.error("Upload failed:", error);
+//     uploadStatus.textContent = "✗ Upload failed";
+//     uploadStatus.style.color = "red";
+//     return null;
+//   } finally {
+//     uploadButton.disabled = false;
+//   }
+// };
 
 //----------------------
 
