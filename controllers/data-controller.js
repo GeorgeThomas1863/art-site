@@ -1,14 +1,8 @@
 import { runAddNewProduct, runEditProduct, runDeleteProduct, runGetProductData } from "../src/products.js";
+import { runAddNewEvent } from "../src/events.js";
 import { buildCart, runGetCartStats, runAddToCart, runUpdateCartItem, runRemoveFromCart } from "../src/cart.js";
 import { placeNewOrder } from "../src/orders.js";
 import { runDeletePic } from "../src/upload-back.js";
-
-// export const getBackgroundPicsControl = async (req, res) => {
-//   const pics = await runGetBackgroundPics();
-//   console.log("PICS");
-//   console.log(pics);
-//   return res.json(pics);
-// };
 
 //returns data for all products
 export const getProductDataControl = async (req, res) => {
@@ -72,6 +66,14 @@ export const deleteProductControl = async (req, res) => {
   if (!productId) return res.status(500).json({ error: "No product ID" });
 
   const data = await runDeleteProduct(productId);
+  return res.json(data);
+};
+
+export const addNewEventControl = async (req, res) => {
+  const inputParams = req.body;
+  if (!inputParams) return res.status(500).json({ error: "No input parameters" });
+
+  const data = await runAddNewEvent(inputParams);
   return res.json(data);
 };
 

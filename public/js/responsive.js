@@ -1,4 +1,6 @@
-import { runModalTrigger, runModalClose, runAddNewProduct, runEditProduct, runDeleteProduct, changeAdminProductSelector } from "./helpers/admin-run.js"; //prettier-ignore
+import { runModalTrigger, runModalClose } from "./helpers/admin-run.js"; //prettier-ignore
+import { runAddNewProduct, runEditProduct, runDeleteProduct, changeAdminProductSelector } from "./helpers/admin-products.js";
+import { runAddNewEvent, runEditEvent, runDeleteEvent } from "./helpers/admin-events.js";
 import { runUploadClick, runUploadPic, runDeleteUploadImage } from "./helpers/upload-pic.js";
 import { changeProductsFilterButton } from "./helpers/products-run.js";
 import { runAddToCart, runIncreaseQuantity, runDecreaseQuantity, runRemoveFromCart } from "./helpers/cart-run.js";
@@ -60,6 +62,10 @@ export const clickHandler = async (e) => {
   if (clickType === "new-product-submit") await runAddNewProduct();
   if (clickType === "edit-product-submit") await runEditProduct();
   if (clickType === "delete-product-submit") await runDeleteProduct();
+
+  if (clickType === "new-event-submit") await runAddNewEvent();
+  if (clickType === "edit-event-submit") await runEditEvent();
+  if (clickType === "delete-event-submit") await runDeleteEvent();
 };
 
 export const keyHandler = async (e) => {
@@ -104,16 +110,16 @@ export const changeHandler = async (e) => {
   if (changeId === "product-selector") await changeAdminProductSelector(changeElement);
 };
 
-//modal
-export const overlayClickHandler = async (e) => {
-  if (e.target.classList.contains("modal-overlay")) {
-    e.target.remove();
-  }
+// //modal
+// export const overlayClickHandler = async (e) => {
+//   if (e.target.classList.contains("modal-overlay")) {
+//     e.target.remove();
+//   }
 
-  // if (e.target.classList.contains("modal-overlay")) {
-  //   e.target.classList.remove("visible");
-  // }
-};
+//   // if (e.target.classList.contains("modal-overlay")) {
+//   //   e.target.classList.remove("visible");
+//   // }
+// };
 
 if (authElement) {
   authElement.addEventListener("click", clickHandler);
@@ -129,7 +135,7 @@ if (adminElement) {
   adminElement.addEventListener("click", clickHandler);
   adminElement.addEventListener("keydown", keyHandler);
   adminElement.addEventListener("change", changeHandler);
-  adminElement.addEventListener("click", overlayClickHandler);
+  // adminElement.addEventListener("click", overlayClickHandler);
 }
 
 if (productsElement) {

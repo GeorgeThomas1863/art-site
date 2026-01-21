@@ -1,12 +1,6 @@
-//get event data submit working
+//event submission working, now need to fix event edit
 
-//FIGURE OUT / RESEARCH TAXES
-
-//keep going with events admin styles / get working / connect to backend
-
-//add in about and events pages
-
-//email about shipping and taxes with tax cloud
+//add in about and event display pages
 
 //integrate tax cloud
 

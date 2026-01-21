@@ -13,6 +13,19 @@ export const buildNewProductParams = async () => {
   return params;
 };
 
+export const buildNewEventParams = async () => {
+  const params = {
+    route: "/add-new-event-route",
+    name: document.getElementById("name").value,
+    eventDate: document.getElementById("event-date").value,
+    eventLocation: document.getElementById("event-location").value,
+    eventDescription: document.getElementById("event-description").value,
+    picData: document.getElementById("upload-button").uploadData,
+    dateCreated: new Date().toISOString(),
+  };
+  return params;
+};
+
 export const getEditProductParams = async () => {
   //product id and route added later
   const params = {
@@ -26,10 +39,6 @@ export const getEditProductParams = async () => {
   };
 
   return params;
-};
-
-export const buildNewEventParams = async () => {
-  //BUILD
 };
 
 export const getEditEventParams = async () => {

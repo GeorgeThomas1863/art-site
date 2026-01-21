@@ -1,6 +1,7 @@
 import { sendToBack } from "./util/api-front.js";
 
 import { buildMainForm, buildNavBar } from "./forms/main-form.js";
+import { buildAdminForm } from "./forms/admin-form.js";
 import { buildProductsForm } from "./forms/products-form.js";
 import { buildAboutForm } from "./forms/about-form.js";
 import { buildEventsForm } from "./forms/events-form.js";
@@ -14,6 +15,7 @@ import { populateCheckout, populateConfirmOrder } from "./helpers/buy-run.js";
 import { startMainPicRotation, startAboutPicRotation } from "./helpers/rotate-pics.js";
 
 const displayElement = document.getElementById("display-element");
+const adminElement = document.getElementById("admin-element");
 const productsElement = document.getElementById("products-element");
 const aboutElement = document.getElementById("about-element");
 const eventsElement = document.getElementById("events-element");
@@ -33,6 +35,16 @@ export const buildMainDisplay = async () => {
 
   await startMainPicRotation();
   await updateNavbarCart();
+
+  return true;
+};
+
+export const buildAdminDisplay = async () => {
+  if (!adminElement) return null;
+  // const { isFirstLoad } = stateAdmin;
+
+  const adminFormData = await buildAdminForm();
+  adminElement.append(adminFormData);
 
   return true;
 };
@@ -122,6 +134,7 @@ export const buildConfirmOrderDisplay = async () => {
 };
 
 if (displayElement) buildMainDisplay();
+if (adminElement) buildAdminDisplay();
 if (productsElement) buildProductsDisplay();
 if (aboutElement) buildAboutDisplay();
 if (eventsElement) buildEventsDisplay();
