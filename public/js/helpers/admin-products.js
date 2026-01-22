@@ -1,4 +1,4 @@
-import { clearAdminEditFields, disableAdminEditFields, enableAdminEditFields } from "./admin-run.js";
+import { clearAdminEditFields, disableAdminEditFields, enableAdminEditFields, updateProductStats } from "./admin-run.js";
 import { sendToBack } from "../util/api-front.js";
 import { buildNewProductParams, getEditProductParams } from "../util/params.js";
 import { displayPopup, displayConfirmDialog } from "./popup.js";
@@ -87,20 +87,20 @@ export const runEditProduct = async () => {
   //!!!!!FIX THIS BELOW (DONT WANT TO DESTROY ON SUBMIT)
 
   // Refresh the product data to reflect changes
-  // const productData = await sendToBack({ route: "/get-product-data-route" }, "GET");
-  // if (productData) {
-  //   await populateAdminProductSelector(productData);
-  //   await updateProductStats(productData);
+  const productData = await sendToBack({ route: "/get-product-data-route" }, "GET");
+  if (productData) {
+    await populateAdminProductSelector(productData);
+    await updateProductStats(productData);
 
-  //   // Re-select the product that was just updated so user can see the changes
-  //   productSelector.value = productId;
+    // Re-select the product that was just updated so user can see the changes
+    productSelector.value = productId;
 
-  //   // Re-populate the form with the updated data
-  //   const updatedOption = productSelector.options[productSelector.selectedIndex];
-  //   if (updatedOption && updatedOption.productData) {
-  //     await populateAdminEditForm(updatedOption.productData);
-  //   }
-  // }
+    // Re-populate the form with the updated data
+    const updatedOption = productSelector.options[productSelector.selectedIndex];
+    if (updatedOption && updatedOption.productData) {
+      await populateEditFormProducts(updatedOption.productData);
+    }
+  }
 
   return data;
 };

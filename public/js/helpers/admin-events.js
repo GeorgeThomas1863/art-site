@@ -70,17 +70,18 @@ export const runEditEvent = async () => {
   const modal = document.querySelector(".modal-overlay");
   if (modal) modal.remove();
 
-  //!!!!!FIX THIS BELOW (DONT WANT TO DESTROY ON SUBMIT)
+  const eventData = await sendToBack({ route: "/get-event-data-route" }, "GET");
+  if (eventData) {
+    await populateAdminEventSelector(eventData);
+    await updateEventStats(eventData);
 
-  // const eventData = await sendToBack({ route: "/get-event-data-route" }, "GET");
-  // if (eventData) {
-  //   await populateAdminEventSelector(eventData);
-  //   eventSelector.value = eventId;
-  //   const updatedOption = eventSelector.options[eventSelector.selectedIndex];
-  //   if (updatedOption && updatedOption.eventData) {
-  //     await populateAdminEditForm(updatedOption.eventData, "events");
-  //   }
-  // }
+    eventSelector.value = eventId;
+    // Re-populate the form with the updated data
+    const updatedOption = eventSelector.options[eventSelector.selectedIndex];
+    if (updatedOption && updatedOption.eventData) {
+      await populateEditFormEvents(updatedOption.eventData);
+    }
+  }
 
   return data;
 };

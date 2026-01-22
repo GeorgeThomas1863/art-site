@@ -37,6 +37,8 @@ export const runModalTrigger = async (clickElement) => {
   if (mode === "edit" && entityType === "products") {
     const productData = await sendToBack({ route: "/get-product-data-route" }, "GET");
     if (productData && productData.length) {
+      console.log("PRODUCT DATA");
+      console.log(productData);
       await populateAdminProductSelector(productData);
       await updateProductStats(productData);
     }
@@ -179,13 +181,30 @@ export const clearAdminEditFields = async () => {
 
 //++++++++++++++++++++++++++
 
-// STATS UPDATE [REWRITE BELOW WITH LOOPS]
+// STATS UPDATE
+export const updateAdminStats = async () => {
+  const productData = await sendToBack({ route: "/get-product-data-route" }, "GET");
+  const eventData = await sendToBack({ route: "/get-event-data-route" }, "GET");
+
+  if (productData && productData.length) await updateProductStats(productData);
+  if (eventData && eventData.length) await updateEventStats(eventData);
+
+  return true;
+};
+
 export const updateProductStats = async (productData) => {
   if (!productData || !productData.length) return null;
 
   const totalProducts = productData.length;
   const displayedProducts = productData.filter((p) => p.display === "yes").length;
   const soldProducts = productData.filter((p) => p.sold === "yes").length;
+
+  console.log("TOTAL PRODUCTS");
+  console.log(totalProducts);
+  console.log("DISPLAYED PRODUCTS");
+  console.log(displayedProducts);
+  console.log("SOLD PRODUCTS");
+  console.log(soldProducts);
 
   const totalStat = document.getElementById("total-products-stat");
   const displayedStat = document.getElementById("displayed-products-stat");
