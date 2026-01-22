@@ -27,6 +27,8 @@ import {
   editProductControl,
   deleteProductControl,
   addNewEventControl,
+  editEventControl,
+  deleteEventControl,
   getProductDataControl,
   getEventDataControl,
   getCartDataControl,
@@ -57,13 +59,17 @@ router.post("/upload-event-pic-route", requireAuth, upload.single("image"), uplo
 
 router.post("/delete-pic-route", requireAuth, deletePicControl);
 
+router.post("/add-new-product-route", requireAuth, addNewProductControl);
+
 router.post("/edit-product-route", requireAuth, editProductControl);
 
 router.post("/delete-product-route", requireAuth, deleteProductControl);
 
-router.post("/add-new-product-route", requireAuth, addNewProductControl);
-
 router.post("/add-new-event-route", requireAuth, addNewEventControl);
+
+router.post("/edit-event-route", requireAuth, editEventControl);
+
+router.post("/delete-event-route", requireAuth, deleteEventControl);
 
 //------------------------
 

@@ -1,6 +1,6 @@
 import { runModalTrigger, runModalClose } from "./helpers/admin-run.js"; //prettier-ignore
 import { runAddNewProduct, runEditProduct, runDeleteProduct, changeAdminProductSelector } from "./helpers/admin-products.js";
-import { runAddNewEvent, runEditEvent, runDeleteEvent } from "./helpers/admin-events.js";
+import { runAddNewEvent, runEditEvent, runDeleteEvent, changeAdminEventSelector } from "./helpers/admin-events.js";
 import { runUploadClick, runUploadPic, runDeleteUploadImage } from "./helpers/upload-pic.js";
 import { changeProductsFilterButton } from "./helpers/products-run.js";
 import { runAddToCart, runIncreaseQuantity, runDecreaseQuantity, runRemoveFromCart } from "./helpers/cart-run.js";
@@ -108,6 +108,8 @@ export const changeHandler = async (e) => {
 
   //Product selector
   if (changeId === "product-selector") await changeAdminProductSelector(changeElement);
+
+  if (changeId === "event-selector") await changeAdminEventSelector(changeElement);
 };
 
 // //modal

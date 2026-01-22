@@ -28,6 +28,10 @@ export const ADMIN_EDIT_DEFAULT_ARRAY = [
   "edit-upload-pic-input",
   "edit-upload-button",
   "edit-submit-button",
+  "edit-event-date",
+  "edit-event-location",
+  "edit-event-description",
+  "edit-event-submit-button",
 ];
 
 // US States array

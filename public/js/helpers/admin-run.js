@@ -20,8 +20,16 @@ export const runModalTrigger = async (clickElement) => {
   const modalStr = modalType.split("-").slice(2).join("-");
   const [mode, entityType] = modalStr.split("-");
 
+  console.log("MODE");
+  console.log(mode);
+  console.log("ENTITY TYPE");
+  console.log(entityType);
+
   const modal = await buildModal(mode, entityType);
   adminElement.append(modal);
+
+  // console.log("MODAL");
+  // console.log(modal);
 
   //HERE FIGURE OUT EVENTS
 

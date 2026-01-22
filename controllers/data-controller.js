@@ -1,5 +1,5 @@
 import { runAddNewProduct, runEditProduct, runDeleteProduct, runGetProductData } from "../src/products.js";
-import { runAddNewEvent } from "../src/events.js";
+import { runAddNewEvent, runEditEvent, runDeleteEvent, runGetEventData } from "../src/events.js";
 import { buildCart, runGetCartStats, runAddToCart, runUpdateCartItem, runRemoveFromCart } from "../src/cart.js";
 import { placeNewOrder } from "../src/orders.js";
 import { runDeletePic } from "../src/upload-back.js";
@@ -11,7 +11,8 @@ export const getProductDataControl = async (req, res) => {
 };
 
 export const getEventDataControl = async (req, res) => {
-  //BUILD
+  const data = await runGetEventData();
+  return res.json(data);
 };
 
 export const uploadPicControl = async (req, res) => {
@@ -74,6 +75,22 @@ export const addNewEventControl = async (req, res) => {
   if (!inputParams) return res.status(500).json({ error: "No input parameters" });
 
   const data = await runAddNewEvent(inputParams);
+  return res.json(data);
+};
+
+export const editEventControl = async (req, res) => {
+  const inputParams = req.body;
+  if (!inputParams) return res.status(500).json({ error: "No input parameters" });
+
+  const data = await runEditEvent(inputParams);
+  return res.json(data);
+};
+
+export const deleteEventControl = async (req, res) => {
+  const eventId = req.body.eventId;
+  if (!eventId) return res.status(500).json({ error: "No event ID" });
+
+  const data = await runDeleteEvent(eventId);
   return res.json(data);
 };
 
