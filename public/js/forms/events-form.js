@@ -36,41 +36,60 @@ export const buildEventsGrid = async () => {
 };
 
 // Build individual event card
-export const buildEventCard = async (event) => {
+export const buildEventCard = async (eventData) => {
+  if (!eventData) return null;
+
   const eventCard = document.createElement("div");
   eventCard.className = "event-card";
 
-  const eventImage = document.createElement("div");
-  eventImage.className = "event-image";
-  if (event.imagePath) {
-    eventImage.style.backgroundImage = `url('${event.imagePath}')`;
-    eventImage.style.backgroundSize = "cover";
-    eventImage.style.backgroundPosition = "center";
-  } else {
-    eventImage.textContent = "[Event Image]";
-  }
+  const eventImage = await buildEventImage(eventData);
+  const eventContent = await buildEventContent(eventData);
 
-  const eventContent = document.createElement("div");
-  eventContent.className = "event-content";
-
-  const eventDate = document.createElement("div");
-  eventDate.className = "event-date";
-  eventDate.textContent = `📅 ${event.date}`;
-
-  const eventTitle = document.createElement("div");
-  eventTitle.className = "event-title";
-  eventTitle.textContent = event.title;
-
-  const eventLocation = document.createElement("div");
-  eventLocation.className = "event-location";
-  eventLocation.textContent = `📍 ${event.location}`;
-
-  const eventDescription = document.createElement("div");
-  eventDescription.className = "event-description";
-  eventDescription.textContent = event.description;
-
-  eventContent.append(eventDate, eventTitle, eventLocation, eventDescription);
   eventCard.append(eventImage, eventContent);
 
   return eventCard;
+};
+
+export const buildEventImage = async (eventData) => {
+  if (!eventData || !eventData.picData) return null;
+  const { filename } = eventData.picData;
+
+  const eventImage = document.createElement("img");
+  eventImage.className = "event-image";
+  eventImage.alt = "No image available";
+
+  const picPath = `/images/events/${filename}`;
+  if (!picPath) return null;
+
+  eventImage.src = picPath;
+
+  return eventImage;
+};
+
+export const buildEventContent = async (eventData) => {
+  if (!eventData) return null;
+  const { name, eventDate, eventLocation, eventDescription } = eventData;
+
+  const eventContentContainer = document.createElement("div");
+  eventContentContainer.className = "event-content";
+
+  const eventDateElement = document.createElement("div");
+  eventDateElement.className = "event-date";
+  eventDateElement.textContent = `📅 ${eventDate}`;
+
+  const eventTitleElement = document.createElement("div");
+  eventTitleElement.className = "event-title";
+  eventTitleElement.textContent = name;
+
+  const eventLocationElement = document.createElement("div");
+  eventLocationElement.className = "event-location";
+  eventLocationElement.textContent = `📍 ${eventLocation}`;
+
+  const eventDescriptionElement = document.createElement("div");
+  eventDescriptionElement.className = "event-description";
+  eventDescriptionElement.textContent = eventDescription;
+
+  eventContentContainer.append(eventDateElement, eventTitleElement, eventLocationElement, eventDescriptionElement);
+
+  return eventContentContainer;
 };
