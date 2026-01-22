@@ -1,6 +1,4 @@
-//event submission working, now need to fix event edit
-
-//add in about and event display pages
+//fix / style events display page
 
 //integrate tax cloud
 
