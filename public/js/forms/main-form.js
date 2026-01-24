@@ -1,3 +1,5 @@
+import { FACEBOOK_ICON_SVG, INSTAGRAM_ICON_SVG } from "../util/define-things.js"; // Update path
+
 // Main function to build and render the photography site
 export const buildMainForm = async () => {
   // if (!inputArray || !inputArray.length) return null;
@@ -49,6 +51,9 @@ export const buildNavBar = async () => {
     ul.appendChild(li);
   }
 
+  const rightContainer = document.createElement("div");
+  rightContainer.className = "nav-right-container";
+
   // Add cart button
   const cartLi = document.createElement("li");
   cartLi.id = "nav-cart-container";
@@ -69,10 +74,33 @@ export const buildNavBar = async () => {
 
   cartLink.append(cartIcon, cartCount);
   cartLi.appendChild(cartLink);
-  ul.appendChild(cartLi);
 
-  navContainer.appendChild(logo);
-  navContainer.appendChild(ul);
+  // Social media icons container
+  const socialContainer = document.createElement("div");
+  socialContainer.className = "social-icons";
+
+  // Facebook icon
+  const facebookLink = document.createElement("a");
+  facebookLink.href = "https://www.facebook.com/people/Two-Sisters-Fiber-Art/100087889424782"; // Replace with actual URL
+  facebookLink.target = "_blank";
+  facebookLink.rel = "noopener noreferrer";
+  facebookLink.className = "social-icon";
+  facebookLink.setAttribute("aria-label", "Visit our Facebook page");
+  facebookLink.innerHTML = FACEBOOK_ICON_SVG;
+
+  // Instagram icon
+  const instagramLink = document.createElement("a");
+  instagramLink.href = "https://www.instagram.com/twosistersfiberart"; // Replace with actual URL
+  instagramLink.target = "_blank";
+  instagramLink.rel = "noopener noreferrer";
+  instagramLink.className = "social-icon";
+  instagramLink.setAttribute("aria-label", "Visit our Instagram page");
+  instagramLink.innerHTML = INSTAGRAM_ICON_SVG;
+
+  socialContainer.append(facebookLink, instagramLink);
+  rightContainer.append(cartLi, socialContainer);
+
+  navContainer.append(logo, ul, rightContainer);
   nav.appendChild(navContainer);
 
   return nav;
