@@ -1,4 +1,4 @@
-//fix / style events display page
+//implement .env file / learn how
 
 //integrate tax cloud
 

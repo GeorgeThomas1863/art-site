@@ -5,7 +5,7 @@ export const processPayment = async (cost, inputParams) => {
   if (!cost || !inputParams) return null;
   const { paymentToken, address, city, state, zip, firstName, lastName, email } = inputParams;
 
-  //FIGURE OUT TAXES, put in CONFIG
+  //INSERT TAX CLOUD API HERE 
   const taxRate = 0.08;
   const tax = cost * taxRate;
   const totalCost = cost + tax;
