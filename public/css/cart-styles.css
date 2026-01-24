@@ -365,33 +365,6 @@
   transform: translateY(1px);
 }
 
-/* Navbar Cart Button */
-.nav-cart-link {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  position: relative;
-}
-
-.cart-icon {
-  font-size: 1.5rem;
-}
-
-.cart-count {
-  position: absolute;
-  top: -12px;
-  right: -16px;
-  background-color: #dc2626;
-  color: #ffffff;
-  /* font-size: 0.75rem; */
-  font-size: 1rem;
-  /* font-weight: 600; */
-  padding: 0.2rem 0.5rem;
-  border-radius: 50%;
-  min-width: 20px;
-  text-align: center;
-}
-
 /* --------------- */
 
 /* SHIPPING SECTION */

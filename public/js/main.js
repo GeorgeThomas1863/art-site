@@ -34,16 +34,16 @@ export const buildMainDisplay = async () => {
   console.log("BUILD MAIN DISPLAY");
   console.log(data);
   displayElement.append(data);
+  await updateNavbarCart();
 
   await startMainPicRotation();
-  await updateNavbarCart();
 
   return true;
 };
 
 export const buildAdminDisplay = async () => {
   if (!adminElement) return null;
-  
+
   const adminFormData = await buildAdminForm();
   adminElement.append(adminFormData);
 
@@ -60,10 +60,12 @@ export const buildProductsDisplay = async () => {
   productsElement.append(navElement, productForm);
 
   const productData = await sendToBack({ route: "/get-product-data-route" }, "GET");
-  console.log("PRODUCT DATA");
-  console.dir(productData);
-  await populateProducts(productData);
+
+  // console.log("PRODUCT DATA");
+  // console.dir(productData);
+
   await updateNavbarCart();
+  await populateProducts(productData);
 
   await updateCategoryDescription("all");
 
@@ -77,8 +79,8 @@ export const buildAboutDisplay = async () => {
   const aboutForm = await buildAboutForm();
   aboutElement.append(navElement, aboutForm);
 
-  await startAboutPicRotation();
   await updateNavbarCart();
+  await startAboutPicRotation();
 
   return true;
 };
@@ -92,10 +94,11 @@ export const buildEventsDisplay = async () => {
 
   // Fetch event data from backend
   const eventData = await sendToBack({ route: "/get-event-data-route" }, "GET");
-  console.log("EVENT DATA");
-  console.dir(eventData);
+  // console.log("EVENT DATA");
+  // console.dir(eventData);
+
+  await updateNavbarCart();
   await populateEvents(eventData);
-  // await updateNavbarCart();
 
   return true;
 };
@@ -107,6 +110,7 @@ export const buildCartDisplay = async () => {
   const cartForm = await buildCartForm();
   cartElement.append(navElement, cartForm);
 
+  await updateNavbarCart();
   await populateCart();
 
   return true;
@@ -119,6 +123,7 @@ export const buildCheckoutDisplay = async () => {
   const checkoutForm = await buildCheckoutForm();
   checkoutElement.append(navElement, checkoutForm);
 
+  await updateNavbarCart();
   await populateCheckout();
 
   return true;

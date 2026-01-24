@@ -53,26 +53,19 @@ h3 {
   z-index: 100;
 }
 
-.nav-container {
+/* .nav-container {
   margin: 0 auto;
   display: flex;
   justify-content: space-between;
   align-items: center;
-}
-
-/* .nav-right-container {
-  display: flex;
-  align-items: center;
-  gap: 2rem;
 } */
 
-.nav-right-container {
+.nav-container {
   margin: 0 auto;
   display: grid;
   grid-template-columns: 1fr auto 1fr;
   align-items: center;
   gap: 2rem;
-  justify-self: end;
 }
 
 .logo {
@@ -103,19 +96,71 @@ h3 {
   color: #fff;
 }
 
+/* .nav-right-container {
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+  gap: 2rem;
+  justify-self: end;
+} */
+
+.nav-right-container {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+  justify-self: end;
+}
+
+/* Cart Link Styles */
+.nav-cart-link {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: #ccc;
+  transition: color 0.3s;
+  position: relative;
+}
+
+.nav-cart-link:hover {
+  color: #fff;
+}
+
+.cart-icon {
+  font-family: "Georgia", serif;
+  font-size: 1.5rem;
+}
+
+.cart-count {
+  font-family: "Georgia", serif;
+  position: absolute;
+  top: -8px;
+  right: -12px;
+  background-color: #dc2626;
+  color: #fff;
+  font-size: 0.8rem;
+  font-weight: 500;
+  padding: 0.2rem 0.5rem;
+  border-radius: 10px;
+  min-width: 20px;
+  text-align: center;
+}
+
 /* Social media icons */
 .social-icons {
   display: flex;
   gap: 1rem;
   align-items: center;
+  margin-right: 2rem;
+  margin-left: 2rem;
 }
 
 .social-icon {
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 24px;
-  height: 24px;
+  width: 36px;
+  height: 36px;
   color: #ccc;
   transition: color 0.3s, transform 0.2s;
 }
