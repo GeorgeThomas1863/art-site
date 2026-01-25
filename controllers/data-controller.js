@@ -1,6 +1,7 @@
 import { runAddNewProduct, runEditProduct, runDeleteProduct, runGetProductData } from "../src/products.js";
 import { runAddNewEvent, runEditEvent, runDeleteEvent, runGetEventData } from "../src/events.js";
 import { buildCart, runGetCartStats, runAddToCart, runUpdateCartItem, runRemoveFromCart } from "../src/cart.js";
+import { runCalculateShipping } from "../src/shipping.js";
 import { placeNewOrder } from "../src/orders.js";
 import { runDeletePic } from "../src/upload-back.js";
 
@@ -164,4 +165,15 @@ export const placeOrderControl = async (req, res) => {
   return res.json(jsonData);
 };
 
-export const calculateShippingControl = async (req, res) => {};
+export const calculateShippingControl = async (req, res) => {
+  if (!req || !req.body) return res.status(500).json({ error: "No input parameters" });
+  if (!req.body.zip) return res.status(500).json({ error: "No ZIP code provided" });
+
+  console.log("ZIP");
+  console.log(req.body.zip);
+
+  const data = await runCalculateShipping(req.body.zip);
+  if (!data || !data.success) return res.status(500).json({ error: "Failed to calculate shipping" });
+
+  return res.json(data);
+};

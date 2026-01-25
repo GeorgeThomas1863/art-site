@@ -91,7 +91,7 @@ router.post("/cart/clear", clearCartControl);
 //ORDER ROUTES
 router.post("/checkout/place-order", placeOrderControl);
 
-router.post("/checkout/shipping", calculateShippingControl);
+router.post("/checkout/calculate-shipping", calculateShippingControl);
 
 //-----------------
 
