@@ -1,10 +1,12 @@
-//implement .env file / learn how
+//build contact us page
 
-//integrate tax cloud
+//build newsletter into the admin backend (add sign up on events / contact us page)
+
+//finish purchases (with shipping + tax)
+
+//add local only option to products (items that cant ship)
 
 //Build page or popup for product details
-
-//add in facebook and insta connections
 
 //build backend for adding events / newsletter (email mailing list)
 
