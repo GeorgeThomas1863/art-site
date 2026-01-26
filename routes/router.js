@@ -9,11 +9,12 @@ import {
   mainDisplay,
   adminDisplay,
   productsDisplay,
+  aboutDisplay,
+  eventsDisplay,
+  contactDisplay,
   cartDisplay,
   checkoutDisplay,
   confirmOrderDisplay,
-  aboutDisplay,
-  eventsDisplay,
   display404,
   display500,
   display401,
@@ -105,6 +106,8 @@ router.get("/get-event-data-route", getEventDataControl);
 router.get("/confirm-order", confirmOrderDisplay);
 
 router.get("/checkout", checkoutDisplay);
+
+router.get("/contact", contactDisplay);
 
 router.get("/cart", cartDisplay);
 

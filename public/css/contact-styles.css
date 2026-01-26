@@ -1,0 +1,145 @@
+.contact-container {
+  max-width: 800px;
+  width: 100%;
+  margin: 0 auto;
+  padding: 2rem;
+}
+
+.contact-page-header {
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+.contact-page-title {
+  font-size: 2.5rem;
+  font-weight: bold;
+  letter-spacing: 3px;
+  color: #000000;
+  text-transform: uppercase;
+}
+
+.contact-page-subtitle {
+  font-size: 1.2rem;
+  color: #333;
+  /* margin-top: 1rem; */
+  letter-spacing: 1px;
+}
+
+.contact-card {
+  background: #ffffff;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  border: 1px solid #e0e0e0;
+}
+
+.contact-form-content {
+  padding: 2.5rem;
+}
+
+.form-group {
+  margin-bottom: 1.5rem;
+}
+
+.form-group label {
+  display: block;
+  font-size: 1.1rem;
+  color: #000000;
+  margin-bottom: 0.5rem;
+  font-weight: bold;
+  letter-spacing: 1px;
+}
+
+.form-group input,
+.form-group textarea {
+  width: 100%;
+  padding: 12px 15px;
+  border: 2px solid #e0e0e0;
+  border-radius: 6px;
+  font-size: 1rem;
+  font-family: "Indie Flower", cursive;
+  transition: border-color 0.3s;
+  background: #fafafa;
+}
+
+.form-group input:focus,
+.form-group textarea:focus {
+  outline: none;
+  border-color: rgb(150, 200, 100);
+  background: #ffffff;
+}
+
+.form-group textarea {
+  resize: vertical;
+  min-height: 140px;
+  line-height: 1.6;
+}
+
+.newsletter-section {
+  background: rgb(220, 240, 200);
+  border-radius: 8px;
+  padding: 1.5rem;
+  margin: 2rem 0;
+  border: 2px dashed rgb(150, 200, 100);
+}
+
+.newsletter-title {
+  font-size: 1.3rem;
+  color: #000000;
+  margin-bottom: 1rem;
+  font-weight: bold;
+  letter-spacing: 1px;
+}
+
+.newsletter-description {
+  font-size: 1rem;
+  color: #333;
+  margin-bottom: 1rem;
+  line-height: 1.4;
+}
+
+.checkbox-wrapper {
+  display: flex;
+  align-items: center;
+}
+
+.checkbox-wrapper input[type="checkbox"] {
+  width: 22px;
+  height: 22px;
+  margin-right: 12px;
+  cursor: pointer;
+  accent-color: rgb(150, 200, 100);
+}
+
+.checkbox-wrapper label {
+  font-size: 1rem;
+  color: #000000;
+  cursor: pointer;
+}
+
+.submit-button {
+  width: 100%;
+  padding: 14px;
+  background-color: #000;
+  color: #fff;
+  border: 2px solid #000;
+  border-radius: 6px;
+  font-size: 1.1rem;
+  font-weight: bold;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  cursor: pointer;
+  font-family: "Indie Flower", cursive;
+  transition: all 0.3s;
+}
+
+.submit-button:hover {
+  background-color: #333;
+  border-color: #333;
+}
+
+.submit-button:active {
+  background-color: #1a1a1a;
+  border-color: #1a1a1a;
+  transform: translateY(1px);
+}

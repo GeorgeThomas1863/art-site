@@ -17,6 +17,18 @@ export const productsDisplay = (req, res) => {
   res.sendFile(path.join(__dirname, "../html/products.html"));
 };
 
+export const aboutDisplay = (req, res) => {
+  res.sendFile(path.join(__dirname, "../html/about.html"));
+};
+
+export const eventsDisplay = (req, res) => {
+  res.sendFile(path.join(__dirname, "../html/events.html"));
+};
+
+export const contactDisplay = (req, res) => {
+  res.sendFile(path.join(__dirname, "../html/contact.html"));
+};
+
 export const cartDisplay = (req, res) => {
   res.sendFile(path.join(__dirname, "../html/cart.html"));
 };
@@ -27,14 +39,6 @@ export const checkoutDisplay = (req, res) => {
 
 export const confirmOrderDisplay = (req, res) => {
   res.sendFile(path.join(__dirname, "../html/confirm-order.html"));
-};
-
-export const aboutDisplay = (req, res) => {
-  res.sendFile(path.join(__dirname, "../html/about.html"));
-};
-
-export const eventsDisplay = (req, res) => {
-  res.sendFile(path.join(__dirname, "../html/events.html"));
 };
 
 //------------------

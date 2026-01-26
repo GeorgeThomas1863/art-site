@@ -5,6 +5,7 @@ import { buildAdminForm } from "./forms/admin-form.js";
 import { buildProductsForm } from "./forms/products-form.js";
 import { buildAboutForm } from "./forms/about-form.js";
 import { buildEventsForm } from "./forms/events-form.js";
+import { buildContactForm } from "./forms/contact-form.js";
 import { buildCartForm } from "./forms/cart-form.js";
 import { buildCheckoutForm } from "./forms/checkout-form.js";
 import { buildConfirmOrderForm } from "./forms/confirm-form.js";
@@ -21,6 +22,7 @@ const adminElement = document.getElementById("admin-element");
 const productsElement = document.getElementById("products-element");
 const aboutElement = document.getElementById("about-element");
 const eventsElement = document.getElementById("events-element");
+const contactElement = document.getElementById("contact-element");
 const cartElement = document.getElementById("cart-element");
 const checkoutElement = document.getElementById("checkout-element");
 const confirmElement = document.getElementById("confirm-element");
@@ -103,6 +105,18 @@ export const buildEventsDisplay = async () => {
   return true;
 };
 
+export const buildContactDisplay = async () => {
+  if (!contactElement) return null;
+
+  const navElement = await buildNavBar();
+  const contactForm = await buildContactForm();
+  contactElement.append(navElement, contactForm);
+
+  await updateNavbarCart();
+
+  return true;
+};
+
 export const buildCartDisplay = async () => {
   if (!cartElement) return null;
 
@@ -146,6 +160,7 @@ if (adminElement) buildAdminDisplay();
 if (productsElement) buildProductsDisplay();
 if (aboutElement) buildAboutDisplay();
 if (eventsElement) buildEventsDisplay();
+if (contactElement) buildContactDisplay();
 if (cartElement) buildCartDisplay();
 if (checkoutElement) buildCheckoutDisplay();
 if (confirmElement) buildConfirmOrderDisplay();
