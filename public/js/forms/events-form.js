@@ -6,8 +6,9 @@ export const buildEventsForm = async () => {
 
   const eventsHeader = await buildEventsHeader();
   const eventsGrid = await buildEventsGrid();
+  const newsletterSection = await buildEventsNewsletterSection();
 
-  eventsContainer.append(eventsHeader, eventsGrid);
+  eventsContainer.append(eventsHeader, eventsGrid, newsletterSection);
 
   return eventsContainer;
 };
@@ -93,3 +94,57 @@ export const buildEventContent = async (eventData) => {
 
   return eventContentContainer;
 };
+
+export const buildEventsNewsletterSection = async () => {
+  const newsletterSection = document.createElement("div");
+  newsletterSection.className = "events-newsletter-section";
+
+  const title = document.createElement("h2");
+  title.className = "events-newsletter-title";
+  title.textContent = "Join Our Newsletter";
+
+  const description = document.createElement("p");
+  description.className = "events-newsletter-description";
+  description.textContent = "Stay updated with new creations, upcoming events, and special offers from Two Sisters Fiber Art.";
+
+  const checkboxWrapper = await buildEventsNewsletterCheckbox();
+
+  newsletterSection.append(title, description, checkboxWrapper);
+
+  return newsletterSection;
+};
+
+// Build checkbox wrapper for newsletter
+export const buildEventsNewsletterCheckbox = async () => {
+  const checkboxWrapper = document.createElement("div");
+  checkboxWrapper.className = "events-newsletter-checkbox-wrapper";
+
+  const checkbox = document.createElement("input");
+  checkbox.type = "checkbox";
+  checkbox.id = "events-newsletter";
+  checkbox.name = "events-newsletter";
+
+  const label = document.createElement("label");
+  label.setAttribute("for", "events-newsletter");
+  label.textContent = "Yes, I want to receive newsletters and updates!";
+
+  // Add event listener for checkbox
+  // checkbox.addEventListener("change", handleNewsletterCheckbox);
+
+  checkboxWrapper.append(checkbox, label);
+
+  return checkboxWrapper;
+};
+
+//MOVE BELOW
+// Handle newsletter checkbox change
+// export const handleNewsletterCheckbox = async (event) => {
+//   const isChecked = event.target.checked;
+
+//   console.log("Newsletter subscription:", isChecked);
+
+//   // TODO: Send to backend when checked
+//   // if (isChecked) {
+//   //   const response = await sendToBack({ route: "/newsletter-subscribe-route" }, "POST");
+//   // }
+// };
