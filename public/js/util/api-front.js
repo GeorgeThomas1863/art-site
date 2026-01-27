@@ -14,6 +14,8 @@ export const sendToBack = async (inputParams, method = "POST") => {
     }
 
     const res = await fetch(route, params);
+    if (!res || !res.ok) return null;
+    
     const data = await res.json();
 
     return data;
