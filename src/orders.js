@@ -1,4 +1,3 @@
-import CONFIG from "../config/config.js";
 import { runGetCartStats } from "./cart.js";
 import { processPayment } from "./payments.js";
 import dbModel from "../models/db-model.js";
@@ -49,7 +48,6 @@ export const placeNewOrder = async (req) => {
 export const storeOrderData = async (payment, cart, inputParams) => {
   if (!payment || !cart || !inputParams) return null;
 
-  const { ordersCollection } = CONFIG;
   const { route, paymentToken, ...customerObj } = inputParams;
   const { total, itemCount } = cart;
   const { id: paymentId, orderId: squareOrderId, status, createdAt, totalMoney, approvedMoney, billingAddress, riskEvaluation, delayAction, delayedUntil, receiptNumber, receiptUrl } = payment; //prettier-ignore
@@ -67,7 +65,7 @@ export const storeOrderData = async (payment, cart, inputParams) => {
   };
 
   //start order to get internal id
-  const orderStartModel = new dbModel(startParams, ordersCollection);
+  const orderStartModel = new dbModel(startParams, process.env.ORDERS_COLLECTION);
   const orderStartData = await orderStartModel.storeAny();
   if (!orderStartData) return { success: false, message: "Failed to store order start" };
 
@@ -98,7 +96,10 @@ export const storeOrderData = async (payment, cart, inputParams) => {
   // console.log("UPDATE PARAMS");
   // console.log(updateParams);
 
-  const updateModel = new dbModel({ keyToLookup: "_id", itemValue: orderStartData.insertedId, updateObj: updateParams }, ordersCollection);
+  const updateModel = new dbModel(
+    { keyToLookup: "_id", itemValue: orderStartData.insertedId, updateObj: updateParams },
+    process.env.ORDERS_COLLECTION
+  );
   const updateData = await updateModel.updateObjItem();
   console.log("UPDATE DATA");
   console.log(updateData);
@@ -113,7 +114,6 @@ export const storeCustomerData = async (orderData, cart, inputParams) => {
   const { firstName, lastName, email, phone, address, city, state, zip } = inputParams;
   const { orderId, orderDate, amountPaid } = orderData;
   const { itemCount } = cart;
-  const { customersCollection } = CONFIG;
 
   const customerParams = {
     firstName: firstName,
@@ -137,7 +137,7 @@ export const storeCustomerData = async (orderData, cart, inputParams) => {
   if (updateData) return customerParams;
 
   //otherwise create new customer
-  const newCustomerModel = new dbModel({ firstOrderDate: orderDate }, customersCollection);
+  const newCustomerModel = new dbModel({ firstOrderDate: orderDate }, process.env.CUSTOMERS_COLLECTION);
   const newCustomerData = await newCustomerModel.storeAny();
 
   console.log("NEW CUSTOMER DATA");
@@ -151,7 +151,10 @@ export const storeCustomerData = async (orderData, cart, inputParams) => {
 
   customerParams.customerId = customerId;
 
-  const storeModel = new dbModel({ keyToLookup: "_id", itemValue: newCustomerData.insertedId, updateObj: customerParams }, customersCollection); //prettier-ignore
+  const storeModel = new dbModel(
+    { keyToLookup: "_id", itemValue: newCustomerData.insertedId, updateObj: customerParams },
+    process.env.CUSTOMERS_COLLECTION
+  );
   const storeData = await storeModel.updateObjItem();
   if (!storeData) return null;
   return customerParams;
@@ -160,7 +163,6 @@ export const storeCustomerData = async (orderData, cart, inputParams) => {
 export const updateCustomerData = async (inputParams) => {
   if (!inputParams) return null;
   const { firstName, lastName, address, lastOrderId, lastOrderDate, lastAmountPaid, totalPaid, totalItemsPurchased } = inputParams;
-  const { customersCollection } = CONFIG;
 
   const checkParams = {
     keyToLookup1: "firstName",
@@ -171,7 +173,7 @@ export const updateCustomerData = async (inputParams) => {
     itemValue3: address,
   };
 
-  const checkModel = new dbModel(checkParams, customersCollection);
+  const checkModel = new dbModel(checkParams, process.env.CUSTOMERS_COLLECTION);
   const checkData = await checkModel.matchMultiItems();
 
   console.log("CHECK DATA");
@@ -188,7 +190,10 @@ export const updateCustomerData = async (inputParams) => {
     totalOrders: +(Number(checkData.totalOrders || 0) + 1),
   };
 
-  const updateModel = new dbModel({ keyToLookup: "customerId", itemValue: checkData.customerId, updateObj: updateParams }, customersCollection);
+  const updateModel = new dbModel(
+    { keyToLookup: "customerId", itemValue: checkData.customerId, updateObj: updateParams },
+    process.env.CUSTOMERS_COLLECTION
+  );
   const updateData = await updateModel.updateObjItem();
   if (!updateData) return null;
   return updateParams;
@@ -197,9 +202,7 @@ export const updateCustomerData = async (inputParams) => {
 //----------
 
 export const getOrderNumber = async () => {
-  const { ordersCollection } = CONFIG;
-
-  const dataModel = new dbModel({ keyToLookup: "orderNumber" }, ordersCollection);
+  const dataModel = new dbModel({ keyToLookup: "orderNumber" }, process.env.ORDERS_COLLECTION);
   const orderNumber = await dataModel.getMaxId();
 
   console.log("ORDER NUMBER");

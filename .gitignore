@@ -3,6 +3,8 @@ config/
 /config*
 /config/*
 .env
+.env.local
+.env.*
 
 # logs
 logs

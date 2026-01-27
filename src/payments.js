@@ -1,11 +1,11 @@
-import SQ from "../config/square-config.js";
+import SQ from "../middleware/square-config.js";
 import { randomUUID } from "crypto";
 
 export const processPayment = async (cost, inputParams) => {
   if (!cost || !inputParams) return null;
   const { paymentToken, address, city, state, zip, firstName, lastName, email } = inputParams;
 
-  //INSERT TAX CLOUD API HERE 
+  //INSERT TAX CLOUD API HERE
   const taxRate = 0.08;
   const tax = cost * taxRate;
   const totalCost = cost + tax;
@@ -19,7 +19,7 @@ export const processPayment = async (cost, inputParams) => {
       amount: BigInt(costInCents),
       currency: "USD",
     },
-    locationId: "LMD9YKFJWX7P0", //SET FOR PROD
+    locationId: process.env.SQUARE_LOCATION_ID, //SET FOR PROD
     buyerEmailAddress: email,
     billingAddress: {
       addressLine1: address,

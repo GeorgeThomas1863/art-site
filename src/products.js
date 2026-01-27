@@ -1,16 +1,14 @@
-import CONFIG from "../config/config.js";
+// import CONFIG from "../config/config.js";
 import dbModel from "../models/db-model.js";
 
 export const runAddNewProduct = async (inputParams) => {
-  const { productsCollection } = CONFIG;
-
   const { route: _, ...params } = inputParams;
 
   console.log("PARAMS");
   console.log(params);
 
   //store
-  const storeModel = new dbModel(params, productsCollection);
+  const storeModel = new dbModel(params, process.env.PRODUCTS_COLLECTION);
   const storeData = await storeModel.storeAny();
   if (!storeData) return { success: false, message: "Failed to store product" };
   console.log("STORE DATA");
@@ -29,7 +27,7 @@ export const runAddNewProduct = async (inputParams) => {
     updateObj: params,
   };
 
-  const updateModel = new dbModel(updateParams, productsCollection);
+  const updateModel = new dbModel(updateParams, process.env.PRODUCTS_COLLECTION);
   const updateData = await updateModel.updateObjItem();
   if (!updateData) return { success: false, message: "Failed to update product" };
   console.log("UPDATE DATA");
@@ -42,8 +40,6 @@ export const runAddNewProduct = async (inputParams) => {
 };
 
 export const runEditProduct = async (inputParams) => {
-  const { productsCollection } = CONFIG;
-
   const { route: _, ...params } = inputParams;
 
   const checkParams = {
@@ -51,7 +47,7 @@ export const runEditProduct = async (inputParams) => {
     itemValue: params.productId,
   };
 
-  const checkModel = new dbModel(checkParams, productsCollection);
+  const checkModel = new dbModel(checkParams, process.env.PRODUCTS_COLLECTION);
   const checkData = await checkModel.getUniqueItem();
   if (!checkData) return { success: false, message: "Product not found" };
   console.log("CHECK DATA");
@@ -64,7 +60,7 @@ export const runEditProduct = async (inputParams) => {
     updateObj: params,
   };
 
-  const editModel = new dbModel(editParams, productsCollection);
+  const editModel = new dbModel(editParams, process.env.PRODUCTS_COLLECTION);
   const editData = await editModel.updateObjItem();
   if (!editData) return { success: false, message: "Failed to update product" };
   console.log("EDIT DATA");
@@ -77,14 +73,12 @@ export const runEditProduct = async (inputParams) => {
 };
 
 export const runDeleteProduct = async (productId) => {
-  const { productsCollection } = CONFIG;
-
   const checkParams = {
     keyToLookup: "productId",
     itemValue: productId,
   };
 
-  const checkModel = new dbModel(checkParams, productsCollection);
+  const checkModel = new dbModel(checkParams, process.env.PRODUCTS_COLLECTION);
   const checkData = await checkModel.getUniqueItem();
   if (!checkData) return { success: false, message: "Product not found" };
   console.log("CHECK DATA");
@@ -95,7 +89,7 @@ export const runDeleteProduct = async (productId) => {
     itemValue: productId,
   };
 
-  const deleteModel = new dbModel(params, productsCollection);
+  const deleteModel = new dbModel(params, process.env.PRODUCTS_COLLECTION);
   const deleteData = await deleteModel.deleteItem();
   if (!deleteData) return { success: false, message: "Failed to delete product" };
 
@@ -109,9 +103,7 @@ export const runDeleteProduct = async (productId) => {
 //---------------
 
 export const runGetProductData = async () => {
-  const { productsCollection } = CONFIG;
-
-  const dataModel = new dbModel("", productsCollection);
+  const dataModel = new dbModel("", process.env.PRODUCTS_COLLECTION);
   const data = await dataModel.getAll();
   // console.log("DATA");
   // console.dir(data);

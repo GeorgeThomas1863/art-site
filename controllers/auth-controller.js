@@ -1,5 +1,3 @@
-import CONFIG from "../config/config.js";
-
 export const authController = (req, res) => {
   if (!req.body || !req.body.pw) {
     res.json({ success: false, redirect: "/401" });
@@ -7,7 +5,7 @@ export const authController = (req, res) => {
   }
 
   //pw check
-  if (req.body.pw !== CONFIG.pw) {
+  if (req.body.pw !== process.env.ADMIN_PW) {
     res.json({ success: false, redirect: "/401" });
     return;
   }

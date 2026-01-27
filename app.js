@@ -22,18 +22,21 @@
 
 //fix square styles for card input
 
+import "dotenv/config";
+
 import express from "express";
 import session from "express-session";
 import routes from "./routes/router.js";
 
-import CONFIG from "./config/config.js";
+import { buildSessionConfig } from "./middleware/session-config.js";
+
+// import CONFIG from "./config/config.js";
 
 // const { expressPicPath, picPath, port } = CONFIG;
-const { port } = CONFIG;
 
 const app = express();
 
-app.use(session(CONFIG.buildSessionConfig()));
+app.use(session(buildSessionConfig()));
 
 // app.use(expressPicPath, express.static(picPath));
 
@@ -46,4 +49,4 @@ app.use(express.json());
 //routes
 app.use(routes);
 
-app.listen(port);
+app.listen(process.env.PORT);

@@ -1,16 +1,14 @@
-import CONFIG from "../config/config.js";
+// import CONFIG from "../config/config.js";
 import dbModel from "../models/db-model.js";
 
 export const runAddNewEvent = async (inputParams) => {
-  const { eventsCollection } = CONFIG;
-
   const { route: _, ...params } = inputParams;
 
   console.log("PARAMS");
   console.log(params);
 
   //store
-  const storeModel = new dbModel(params, eventsCollection);
+  const storeModel = new dbModel(params, process.env.EVENTS_COLLECTION);
   const storeData = await storeModel.storeAny();
   if (!storeData) return { success: false, message: "Failed to store product" };
   console.log("STORE DATA");
@@ -29,7 +27,7 @@ export const runAddNewEvent = async (inputParams) => {
     updateObj: params,
   };
 
-  const updateModel = new dbModel(updateParams, eventsCollection);
+  const updateModel = new dbModel(updateParams, process.env.EVENTS_COLLECTION);
   const updateData = await updateModel.updateObjItem();
   if (!updateData) return { success: false, message: "Failed to update product" };
   console.log("UPDATE DATA");
@@ -42,8 +40,6 @@ export const runAddNewEvent = async (inputParams) => {
 };
 
 export const runEditEvent = async (inputParams) => {
-  const { eventsCollection } = CONFIG;
-
   const { route: _, ...params } = inputParams;
 
   const checkParams = {
@@ -51,7 +47,7 @@ export const runEditEvent = async (inputParams) => {
     itemValue: params.eventId,
   };
 
-  const checkModel = new dbModel(checkParams, eventsCollection);
+  const checkModel = new dbModel(checkParams, process.env.EVENTS_COLLECTION);
   const checkData = await checkModel.getUniqueItem();
   if (!checkData) return { success: false, message: "Event not found" };
   console.log("CHECK DATA");
@@ -64,7 +60,7 @@ export const runEditEvent = async (inputParams) => {
     updateObj: params,
   };
 
-  const editModel = new dbModel(editParams, eventsCollection);
+  const editModel = new dbModel(editParams, process.env.EVENTS_COLLECTION);
   const editData = await editModel.updateObjItem();
   if (!editData) return { success: false, message: "Failed to update event" };
   console.log("EDIT DATA");
@@ -77,14 +73,12 @@ export const runEditEvent = async (inputParams) => {
 };
 
 export const runDeleteEvent = async (eventId) => {
-  const { eventsCollection } = CONFIG;
-
   const checkParams = {
     keyToLookup: "eventId",
     itemValue: eventId,
   };
 
-  const checkModel = new dbModel(checkParams, eventsCollection);
+  const checkModel = new dbModel(checkParams, process.env.EVENTS_COLLECTION);
   const checkData = await checkModel.getUniqueItem();
   if (!checkData) return { success: false, message: "Event not found" };
   console.log("CHECK DATA");
@@ -95,7 +89,7 @@ export const runDeleteEvent = async (eventId) => {
     itemValue: eventId,
   };
 
-  const deleteModel = new dbModel(params, eventsCollection);
+  const deleteModel = new dbModel(params, process.env.EVENTS_COLLECTION);
   const deleteData = await deleteModel.deleteItem();
   if (!deleteData) return { success: false, message: "Failed to delete event" };
 
@@ -107,9 +101,7 @@ export const runDeleteEvent = async (eventId) => {
 };
 
 export const runGetEventData = async () => {
-  const { eventsCollection } = CONFIG;
-
-  const dataModel = new dbModel("", eventsCollection);
+  const dataModel = new dbModel("", process.env.EVENTS_COLLECTION);
   const data = await dataModel.getAll();
   console.log("EVENT DATA");
   console.log(data);
