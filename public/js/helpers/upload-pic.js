@@ -17,14 +17,6 @@ export const runUploadClick = async (clickedElement) => {
 export const runUploadPic = async (pic, mode = "add", entityType = "products") => {
   if (!pic) return null;
 
-  // console.log("RUN UPLOAD PIC");
-  // console.log("PIC");
-  // console.log(pic);
-  // console.log("MODE");
-  // console.log(mode);
-  // console.log("ENTITY TYPE");
-  // console.log(entityType);
-
   const uploadStatusId = mode === "add" ? "upload-status" : "edit-upload-status";
   const uploadButtonId = mode === "add" ? "upload-button" : "edit-upload-button";
   const currentImageId = mode === "add" ? "current-image" : "edit-current-image";
@@ -80,47 +72,6 @@ export const runUploadPic = async (pic, mode = "add", entityType = "products") =
 
   return data;
 };
-
-// export const uploadFile = async (file) => {
-//   if (!file) return null;
-
-//   const uploadRoute = await sendToBack({ route: "/get-backend-value-route", key: "uploadRoute" });
-//   if (!uploadRoute) return null;
-
-//   const uploadStatus = document.getElementById("upload-status");
-//   const uploadButton = document.getElementById("upload-button");
-
-//   uploadStatus.textContent = "Uploading...";
-//   uploadStatus.style.display = "inline";
-//   uploadButton.disabled = true;
-
-//   const formData = new FormData();
-//   formData.append("image", file);
-
-//   try {
-//     const response = await fetch(uploadRoute, {
-//       method: "POST",
-//       body: formData,
-//     });
-
-//     const result = await response.json();
-
-//     if (result.error) {
-//       uploadStatus.textContent = `✗ ${result.error}`;
-//       uploadStatus.style.color = "red";
-//       return null;
-//     }
-
-//     return result;
-//   } catch (error) {
-//     console.error("Upload failed:", error);
-//     uploadStatus.textContent = "✗ Upload failed";
-//     uploadStatus.style.color = "red";
-//     return null;
-//   } finally {
-//     uploadButton.disabled = false;
-//   }
-// };
 
 //----------------------
 

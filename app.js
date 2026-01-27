@@ -20,6 +20,8 @@
 
 //BUGS: price of items in cart needs to changed based on quantity
 
+//number of events at bottom not updating correctly
+
 //fix square styles for card input
 
 import "dotenv/config";
