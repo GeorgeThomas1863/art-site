@@ -13,6 +13,7 @@ const authElement = document.getElementById("auth-element");
 const displayElement = document.getElementById("display-element");
 const adminElement = document.getElementById("admin-element");
 const productsElement = document.getElementById("products-element");
+const contactElement = document.getElementById("contact-element");
 const cartElement = document.getElementById("cart-element");
 const checkoutElement = document.getElementById("checkout-element");
 
@@ -115,17 +116,6 @@ export const changeHandler = async (e) => {
   if (changeId === "event-selector") await changeAdminEventSelector(changeElement);
 };
 
-// //modal
-// export const overlayClickHandler = async (e) => {
-//   if (e.target.classList.contains("modal-overlay")) {
-//     e.target.remove();
-//   }
-
-//   // if (e.target.classList.contains("modal-overlay")) {
-//   //   e.target.classList.remove("visible");
-//   // }
-// };
-
 if (authElement) {
   authElement.addEventListener("click", clickHandler);
   authElement.addEventListener("keydown", keyHandler);
@@ -147,6 +137,12 @@ if (productsElement) {
   productsElement.addEventListener("click", clickHandler);
   productsElement.addEventListener("keydown", keyHandler);
   productsElement.addEventListener("change", changeHandler);
+}
+
+if (contactElement) {
+  contactElement.addEventListener("click", clickHandler);
+  contactElement.addEventListener("keydown", keyHandler);
+  contactElement.addEventListener("change", changeHandler);
 }
 
 if (cartElement) {
