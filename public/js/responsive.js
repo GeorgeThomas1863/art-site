@@ -25,18 +25,10 @@ export const clickHandler = async (e) => {
   const clickType = clickElement.getAttribute("data-label");
   // const tabType = clickElement.getAttribute("data-tab");
 
-  //get rid of
-  // const modalTrigger = clickElement.getAttribute("data-modal-trigger");
-  // const modalClose = clickElement.getAttribute("data-modal-close");
-
   console.log("CLICK HANDLER");
   console.log(clickId);
   console.log("CLICK TYPE");
   console.log(clickType);
-  // console.log("MODAL TRIGGER");
-  // console.log(modalTrigger);
-  // console.log("MODAL CLOSE");
-  // console.log(modalClose);
 
   if (clickType === "auth-submit") await runAuthSubmit();
   if (clickType === "pwToggle") await runPwToggle();

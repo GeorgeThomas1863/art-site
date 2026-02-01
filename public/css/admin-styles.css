@@ -10,8 +10,6 @@
 
 /* Dashboard Header */
 .dashboard-header {
-  /* background: rgba(0, 0, 0, 0.95);
-  color: #ffffff; */
   background: linear-gradient(135deg, #f5f5f5 0%, #fafafa 100%);
   color: black;
   padding: 1.5rem;
