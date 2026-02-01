@@ -3,6 +3,10 @@ import nodemailer from "nodemailer";
 export const runContactSubmit = async (inputParams) => {
   if (!inputParams) return { success: false, message: "No input parameters" };
 
+  console.log("RUN CONTACT SUBMIT");
+  console.log("INPUT PARAMS");
+  console.log(inputParams);
+
   const { name, email, subject, message } = inputParams;
 
   const mailParams = {
