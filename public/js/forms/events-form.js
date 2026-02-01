@@ -108,8 +108,9 @@ export const buildEventsNewsletterSection = async () => {
   description.textContent = "Stay updated with new creations, upcoming events, and special offers from Two Sisters Fiber Art.";
 
   const checkboxWrapper = await buildEventsNewsletterCheckbox();
+  const emailInputWrapper = await buildEventsNewsletterEmailInput();
 
-  newsletterSection.append(title, description, checkboxWrapper);
+  newsletterSection.append(title, description, checkboxWrapper, emailInputWrapper);
 
   return newsletterSection;
 };
@@ -123,28 +124,37 @@ export const buildEventsNewsletterCheckbox = async () => {
   checkbox.type = "checkbox";
   checkbox.id = "events-newsletter";
   checkbox.name = "events-newsletter";
+  checkbox.setAttribute("data-label", "events-newsletter-checkbox");
 
   const label = document.createElement("label");
   label.setAttribute("for", "events-newsletter");
   label.textContent = "Yes, I want to receive newsletters and updates!";
-
-  // Add event listener for checkbox
-  // checkbox.addEventListener("change", handleNewsletterCheckbox);
+  label.setAttribute("data-label", "events-newsletter-checkbox");
 
   checkboxWrapper.append(checkbox, label);
 
   return checkboxWrapper;
 };
 
-//MOVE BELOW
-// Handle newsletter checkbox change
-// export const handleNewsletterCheckbox = async (event) => {
-//   const isChecked = event.target.checked;
+export const buildEventsNewsletterEmailInput = async () => {
+  const emailWrapper = document.createElement("div");
+  emailWrapper.id = "events-newsletter-email-wrapper";
+  emailWrapper.className = "events-newsletter-email-wrapper hidden";
 
-//   console.log("Newsletter subscription:", isChecked);
+  const emailInput = document.createElement("input");
+  emailInput.type = "email";
+  emailInput.id = "events-newsletter-email";
+  emailInput.name = "events-newsletter-email";
+  emailInput.placeholder = "Enter your email address";
+  emailInput.className = "events-newsletter-email-input";
 
-//   // TODO: Send to backend when checked
-//   // if (isChecked) {
-//   //   const response = await sendToBack({ route: "/newsletter-subscribe-route" }, "POST");
-//   // }
-// };
+  const submitButton = document.createElement("button");
+  submitButton.type = "button";
+  submitButton.className = "events-newsletter-submit-btn";
+  submitButton.textContent = "Subscribe";
+  submitButton.setAttribute("data-label", "events-newsletter-submit");
+
+  emailWrapper.append(emailInput, submitButton);
+
+  return emailWrapper;
+};

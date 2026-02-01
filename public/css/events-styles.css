@@ -134,3 +134,62 @@
   cursor: pointer;
   font-weight: bold;
 }
+
+.events-newsletter-email-wrapper {
+  margin-top: 1.5rem;
+  display: flex;
+  gap: 0.75rem;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s ease;
+}
+
+.events-newsletter-email-wrapper.hidden {
+  display: none;
+}
+
+.events-newsletter-email-input {
+  font-family: "Georgia", serif;
+  flex: 1;
+  max-width: 350px;
+  padding: 0.9rem 1.2rem;
+  font-size: 1rem;
+  border: 2px solid rgb(150, 200, 100);
+  border-radius: 6px;
+  outline: none;
+  transition: border-color 0.3s;
+}
+
+.events-newsletter-email-input:focus {
+  border-color: rgb(100, 150, 50);
+}
+
+.events-newsletter-email-input::placeholder {
+  font-family: "Indie Flower", cursive;
+  color: #999;
+}
+
+.events-newsletter-submit-btn {
+  padding: 0.9rem 2rem;
+  font-size: 1rem;
+  font-family: "Indie Flower", cursive;
+  font-weight: bold;
+  background-color: rgb(150, 200, 100);
+  color: #000;
+  border: 2px solid rgb(150, 200, 100);
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.3s;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.events-newsletter-submit-btn:hover {
+  background-color: rgb(130, 180, 80);
+  border-color: rgb(130, 180, 80);
+}
+
+.events-newsletter-submit-btn:active {
+  background-color: rgb(110, 160, 60);
+  transform: translateY(1px);
+}

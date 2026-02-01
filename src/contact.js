@@ -1,4 +1,6 @@
 import nodemailer from "nodemailer";
+import dbModel from "../models/db-model.js";
+import { runAddToNewsletter } from "./newsletter.js";
 
 export const runContactSubmit = async (inputParams) => {
   if (!inputParams) return { success: false, message: "No input parameters" };
@@ -7,7 +9,16 @@ export const runContactSubmit = async (inputParams) => {
   console.log("INPUT PARAMS");
   console.log(inputParams);
 
-  const { name, email, subject, message } = inputParams;
+  const { name, email, subject, message, newsletter } = inputParams;
+
+  if (newsletter) {
+    const newsletterData = await runAddToNewsletter(email);
+    if (!newsletterData || !newsletterData.success) {
+      if (newsletterData.message !== "Email already subscribed") {
+        return { success: false, message: "Failed to add email to newsletter" };
+      }
+    }
+  }
 
   const mailParams = {
     from: process.env.EMAIL_USER,
@@ -33,7 +44,17 @@ export const runContactSubmit = async (inputParams) => {
 
   try {
     const data = await transport.sendMail(mailParams);
-    console.log("EMAIL SENT:", data.response);
+    console.log("EMAIL SENT:", data);
+    if (!data) return { success: false, message: "Failed to send email" };
+
+    mailParams.emailData = data;
+    mailParams.messageId = data.messageId;
+    mailParams.newsletter = newsletter;
+
+    const storeModel = new dbModel(mailParams, process.env.CONTACTS_COLLECTION);
+    const storeData = await storeModel.storeAny();
+    if (!storeData) return { success: false, message: "Failed to store email data" };
+
     return { success: true, message: "Email sent successfully", messageId: data.messageId };
   } catch (error) {
     console.error("EMAIL ERROR:", error);

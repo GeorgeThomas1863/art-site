@@ -1,6 +1,7 @@
 import { runAddNewProduct, runEditProduct, runDeleteProduct, runGetProductData } from "../src/products.js";
 import { runAddNewEvent, runEditEvent, runDeleteEvent, runGetEventData } from "../src/events.js";
 import { runContactSubmit } from "../src/contact.js";
+import { runAddToNewsletter } from "../src/newsletter.js";
 import { buildCart, runGetCartStats, runAddToCart, runUpdateCartItem, runRemoveFromCart } from "../src/cart.js";
 import { runCalculateShipping } from "../src/shipping.js";
 import { placeNewOrder } from "../src/orders.js";
@@ -191,6 +192,16 @@ export const contactSubmitControl = async (req, res) => {
 
   const data = await runContactSubmit(req.body);
   if (!data || !data.success) return res.status(500).json({ error: "Failed to submit contact form" });
+
+  return res.json(data);
+};
+
+export const addToNewsletterControl = async (req, res) => {
+  if (!req || !req.body) return res.status(500).json({ error: "No input parameters" });
+  if (!req.body.email) return res.status(500).json({ error: "No email provided" });
+
+  const data = await runAddToNewsletter(req.body.email);
+  if (!data || !data.success) return res.status(500).json({ error: "Failed to add email to newsletter" });
 
   return res.json(data);
 };

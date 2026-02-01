@@ -4,6 +4,7 @@ import { runAddNewEvent, runEditEvent, runDeleteEvent, changeAdminEventSelector 
 import { runUploadClick, runUploadPic, runDeleteUploadImage } from "./helpers/upload-pic.js";
 import { changeProductsFilterButton } from "./helpers/products-run.js";
 import { runContactSubmit } from "./helpers/contact-run.js";
+import { runEventsNewsletterToggle, runEventsNewsletterSubmit } from "./helpers/events-run.js";
 import { runAddToCart, runIncreaseQuantity, runDecreaseQuantity, runRemoveFromCart } from "./helpers/cart-run.js";
 import { runPlaceOrder, runCalculateShipping } from "./helpers/buy-run.js";
 import { runAuthSubmit, runPwToggle } from "./auth.js";
@@ -13,6 +14,7 @@ const authElement = document.getElementById("auth-element");
 const displayElement = document.getElementById("display-element");
 const adminElement = document.getElementById("admin-element");
 const productsElement = document.getElementById("products-element");
+const eventsElement = document.getElementById("events-element");
 const contactElement = document.getElementById("contact-element");
 const cartElement = document.getElementById("cart-element");
 const checkoutElement = document.getElementById("checkout-element");
@@ -60,6 +62,9 @@ export const clickHandler = async (e) => {
 
   if (clickType === "checkout-btn") window.location.href = "/checkout";
   if (clickType === "place-order") await runPlaceOrder();
+
+  if (clickType === "events-newsletter-checkbox") await runEventsNewsletterToggle(clickElement);
+  if (clickType === "events-newsletter-submit") await runEventsNewsletterSubmit();
 
   if (clickType === "contact-submit") await runContactSubmit();
 
@@ -139,6 +144,10 @@ if (productsElement) {
   productsElement.addEventListener("click", clickHandler);
   productsElement.addEventListener("keydown", keyHandler);
   productsElement.addEventListener("change", changeHandler);
+}
+
+if (eventsElement) {
+  eventsElement.addEventListener("click", clickHandler);
 }
 
 if (contactElement) {

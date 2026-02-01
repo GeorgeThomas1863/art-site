@@ -1,4 +1,3 @@
-// import CONFIG from "../config/config.js";
 import dbModel from "../models/db-model.js";
 
 export const runAddNewEvent = async (inputParams) => {
@@ -103,7 +102,7 @@ export const runDeleteEvent = async (eventId) => {
 export const runGetEventData = async () => {
   const dataModel = new dbModel("", process.env.EVENTS_COLLECTION);
   const data = await dataModel.getAll();
-  console.log("EVENT DATA");
-  console.log(data);
+  // console.log("EVENT DATA");
+  // console.log(data);
   return data;
 };

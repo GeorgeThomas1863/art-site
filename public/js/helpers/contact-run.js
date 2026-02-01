@@ -12,6 +12,14 @@ export const runContactSubmit = async () => {
     return null;
   }
 
+  const email = contactParams.email.trim();
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+  if (!email || !emailRegex.test(email)) {
+    await displayPopup("Please enter a valid email address", "error");
+    return null;
+  }
+
   const data = await sendToBack(contactParams);
   console.log("CONTACT DATA:");
   console.dir(data);
@@ -22,6 +30,12 @@ export const runContactSubmit = async () => {
   }
 
   await displayPopup("Message sent! We'll get back to you soon.", "success");
+
+  const form = document.getElementById("contactForm");
+  if (form) form.reset();
+
+  const newsletterCheckbox = document.getElementById("newsletter");
+  if (newsletterCheckbox) newsletterCheckbox.checked = false;
 
   return true;
 };

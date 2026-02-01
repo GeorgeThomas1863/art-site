@@ -41,6 +41,7 @@ import {
   placeOrderControl,
   calculateShippingControl,
   contactSubmitControl,
+  addToNewsletterControl,
 } from "../controllers/data-controller.js";
 
 const router = express.Router();
@@ -97,6 +98,8 @@ router.post("/checkout/calculate-shipping", calculateShippingControl);
 
 //CONTACT ROUTES
 router.post("/contact-submit", contactSubmitControl);
+
+router.post("/newsletter/add", addToNewsletterControl);
 
 //-----------------
 

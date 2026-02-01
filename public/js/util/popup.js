@@ -2,12 +2,14 @@ const adminElement = document.getElementById("admin-element");
 const productsElement = document.getElementById("products-element");
 const cartElement = document.getElementById("cart-element");
 const contactElement = document.getElementById("contact-element");
+const eventsElement = document.getElementById("events-element");
 
 export const getTargetElement = async () => {
   if (adminElement) return adminElement;
   if (productsElement) return productsElement;
   if (cartElement) return cartElement;
   if (contactElement) return contactElement;
+  if (eventsElement) return eventsElement;
 
   return null;
 };
