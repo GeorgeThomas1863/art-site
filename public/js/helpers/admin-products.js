@@ -1,7 +1,7 @@
 import { clearAdminEditFields, disableAdminEditFields, enableAdminEditFields, updateProductStats } from "./admin-run.js";
 import { sendToBack } from "../util/api-front.js";
 import { buildNewProductParams, getEditProductParams } from "../util/params.js";
-import { displayPopup, displayConfirmDialog } from "./popup.js";
+import { displayPopup, displayConfirmDialog } from "../util/popup.js";
 
 //Add product
 export const runAddNewProduct = async () => {

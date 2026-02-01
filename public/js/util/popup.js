@@ -1,7 +1,16 @@
-//MOVE TO HELPERS
 const adminElement = document.getElementById("admin-element");
 const productsElement = document.getElementById("products-element");
 const cartElement = document.getElementById("cart-element");
+const contactElement = document.getElementById("contact-element");
+
+export const getTargetElement = async () => {
+  if (adminElement) return adminElement;
+  if (productsElement) return productsElement;
+  if (cartElement) return cartElement;
+  if (contactElement) return contactElement;
+
+  return null;
+};
 
 export const displayPopup = async (message, type = "success") => {
   if (!message) return null;
@@ -48,7 +57,7 @@ export const displayPopup = async (message, type = "success") => {
   // Auto-remove after 5 seconds
   setTimeout(() => {
     popup.style.display = "none";
-  }, 3000);
+  }, 5000);
 };
 
 export const closePopup = async () => {
@@ -62,14 +71,6 @@ export const closePopup = async () => {
 };
 
 //---------------------------
-
-export const getTargetElement = async () => {
-  if (adminElement) return adminElement;
-  if (productsElement) return productsElement;
-  if (cartElement) return cartElement;
-
-  return null;
-};
 
 export const displayConfirmDialog = async (message) => {
   const adminElement = document.getElementById("admin-element");

@@ -1,6 +1,6 @@
 import { sendToBack } from "../util/api-front.js";
 import { buildCartItem, buildEmptyCart } from "../forms/cart-form.js";
-import { displayPopup } from "./popup.js";
+import { displayPopup } from "../util/popup.js";
 
 export const runAddToCart = async (clickElement) => {
   if (!clickElement) return null;

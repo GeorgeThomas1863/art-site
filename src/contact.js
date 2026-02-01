@@ -12,14 +12,13 @@ export const runContactSubmit = async (inputParams) => {
   const mailParams = {
     from: process.env.EMAIL_USER,
     to: process.env.EMAIL_RECIPIENT,
-    subject: `CONTACT FORM SUBMISSION: ${subject}`,
+    subject: `SITE MESSAGE FROM ${name} | SUBJECT: ${subject}`,
     html: `
-      <h3>NEW CONTACT FORM SUBMISSION</h3><br><br>
+      <h4>NEW CONTACT FORM SUBMISSION:</h4>
       <p><strong>Name:</strong> ${name}</p>
       <p><strong>Email:</strong> ${email}</p>
       <p><strong>Subject:</strong> ${subject || "No subject provided"}</p>
-      <p><strong>Message:</strong></p>
-      <p>${message.replace(/\n/g, "<br>")}</p>} `,
+      <p><strong>Message:</strong> ${message.replace(/\n/g, "<br>")}</p>`,
 
     replyTo: email,
   };

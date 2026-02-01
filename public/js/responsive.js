@@ -7,7 +7,7 @@ import { runContactSubmit } from "./helpers/contact-run.js";
 import { runAddToCart, runIncreaseQuantity, runDecreaseQuantity, runRemoveFromCart } from "./helpers/cart-run.js";
 import { runPlaceOrder, runCalculateShipping } from "./helpers/buy-run.js";
 import { runAuthSubmit, runPwToggle } from "./auth.js";
-import { closePopup, closeConfirmDialog } from "./helpers/popup.js";
+import { closePopup, closeConfirmDialog } from "./util/popup.js";
 
 const authElement = document.getElementById("auth-element");
 const displayElement = document.getElementById("display-element");
@@ -74,6 +74,8 @@ export const clickHandler = async (e) => {
 
 export const keyHandler = async (e) => {
   if (e.key !== "Enter") return null;
+  if (e.target.tagName === "TEXTAREA") return null; //textarea
+
   e.preventDefault();
 
   const keyElement = e.target;

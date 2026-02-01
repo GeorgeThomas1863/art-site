@@ -3,7 +3,7 @@ import { buildCheckoutItem } from "../forms/checkout-form.js";
 import { buildSquarePayment, tokenizePaymentMethod } from "./square-payment.js";
 import { getCustomerParams } from "../util/params.js";
 import { buildConfirmItem } from "../forms/confirm-form.js";
-import { displayPopup } from "./popup.js";
+import { displayPopup } from "../util/popup.js";
 import { updateCartSummary } from "./cart-run.js";
 
 //main purchase function

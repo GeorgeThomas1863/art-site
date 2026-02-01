@@ -1,7 +1,7 @@
 import { clearAdminEditFields, disableAdminEditFields, enableAdminEditFields, updateEventStats } from "./admin-run.js";
 import { sendToBack } from "../util/api-front.js";
 import { buildNewEventParams, getEditEventParams } from "../util/params.js";
-import { displayPopup, displayConfirmDialog } from "./popup.js";
+import { displayPopup, displayConfirmDialog } from "../util/popup.js";
 
 //Add event
 export const runAddNewEvent = async () => {

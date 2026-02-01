@@ -19,13 +19,9 @@ export const buildContactHeader = async () => {
 
   const title = document.createElement("h1");
   title.className = "contact-page-title";
-  title.textContent = "Contact Us";
+  title.textContent = "We'd love to hear from you!";
 
-  const subtitle = document.createElement("p");
-  subtitle.className = "contact-page-subtitle";
-  subtitle.textContent = "We'd love to hear from you!";
-
-  contactHeader.append(title, subtitle);
+  contactHeader.append(title);
 
   return contactHeader;
 };
@@ -60,6 +56,7 @@ export const buildContactFormElement = async () => {
   const nameGroup = await buildFormGroup("name", "Name", "text");
   const emailGroup = await buildFormGroup("email", "Email Address", "email");
   const subjectGroup = await buildFormGroup("subject", "Subject", "text");
+  subjectGroup.querySelector("input").required = false;
   const messageGroup = await buildFormGroup("message", "Message", "textarea");
   const newsletterSection = await buildNewsletterSection();
   const submitButton = await buildSubmitButton();
@@ -142,7 +139,7 @@ export const buildCheckboxWrapper = async () => {
 // Build submit button
 export const buildSubmitButton = async () => {
   const button = document.createElement("button");
-  button.type = "submit";
+  button.type = "button";
   button.className = "submit-button";
   button.textContent = "Send Message";
   button.setAttribute("data-label", "contact-submit");
