@@ -5,9 +5,10 @@ export const buildAdminForm = async () => {
   const dashboardHeader = await buildDashboardHeader();
   const productsSection = await buildProductsSection();
   const eventsSection = await buildEventsSection();
+  const newsletterSection = await buildNewsletterSection();
   const statsSection = await buildStatsSection();
 
-  adminFormWrapper.append(dashboardHeader, productsSection, eventsSection, statsSection);
+  adminFormWrapper.append(dashboardHeader, productsSection, eventsSection, newsletterSection, statsSection);
 
   return adminFormWrapper;
 };
@@ -69,6 +70,26 @@ export const buildEventsSection = async () => {
   return section;
 };
 
+export const buildNewsletterSection = async () => {
+  const section = document.createElement("div");
+  section.className = "category-section";
+
+  const title = document.createElement("h2");
+  title.className = "category-title";
+  title.textContent = "📧 NEWSLETTER";
+
+  const actionCards = document.createElement("div");
+  actionCards.className = "action-cards";
+
+  const writeCard = await buildActionCard("write", "newsletter");
+  const editCard = await buildActionCard("edit", "newsletter");
+
+  actionCards.append(writeCard, editCard);
+  section.append(title, actionCards);
+
+  return section;
+};
+
 export const buildStatsSection = async () => {
   const section = document.createElement("div");
   section.className = "stats-section";
@@ -78,6 +99,7 @@ export const buildStatsSection = async () => {
     { icon: "👁️", value: "0", label: "Displayed", id: "displayed-products-stat" },
     { icon: "✅", value: "0", label: "Sold", id: "sold-products-stat" },
     { icon: "📅", value: "0", label: "Upcoming Events", id: "upcoming-events-stat" },
+    { icon: "📧", value: "0", label: "Subscribers", id: "total-subscribers-stat" },
   ];
 
   for (let i = 0; i < stats.length; i++) {
@@ -108,26 +130,43 @@ export const buildStatsSection = async () => {
 export const buildActionCard = async (mode, entityType) => {
   const card = document.createElement("div");
   card.className = "action-card";
-  // card.setAttribute("data-modal-trigger", `${mode}-${entityType}`);
   card.setAttribute("data-label", `open-modal-${mode}-${entityType}`);
 
   const icon = document.createElement("div");
   icon.className = "action-icon";
-  icon.textContent = mode === "add" ? "➕" : "✏️";
+
+  if (entityType === "newsletter") {
+    icon.textContent = mode === "write" ? "✍️" : "📝";
+  } else {
+    icon.textContent = mode === "add" ? "➕" : "✏️";
+  }
   icon.setAttribute("data-label", `open-modal-${mode}-${entityType}`);
 
   const title = document.createElement("div");
   title.className = "action-title";
-  const entityName = entityType === "products" ? "Product" : "Event";
-  title.textContent = mode === "add" ? `Add New ${entityName}` : `Edit ${entityName}`;
+
+  let entityName;
+  let titleText;
+  let descText;
+
+  if (entityType === "newsletter") {
+    titleText = mode === "write" ? "Write Newsletter" : "Edit Mailing List";
+    descText = mode === "write" ? "Compose and send a newsletter to all subscribers" : "Add or remove email addresses from your mailing list";
+  } else {
+    entityName = entityType === "products" ? "Product" : "Event";
+    titleText = mode === "add" ? `Add New ${entityName}` : `Edit ${entityName}`;
+    descText =
+      mode === "add"
+        ? `Create a new ${entityName.toLowerCase()} listing with images and details`
+        : `Modify or delete existing ${entityName.toLowerCase()}s`;
+  }
+
+  title.textContent = titleText;
   title.setAttribute("data-label", `open-modal-${mode}-${entityType}`);
 
   const description = document.createElement("div");
   description.className = "action-description";
-  description.textContent =
-    mode === "add"
-      ? `Create a new ${entityName.toLowerCase()} listing with images and details`
-      : `Modify or delete existing ${entityName.toLowerCase()}s`;
+  description.textContent = descText;
   description.setAttribute("data-label", `open-modal-${mode}-${entityType}`);
 
   card.append(icon, title, description);
@@ -168,14 +207,21 @@ export const buildModalHeader = async (mode, entityType) => {
 
   const title = document.createElement("h2");
   title.className = "modal-title";
-  const entityName = entityType === "products" ? "PRODUCT" : "EVENT";
-  title.textContent = mode === "add" ? `ADD NEW ${entityName}` : `EDIT ${entityName}`;
+
+  let titleText;
+  if (entityType === "newsletter") {
+    titleText = mode === "write" ? "WRITE NEWSLETTER" : "EDIT MAILING LIST";
+  } else {
+    const entityName = entityType === "products" ? "PRODUCT" : "EVENT";
+    titleText = mode === "add" ? `ADD NEW ${entityName}` : `EDIT ${entityName}`;
+  }
+
+  title.textContent = titleText;
 
   const closeButton = document.createElement("button");
   closeButton.className = "modal-close";
   closeButton.textContent = "×";
   closeButton.type = "button";
-  // closeButton.setAttribute("data-modal-close", `${mode}-${entityType}-modal`);
   closeButton.setAttribute("data-label", `close-modal-${mode}-${entityType}`);
 
   header.append(title, closeButton);
@@ -192,6 +238,19 @@ export const buildModalBody = async (mode, entityType) => {
   if (mode === "edit") {
     const selector = entityType === "products" ? await buildAdminProductSelector() : await buildAdminEventSelector();
     body.append(selector);
+  }
+
+  if (entityType === "newsletter") {
+    if (mode === "write") {
+      const subjectField = await buildNewsletterSubject();
+      const messageField = await buildNewsletterMessage();
+      body.append(subjectField, messageField);
+      return body;
+    } else if (mode === "edit") {
+      const mailingListSection = await buildMailingListSection();
+      body.append(mailingListSection);
+      return body;
+    }
   }
 
   // Build form fields based on entity type
@@ -228,7 +287,7 @@ export const buildModalActions = async (mode, entityType) => {
   actions.className = "modal-actions";
 
   // Delete button for edit mode
-  if (mode === "edit") {
+  if (mode === "edit" && entityType !== "newsletter") {
     const deleteButton = document.createElement("button");
     deleteButton.className = "btn btn-admin-delete";
     deleteButton.type = "button";
@@ -244,34 +303,35 @@ export const buildModalActions = async (mode, entityType) => {
   cancelButton.className = "btn btn-admin-cancel";
   cancelButton.type = "button";
   cancelButton.textContent = "Cancel";
-  // cancelButton.setAttribute("data-modal-close", `${mode}-${entityType}-modal`);
   cancelButton.setAttribute("data-label", `close-modal-${mode}-${entityType}`);
 
   // Submit button (ridiculous from claude)
   const submitButton = document.createElement("button");
   submitButton.className = "btn btn-admin-submit";
   submitButton.type = "button";
-  submitButton.id =
-    mode === "add"
-      ? entityType === "products"
-        ? "submit-button"
-        : "event-submit-button"
-      : entityType === "products"
-      ? "edit-submit-button"
-      : "edit-event-submit-button";
-  submitButton.textContent = mode === "add" ? "Submit" : "Update";
-  submitButton.setAttribute(
-    "data-label",
-    mode === "add"
-      ? entityType === "products"
-        ? "new-product-submit"
-        : "new-event-submit"
-      : entityType === "products"
-      ? "edit-product-submit"
-      : "edit-event-submit"
-  );
 
-  if (mode === "edit") {
+  let submitId;
+  let submitLabel;
+  let submitText;
+
+  if (entityType === "newsletter") {
+    submitId = mode === "write" ? "send-newsletter-button" : "save-mailing-list-button";
+    submitLabel = mode === "write" ? "send-newsletter-submit" : "save-mailing-list-submit";
+    submitText = mode === "write" ? "Send Newsletter" : "Save Changes";
+  } else if (entityType === "products") {
+    submitId = mode === "add" ? "submit-button" : "edit-submit-button";
+    submitLabel = mode === "add" ? "new-product-submit" : "edit-product-submit";
+    submitText = mode === "add" ? "Submit" : "Update";
+  } else {
+    submitId = mode === "add" ? "event-submit-button" : "edit-event-submit-button";
+    submitLabel = mode === "add" ? "new-event-submit" : "edit-event-submit";
+    submitText = mode === "add" ? "Submit" : "Update";
+  }
+  submitButton.id = submitId;
+  submitButton.textContent = submitText;
+  submitButton.setAttribute("data-label", submitLabel);
+
+  if (mode === "edit" && entityType !== "newsletter") {
     submitButton.disabled = true;
   }
 
@@ -638,6 +698,101 @@ export const buildEventDescription = async (mode) => {
   descWrapper.append(descLabel, descInput);
 
   return descWrapper;
+};
+
+//NEWSLETTER FORM FIELDS
+
+export const buildNewsletterSubject = async () => {
+  const subjectWrapper = document.createElement("div");
+  subjectWrapper.className = "form-field";
+
+  const subjectLabel = document.createElement("label");
+  subjectLabel.className = "form-label";
+  subjectLabel.textContent = "Subject Line";
+  subjectLabel.setAttribute("for", "newsletter-subject");
+
+  const subjectInput = document.createElement("input");
+  subjectInput.className = "form-input";
+  subjectInput.type = "text";
+  subjectInput.id = "newsletter-subject";
+  subjectInput.name = "newsletter-subject";
+  subjectInput.placeholder = "Enter newsletter subject...";
+
+  subjectWrapper.append(subjectLabel, subjectInput);
+
+  return subjectWrapper;
+};
+
+export const buildNewsletterMessage = async () => {
+  const messageWrapper = document.createElement("div");
+  messageWrapper.className = "form-field";
+
+  const messageLabel = document.createElement("label");
+  messageLabel.className = "form-label";
+  messageLabel.textContent = "Message";
+  messageLabel.setAttribute("for", "newsletter-message");
+
+  const messageInput = document.createElement("textarea");
+  messageInput.className = "form-textarea newsletter-textarea";
+  messageInput.id = "newsletter-message";
+  messageInput.name = "newsletter-message";
+  messageInput.placeholder = "Write your newsletter message...";
+
+  messageWrapper.append(messageLabel, messageInput);
+
+  return messageWrapper;
+};
+
+export const buildMailingListSection = async () => {
+  const section = document.createElement("div");
+  section.className = "mailing-list-section";
+
+  // Add email input
+  const addEmailSection = document.createElement("div");
+  addEmailSection.className = "add-email-section";
+
+  const addEmailLabel = document.createElement("label");
+  addEmailLabel.className = "form-label";
+  addEmailLabel.textContent = "Add New Subscriber";
+  addEmailLabel.setAttribute("for", "new-subscriber-email");
+
+  const addEmailRow = document.createElement("div");
+  addEmailRow.className = "add-email-row";
+
+  const emailInput = document.createElement("input");
+  emailInput.className = "form-input";
+  emailInput.type = "email";
+  emailInput.id = "new-subscriber-email";
+  emailInput.name = "new-subscriber-email";
+  emailInput.placeholder = "email@example.com";
+
+  const addButton = document.createElement("button");
+  addButton.className = "btn btn-add-email";
+  addButton.type = "button";
+  addButton.textContent = "Add";
+  addButton.setAttribute("data-label", "add-subscriber-email");
+
+  addEmailRow.append(emailInput, addButton);
+  addEmailSection.append(addEmailLabel, addEmailRow);
+
+  // Subscriber list
+  const listLabel = document.createElement("label");
+  listLabel.className = "form-label subscriber-list-label";
+  listLabel.textContent = "Current Subscribers";
+
+  const subscriberList = document.createElement("div");
+  subscriberList.className = "subscriber-list";
+  subscriberList.id = "subscriber-list";
+
+  // Placeholder for empty state
+  const emptyState = document.createElement("div");
+  emptyState.className = "subscriber-empty-state";
+  emptyState.textContent = "No subscribers yet";
+  subscriberList.append(emptyState);
+
+  section.append(addEmailSection, listLabel, subscriberList);
+
+  return section;
 };
 
 //++++++++++++

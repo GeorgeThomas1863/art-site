@@ -1,5 +1,6 @@
 import { populateAdminProductSelector } from "./admin-products.js";
 import { populateAdminEventSelector } from "./admin-events.js";
+import { populateSubscriberList } from "./admin-newsletter.js";
 import { ADMIN_EDIT_DEFAULT_ARRAY } from "../util/define-things.js";
 import { sendToBack } from "../util/api-front.js";
 import { buildModal } from "../forms/admin-form.js";
@@ -50,6 +51,14 @@ export const runModalTrigger = async (clickElement) => {
     if (eventData && eventData.length) {
       await populateAdminEventSelector(eventData);
       await updateEventStats(eventData);
+    }
+  }
+
+  if (mode === "edit" && entityType === "newsletter") {
+    const subscriberData = await sendToBack({ route: "/get-subscribers-route" }, "GET");
+    if (subscriberData && subscriberData.length) {
+      await populateSubscriberList(subscriberData);
+      await updateSubscriberStats(subscriberData);
     }
   }
 
@@ -185,9 +194,11 @@ export const clearAdminEditFields = async () => {
 export const updateAdminStats = async () => {
   const productData = await sendToBack({ route: "/get-product-data-route" }, "GET");
   const eventData = await sendToBack({ route: "/get-event-data-route" }, "GET");
+  const subscriberData = await sendToBack({ route: "/get-subscribers-route" }, "GET");
 
   if (productData && productData.length) await updateProductStats(productData);
   if (eventData && eventData.length) await updateEventStats(eventData);
+  if (subscriberData && subscriberData.length) await updateSubscriberStats(subscriberData);
 
   return true;
 };
@@ -228,6 +239,17 @@ export const updateEventStats = async (eventData) => {
 
   const upcomingStat = document.getElementById("upcoming-events-stat");
   if (upcomingStat) upcomingStat.textContent = upcomingEvents;
+
+  return true;
+};
+
+export const updateSubscriberStats = async (subscriberData) => {
+  if (!subscriberData) return null;
+
+  const totalSubscribers = Array.isArray(subscriberData) ? subscriberData.length : 0;
+
+  const subscriberStat = document.getElementById("total-subscribers-stat");
+  if (subscriberStat) subscriberStat.textContent = totalSubscribers;
 
   return true;
 };
