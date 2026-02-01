@@ -1,6 +1,4 @@
-//github actions
-
-//build in email capability on backend, connect to front
+//finish up contact form
 
 //build newsletter into the admin backend (add sign up on events / contact us page)
 
