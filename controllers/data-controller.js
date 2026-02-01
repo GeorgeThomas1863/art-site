@@ -1,5 +1,6 @@
 import { runAddNewProduct, runEditProduct, runDeleteProduct, runGetProductData } from "../src/products.js";
 import { runAddNewEvent, runEditEvent, runDeleteEvent, runGetEventData } from "../src/events.js";
+import { runContactSubmit } from "../src/contact.js";
 import { buildCart, runGetCartStats, runAddToCart, runUpdateCartItem, runRemoveFromCart } from "../src/cart.js";
 import { runCalculateShipping } from "../src/shipping.js";
 import { placeNewOrder } from "../src/orders.js";
