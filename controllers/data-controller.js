@@ -183,6 +183,9 @@ export const calculateShippingControl = async (req, res) => {
 //CONTACT CONTROLLER
 
 export const contactSubmitControl = async (req, res) => {
+  console.log("CONTACT SUBMIT CONTROL");
+  console.log("REQUEST BODY");
+  console.log(req.body);
   if (!req || !req.body) return res.status(500).json({ error: "No input parameters" });
 
   const data = await runContactSubmit(req.body);
