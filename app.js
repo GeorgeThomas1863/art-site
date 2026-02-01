@@ -1,6 +1,4 @@
-//finish up contact form
-
-//build newsletter into the admin backend (add sign up on events / contact us page)
+//build admin newsletter backend, get fully working
 
 //finish purchases (with shipping + tax)
 
@@ -8,11 +6,7 @@
 
 //Build page or popup for product details
 
-//build backend for adding events / newsletter (email mailing list)
-
-//add about, events, contact us, newsletter  display pages
-
-//rotating pics on about
+//rotating pics on about?
 
 //-----------------
 
