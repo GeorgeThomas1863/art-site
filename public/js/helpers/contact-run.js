@@ -5,4 +5,6 @@ export const runContactSubmit = async () => {
     const contactParams = await buildContactParams();
 
     const data = await sendToBack(contactParams);
+    console.log("CONTACT DATA:");
+    console.dir(data);
 };
