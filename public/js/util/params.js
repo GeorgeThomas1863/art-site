@@ -67,3 +67,16 @@ export const getCustomerParams = async () => {
 
   return params;
 };
+
+export const buildContactParams = async () => {
+  const params = {
+    route: "/contact-submit",
+    name: document.getElementById("name").value,
+    email: document.getElementById("email").value,
+    subject: document.getElementById("subject").value,
+    message: document.getElementById("message").value,
+    newsletter: document.getElementById("newsletter").checked,
+  };
+
+  return params;
+};

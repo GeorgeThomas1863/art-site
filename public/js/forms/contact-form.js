@@ -145,32 +145,7 @@ export const buildSubmitButton = async () => {
   button.type = "submit";
   button.className = "submit-button";
   button.textContent = "Send Message";
+  button.setAttribute("data-label", "contact-submit");
 
   return button;
 };
-
-//MOVE BELOW
-// Handle form submission
-// export const handleFormSubmit = async (event) => {
-//   event.preventDefault();
-
-//   const form = event.target;
-//   const formData = {
-//     name: form.name.value,
-//     email: form.email.value,
-//     subject: form.subject.value,
-//     message: form.message.value,
-//     newsletter: form.newsletter.checked,
-//   };
-
-//   console.log("Form Data:", formData);
-
-//   // TODO: Send data to backend
-//   // const response = await sendToBack({ route: "/contact-route", data: formData }, "POST");
-
-//   // For now, just show success message in console
-//   alert("Thank you for your message! We'll get back to you soon.");
-
-//   // Reset form
-//   form.reset();
-// };

@@ -3,6 +3,7 @@ import { runAddNewProduct, runEditProduct, runDeleteProduct, changeAdminProductS
 import { runAddNewEvent, runEditEvent, runDeleteEvent, changeAdminEventSelector } from "./helpers/admin-events.js";
 import { runUploadClick, runUploadPic, runDeleteUploadImage } from "./helpers/upload-pic.js";
 import { changeProductsFilterButton } from "./helpers/products-run.js";
+import { runContactSubmit } from "./helpers/contact-run.js";
 import { runAddToCart, runIncreaseQuantity, runDecreaseQuantity, runRemoveFromCart } from "./helpers/cart-run.js";
 import { runPlaceOrder, runCalculateShipping } from "./helpers/buy-run.js";
 import { runAuthSubmit, runPwToggle } from "./auth.js";
@@ -58,6 +59,8 @@ export const clickHandler = async (e) => {
 
   if (clickType === "checkout-btn") window.location.href = "/checkout";
   if (clickType === "place-order") await runPlaceOrder();
+
+  if (clickType === "contact-submit") await runContactSubmit();
 
   if (clickType === "new-product-submit") await runAddNewProduct();
   if (clickType === "edit-product-submit") await runEditProduct();

@@ -5,6 +5,7 @@ config/
 .env
 .env.local
 .env.*
+.env.*.local
 
 # logs
 logs

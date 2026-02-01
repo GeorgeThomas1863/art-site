@@ -177,3 +177,16 @@ export const calculateShippingControl = async (req, res) => {
 
   return res.json(data);
 };
+
+//-----------
+
+//CONTACT CONTROLLER
+
+export const contactSubmitControl = async (req, res) => {
+  if (!req || !req.body) return res.status(500).json({ error: "No input parameters" });
+
+  const data = await runContactSubmit(req.body);
+  if (!data || !data.success) return res.status(500).json({ error: "Failed to submit contact form" });
+
+  return res.json(data);
+};
