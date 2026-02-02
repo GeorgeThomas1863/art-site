@@ -1,6 +1,7 @@
 import { sendToBack } from "../util/api-front.js";
 import { displayPopup } from "../util/popup.js";
 import { updateCartSummary } from "./cart-run.js";
+import { buildShippingOption } from "../forms/cart-form.js";
 
 //SHIPPING
 export const runCalculateShipping = async (clickElement) => {
@@ -33,61 +34,64 @@ export const runCalculateShipping = async (clickElement) => {
     height: 5, //CALC FROM CART DATA
   };
 
-  // TODO: Call backend to calculate shipping
-  // For now, mock response
   const data = await sendToBack(params);
+  if (!data) return null;
   console.log("DATA");
   console.dir(data);
 
-  const rateArray = data.rate;
+  const rateArray = data.rateData;
+  rateArray.sort((a, b) => a.shipping_amount.amount - b.shipping_amount.amount);
+
+  const resultContainer = document.getElementById("shipping-calculator-result");
+  if (!resultContainer) return null;
+
+  // Clear previous results
+  resultContainer.innerHTML = "";
+
+  // Add title
+  const title = document.createElement("h4");
+  title.className = "shipping-options-title";
+  title.textContent = "Select Shipping Method:";
+  resultContainer.appendChild(title);
+
   for (const rate of rateArray) {
-    console.log("CARRIER NAME");
-    console.log(rate.carrier_friendly_name);
-    console.log("SERVICE TYPE");
-    console.log(rate.service_type);
-    console.log("COST");
-    console.log(rate.shipping_amount.amount);
+    const optionElement = await buildShippingOption(rate);
+    resultContainer.appendChild(optionElement);
   }
 
-  // if (!data || !data.success || !data.distance) {
-  //   const errorMsg = "Failed to calculate shipping cost. Please check your ZIP code and try again.";
-  //   await displayPopup(errorMsg, "error");
-  //   return null;
-  // }
+  // Show the container
+  resultContainer.classList.remove("hidden");
 
-  // const shippingCost = await calculateDistanceCost(data.distance);
-  // if (!shippingCost) {
-  //   const errorMsg = "Failed to calculate shipping cost. Please check your ZIP code and try again.";
-  //   await displayPopup(errorMsg, "error");
-  //   return null;
-  // }
+  const firstRadio = resultContainer.querySelector('input[name="shipping-option"]');
+  if (firstRadio) {
+    firstRadio.checked = true;
+    const cheapestCost = parseFloat(firstRadio.value);
+    await updateCartSummary(cheapestCost);
+  }
 
-  // // Show result in calculator
-  // const resultDiv = document.getElementById("shipping-calculator-result");
-  // const resultValue = document.getElementById("shipping-result-value");
-  // if (resultDiv && resultValue) {
-  //   resultValue.textContent = `$${shippingCost.toFixed(2)}`;
-  //   resultDiv.style.display = "flex";
-  // }
-
-  // // Update summary shipping
-  // const shippingElement = document.getElementById("cart-summary-shipping");
-  // if (shippingElement) {
-  //   shippingElement.textContent = `$${shippingCost.toFixed(2)}`;
-  // }
-
-  // await updateCartSummary(shippingCost);
-  // await displayPopup("Shipping calculated successfully", "success");
-
-  // return true;
+  await displayPopup("Shipping options loaded successfully", "success");
+  return true;
 };
 
-// export const calculateDistanceCost = async (distance) => {
-//   if (!distance) return null;
+export const runShippingOptionSelect = async (clickElement) => {
+  if (!clickElement) return null;
 
-//   if (distance > 1000) return 20;
-//   if (distance > 300) return 10;
-//   if (distance > 100) return 5;
+  const optionDiv = clickElement.closest(".shipping-option");
+  if (!optionDiv) return null;
 
-//   return 0;
-// };
+  const radioInput = optionDiv.querySelector('input[name="shipping-option"]');
+  if (!radioInput) return null;
+
+  // Find the radio button within the clicked option div
+  // const radioInput = clickElement.querySelector('input[name="shipping-option"]');
+  // if (!radioInput) return null;
+
+  // Check the radio button
+  radioInput.checked = true;
+
+  // Get the shipping cost and update summary
+  const shippingCost = parseFloat(radioInput.value);
+  await updateCartSummary(shippingCost);
+
+  return true;
+};

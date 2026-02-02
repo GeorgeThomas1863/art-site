@@ -263,35 +263,33 @@ export const displayCart = async (cartItems) => {
 
 // Update cart summary (totals, item count), remove param
 export const updateCartSummary = async (shippingCost = 0) => {
-  const response = await sendToBack({ route: "/cart/stats" }, "GET");
+  const itemCountElement = document.getElementById("cart-summary-item-count");
+  const subtotalElement = document.getElementById("cart-summary-subtotal");
+  const shippingElement = document.getElementById("cart-summary-shipping");
+  const totalElement = document.getElementById("cart-summary-total");
 
-  if (!response) {
+  if (!itemCountElement || !subtotalElement || !totalElement || !shippingElement) return null;
+
+  const cartData = await sendToBack({ route: "/cart/stats" }, "GET");
+
+  if (!cartData) {
     console.error("Failed to get cart summary");
     return null;
   }
 
-  const { itemCount, total } = response;
+  const { itemCount, total } = cartData;
 
-  // Update item count
-  const itemCountElement = document.getElementById("cart-summary-item-count");
-  if (itemCountElement) {
-    itemCountElement.textContent = itemCount;
+  itemCountElement.textContent = itemCount;
+  subtotalElement.textContent = `$${total.toFixed(2)}`;
+
+  if (shippingCost > 0) {
+    shippingElement.textContent = `$${shippingCost.toFixed(2)}`;
+  } else {
+    shippingElement.textContent = "[Calculate below]";
   }
 
-  // Update subtotal
-  const subtotalElement = document.getElementById("cart-summary-subtotal");
-  if (subtotalElement) {
-    subtotalElement.textContent = `$${total.toFixed(2)}`;
-  }
-  
-  //can prob remove
   const finalTotal = total + shippingCost;
-
-  // Update total
-  const totalElement = document.getElementById("cart-summary-total");
-  if (totalElement) {
-    totalElement.textContent = `$${finalTotal.toFixed(2)}`;
-  }
+  totalElement.textContent = `$${finalTotal.toFixed(2)}`;
 
   return true;
 };

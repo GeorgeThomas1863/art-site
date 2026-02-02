@@ -204,7 +204,7 @@
 
 /* Cart Summary Section */
 .cart-summary-section {
-  position: sticky;
+  /* position: sticky; */
   top: 100px;
 }
 
@@ -380,6 +380,8 @@
   flex-direction: column;
   gap: 1rem;
   margin-top: 2rem;
+  max-height: calc(100vh - 120px); /* Limit total height */
+  overflow: hidden; /* Prevent overflow of container */
 }
 
 .shipping-calculator-title {
@@ -446,25 +448,139 @@
 
 .shipping-calculator-result {
   display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  margin-top: 1rem;
+  overflow-y: auto; /* Make this section scrollable */
+  max-height: 400px; /* Limit height of scrollable area */
+  padding-right: 0.5rem; /* Space for scrollbar */
+}
+
+.shipping-calculator-result.hidden {
+  display: none;
+}
+
+/* Custom scrollbar styling for shipping options */
+.shipping-calculator-result::-webkit-scrollbar {
+  width: 6px;
+}
+
+.shipping-calculator-result::-webkit-scrollbar-track {
+  background: #f5f5f5;
+  border-radius: 3px;
+}
+
+.shipping-calculator-result::-webkit-scrollbar-thumb {
+  background: #999;
+  border-radius: 3px;
+}
+
+.shipping-calculator-result::-webkit-scrollbar-thumb:hover {
+  background: #666;
+}
+
+.shipping-options-title {
+  font-size: 0.9rem;
+  font-weight: 400;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  color: #333;
+  margin-bottom: 0.5rem;
+}
+
+.shipping-option {
+  display: flex;
+  gap: 1rem;
+  padding: 1rem;
+  border: 2px solid #e0e0e0;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.3s;
+  background: #ffffff;
+}
+
+.shipping-option:hover {
+  border-color: #999;
+  background: #fafafa;
+}
+
+.shipping-option:has(input:checked) {
+  border-color: #000000;
+  background: #f5f5f5;
+}
+
+.shipping-option-radio {
+  flex-shrink: 0;
+  width: 20px;
+  height: 20px;
+  margin-top: 0.25rem;
+  cursor: pointer;
+}
+
+.shipping-option-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.shipping-option-header {
+  display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 0.75rem;
-  background: #f5f5f5;
-  border: 1px solid #e0e0e0;
-  border-radius: 4px;
-  margin-top: 0.25rem;
+  gap: 1rem;
 }
 
-.shipping-result-label {
+.shipping-option-name {
+  font-size: 0.95rem;
   font-weight: 400;
   letter-spacing: 0.5px;
-  color: #666;
-  font-size: 0.85rem;
+  color: #000000;
 }
 
-.shipping-result-value {
+.shipping-option-price {
+  font-size: 1.1rem;
   font-weight: 500;
   letter-spacing: 1px;
   color: #000000;
-  font-size: 1rem;
 }
+
+.shipping-option-details {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  font-size: 0.85rem;
+  color: #666;
+}
+
+.shipping-option-badges {
+  display: flex;
+  gap: 0.5rem;
+  margin-top: 0.25rem;
+}
+
+.shipping-badge {
+  font-size: 0.7rem;
+  font-weight: 400;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  padding: 0.2rem 0.5rem;
+  border-radius: 3px;
+  background: #e0e0e0;
+  color: #333;
+}
+
+.shipping-badge-fastest {
+  background: #dcfce7;
+  color: #15803d;
+}
+
+.shipping-badge-cheapest {
+  background: #dbeafe;
+  color: #1e40af;
+}
+
+/* .shipping-badge-best_value {
+  background: #fef3c7;
+  color: #92400e;
+} */

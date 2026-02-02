@@ -1,18 +1,10 @@
 import axios from "axios";
-import dbModel from "../models/db-model.js";
+// import dbModel from "../models/db-model.js";
 
 export const runCalculateShipping = async (inputParams) => {
   if (!inputParams || !inputParams.zip) return { success: false, message: "No ZIP code provided" };
   const { zip, weight, length, width, height } = inputParams;
 
-  // console.log("RUN CALCULATE SHIPPING");
-  // console.log("INPUT PARAMS");
-  // console.log(inputParams);
-
-  // const carrierArray = await getCarrierArray();
-  // console.log("CARRIER ARRAY");
-  // console.log(carrierArray);
-  // if (!carrierArray || !carrierArray.length) return { success: false, message: "Failed to get USPS carrier data" };
   try {
     const usps = await getUSPS();
     console.log("USPS");
@@ -54,27 +46,13 @@ export const runCalculateShipping = async (inputParams) => {
     console.log("RATE RESPONSE DATA");
     console.log(res.data);
 
-    return { success: true, message: "Shipping rate calculated successfully", rate: res.data };
+    return { success: true, message: "Shipping rate calculated successfully", rateData: res.data };
   } catch (e) {
     console.log("RATE ERROR");
     console.log(e);
     console.log(e.response.data);
     return { success: false, message: "Failed to calculate shipping rate" };
   }
-
-  // //zipSort = Z + zip
-  // const params = {
-  //   keyToLookup: "zipSort",
-  //   itemValue: `Z${zip}`,
-  // };
-
-  // const shippingModel = new dbModel(params, process.env.SHIPPING_COLLECTION);
-  // const shippingData = await shippingModel.getUniqueItem();
-  // if (!shippingData || !shippingData.distance) return { success: false, message: "No shipping data found" };
-  // shippingData.success = true;
-  // shippingData.message = "Shipping data found";
-
-  // return shippingData;
 };
 
 export const getUSPS = async () => {
@@ -94,25 +72,25 @@ export const getUSPS = async () => {
 };
 
 //return array of all carrier ids
-export const getCarrierArray = async () => {
-  const res = await axios.get(`${process.env.SHIP_STATION_BASE_URL}/carriers`, {
-    headers: {
-      "API-Key": process.env.SHIP_STATION_API_KEY,
-    },
-  });
+// export const getCarrierArray = async () => {
+//   const res = await axios.get(`${process.env.SHIP_STATION_BASE_URL}/carriers`, {
+//     headers: {
+//       "API-Key": process.env.SHIP_STATION_API_KEY,
+//     },
+//   });
 
-  console.log("CARRIER RESPONSE DATA");
-  console.log(res.data);
+//   console.log("CARRIER RESPONSE DATA");
+//   console.log(res.data);
 
-  const returnArray = [];
-  for (const carrier of res.data.carriers) {
-    if (carrier.carrier_id) {
-      console.log("CARRIER ID");
-      console.log(carrier.carrier_id);
-      returnArray.push(carrier.carrier_id);
-    }
-  }
-  console.log("RETURN ARRAY");
-  console.log(returnArray);
-  return returnArray;
-};
+//   const returnArray = [];
+//   for (const carrier of res.data.carriers) {
+//     if (carrier.carrier_id) {
+//       console.log("CARRIER ID");
+//       console.log(carrier.carrier_id);
+//       returnArray.push(carrier.carrier_id);
+//     }
+//   }
+//   console.log("RETURN ARRAY");
+//   console.log(returnArray);
+//   return returnArray;
+// };

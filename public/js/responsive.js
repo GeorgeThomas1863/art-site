@@ -8,7 +8,7 @@ import { runContactSubmit } from "./helpers/contact-run.js";
 import { runEventsNewsletterToggle, runEventsNewsletterSubmit } from "./helpers/events-run.js";
 import { runAddToCart, runIncreaseQuantity, runDecreaseQuantity, runRemoveFromCart } from "./helpers/cart-run.js";
 import { runPlaceOrder } from "./helpers/buy-run.js";
-import { runCalculateShipping } from "./helpers/shipping-calc.js";
+import { runCalculateShipping, runShippingOptionSelect } from "./helpers/shipping-calc.js";
 import { runAuthSubmit, runPwToggle } from "./auth.js";
 import { closePopup, closeConfirmDialog } from "./util/popup.js";
 
@@ -53,6 +53,7 @@ export const clickHandler = async (e) => {
   if (clickType === "remove-from-cart") await runRemoveFromCart(clickElement);
 
   if (clickType === "calculate-shipping") await runCalculateShipping(clickElement);
+  if (clickType === "shipping-option-select") await runShippingOptionSelect(clickElement);
 
   if (clickType === "checkout-btn") window.location.href = "/checkout";
   if (clickType === "place-order") await runPlaceOrder();
