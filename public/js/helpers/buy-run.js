@@ -1,8 +1,9 @@
 import { sendToBack } from "../util/api-front.js";
-import { buildCheckoutItem } from "../forms/checkout-form.js";
+import { buildCheckoutItem, buildCheckoutShippingOption } from "../forms/checkout-form.js";
 import { buildSquarePayment, tokenizePaymentMethod } from "./square-payment.js";
 import { getCustomerParams } from "../util/params.js";
 import { buildConfirmItem } from "../forms/confirm-form.js";
+import { displayPopup } from "../util/popup.js";
 
 //main purchase function
 export const runPlaceOrder = async () => {
@@ -81,8 +82,7 @@ export const populateCheckout = async () => {
   const data = await sendToBack({ route: "/cart/data" }, "GET");
 
   if (!data || !data.cart) {
-    console.error("Failed to load cart data for checkout");
-    // Redirect to cart if no items
+    await displayPopup("Failed to load cart data for checkout", "error");
     window.location.href = "/cart";
     return null;
   }
@@ -94,6 +94,7 @@ export const populateCheckout = async () => {
   }
 
   await displayCheckoutItems(data.cart);
+  await loadCheckoutShippingOptions();
   await updateCheckoutSummary();
 
   await buildSquarePayment();
@@ -123,38 +124,83 @@ export const displayCheckoutItems = async (cartItems) => {
   return true;
 };
 
-// Update checkout summary
-export const updateCheckoutSummary = async () => {
-  const response = await sendToBack({ route: "/cart/stats" }, "GET");
+export const loadCheckoutShippingOptions = async () => {
+  const shippingContainer = document.getElementById("checkout-shipping-container");
+  if (!shippingContainer) return null;
 
-  if (!response) {
-    console.error("Failed to get cart summary");
+  // Clear existing content
+  shippingContainer.innerHTML = "";
+
+  const data = await sendToBack({ route: "/shipping/data" }, "GET");
+  console.log("SHIPPING DATA");
+  console.dir(data);
+
+  if (!data || !data.shipping) {
+    await displayPopup("Failed to get shipping data", "error");
     return null;
   }
 
-  const { total } = response;
+  const { rateData, selectedRate } = data.shipping;
 
-  // Update subtotal
+  if (!rateData || !rateData.length) {
+    const noShippingMsg = document.createElement("div");
+    noShippingMsg.className = "checkout-no-shipping";
+    noShippingMsg.textContent = "Enter shipping address to calculate options";
+    shippingContainer.append(noShippingMsg);
+    return null;
+  }
+
+  // Display shipping options
+  for (let i = 0; i < rateData.length; i++) {
+    const rate = rateData[i];
+    const optionElement = await buildCheckoutShippingOption(rate);
+    shippingContainer.append(optionElement);
+
+    // Pre-select if this was the saved selection
+    if (selectedRate && selectedRate.service_code === rate.service_code) {
+      const radio = optionElement.querySelector("input[type='radio']");
+      if (radio) radio.checked = true;
+    }
+  }
+
+  return true;
+};
+
+// Update checkout summary
+export const updateCheckoutSummary = async () => {
   const subtotalElement = document.getElementById("checkout-subtotal");
-  if (subtotalElement) {
-    subtotalElement.textContent = `$${total.toFixed(2)}`;
-  }
-
-  // Calculate tax (example: 8% - you'll need to adjust this)
-  const taxRate = 0.08;
-  const tax = total * taxRate;
-
+  const shippingElement = document.getElementById("checkout-shipping");
   const taxElement = document.getElementById("checkout-tax");
-  if (taxElement) {
-    taxElement.textContent = `$${tax.toFixed(2)}`;
+  const totalElement = document.getElementById("checkout-total");
+  if (!subtotalElement || !shippingElement || !taxElement || !totalElement) return null;
+
+  const cartData = await sendToBack({ route: "/cart/stats" }, "GET");
+
+  if (!cartData) {
+    await displayPopup("Failed to get cart summary", "error");
+    return null;
   }
 
-  // Update total (subtotal + tax for now, shipping TBD)
-  const finalTotal = total + tax;
-  const totalElement = document.getElementById("checkout-total");
-  if (totalElement) {
-    totalElement.textContent = `$${finalTotal.toFixed(2)}`;
+  subtotalElement.textContent = `$${cartData.total.toFixed(2)}`;
+
+  const shippingData = await sendToBack({ route: "/shipping/data" }, "GET");
+  let shippingCost = 0;
+
+  if (shippingData && shippingData.selectedRate) {
+    shippingCost = shippingData.selectedRate.shipping_amount.amount;
+    shippingElement.textContent = `$${shippingCost.toFixed(2)}`;
+  } else {
+    shippingElement.textContent = "Select option";
   }
+
+  // Calculate tax HERE
+  //maybe move to backend?
+  const taxRate = 0.08;
+  const tax = cartData.total * taxRate;
+  taxElement.textContent = `$${tax.toFixed(2)}`;
+
+  const finalTotal = cartData.total + tax + shippingCost;
+  totalElement.textContent = `$${finalTotal.toFixed(2)}`;
 
   return true;
 };

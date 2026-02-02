@@ -1,4 +1,4 @@
-//put shipping data in session, check that on checkout
+//finish shipping on checkout page, add events, change days on backend. add option to calculate based on zip, debounce zip input
 
 //build admin newsletter backend, get fully working
 

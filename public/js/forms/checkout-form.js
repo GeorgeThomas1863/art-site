@@ -159,6 +159,8 @@ export const buildCheckoutSummarySection = async () => {
   itemsContainer.className = "checkout-items-container";
   itemsContainer.id = "checkout-items-container";
 
+  const shippingSection = await buildCheckoutShippingSection();
+
   // Summary details
   const summaryDetails = document.createElement("div");
   summaryDetails.className = "checkout-summary-details";
@@ -196,10 +198,111 @@ export const buildCheckoutSummarySection = async () => {
   backToCartLink.href = "/cart";
   backToCartLink.textContent = "Back to Cart";
 
-  summaryCard.append(summaryTitle, itemsContainer, summaryDetails, placeOrderBtn, backToCartLink);
+  summaryCard.append(summaryTitle, itemsContainer, shippingSection, summaryDetails, placeOrderBtn, backToCartLink);
   summarySection.append(summaryCard);
 
   return summarySection;
+};
+
+// NEW: Build shipping options section
+export const buildCheckoutShippingSection = async () => {
+  const shippingSection = document.createElement("div");
+  shippingSection.className = "checkout-shipping-section";
+  shippingSection.id = "checkout-shipping-section";
+
+  const shippingTitle = document.createElement("h4");
+  shippingTitle.className = "checkout-shipping-title";
+  shippingTitle.textContent = "Shipping Options";
+
+  const shippingContainer = document.createElement("div");
+  shippingContainer.className = "checkout-shipping-container";
+  shippingContainer.id = "checkout-shipping-container";
+
+  const noShippingMsg = document.createElement("div");
+  noShippingMsg.className = "checkout-no-shipping";
+  noShippingMsg.textContent = "Enter shipping address to see options";
+
+  shippingContainer.append(noShippingMsg);
+  shippingSection.append(shippingTitle, shippingContainer);
+
+  return shippingSection;
+};
+
+// NEW: Build individual shipping option for checkout
+export const buildCheckoutShippingOption = async (rateData) => {
+  const optionDiv = document.createElement("div");
+  optionDiv.className = "checkout-shipping-option";
+  optionDiv.setAttribute("data-rate", JSON.stringify(rateData));
+  optionDiv.setAttribute("data-label", "checkout-shipping-option-select");
+
+  const radioInput = document.createElement("input");
+  radioInput.type = "radio";
+  radioInput.name = "checkout-shipping-option";
+  radioInput.id = `checkout-shipping-${rateData.service_code}`;
+  radioInput.className = "checkout-shipping-option-radio";
+  radioInput.value = rateData.shipping_amount.amount;
+
+  const contentDiv = document.createElement("div");
+  contentDiv.className = "checkout-shipping-option-content";
+  contentDiv.setAttribute("data-label", "checkout-shipping-option-select");
+
+  const headerDiv = document.createElement("div");
+  headerDiv.className = "checkout-shipping-option-header";
+  headerDiv.setAttribute("data-label", "checkout-shipping-option-select");
+
+  const nameSpan = document.createElement("span");
+  nameSpan.className = "checkout-shipping-option-name";
+  nameSpan.textContent = `${rateData.carrier_friendly_name} - ${rateData.service_type}`;
+  nameSpan.setAttribute("data-label", "checkout-shipping-option-select");
+
+  const priceSpan = document.createElement("span");
+  priceSpan.className = "checkout-shipping-option-price";
+  priceSpan.textContent = `$${rateData.shipping_amount.amount.toFixed(2)}`;
+  priceSpan.setAttribute("data-label", "checkout-shipping-option-select");
+
+  headerDiv.append(nameSpan, priceSpan);
+
+  const detailsDiv = document.createElement("div");
+  detailsDiv.className = "checkout-shipping-option-details";
+  detailsDiv.setAttribute("data-label", "checkout-shipping-option-select");
+
+  if (rateData.delivery_days) {
+    const deliverySpan = document.createElement("span");
+    deliverySpan.textContent = `${rateData.delivery_days} business days`;
+    deliverySpan.setAttribute("data-label", "checkout-shipping-option-select");
+    detailsDiv.appendChild(deliverySpan);
+  }
+
+  if (rateData.estimated_delivery_date) {
+    const dateSpan = document.createElement("span");
+    const deliveryDate = new Date(rateData.estimated_delivery_date);
+    dateSpan.textContent = `Est. delivery: ${deliveryDate.toLocaleDateString()}`;
+    dateSpan.setAttribute("data-label", "checkout-shipping-option-select");
+    detailsDiv.appendChild(dateSpan);
+  }
+
+  // if (rateData.rate_attributes && rateData.rate_attributes.length > 0) {
+  //   const badgesDiv = document.createElement("div");
+  //   badgesDiv.className = "checkout-shipping-option-badges";
+  //   badgesDiv.setAttribute("data-label", "checkout-shipping-option-select");
+
+  //   for (const attribute of rateData.rate_attributes) {
+  //     if (attribute.includes("best_value")) continue;
+
+  //     const badge = document.createElement("span");
+  //     badge.className = `checkout-shipping-badge checkout-shipping-badge-${attribute}`;
+  //     badge.textContent = attribute.replace("_", " ");
+  //     badge.setAttribute("data-label", "checkout-shipping-option-select");
+  //     badgesDiv.appendChild(badge);
+  //   }
+
+  //   detailsDiv.appendChild(badgesDiv);
+  // }
+
+  contentDiv.append(headerDiv, detailsDiv);
+  optionDiv.append(radioInput, contentDiv);
+
+  return optionDiv;
 };
 
 export const buildSummaryRow = async (label, value, valueId) => {

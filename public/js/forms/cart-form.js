@@ -356,23 +356,23 @@ export const buildShippingOption = async (rateData) => {
   }
 
   // Add badges for special attributes
-  if (rateData.rate_attributes && rateData.rate_attributes.length > 0) {
-    const badgesDiv = document.createElement("div");
-    badgesDiv.className = "shipping-option-badges";
-    badgesDiv.setAttribute("data-label", "shipping-option-select");
+  // if (rateData.rate_attributes && rateData.rate_attributes.length > 0) {
+  //   const badgesDiv = document.createElement("div");
+  //   badgesDiv.className = "shipping-option-badges";
+  //   badgesDiv.setAttribute("data-label", "shipping-option-select");
 
-    for (const attribute of rateData.rate_attributes) {
-      if (attribute.includes("best_value")) continue;
+  //   for (const attribute of rateData.rate_attributes) {
+  //     if (attribute.includes("best_value")) continue;
 
-      const badge = document.createElement("span");
-      badge.className = `shipping-badge shipping-badge-${attribute}`;
-      badge.textContent = attribute.replace("_", " ");
-      badge.setAttribute("data-label", "shipping-option-select");
-      badgesDiv.appendChild(badge);
-    }
+  //     const badge = document.createElement("span");
+  //     badge.className = `shipping-badge shipping-badge-${attribute}`;
+  //     badge.textContent = attribute.replace("_", " ");
+  //     badge.setAttribute("data-label", "shipping-option-select");
+  //     badgesDiv.appendChild(badge);
+  //   }
 
-    detailsDiv.appendChild(badgesDiv);
-  }
+  //   detailsDiv.appendChild(badgesDiv);
+  // }
 
   contentDiv.append(headerDiv, detailsDiv);
   optionDiv.append(radioInput, contentDiv);
