@@ -7,7 +7,8 @@ import { changeProductsFilterButton } from "./helpers/products-run.js";
 import { runContactSubmit } from "./helpers/contact-run.js";
 import { runEventsNewsletterToggle, runEventsNewsletterSubmit } from "./helpers/events-run.js";
 import { runAddToCart, runIncreaseQuantity, runDecreaseQuantity, runRemoveFromCart } from "./helpers/cart-run.js";
-import { runPlaceOrder, runCalculateShipping } from "./helpers/buy-run.js";
+import { runPlaceOrder } from "./helpers/buy-run.js";
+import { runCalculateShipping } from "./helpers/shipping-calc.js";
 import { runAuthSubmit, runPwToggle } from "./auth.js";
 import { closePopup, closeConfirmDialog } from "./util/popup.js";
 

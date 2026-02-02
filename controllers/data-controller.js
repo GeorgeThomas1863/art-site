@@ -172,9 +172,9 @@ export const calculateShippingControl = async (req, res) => {
   if (!req.body.zip) return res.status(500).json({ error: "No ZIP code provided" });
 
   console.log("ZIP");
-  console.log(req.body.zip);
+  console.log(req.body);
 
-  const data = await runCalculateShipping(req.body.zip);
+  const data = await runCalculateShipping(req.body);
   if (!data || !data.success) return res.status(500).json({ error: "Failed to calculate shipping" });
 
   return res.json(data);

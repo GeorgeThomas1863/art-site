@@ -2,7 +2,7 @@
 
 //finish purchases (with shipping + tax)
 
-//add local only option to products (items that cant ship)
+//add local only option to products (items that cant ship); size / weight of items when creating product
 
 //Build page or popup for product details
 
