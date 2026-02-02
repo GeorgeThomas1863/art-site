@@ -38,45 +38,56 @@ export const runCalculateShipping = async (clickElement) => {
   const data = await sendToBack(params);
   console.log("DATA");
   console.dir(data);
-  if (!data || !data.success || !data.distance) {
-    const errorMsg = "Failed to calculate shipping cost. Please check your ZIP code and try again.";
-    await displayPopup(errorMsg, "error");
-    return null;
+
+  const rateArray = data.rate;
+  for (const rate of rateArray) {
+    console.log("CARRIER NAME");
+    console.log(rate.carrier_friendly_name);
+    console.log("SERVICE TYPE");
+    console.log(rate.service_type);
+    console.log("COST");
+    console.log(rate.shipping_amount.amount);
   }
 
-  const shippingCost = await calculateDistanceCost(data.distance);
-  if (!shippingCost) {
-    const errorMsg = "Failed to calculate shipping cost. Please check your ZIP code and try again.";
-    await displayPopup(errorMsg, "error");
-    return null;
-  }
+  // if (!data || !data.success || !data.distance) {
+  //   const errorMsg = "Failed to calculate shipping cost. Please check your ZIP code and try again.";
+  //   await displayPopup(errorMsg, "error");
+  //   return null;
+  // }
 
-  // Show result in calculator
-  const resultDiv = document.getElementById("shipping-calculator-result");
-  const resultValue = document.getElementById("shipping-result-value");
-  if (resultDiv && resultValue) {
-    resultValue.textContent = `$${shippingCost.toFixed(2)}`;
-    resultDiv.style.display = "flex";
-  }
+  // const shippingCost = await calculateDistanceCost(data.distance);
+  // if (!shippingCost) {
+  //   const errorMsg = "Failed to calculate shipping cost. Please check your ZIP code and try again.";
+  //   await displayPopup(errorMsg, "error");
+  //   return null;
+  // }
 
-  // Update summary shipping
-  const shippingElement = document.getElementById("cart-summary-shipping");
-  if (shippingElement) {
-    shippingElement.textContent = `$${shippingCost.toFixed(2)}`;
-  }
+  // // Show result in calculator
+  // const resultDiv = document.getElementById("shipping-calculator-result");
+  // const resultValue = document.getElementById("shipping-result-value");
+  // if (resultDiv && resultValue) {
+  //   resultValue.textContent = `$${shippingCost.toFixed(2)}`;
+  //   resultDiv.style.display = "flex";
+  // }
 
-  await updateCartSummary(shippingCost);
-  await displayPopup("Shipping calculated successfully", "success");
+  // // Update summary shipping
+  // const shippingElement = document.getElementById("cart-summary-shipping");
+  // if (shippingElement) {
+  //   shippingElement.textContent = `$${shippingCost.toFixed(2)}`;
+  // }
 
-  return true;
+  // await updateCartSummary(shippingCost);
+  // await displayPopup("Shipping calculated successfully", "success");
+
+  // return true;
 };
 
-export const calculateDistanceCost = async (distance) => {
-  if (!distance) return null;
+// export const calculateDistanceCost = async (distance) => {
+//   if (!distance) return null;
 
-  if (distance > 1000) return 20;
-  if (distance > 300) return 10;
-  if (distance > 100) return 5;
+//   if (distance > 1000) return 20;
+//   if (distance > 300) return 10;
+//   if (distance > 100) return 5;
 
-  return 0;
-};
+//   return 0;
+// };
