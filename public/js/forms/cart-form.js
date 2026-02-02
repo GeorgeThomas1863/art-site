@@ -298,34 +298,10 @@ export const buildShippingSection = async () => {
   resultContainer.id = "shipping-calculator-result";
   resultContainer.className = "shipping-calculator-result hidden";
 
-  // const shippingResult = document.createElement("div");
-  // shippingResult.className = "shipping-calculator-result";
-  // shippingResult.id = "shipping-calculator-result";
-  // shippingResult.style.display = "none";
-
-  // const resultLabel = document.createElement("span");
-  // resultLabel.className = "shipping-result-label";
-  // resultLabel.textContent = "Estimated Shipping:";
-
-  // const resultValue = document.createElement("span");
-  // resultValue.className = "shipping-result-value";
-  // resultValue.id = "shipping-result-value";
-  // resultValue.textContent = "$0.00";
-
-  // shippingResult.append(resultLabel, resultValue);
-
   shippingSection.append(shippingTitle, shippingForm, resultContainer);
 
   return shippingSection;
 };
-
-// export const buildShippingCalculatorResult = async () => {
-//   const resultContainer = document.createElement("div");
-//   resultContainer.id = "shipping-calculator-result";
-//   resultContainer.className = "shipping-calculator-result hidden";
-
-//   return resultContainer;
-// };
 
 export const buildShippingOption = async (rateData) => {
   const optionDiv = document.createElement("div");

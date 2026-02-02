@@ -1,34 +1,13 @@
-const displayElement = document.getElementById("display-element");
-
-// Build the loading overlay (replaces buildLoadStatusMessage)
-export const buildLoadingOverlay = async () => {
-  const loadingOverlay = document.createElement("div");
-  loadingOverlay.id = "loading-overlay";
-  loadingOverlay.className = "loading-overlay";
-
-  const spinner = document.createElement("div");
-  spinner.className = "spinner";
-
-  const loadingText = document.createElement("div");
-  loadingText.className = "loading-text";
-  loadingText.textContent = "Processing your garbage, should take 30-60 seconds, inshaAllah";
-
-  loadingOverlay.append(spinner, loadingText);
-
-  return loadingOverlay;
-};
-
 // Show loading overlay
-export const showLoadStatus = async () => {
-  if (!displayElement) return null;
-  console.log("SHOWING LOAD STATUS");
-
+export const showLoadStatus = async (targetElement, customText = "Loading...") => {
+  if (!targetElement) return null;
   let loadingOverlay = document.getElementById("loading-overlay");
 
-  if (!loadingOverlay) {
-    loadingOverlay = await buildLoadingOverlay();
-    document.body.append(loadingOverlay);
-  }
+  if (loadingOverlay) loadingOverlay.remove();
+
+  loadingOverlay = await buildLoadingOverlay(customText);
+  targetElement.style.position = "relative";
+  targetElement.append(loadingOverlay);
 
   loadingOverlay.classList.add("active");
   return true;
@@ -40,5 +19,30 @@ export const hideLoadStatus = async () => {
   if (!loadingOverlay) return;
 
   loadingOverlay.classList.remove("active");
+
+  //remove from dom
+  setTimeout(() => {
+    if (loadingOverlay.parentElement) {
+      loadingOverlay.remove();
+    }
+  }, 300); // Wait for any CSS transitions
+
   return true;
+};
+
+export const buildLoadingOverlay = async (customText = "Loading...") => {
+  const loadingOverlay = document.createElement("div");
+  loadingOverlay.id = "loading-overlay";
+  loadingOverlay.className = "loading-overlay";
+
+  const spinner = document.createElement("div");
+  spinner.className = "spinner";
+
+  const loadingText = document.createElement("div");
+  loadingText.className = "loading-text";
+  loadingText.textContent = customText;
+
+  loadingOverlay.append(spinner, loadingText);
+
+  return loadingOverlay;
 };

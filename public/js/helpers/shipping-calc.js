@@ -2,6 +2,7 @@ import { sendToBack } from "../util/api-front.js";
 import { displayPopup } from "../util/popup.js";
 import { updateCartSummary } from "./cart-run.js";
 import { buildShippingOption } from "../forms/cart-form.js";
+import { showLoadStatus, hideLoadStatus } from "../util/loading.js";
 
 //SHIPPING
 export const runCalculateShipping = async (clickElement) => {
@@ -21,56 +22,98 @@ export const runCalculateShipping = async (clickElement) => {
     return null;
   }
 
-  const cartData = await sendToBack({ route: "/cart/data" }, "GET");
-  console.log("CART DATA");
-  console.dir(cartData);
+  const cartElement = document.getElementById("cart-element");
+  if (!cartElement) return null;
+  await showLoadStatus(cartElement, "Calculating shipping rates, should take about 5-10 seconds");
 
-  const params = {
-    route: "/checkout/calculate-shipping",
-    zip: zip,
-    weight: 5, //CALC FROM CART DATA
-    width: 5, //CALC FROM CART DATA
-    length: 10, //CALC FROM CART DATA
-    height: 5, //CALC FROM CART DATA
-  };
+  try {
+    const cartData = await sendToBack({ route: "/cart/data" }, "GET");
+    if (!cartData) {
+      await hideLoadStatus();
+      await displayPopup("Failed to get cart data", "error");
+      return null;
+    }
 
-  const data = await sendToBack(params);
-  if (!data) return null;
-  console.log("DATA");
-  console.dir(data);
+    const params = {
+      route: "/checkout/calculate-shipping",
+      zip: zip,
+      weight: 5, //CALC FROM CART DATA
+      width: 5, //CALC FROM CART DATA
+      length: 10, //CALC FROM CART DATA
+      height: 5, //CALC FROM CART DATA
+    };
 
-  const rateArray = data.rateData;
-  rateArray.sort((a, b) => a.shipping_amount.amount - b.shipping_amount.amount);
+    const data = await sendToBack(params);
+    if (!data || !data.rateData) {
+      await hideLoadStatus();
+      await displayPopup("Failed to calculate shipping rates from backend", "error");
+      return null;
+    }
+    console.log("DATA");
+    console.dir(data);
 
-  const resultContainer = document.getElementById("shipping-calculator-result");
-  if (!resultContainer) return null;
+    const rateArray = data.rateData;
 
-  // Clear previous results
-  resultContainer.innerHTML = "";
+    // !!!Add 2 days to delivery estimates for processing time and $2 to cost, then rebuild
+    for (const rate of rateArray) {
+      if (rate.delivery_days) {
+        rate.delivery_days = rate.delivery_days + 2;
+      }
 
-  // Add title
-  const title = document.createElement("h4");
-  title.className = "shipping-options-title";
-  title.textContent = "Select Shipping Method:";
-  resultContainer.appendChild(title);
+      if (rate.estimated_delivery_date) {
+        const deliveryDate = new Date(rate.estimated_delivery_date);
+        deliveryDate.setDate(deliveryDate.getDate() + 2);
+        rate.estimated_delivery_date = deliveryDate.toISOString();
+      }
 
-  for (const rate of rateArray) {
-    const optionElement = await buildShippingOption(rate);
-    resultContainer.appendChild(optionElement);
+      if (rate.shipping_amount && rate.shipping_amount.amount !== undefined) {
+        rate.shipping_amount.amount = rate.shipping_amount.amount + 2;
+      }
+    }
+
+    rateArray.sort((a, b) => a.shipping_amount.amount - b.shipping_amount.amount);
+
+    const resultContainer = document.getElementById("shipping-calculator-result");
+    if (!resultContainer) {
+      await hideLoadStatus();
+      await displayPopup("Failed to get result container", "error");
+      return null;
+    }
+
+    // Clear previous results
+    resultContainer.innerHTML = "";
+
+    // Add title
+    const title = document.createElement("h4");
+    title.className = "shipping-options-title";
+    title.textContent = "Select Shipping Method:";
+    resultContainer.appendChild(title);
+
+    for (const rate of rateArray) {
+      const optionElement = await buildShippingOption(rate);
+      resultContainer.appendChild(optionElement);
+    }
+
+    // Show the container
+    resultContainer.classList.remove("hidden");
+
+    const firstRadio = resultContainer.querySelector('input[name="shipping-option"]');
+    if (firstRadio) {
+      firstRadio.checked = true;
+      const cheapestCost = parseFloat(firstRadio.value);
+      await updateCartSummary(cheapestCost);
+    }
+
+    await hideLoadStatus();
+
+    await displayPopup("Shipping options loaded successfully", "success");
+    return true;
+  } catch (error) {
+    console.error("Error calculating shipping rates:", error);
+    await hideLoadStatus();
+    await displayPopup("Failed to calculate shipping rates", "error");
+    return null;
   }
-
-  // Show the container
-  resultContainer.classList.remove("hidden");
-
-  const firstRadio = resultContainer.querySelector('input[name="shipping-option"]');
-  if (firstRadio) {
-    firstRadio.checked = true;
-    const cheapestCost = parseFloat(firstRadio.value);
-    await updateCartSummary(cheapestCost);
-  }
-
-  await displayPopup("Shipping options loaded successfully", "success");
-  return true;
 };
 
 export const runShippingOptionSelect = async (clickElement) => {
@@ -81,10 +124,6 @@ export const runShippingOptionSelect = async (clickElement) => {
 
   const radioInput = optionDiv.querySelector('input[name="shipping-option"]');
   if (!radioInput) return null;
-
-  // Find the radio button within the clicked option div
-  // const radioInput = clickElement.querySelector('input[name="shipping-option"]');
-  // if (!radioInput) return null;
 
   // Check the radio button
   radioInput.checked = true;

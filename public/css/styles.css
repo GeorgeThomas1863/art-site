@@ -630,3 +630,53 @@ h3 {
   max-height: 0;
   padding: 0 2rem;
 }
+
+/* +++++++++++++++++++++++++++++ */
+
+/* LOADING STYLES */
+
+.loading-overlay {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(255, 255, 255, 0.95);
+  z-index: 9999;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+}
+
+/* .loading-overlay:not(body > .loading-overlay) {
+  position: absolute;
+  border-radius: 4px;
+} */
+
+.loading-overlay.active {
+  display: flex;
+}
+
+.spinner {
+  width: 60px;
+  height: 60px;
+  border: 6px solid #e8e8e8;
+  border-top-color: #555;
+  border-radius: 50%;
+  animation: spin 1.2s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.loading-text {
+  font-family: "Georgia", serif;
+  margin-top: 20px;
+  color: #666;
+  font-size: 16px;
+  font-weight: 500;
+}
