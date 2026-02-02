@@ -1,9 +1,8 @@
 import axios from "axios";
-// import dbModel from "../models/db-model.js";
 
-export const runCalculateShipping = async (inputParams) => {
-  if (!inputParams || !inputParams.zip) return { success: false, message: "No ZIP code provided" };
-  const { zip, weight, length, width, height } = inputParams;
+export const runCalculateShipping = async (req) => {
+  if (!req || !req.body || !req.body.zip) return { success: false, message: "No ZIP code provided" };
+  const { zip, weight, length, width, height } = req.body;
 
   try {
     const usps = await getUSPS();
@@ -46,6 +45,14 @@ export const runCalculateShipping = async (inputParams) => {
     console.log("RATE RESPONSE DATA");
     console.log(res.data);
 
+    // Store all rates in session for later use
+    req.session.shipping = {
+      zip: zip,
+      selectedRate: null,
+      rateData: res.data,
+      calculatedAt: new Date().toISOString(),
+    };
+
     return { success: true, message: "Shipping rate calculated successfully", rateData: res.data };
   } catch (e) {
     console.log("RATE ERROR");
@@ -71,26 +78,30 @@ export const getUSPS = async () => {
   return null;
 };
 
-//return array of all carrier ids
-// export const getCarrierArray = async () => {
-//   const res = await axios.get(`${process.env.SHIP_STATION_BASE_URL}/carriers`, {
-//     headers: {
-//       "API-Key": process.env.SHIP_STATION_API_KEY,
-//     },
-//   });
+//-------------------
 
-//   console.log("CARRIER RESPONSE DATA");
-//   console.log(res.data);
+//SESSION FUNCTIONS
+export const saveShippingToSession = async (req) => {
+  const { shippingData } = req.body;
 
-//   const returnArray = [];
-//   for (const carrier of res.data.carriers) {
-//     if (carrier.carrier_id) {
-//       console.log("CARRIER ID");
-//       console.log(carrier.carrier_id);
-//       returnArray.push(carrier.carrier_id);
-//     }
-//   }
-//   console.log("RETURN ARRAY");
-//   console.log(returnArray);
-//   return returnArray;
-// };
+  if (!shippingData) {
+    return { success: false, message: "No shipping data provided" };
+  }
+
+  req.session.shipping = shippingData;
+
+  return { success: true, shipping: req.session.shipping };
+};
+
+export const getShippingFromSession = async (req) => {
+  if (!req.session.shipping) {
+    return { success: false, message: "No shipping data in session" };
+  }
+
+  return { success: true, shipping: req.session.shipping };
+};
+
+export const clearShippingFromSession = async (req) => {
+  req.session.shipping = null;
+  return { success: true };
+};

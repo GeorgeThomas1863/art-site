@@ -3,7 +3,7 @@ import { runAddNewEvent, runEditEvent, runDeleteEvent, runGetEventData } from ".
 import { runContactSubmit } from "../src/contact.js";
 import { runAddToNewsletter } from "../src/newsletter.js";
 import { buildCart, runGetCartStats, runAddToCart, runUpdateCartItem, runRemoveFromCart } from "../src/cart.js";
-import { runCalculateShipping } from "../src/shipping.js";
+import { runCalculateShipping, getShippingFromSession, saveShippingToSession, clearShippingFromSession } from "../src/shipping.js";
 import { placeNewOrder } from "../src/orders.js";
 import { runDeletePic } from "../src/upload-back.js";
 
@@ -153,6 +153,51 @@ export const clearCartControl = async (req, res) => {
 
 //-----------------------
 
+//SHIPPING CONTROLLER
+
+export const getShippingControl = async (req, res) => {
+  const data = await getShippingFromSession(req);
+
+  if (!data || !data.success) {
+    return res.json({ success: false, shipping: null });
+  }
+
+  return res.json(data);
+};
+
+export const calculateShippingControl = async (req, res) => {
+  if (!req || !req.body) return res.status(500).json({ error: "No input parameters" });
+  if (!req.body.zip) return res.status(500).json({ error: "No ZIP code provided" });
+
+  // console.log("ZIP");
+  // console.log(req.body);
+
+  const data = await runCalculateShipping(req);
+  if (!data || !data.success) return res.status(500).json({ error: "Failed to calculate shipping" });
+
+  return res.json(data);
+};
+
+export const saveShippingControl = async (req, res) => {
+  if (!req || !req.body || !req.body.shippingData) {
+    return res.status(400).json({ error: "No shipping data provided" });
+  }
+
+  const data = await saveShippingToSession(req);
+  if (!data || !data.success) {
+    return res.status(500).json({ error: "Failed to save shipping data" });
+  }
+
+  return res.json(data);
+};
+
+export const clearShippingControl = async (req, res) => {
+  const data = await clearShippingFromSession(req);
+  return res.json(data);
+};
+
+//-----------------
+
 //ORDERS CONTROLLER
 
 export const placeOrderControl = async (req, res) => {
@@ -165,19 +210,6 @@ export const placeOrderControl = async (req, res) => {
   const jsonData = JSON.parse(JSON.stringify(data, (key, value) => (typeof value === "bigint" ? Number(value) : value)));
 
   return res.json(jsonData);
-};
-
-export const calculateShippingControl = async (req, res) => {
-  if (!req || !req.body) return res.status(500).json({ error: "No input parameters" });
-  if (!req.body.zip) return res.status(500).json({ error: "No ZIP code provided" });
-
-  console.log("ZIP");
-  console.log(req.body);
-
-  const data = await runCalculateShipping(req.body);
-  if (!data || !data.success) return res.status(500).json({ error: "Failed to calculate shipping" });
-
-  return res.json(data);
 };
 
 //-----------

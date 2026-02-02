@@ -35,7 +35,7 @@ export const runCalculateShipping = async (clickElement) => {
     }
 
     const params = {
-      route: "/checkout/calculate-shipping",
+      route: "/shipping/calculate",
       zip: zip,
       weight: 5, //CALC FROM CART DATA
       width: 5, //CALC FROM CART DATA

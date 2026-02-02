@@ -40,6 +40,9 @@ import {
   getCartStatsControl,
   placeOrderControl,
   calculateShippingControl,
+  saveShippingControl,
+  clearShippingControl,
+  getShippingControl,
   contactSubmitControl,
   addToNewsletterControl,
 } from "../controllers/data-controller.js";
@@ -91,15 +94,24 @@ router.post("/cart/clear", clearCartControl);
 
 //---------------------
 
-//ORDER ROUTES
-router.post("/checkout/place-order", placeOrderControl);
+//SHIPPING ROUTES
+router.get("/shipping/data", getShippingControl);
 
-router.post("/checkout/calculate-shipping", calculateShippingControl);
+router.post("/shipping/calculate", calculateShippingControl);
+
+router.post("/shipping/save", saveShippingControl);
+
+router.post("/shipping/clear", clearShippingControl);
+
+//--------------
 
 //CONTACT ROUTES
 router.post("/contact-submit", contactSubmitControl);
 
 router.post("/newsletter/add", addToNewsletterControl);
+
+//ORDER ROUTES
+router.post("/checkout/place-order", placeOrderControl);
 
 //-----------------
 
