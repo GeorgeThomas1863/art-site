@@ -1,4 +1,4 @@
-//REDO SHIPPING FRONTEND
+//put shipping data in session, check that on checkout
 
 //build admin newsletter backend, get fully working
 
