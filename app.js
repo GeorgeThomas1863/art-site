@@ -1,3 +1,5 @@
+//REDO SHIPPING FRONTEND
+
 //build admin newsletter backend, get fully working
 
 //finish purchases (with shipping + tax)
