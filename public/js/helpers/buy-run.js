@@ -178,6 +178,8 @@ export const updateCheckoutSummary = async () => {
   const shippingElement = document.getElementById("checkout-shipping");
   const taxElement = document.getElementById("checkout-tax");
   const totalElement = document.getElementById("checkout-total");
+  //FIGURE OUT HOW TO FUCKING SELECT THIS !!!! 
+  const zipElement = document.getElementById("zip"); 
   if (!subtotalElement || !shippingElement || !taxElement || !totalElement) return null;
 
   const cartData = await sendToBack({ route: "/cart/stats" }, "GET");
@@ -195,6 +197,7 @@ export const updateCheckoutSummary = async () => {
   if (shippingData && shippingData.selectedRate) {
     shippingCost = shippingData.selectedRate.shipping_amount.amount;
     shippingElement.textContent = `$${shippingCost.toFixed(2)}`;
+    zipElement.input.value = shippingData.selectedRate.zip;
   } else {
     shippingElement.textContent = "[Input Zip Code]";
   }

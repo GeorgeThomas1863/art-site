@@ -101,6 +101,57 @@ export const runCalculateShipping = async (clickElement) => {
   }
 };
 
+// Debounced shipping calculation for checkout zip field
+export const runCalculateShippingCheckout = async () => {
+  const zipInput = document.getElementById("zip");
+  if (!zipInput) return null;
+
+  const zip = zipInput.value.trim();
+
+  // Silently validate 5-digit zip (no popups while typing)
+  if (!zip || zip.length !== 5 || !/^\d{5}$/.test(zip)) {
+    return null;
+  }
+
+  const checkoutElement = document.getElementById("checkout-element");
+  if (!checkoutElement) return null;
+  await showLoadStatus(checkoutElement, "Calculating shipping rates, should take about 5-10 seconds");
+
+  try {
+    const params = {
+      route: "/shipping/calculate",
+      zip: zip,
+      weight: 5,
+      width: 5,
+      length: 10,
+      height: 5,
+    };
+
+    const data = await sendToBack(params);
+    if (!data || !data.rateData) {
+      await hideLoadStatus();
+      await displayPopup("Failed to calculate shipping rates", "error");
+      return null;
+    }
+
+    // Refresh shipping options UI and update totals
+    await loadCheckoutShippingOptions();
+    await updateCheckoutSummary();
+
+    await hideLoadStatus();
+    await displayPopup("Shipping rates calculated successfully", "success");
+
+    return true;
+  } catch (error) {
+    console.error("Error calculating shipping rates:", error);
+    await hideLoadStatus();
+    await displayPopup("Failed to calculate shipping rates", "error");
+    return null;
+  }
+};
+
+//--------------------------------
+
 export const runShippingOptionSelect = async (clickElement) => {
   if (!clickElement) return null;
 
@@ -141,48 +192,4 @@ export const runCheckoutShippingOptionSelect = async (clickElement) => {
   await updateCheckoutSummary();
 
   return true;
-};
-
-// Debounced shipping calculation for checkout zip field
-export const runCheckoutZipShippingCalculation = async () => {
-  const zipInput = document.getElementById("zip");
-  if (!zipInput) return null;
-
-  const zip = zipInput.value.trim();
-
-  // Silently validate 5-digit zip (no popups while typing)
-  if (!zip || zip.length !== 5 || !/^\d{5}$/.test(zip)) {
-    return null;
-  }
-
-  const shippingContainer = document.getElementById("checkout-shipping-container");
-  if (shippingContainer) {
-    shippingContainer.innerHTML = '<div class="checkout-shipping-loading">Calculating shipping...</div>';
-  }
-
-  try {
-    const params = {
-      route: "/shipping/calculate",
-      zip: zip,
-      weight: 5,
-      width: 5,
-      length: 10,
-      height: 5,
-    };
-
-    const data = await sendToBack(params);
-    if (!data || !data.rateData) {
-      console.error("Failed to calculate shipping rates");
-      return null;
-    }
-
-    // Refresh shipping options UI and update totals
-    await loadCheckoutShippingOptions();
-    await updateCheckoutSummary();
-
-    return true;
-  } catch (error) {
-    console.error("Error calculating shipping rates:", error);
-    return null;
-  }
 };

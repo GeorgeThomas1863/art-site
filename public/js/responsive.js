@@ -8,7 +8,7 @@ import { runContactSubmit } from "./helpers/contact-run.js";
 import { runEventsNewsletterToggle, runEventsNewsletterSubmit } from "./helpers/events-run.js";
 import { runAddToCart, runIncreaseQuantity, runDecreaseQuantity, runRemoveFromCart } from "./helpers/cart-run.js";
 import { runPlaceOrder } from "./helpers/buy-run.js";
-import { runCalculateShipping, runShippingOptionSelect, runCheckoutShippingOptionSelect, runCheckoutZipShippingCalculation } from "./helpers/shipping-calc.js"; //prettier-ignore
+import { runCalculateShipping, runShippingOptionSelect, runCheckoutShippingOptionSelect, runCalculateShippingCheckout } from "./helpers/shipping-calc.js"; //prettier-ignore
 import { runAuthSubmit, runPwToggle } from "./auth.js";
 import { closePopup, closeConfirmDialog } from "./util/popup.js";
 import debounce from "./util/debounce.js";
@@ -124,7 +124,7 @@ export const changeHandler = async (e) => {
   if (changeId === "event-selector") await changeAdminEventSelector(changeElement);
 };
 
-const debouncedCheckoutZipShipping = debounce(runCheckoutZipShippingCalculation);
+const debouncedCheckoutZipShipping = debounce(runCalculateShippingCheckout);
 
 export const inputHandler = async (e) => {
   const inputElement = e.target;
