@@ -1,4 +1,6 @@
-//finish shipping on checkout page, add events, change days on backend. add option to calculate based on zip, debounce zip input
+//UNFUCK the names of the shipping funciton, fix the laoding screen, put shipping display at bottom. 
+
+//move shipping display below on checmout page
 
 //build admin newsletter backend, get fully working
 

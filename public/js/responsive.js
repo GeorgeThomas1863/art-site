@@ -8,9 +8,10 @@ import { runContactSubmit } from "./helpers/contact-run.js";
 import { runEventsNewsletterToggle, runEventsNewsletterSubmit } from "./helpers/events-run.js";
 import { runAddToCart, runIncreaseQuantity, runDecreaseQuantity, runRemoveFromCart } from "./helpers/cart-run.js";
 import { runPlaceOrder } from "./helpers/buy-run.js";
-import { runCalculateShipping, runShippingOptionSelect, runCheckoutShippingOptionSelect } from "./helpers/shipping-calc.js";
+import { runCalculateShipping, runShippingOptionSelect, runCheckoutShippingOptionSelect, runCheckoutZipShippingCalculation } from "./helpers/shipping-calc.js"; //prettier-ignore
 import { runAuthSubmit, runPwToggle } from "./auth.js";
 import { closePopup, closeConfirmDialog } from "./util/popup.js";
+import debounce from "./util/debounce.js";
 
 const authElement = document.getElementById("auth-element");
 const displayElement = document.getElementById("display-element");
@@ -123,6 +124,21 @@ export const changeHandler = async (e) => {
   if (changeId === "event-selector") await changeAdminEventSelector(changeElement);
 };
 
+const debouncedCheckoutZipShipping = debounce(runCheckoutZipShippingCalculation);
+
+export const inputHandler = async (e) => {
+  const inputElement = e.target;
+  const inputId = inputElement.id;
+
+  console.log("INPUT HANDLER");
+  console.log(inputId);
+
+  // Debounced shipping calculation when typing in checkout zip field
+  if (inputId === "zip") {
+    await debouncedCheckoutZipShipping();
+  }
+};
+
 if (authElement) {
   authElement.addEventListener("click", clickHandler);
   authElement.addEventListener("keydown", keyHandler);
@@ -162,4 +178,5 @@ if (cartElement) {
 
 if (checkoutElement) {
   checkoutElement.addEventListener("click", clickHandler);
+  checkoutElement.addEventListener("input", inputHandler);
 }

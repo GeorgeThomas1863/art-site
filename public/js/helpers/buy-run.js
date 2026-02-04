@@ -196,7 +196,7 @@ export const updateCheckoutSummary = async () => {
     shippingCost = shippingData.selectedRate.shipping_amount.amount;
     shippingElement.textContent = `$${shippingCost.toFixed(2)}`;
   } else {
-    shippingElement.textContent = "Select option";
+    shippingElement.textContent = "[Input Zip Code]";
   }
 
   // Calculate tax HERE
