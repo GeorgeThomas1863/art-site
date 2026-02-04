@@ -43,6 +43,7 @@ import {
   saveShippingControl,
   clearShippingControl,
   getShippingControl,
+  updateSelectedRateControl,
   contactSubmitControl,
   addToNewsletterControl,
 } from "../controllers/data-controller.js";
@@ -102,6 +103,8 @@ router.post("/shipping/calculate", calculateShippingControl);
 router.post("/shipping/save", saveShippingControl);
 
 router.post("/shipping/clear", clearShippingControl);
+
+router.post("/shipping/select", updateSelectedRateControl);
 
 //--------------
 

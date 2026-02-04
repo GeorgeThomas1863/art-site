@@ -135,7 +135,7 @@
 
 /* Checkout Summary Section */
 .checkout-summary-section {
-  /* position: sticky; */
+  position: sticky;
   top: 100px;
 }
 

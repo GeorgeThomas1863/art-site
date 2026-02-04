@@ -45,21 +45,51 @@ export const runCalculateShipping = async (req) => {
     console.log("RATE RESPONSE DATA");
     console.log(res.data);
 
-    // Store all rates in session for later use
+    // Apply business adjustments before any processing
+    const adjustedRates = await applyShippingAdjustments(res.data);
+
+    let cheapestRate = null;
+    for (let i = 0; i < adjustedRates.length; i++) {
+      const rate = adjustedRates[i];
+      if (!cheapestRate || rate.shipping_amount.amount < cheapestRate.shipping_amount.amount) {
+        cheapestRate = rate;
+      }
+    }
+
+    // Store ADJUSTED rates in session
     req.session.shipping = {
       zip: zip,
-      selectedRate: null,
-      rateData: res.data,
+      selectedRate: cheapestRate,
+      rateData: adjustedRates,
       calculatedAt: new Date().toISOString(),
     };
 
-    return { success: true, message: "Shipping rate calculated successfully", rateData: res.data };
+    return { success: true, message: "Shipping rate calculated successfully", rateData: adjustedRates };
   } catch (e) {
     console.log("RATE ERROR");
     console.log(e);
     console.log(e.response.data);
     return { success: false, message: "Failed to calculate shipping rate" };
   }
+};
+
+export const applyShippingAdjustments = async (rateArray) => {
+  if (!rateArray || !Array.isArray(rateArray)) return rateArray;
+
+  for (const rate of rateArray) {
+    if (rate.delivery_days) {
+      rate.delivery_days = rate.delivery_days + 2;
+    }
+    if (rate.estimated_delivery_date) {
+      const deliveryDate = new Date(rate.estimated_delivery_date);
+      deliveryDate.setDate(deliveryDate.getDate() + 2);
+      rate.estimated_delivery_date = deliveryDate.toISOString();
+    }
+    if (rate.shipping_amount && rate.shipping_amount.amount !== undefined) {
+      rate.shipping_amount.amount = rate.shipping_amount.amount + 2;
+    }
+  }
+  return rateArray;
 };
 
 export const getUSPS = async () => {
@@ -104,4 +134,20 @@ export const getShippingFromSession = async (req) => {
 export const clearShippingFromSession = async (req) => {
   req.session.shipping = null;
   return { success: true };
+};
+
+export const updateSelectedRate = async (req) => {
+  const { selectedRate } = req.body;
+
+  if (!selectedRate) {
+    return { success: false, message: "No selected rate provided" };
+  }
+
+  if (!req.session.shipping) {
+    req.session.shipping = {};
+  }
+
+  req.session.shipping.selectedRate = selectedRate;
+
+  return { success: true, shipping: req.session.shipping };
 };

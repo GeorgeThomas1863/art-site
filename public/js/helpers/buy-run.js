@@ -124,6 +124,7 @@ export const displayCheckoutItems = async (cartItems) => {
   return true;
 };
 
+
 export const loadCheckoutShippingOptions = async () => {
   const shippingContainer = document.getElementById("checkout-shipping-container");
   if (!shippingContainer) return null;
@@ -150,15 +151,20 @@ export const loadCheckoutShippingOptions = async () => {
     return null;
   }
 
+  // Sort by cost ascending (same as cart page)
+  rateData.sort((a, b) => a.shipping_amount.amount - b.shipping_amount.amount);
+
   // Display shipping options
   for (let i = 0; i < rateData.length; i++) {
     const rate = rateData[i];
     const optionElement = await buildCheckoutShippingOption(rate);
     shippingContainer.append(optionElement);
 
-    // Pre-select if this was the saved selection
+    const radio = optionElement.querySelector("input[type='radio']");
+    // Pre-select: either the saved selection OR the first (cheapest) option
     if (selectedRate && selectedRate.service_code === rate.service_code) {
-      const radio = optionElement.querySelector("input[type='radio']");
+      if (radio) radio.checked = true;
+    } else if (i === 0 && !selectedRate) {
       if (radio) radio.checked = true;
     }
   }

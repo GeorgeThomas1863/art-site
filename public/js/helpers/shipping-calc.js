@@ -1,6 +1,7 @@
 import { sendToBack } from "../util/api-front.js";
 import { displayPopup } from "../util/popup.js";
 import { updateCartSummary } from "./cart-run.js";
+import { updateCheckoutSummary } from "./buy-run.js";
 import { buildShippingOption } from "../forms/cart-form.js";
 import { showLoadStatus, hideLoadStatus } from "../util/loading.js";
 
@@ -54,23 +55,7 @@ export const runCalculateShipping = async (clickElement) => {
 
     const rateArray = data.rateData;
 
-    // !!!Add 2 days to delivery estimates for processing time and $2 to cost, then rebuild
-    for (const rate of rateArray) {
-      if (rate.delivery_days) {
-        rate.delivery_days = rate.delivery_days + 2;
-      }
-
-      if (rate.estimated_delivery_date) {
-        const deliveryDate = new Date(rate.estimated_delivery_date);
-        deliveryDate.setDate(deliveryDate.getDate() + 2);
-        rate.estimated_delivery_date = deliveryDate.toISOString();
-      }
-
-      if (rate.shipping_amount && rate.shipping_amount.amount !== undefined) {
-        rate.shipping_amount.amount = rate.shipping_amount.amount + 2;
-      }
-    }
-
+    // Rates are already adjusted by backend - just sort by cost
     rateArray.sort((a, b) => a.shipping_amount.amount - b.shipping_amount.amount);
 
     const resultContainer = document.getElementById("shipping-calculator-result");
@@ -120,17 +105,40 @@ export const runShippingOptionSelect = async (clickElement) => {
   if (!clickElement) return null;
 
   const optionDiv = clickElement.closest(".shipping-option");
-  if (!optionDiv) return null;
-
   const radioInput = optionDiv.querySelector('input[name="shipping-option"]');
-  if (!radioInput) return null;
+  const rateDataStr = optionDiv.getAttribute("data-rate");
+
+  if (!optionDiv || !radioInput || !rateDataStr) return null;
 
   // Check the radio button
   radioInput.checked = true;
 
+  const selectedRate = JSON.parse(rateDataStr);
+  await sendToBack({ route: "/shipping/select", selectedRate });
+
   // Get the shipping cost and update summary
   const shippingCost = parseFloat(radioInput.value);
   await updateCartSummary(shippingCost);
+
+  return true;
+};
+
+export const runCheckoutShippingOptionSelect = async (clickElement) => {
+  if (!clickElement) return null;
+
+  const optionDiv = clickElement.closest(".checkout-shipping-option");
+  const radioInput = optionDiv.querySelector('input[name="checkout-shipping-option"]');
+  const rateDataStr = optionDiv.getAttribute("data-rate");
+
+  if (!optionDiv || !radioInput || !rateDataStr) return null;
+
+  radioInput.checked = true;
+
+  const selectedRate = JSON.parse(rateDataStr);
+  await sendToBack({ route: "/shipping/select", selectedRate });
+
+  // Update checkout summary with new shipping selection
+  await updateCheckoutSummary();
 
   return true;
 };

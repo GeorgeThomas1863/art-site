@@ -3,7 +3,7 @@ import { runAddNewEvent, runEditEvent, runDeleteEvent, runGetEventData } from ".
 import { runContactSubmit } from "../src/contact.js";
 import { runAddToNewsletter } from "../src/newsletter.js";
 import { buildCart, runGetCartStats, runAddToCart, runUpdateCartItem, runRemoveFromCart } from "../src/cart.js";
-import { runCalculateShipping, getShippingFromSession, saveShippingToSession, clearShippingFromSession } from "../src/shipping.js";
+import { runCalculateShipping, getShippingFromSession, saveShippingToSession, clearShippingFromSession, updateSelectedRate } from "../src/shipping.js";
 import { placeNewOrder } from "../src/orders.js";
 import { runDeletePic } from "../src/upload-back.js";
 
@@ -193,6 +193,17 @@ export const saveShippingControl = async (req, res) => {
 
 export const clearShippingControl = async (req, res) => {
   const data = await clearShippingFromSession(req);
+  return res.json(data);
+};
+
+export const updateSelectedRateControl = async (req, res) => {
+  if (!req || !req.body || !req.body.selectedRate) {
+    return res.status(400).json({ error: "No selected rate provided" });
+  }
+
+  const data = await updateSelectedRate(req);
+  if (!data || !data.success) return res.status(500).json({ error: "Failed to update selected rate" });
+
   return res.json(data);
 };
 
