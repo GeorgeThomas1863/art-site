@@ -1,12 +1,8 @@
-//UNFUCK the names of the shipping funciton, fix the laoding screen, put shipping display at bottom. 
+//confirm checkout page + shipping fully works.
 
-//move shipping display below on checmout page
+//change product inputs to include weight / dimensions / if shippable or pickup
 
 //build admin newsletter backend, get fully working
-
-//finish purchases (with shipping + tax)
-
-//add local only option to products (items that cant ship); size / weight of items when creating product
 
 //Build page or popup for product details
 
