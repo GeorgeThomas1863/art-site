@@ -229,12 +229,17 @@
 /* +++++++++++++++++++++++ */
 
 /* Checkout Shipping Section */
-.checkout-shipping-section {
+/* .checkout-shipping-section {
   margin-top: -1.5rem;
   padding: 1.5rem 0;
-  /* border-top: 1px solid #e0e0e0; */
   border-bottom: 1px solid #e0e0e0;
-  /* margin: 1rem 0; */
+} */
+
+.checkout-shipping-section {
+  margin-top: 0;
+  padding: 1.5rem 0 0 0;
+  border-top: 1px solid #e0e0e0;
+  border-bottom: none;
 }
 
 .checkout-shipping-title {

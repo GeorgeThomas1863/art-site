@@ -202,7 +202,7 @@ export const buildCheckoutSummarySection = async () => {
   backToCartLink.href = "/cart";
   backToCartLink.textContent = "Back to Cart";
 
-  summaryCard.append(summaryTitle, itemsContainer, shippingSection, summaryDetails, placeOrderBtn, backToCartLink);
+  summaryCard.append(summaryTitle, itemsContainer, summaryDetails, placeOrderBtn, backToCartLink, shippingSection);
   summarySection.append(summaryCard);
 
   return summarySection;

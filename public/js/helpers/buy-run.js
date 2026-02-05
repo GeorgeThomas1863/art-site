@@ -124,7 +124,6 @@ export const displayCheckoutItems = async (cartItems) => {
   return true;
 };
 
-
 export const loadCheckoutShippingOptions = async () => {
   const shippingContainer = document.getElementById("checkout-shipping-container");
   if (!shippingContainer) return null;
@@ -178,9 +177,8 @@ export const updateCheckoutSummary = async () => {
   const shippingElement = document.getElementById("checkout-shipping");
   const taxElement = document.getElementById("checkout-tax");
   const totalElement = document.getElementById("checkout-total");
-  //FIGURE OUT HOW TO FUCKING SELECT THIS !!!! 
-  const zipElement = document.getElementById("zip"); 
-  if (!subtotalElement || !shippingElement || !taxElement || !totalElement) return null;
+  const zipElement = document.getElementById("zip");
+  if (!subtotalElement || !shippingElement || !taxElement || !totalElement || !zipElement) return null;
 
   const cartData = await sendToBack({ route: "/cart/stats" }, "GET");
 
@@ -192,17 +190,24 @@ export const updateCheckoutSummary = async () => {
   subtotalElement.textContent = `$${cartData.total.toFixed(2)}`;
 
   const shippingData = await sendToBack({ route: "/shipping/data" }, "GET");
-  let shippingCost = 0;
 
-  if (shippingData && shippingData.selectedRate) {
-    shippingCost = shippingData.selectedRate.shipping_amount.amount;
+  if (!shippingData || !shippingData.shipping) {
+    await displayPopup("Failed to get shipping data", "error");
+    return null;
+  }
+
+  let shippingCost = 0;
+  if (shippingData.shipping.selectedRate) {
+    shippingCost = shippingData.shipping.selectedRate.shipping_amount.amount;
     shippingElement.textContent = `$${shippingCost.toFixed(2)}`;
-    zipElement.input.value = shippingData.selectedRate.zip;
   } else {
     shippingElement.textContent = "[Input Zip Code]";
   }
 
-  // Calculate tax HERE
+  if (shippingData.shipping.zip) {
+    zipElement.value = shippingData.shipping.zip;
+  }
+
   //maybe move to backend?
   const taxRate = 0.08;
   const tax = cartData.total * taxRate;
