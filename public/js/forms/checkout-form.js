@@ -95,7 +95,11 @@ export const buildCustomerInfoCard = async () => {
 
   locationRow.append(cityField, stateField, zipField);
 
-  form.append(nameRow, emailField, phoneField, shippingTitle, addressField, locationRow);
+  const shippingHelper = document.createElement("span");
+  shippingHelper.className = "checkout-form-helper";
+  shippingHelper.textContent = "Shipping rates update automatically based on ZIP code";
+
+  form.append(nameRow, emailField, phoneField, shippingTitle, addressField, locationRow, shippingHelper);
 
   card.append(cardTitle, form);
 
