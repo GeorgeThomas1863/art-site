@@ -1,3 +1,5 @@
+//MOVE CAN SHIP TO ROW ABOVE, IF NO HIDE WEIGHT / DIMENSIONS
+
 //confirm checkout page + shipping fully works.
 
 //change product inputs to include weight / dimensions / if shippable or pickup
