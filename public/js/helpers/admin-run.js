@@ -1,7 +1,7 @@
 import { populateAdminProductSelector } from "./admin-products.js";
 import { populateAdminEventSelector } from "./admin-events.js";
 import { populateSubscriberList } from "./admin-newsletter.js";
-import { ADMIN_EDIT_DEFAULT_ARRAY } from "../util/define-things.js";
+// import { ADMIN_EDIT_DEFAULT_ARRAY } from "../util/define-things.js";
 import { sendToBack } from "../util/api-front.js";
 import { buildModal } from "../forms/admin-form.js";
 
@@ -81,8 +81,23 @@ export const runModalClose = async (clickElement) => {
 //FOR BOTH PRODUCTS AND EVENTS
 
 export const enableAdminEditFields = async () => {
-  for (let i = 0; i < ADMIN_EDIT_DEFAULT_ARRAY.length; i++) {
-    const field = document.getElementById(ADMIN_EDIT_DEFAULT_ARRAY[i]);
+  const enableFieldsArray = [
+    "edit-name",
+    "edit-product-type",
+    "edit-price",
+    "edit-description",
+    "edit-display",
+    "edit-sold",
+    "edit-upload-pic-input",
+    "edit-upload-button",
+    "edit-submit-button",
+    "edit-event-date",
+    "edit-event-location",
+    "edit-event-description",
+    "edit-event-submit-button",
+  ];
+  for (let i = 0; i < enableFieldsArray.length; i++) {
+    const field = document.getElementById(enableFieldsArray[i]);
     if (field) {
       field.disabled = false;
     }
@@ -92,8 +107,23 @@ export const enableAdminEditFields = async () => {
 };
 
 export const disableAdminEditFields = async () => {
-  for (let i = 0; i < ADMIN_EDIT_DEFAULT_ARRAY.length; i++) {
-    const field = document.getElementById(ADMIN_EDIT_DEFAULT_ARRAY[i]);
+  const disableFieldsArray = [
+    "edit-name",
+    "edit-product-type",
+    "edit-price",
+    "edit-description",
+    "edit-display",
+    "edit-sold",
+    "edit-upload-pic-input",
+    "edit-upload-button",
+    "edit-submit-button",
+    "edit-event-date",
+    "edit-event-location",
+    "edit-event-description",
+    "edit-event-submit-button",
+  ];
+  for (let i = 0; i < disableFieldsArray.length; i++) {
+    const field = document.getElementById(disableFieldsArray[i]);
     if (field) {
       field.disabled = true;
     }

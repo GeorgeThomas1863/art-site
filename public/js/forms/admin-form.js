@@ -261,12 +261,13 @@ export const buildModalBody = async (mode, entityType) => {
     const nameField = await buildProductName(mode);
     const typeField = await buildProductType(mode);
     const priceField = await buildProductPrice(mode);
+    const shippingRow = await buildProductShippingRow(mode);
     const descriptionField = await buildProductDescription(mode);
     const dropDownRow = await buildProductDropDownRow(mode);
     const uploadSection = await buildAdminUpload(mode, entityType);
 
     typePriceRow.append(typeField, priceField);
-    body.append(nameField, typePriceRow, descriptionField, dropDownRow, uploadSection);
+    body.append(nameField, typePriceRow, shippingRow, descriptionField, dropDownRow, uploadSection);
     return body;
   }
 
@@ -461,6 +462,125 @@ export const buildProductPrice = async (mode) => {
 
   return priceWrapper;
 };
+
+//--------------------
+
+export const buildProductShippingRow = async (mode) => {
+  const shippingRow = document.createElement("div");
+  shippingRow.className = "shipping-row";
+
+  const canShipField = await buildProductCanShip(mode);
+  const dimensionsGroup = await buildProductDimensions(mode);
+  const weightField = await buildProductWeight(mode);
+
+  shippingRow.append(canShipField, dimensionsGroup, weightField);
+
+  return shippingRow;
+};
+
+export const buildProductWeight = async (mode) => {
+  const weightField = document.createElement("div");
+  weightField.className = "weight-field";
+
+  const weightLabel = document.createElement("label");
+  weightLabel.className = "form-label";
+  weightLabel.textContent = "Ship Weight (lbs)";
+  weightLabel.setAttribute("for", mode === "add" ? "weight" : "edit-weight");
+
+  const weightInput = document.createElement("input");
+  weightInput.className = "form-input";
+  weightInput.type = "text";
+  weightInput.id = mode === "add" ? "weight" : "edit-weight";
+  weightInput.name = mode === "add" ? "weight" : "edit-weight";
+  weightInput.placeholder = "0.0";
+
+  if (mode === "edit") {
+    weightInput.disabled = true;
+  }
+
+  weightField.append(weightLabel, weightInput);
+
+  return weightField;
+};
+
+export const buildProductDimensions = async (mode) => {
+  const dimensionsGroup = document.createElement("div");
+  dimensionsGroup.className = "dimensions-group";
+
+  const dimensions = [
+    { label: "L (in)", name: "length" },
+    { label: "W (in)", name: "width" },
+    { label: "H (in)", name: "height" },
+  ];
+
+  for (let i = 0; i < dimensions.length; i++) {
+    const dim = dimensions[i];
+    const dimensionField = document.createElement("div");
+    dimensionField.className = "dimension-field";
+
+    const dimLabel = document.createElement("label");
+    dimLabel.className = "form-label";
+    dimLabel.textContent = dim.label;
+    dimLabel.setAttribute("for", mode === "add" ? dim.name : `edit-${dim.name}`);
+
+    const dimInput = document.createElement("input");
+    dimInput.className = "form-input";
+    dimInput.type = "text";
+    dimInput.id = mode === "add" ? dim.name : `edit-${dim.name}`;
+    dimInput.name = mode === "add" ? dim.name : `edit-${dim.name}`;
+    dimInput.placeholder = "0";
+
+    if (mode === "edit") {
+      dimInput.disabled = true;
+    }
+
+    dimensionField.append(dimLabel, dimInput);
+    dimensionsGroup.append(dimensionField);
+  }
+
+  return dimensionsGroup;
+};
+
+export const buildProductCanShip = async (mode) => {
+  const canShipField = document.createElement("div");
+  canShipField.className = "can-ship-field";
+
+  const canShipLabel = document.createElement("label");
+  canShipLabel.className = "form-label";
+  canShipLabel.textContent = "Can Ship?";
+  canShipLabel.setAttribute("for", mode === "add" ? "can-ship" : "edit-can-ship");
+
+  const canShipSelect = document.createElement("select");
+  canShipSelect.className = "form-select";
+  canShipSelect.id = mode === "add" ? "can-ship" : "edit-can-ship";
+  canShipSelect.name = mode === "add" ? "can-ship" : "edit-can-ship";
+
+  if (mode === "edit") {
+    canShipSelect.disabled = true;
+  }
+
+  const canShipOptions = [
+    { value: "yes", text: "Yes", selected: true },
+    { value: "no", text: "No" },
+  ];
+
+  for (let i = 0; i < canShipOptions.length; i++) {
+    const optionData = canShipOptions[i];
+    const option = document.createElement("option");
+    option.value = optionData.value;
+    option.textContent = optionData.text;
+    if (optionData.selected) {
+      option.selected = true;
+    }
+    canShipSelect.append(option);
+  }
+
+  canShipField.append(canShipLabel, canShipSelect);
+
+  return canShipField;
+};
+
+//------------
 
 export const buildProductDescription = async (mode) => {
   const descWrapper = document.createElement("div");

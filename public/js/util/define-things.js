@@ -30,21 +30,21 @@ export const INSTAGRAM_ICON_SVG = `
       </svg>
     `;
 
-export const ADMIN_EDIT_DEFAULT_ARRAY = [
-  "edit-name",
-  "edit-product-type",
-  "edit-price",
-  "edit-description",
-  "edit-display",
-  "edit-sold",
-  "edit-upload-pic-input",
-  "edit-upload-button",
-  "edit-submit-button",
-  "edit-event-date",
-  "edit-event-location",
-  "edit-event-description",
-  "edit-event-submit-button",
-];
+// export const ADMIN_EDIT_DEFAULT_ARRAY = [
+//   "edit-name",
+//   "edit-product-type",
+//   "edit-price",
+//   "edit-description",
+//   "edit-display",
+//   "edit-sold",
+//   "edit-upload-pic-input",
+//   "edit-upload-button",
+//   "edit-submit-button",
+//   "edit-event-date",
+//   "edit-event-location",
+//   "edit-event-description",
+//   "edit-event-submit-button",
+// ];
 
 // US States array
 export const STATES_ARRAY = [
