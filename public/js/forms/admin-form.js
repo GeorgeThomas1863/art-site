@@ -229,7 +229,7 @@ export const buildModalHeader = async (mode, entityType) => {
   return header;
 };
 
-// Modal Body
+// Modal Body - UPDATED for new layout
 export const buildModalBody = async (mode, entityType) => {
   const body = document.createElement("div");
   body.className = "modal-body";
@@ -253,36 +253,33 @@ export const buildModalBody = async (mode, entityType) => {
     }
   }
 
-  // Build form fields based on entity type
+  // Build form fields based on entity type - NEW SECTIONED LAYOUT
   if (entityType === "products") {
-    const typePriceRow = document.createElement("div");
-    typePriceRow.className = "form-row";
+    // Section 1: Product Details
+    const detailsSection = await buildProductDetailsSection(mode);
 
-    const nameField = await buildProductName(mode);
-    const typeField = await buildProductType(mode);
-    const priceField = await buildProductPrice(mode);
-    const shippingRow = await buildProductShippingRow(mode);
-    const descriptionField = await buildProductDescription(mode);
-    const dropDownRow = await buildProductDropDownRow(mode);
-    const uploadSection = await buildAdminUpload(mode, entityType);
+    // Section 2: Product Status
+    const statusSection = await buildProductStatusSection(mode);
 
-    typePriceRow.append(typeField, priceField);
-    body.append(nameField, typePriceRow, dropDownRow, shippingRow, descriptionField, uploadSection);
+    // Section 3: Shipping Information
+    const shippingSection = await buildProductShippingSection(mode);
+
+    // Section 4: Product Image
+    const imageSection = await buildProductImageSection(mode);
+
+    body.append(detailsSection, statusSection, shippingSection, imageSection);
     return body;
   }
 
-  const nameField = await buildEventName(mode);
-  const dateField = await buildEventDate(mode);
-  const locationField = await buildEventLocation(mode);
-  const descriptionField = await buildEventDescription(mode);
-  const uploadSection = await buildAdminUpload(mode, entityType);
+  // Events layout (keep similar structure)
+  const detailsSection = await buildEventDetailsSection(mode);
+  const imageSection = await buildEventImageSection(mode);
 
-  body.append(nameField, dateField, locationField, descriptionField, uploadSection);
+  body.append(detailsSection, imageSection);
 
   return body;
 };
 
-// Modal Actions
 export const buildModalActions = async (mode, entityType) => {
   const actions = document.createElement("div");
   actions.className = "modal-actions";
@@ -306,7 +303,7 @@ export const buildModalActions = async (mode, entityType) => {
   cancelButton.textContent = "Cancel";
   cancelButton.setAttribute("data-label", `close-modal-${mode}-${entityType}`);
 
-  // Submit button (ridiculous from claude)
+  // Submit button
   const submitButton = document.createElement("button");
   submitButton.className = "btn btn-admin-submit";
   submitButton.type = "button";
@@ -341,17 +338,405 @@ export const buildModalActions = async (mode, entityType) => {
   return actions;
 };
 
+// NEW SECTIONED LAYOUT BUILDERS
 //+++++++++++++++++++++++++++++
+
+// NEW FUNCTION: Product Details Section
+export const buildProductDetailsSection = async (mode) => {
+  const section = document.createElement("div");
+  section.className = "product-section";
+
+  const header = document.createElement("div");
+  header.className = "section-header";
+
+  const icon = document.createElement("span");
+  icon.className = "section-icon";
+  icon.textContent = "📦";
+
+  const title = document.createElement("h4");
+  title.className = "section-title";
+  title.textContent = "Product Details";
+
+  header.append(icon, title);
+
+  // Product Name Row
+  const nameRow = await buildInfoRow(mode, "name", "Product Name");
+
+  // Type Row
+  const typeRow = await buildInfoRowSelect(mode, "product-type", "Type", [
+    { value: "acorns", text: "Acorns", selected: true },
+    { value: "mountainTreasureBaskets", text: "Mountain Treasure Baskets" },
+    { value: "animals", text: "Animals" },
+    { value: "geodes", text: "Geodes" },
+    { value: "gnomeHouses", text: "Gnome Houses" },
+    { value: "wallPieces", text: "Wall Pieces" },
+    { value: "other", text: "Other" },
+  ]);
+
+  // Price Row
+  const priceRow = await buildInfoRow(mode, "price", "Price");
+
+  // Description Row
+  const descRow = await buildInfoRowTextarea(mode, "description", "Description");
+
+  section.append(header, nameRow, typeRow, priceRow, descRow);
+
+  return section;
+};
+
+// NEW FUNCTION: Product Status Section
+export const buildProductStatusSection = async (mode) => {
+  const section = document.createElement("div");
+  section.className = "product-section";
+
+  const header = document.createElement("div");
+  header.className = "section-header";
+
+  const icon = document.createElement("span");
+  icon.className = "section-icon";
+  icon.textContent = "⚙️";
+
+  const title = document.createElement("h4");
+  title.className = "section-title";
+  title.textContent = "Product Status";
+
+  header.append(icon, title);
+
+  const statusGrid = document.createElement("div");
+  statusGrid.className = "status-grid";
+
+  // Display Status Card
+  const displayCard = await buildStatusCard(mode, "display", "Display on Site");
+
+  // Sold Status Card
+  const soldCard = await buildStatusCard(mode, "sold", "Marked as Sold");
+
+  // Can Ship Status Card
+  const canShipCard = await buildStatusCard(mode, "can-ship", "Can Ship");
+
+  statusGrid.append(displayCard, soldCard, canShipCard);
+  section.append(header, statusGrid);
+
+  return section;
+};
+
+// NEW FUNCTION: Product Shipping Section
+export const buildProductShippingSection = async (mode) => {
+  const section = document.createElement("div");
+  section.className = "product-section";
+
+  const header = document.createElement("div");
+  header.className = "section-header";
+
+  const icon = document.createElement("span");
+  icon.className = "section-icon";
+  icon.textContent = "📏";
+
+  const title = document.createElement("h4");
+  title.className = "section-title";
+  title.textContent = "Shipping Information";
+
+  header.append(icon, title);
+
+  const shippingLayout = document.createElement("div");
+  shippingLayout.className = "shipping-layout";
+
+  const col1 = document.createElement("div");
+  col1.className = "shipping-col";
+
+  const col2 = document.createElement("div");
+  col2.className = "shipping-col";
+
+  // Dimensions
+  const lengthItem = await buildShippingItem(mode, "length", "Length");
+  const widthItem = await buildShippingItem(mode, "width", "Width");
+  const heightItem = await buildShippingItem(mode, "height", "Height");
+  const weightItem = await buildShippingItem(mode, "weight", "Weight");
+
+  col1.append(lengthItem, widthItem);
+  col2.append(heightItem, weightItem);
+
+  shippingLayout.append(col1, col2);
+  section.append(header, shippingLayout);
+
+  return section;
+};
+
+// NEW FUNCTION: Product Image Section
+export const buildProductImageSection = async (mode) => {
+  const section = document.createElement("div");
+  section.className = "product-section product-section-last";
+
+  const header = document.createElement("div");
+  header.className = "section-header";
+
+  const icon = document.createElement("span");
+  icon.className = "section-icon";
+  icon.textContent = "📷";
+
+  const title = document.createElement("h4");
+  title.className = "section-title";
+  title.textContent = "Product Image";
+
+  header.append(icon, title);
+
+  const uploadSection = await buildAdminUpload(mode, "products");
+
+  section.append(header, uploadSection);
+
+  return section;
+};
+
+// NEW HELPER: Build Info Row (for text inputs)
+export const buildInfoRow = async (mode, fieldName, labelText) => {
+  const row = document.createElement("div");
+  row.className = "info-row";
+
+  const label = document.createElement("div");
+  label.className = "info-label";
+  label.textContent = labelText;
+
+  const contentWrapper = document.createElement("div");
+  contentWrapper.className = "info-content-wrapper";
+
+  const input = document.createElement("input");
+  input.className = "info-content info-input";
+  input.type = "text";
+  input.id = mode === "add" ? fieldName : `edit-${fieldName}`;
+  input.name = mode === "add" ? fieldName : `edit-${fieldName}`;
+
+  if (mode === "edit") {
+    input.disabled = true;
+  }
+
+  contentWrapper.append(input);
+  row.append(label, contentWrapper);
+
+  return row;
+};
+
+//--------------
+
+export const buildInfoRowSelect = async (mode, fieldName, labelText, options) => {
+  const row = document.createElement("div");
+  row.className = "info-row";
+
+  const label = document.createElement("div");
+  label.className = "info-label";
+  label.textContent = labelText;
+
+  const contentWrapper = document.createElement("div");
+  contentWrapper.className = "info-content-wrapper";
+
+  const select = document.createElement("select");
+  select.className = "info-content info-select";
+  select.id = mode === "add" ? fieldName : `edit-${fieldName}`;
+  select.name = mode === "add" ? fieldName : `edit-${fieldName}`;
+
+  if (mode === "edit") {
+    select.disabled = true;
+  }
+
+  for (let i = 0; i < options.length; i++) {
+    const optionData = options[i];
+    const option = document.createElement("option");
+    option.value = optionData.value;
+    option.textContent = optionData.text;
+    if (optionData.selected) {
+      option.selected = true;
+    }
+    select.append(option);
+  }
+
+  contentWrapper.append(select);
+  row.append(label, contentWrapper);
+
+  return row;
+};
+
+// NEW HELPER: Build Info Row with Textarea
+export const buildInfoRowTextarea = async (mode, fieldName, labelText) => {
+  const row = document.createElement("div");
+  row.className = "info-row";
+
+  const label = document.createElement("div");
+  label.className = "info-label";
+  label.textContent = labelText;
+
+  const contentWrapper = document.createElement("div");
+  contentWrapper.className = "info-content-wrapper";
+
+  const textarea = document.createElement("textarea");
+  textarea.className = "info-content info-textarea";
+  textarea.id = mode === "add" ? fieldName : `edit-${fieldName}`;
+  textarea.name = mode === "add" ? fieldName : `edit-${fieldName}`;
+
+  if (mode === "edit") {
+    textarea.disabled = true;
+  }
+
+  contentWrapper.append(textarea);
+  row.append(label, contentWrapper);
+
+  return row;
+};
+
+// NEW HELPER: Build Status Card
+export const buildStatusCard = async (mode, fieldName, labelText) => {
+  const card = document.createElement("div");
+  card.className = "status-card";
+
+  const label = document.createElement("div");
+  label.className = "status-label";
+  label.textContent = labelText;
+
+  const select = document.createElement("select");
+  select.className = "status-select";
+  select.id = mode === "add" ? fieldName : `edit-${fieldName}`;
+  select.name = mode === "add" ? fieldName : `edit-${fieldName}`;
+
+  if (mode === "edit") {
+    select.disabled = true;
+  }
+
+  const yesOption = document.createElement("option");
+  yesOption.value = "yes";
+  yesOption.textContent = "Yes";
+  if (fieldName === "display" || fieldName === "can-ship") {
+    yesOption.selected = true;
+  }
+
+  const noOption = document.createElement("option");
+  noOption.value = "no";
+  noOption.textContent = "No";
+  if (fieldName === "sold") {
+    noOption.selected = true;
+  }
+
+  select.append(yesOption, noOption);
+  card.append(label, select);
+
+  return card;
+};
+
+// NEW HELPER: Build Shipping Item
+export const buildShippingItem = async (mode, fieldName, labelText) => {
+  const item = document.createElement("div");
+  item.className = "shipping-item";
+
+  const label = document.createElement("span");
+  label.className = "shipping-label";
+  label.textContent = labelText;
+
+  const inputWrapper = document.createElement("div");
+  inputWrapper.className = "shipping-value-wrapper";
+
+  const input = document.createElement("input");
+  input.className = "shipping-value shipping-input";
+  input.type = "text";
+  input.id = mode === "add" ? fieldName : `edit-${fieldName}`;
+  input.name = mode === "add" ? fieldName : `edit-${fieldName}`;
+  input.placeholder = "0";
+
+  if (mode === "edit") {
+    input.disabled = true;
+  }
+
+  const unit = document.createElement("span");
+  unit.className = "shipping-unit";
+  unit.textContent = fieldName === "weight" ? "lbs" : "in";
+
+  inputWrapper.append(input, unit);
+  item.append(label, inputWrapper);
+
+  return item;
+};
+
+// NEW FUNCTIONS FOR EVENTS
+export const buildEventDetailsSection = async (mode) => {
+  const section = document.createElement("div");
+  section.className = "product-section";
+
+  const header = document.createElement("div");
+  header.className = "section-header";
+
+  const icon = document.createElement("span");
+  icon.className = "section-icon";
+  icon.textContent = "📅";
+
+  const title = document.createElement("h4");
+  title.className = "section-title";
+  title.textContent = "Event Details";
+
+  header.append(icon, title);
+
+  const nameRow = await buildInfoRow(mode, "name", "Event Name");
+  const dateRow = await buildInfoRowDate(mode, "event-date", "Event Date");
+  const locationRow = await buildInfoRow(mode, "event-location", "Location");
+  const descRow = await buildInfoRowTextarea(mode, "event-description", "Description");
+
+  section.append(header, nameRow, dateRow, locationRow, descRow);
+
+  return section;
+};
+
+export const buildInfoRowDate = async (mode, fieldName, labelText) => {
+  const row = document.createElement("div");
+  row.className = "info-row";
+
+  const label = document.createElement("div");
+  label.className = "info-label";
+  label.textContent = labelText;
+
+  const contentWrapper = document.createElement("div");
+  contentWrapper.className = "info-content-wrapper";
+
+  const input = document.createElement("input");
+  input.className = "info-content info-input";
+  input.type = "date";
+  input.id = mode === "add" ? fieldName : `edit-${fieldName}`;
+  input.name = mode === "add" ? fieldName : `edit-${fieldName}`;
+
+  if (mode === "edit") {
+    input.disabled = true;
+  }
+
+  contentWrapper.append(input);
+  row.append(label, contentWrapper);
+
+  return row;
+};
+
+export const buildEventImageSection = async (mode) => {
+  const section = document.createElement("div");
+  section.className = "product-section product-section-last";
+
+  const header = document.createElement("div");
+  header.className = "section-header";
+
+  const icon = document.createElement("span");
+  icon.className = "section-icon";
+  icon.textContent = "📷";
+
+  const title = document.createElement("h4");
+  title.className = "section-title";
+  title.textContent = "Event Image";
+
+  header.append(icon, title);
+
+  const uploadSection = await buildAdminUpload(mode, "events");
+
+  section.append(header, uploadSection);
+
+  return section;
+};
+
+//-------------------
 
 //PRODUCT FORM FIELDS
 export const buildAdminProductSelector = async () => {
   const selectorWrapper = document.createElement("li");
   selectorWrapper.className = "form-field product-selector-field";
-
-  // const selectorLabel = document.createElement("label");
-  // selectorLabel.className = "form-label";
-  // selectorLabel.textContent = "Select Product to Edit";
-  // selectorLabel.setAttribute("for", "product-selector");
 
   const productSelect = document.createElement("select");
   productSelect.className = "form-select";
@@ -371,335 +756,6 @@ export const buildAdminProductSelector = async () => {
 
   return selectorWrapper;
 };
-
-export const buildProductName = async (mode) => {
-  const nameWrapper = document.createElement("li");
-  nameWrapper.className = "form-field";
-
-  const nameLabel = document.createElement("label");
-  nameLabel.className = "form-label";
-  nameLabel.textContent = "Product Name";
-  nameLabel.setAttribute("for", mode === "add" ? "name" : "edit-name");
-
-  const nameInput = document.createElement("input");
-  nameInput.className = "form-input";
-  nameInput.type = "text";
-  nameInput.id = mode === "add" ? "name" : "edit-name";
-  nameInput.name = mode === "add" ? "name" : "edit-name";
-
-  if (mode === "edit") {
-    nameInput.disabled = true;
-  }
-
-  nameWrapper.append(nameLabel, nameInput);
-
-  return nameWrapper;
-};
-
-export const buildProductType = async (mode) => {
-  const adminProductType = document.createElement("div");
-  adminProductType.className = "form-field";
-
-  const productTypeLabel = document.createElement("label");
-  productTypeLabel.className = "form-label";
-  productTypeLabel.textContent = "Type";
-  productTypeLabel.setAttribute("for", mode === "add" ? "product-type" : "edit-product-type");
-
-  const productTypeSelect = document.createElement("select");
-  productTypeSelect.className = "form-select";
-  productTypeSelect.id = mode === "add" ? "product-type" : "edit-product-type";
-
-  if (mode === "edit") {
-    productTypeSelect.disabled = true;
-  }
-
-  const optionArray = [
-    { value: "acorns", text: "Acorns", selected: true },
-    { value: "mountainTreasureBaskets", text: "Mountain Treasure Baskets" },
-    { value: "animals", text: "Animals" },
-    { value: "geodes", text: "Geodes" },
-    { value: "gnomeHouses", text: "Gnome Houses" },
-    { value: "wallPieces", text: "Wall Pieces" },
-    { value: "other", text: "Other" },
-  ];
-
-  for (let i = 0; i < optionArray.length; i++) {
-    const optionData = optionArray[i];
-    const option = document.createElement("option");
-    option.value = optionData.value;
-    option.textContent = optionData.text;
-    if (optionData.selected) {
-      option.selected = true;
-    }
-    productTypeSelect.append(option);
-  }
-
-  adminProductType.append(productTypeLabel, productTypeSelect);
-
-  return adminProductType;
-};
-
-export const buildProductPrice = async (mode) => {
-  const priceWrapper = document.createElement("div");
-  priceWrapper.className = "form-field";
-
-  const priceLabel = document.createElement("label");
-  priceLabel.className = "form-label";
-  priceLabel.textContent = "Price";
-  priceLabel.setAttribute("for", mode === "add" ? "price" : "edit-price");
-
-  const priceInput = document.createElement("input");
-  priceInput.className = "form-input";
-  priceInput.type = "text";
-  priceInput.id = mode === "add" ? "price" : "edit-price";
-  priceInput.name = mode === "add" ? "price" : "edit-price";
-
-  if (mode === "edit") {
-    priceInput.disabled = true;
-  }
-
-  priceWrapper.append(priceLabel, priceInput);
-
-  return priceWrapper;
-};
-
-//--------------------
-
-export const buildProductShippingRow = async (mode) => {
-  const shippingRow = document.createElement("div");
-  shippingRow.className = "shipping-row";
-
-  const dimensionsGroup = await buildProductDimensions(mode);
-  const weightField = await buildProductWeight(mode);
-
-  shippingRow.append(dimensionsGroup, weightField);
-
-  return shippingRow;
-};
-
-export const buildProductWeight = async (mode) => {
-  const weightField = document.createElement("div");
-  weightField.className = "weight-field";
-
-  const weightLabel = document.createElement("label");
-  weightLabel.className = "form-label";
-  weightLabel.textContent = "Ship Weight (lbs)";
-  weightLabel.setAttribute("for", mode === "add" ? "weight" : "edit-weight");
-
-  const weightInput = document.createElement("input");
-  weightInput.className = "form-input";
-  weightInput.type = "text";
-  weightInput.id = mode === "add" ? "weight" : "edit-weight";
-  weightInput.name = mode === "add" ? "weight" : "edit-weight";
-  weightInput.placeholder = "0.0";
-
-  if (mode === "edit") {
-    weightInput.disabled = true;
-  }
-
-  weightField.append(weightLabel, weightInput);
-
-  return weightField;
-};
-
-export const buildProductDimensions = async (mode) => {
-  const dimensionsGroup = document.createElement("div");
-  dimensionsGroup.className = "dimensions-group";
-
-  const dimensions = [
-    { label: "L (in)", name: "length" },
-    { label: "W (in)", name: "width" },
-    { label: "H (in)", name: "height" },
-  ];
-
-  for (let i = 0; i < dimensions.length; i++) {
-    const dim = dimensions[i];
-    const dimensionField = document.createElement("div");
-    dimensionField.className = "dimension-field";
-
-    const dimLabel = document.createElement("label");
-    dimLabel.className = "form-label";
-    dimLabel.textContent = dim.label;
-    dimLabel.setAttribute("for", mode === "add" ? dim.name : `edit-${dim.name}`);
-
-    const dimInput = document.createElement("input");
-    dimInput.className = "form-input";
-    dimInput.type = "text";
-    dimInput.id = mode === "add" ? dim.name : `edit-${dim.name}`;
-    dimInput.name = mode === "add" ? dim.name : `edit-${dim.name}`;
-    dimInput.placeholder = "0";
-
-    if (mode === "edit") {
-      dimInput.disabled = true;
-    }
-
-    dimensionField.append(dimLabel, dimInput);
-    dimensionsGroup.append(dimensionField);
-  }
-
-  return dimensionsGroup;
-};
-
-export const buildProductCanShip = async (mode) => {
-  const canShipField = document.createElement("div");
-  canShipField.className = "drop-down-half";
-
-  const canShipLabel = document.createElement("label");
-  canShipLabel.className = "form-label";
-  canShipLabel.textContent = "Can Ship?";
-  canShipLabel.setAttribute("for", mode === "add" ? "can-ship" : "edit-can-ship");
-
-  const canShipSelect = document.createElement("select");
-  canShipSelect.className = "form-select";
-  canShipSelect.id = mode === "add" ? "can-ship" : "edit-can-ship";
-  canShipSelect.name = mode === "add" ? "can-ship" : "edit-can-ship";
-
-  if (mode === "edit") {
-    canShipSelect.disabled = true;
-  }
-
-  const canShipOptions = [
-    { value: "yes", text: "Yes", selected: true },
-    { value: "no", text: "No" },
-  ];
-
-  for (let i = 0; i < canShipOptions.length; i++) {
-    const optionData = canShipOptions[i];
-    const option = document.createElement("option");
-    option.value = optionData.value;
-    option.textContent = optionData.text;
-    if (optionData.selected) {
-      option.selected = true;
-    }
-    canShipSelect.append(option);
-  }
-
-  canShipField.append(canShipLabel, canShipSelect);
-
-  return canShipField;
-};
-
-//------------
-
-export const buildProductDescription = async (mode) => {
-  const descWrapper = document.createElement("div");
-  descWrapper.className = "form-field";
-
-  const descLabel = document.createElement("label");
-  descLabel.className = "form-label";
-  descLabel.textContent = "Description";
-  descLabel.setAttribute("for", mode === "add" ? "description" : "edit-description");
-
-  const descInput = document.createElement("textarea");
-  descInput.className = "form-textarea";
-  descInput.id = mode === "add" ? "description" : "edit-description";
-  descInput.name = mode === "add" ? "description" : "edit-description";
-
-  if (mode === "edit") {
-    descInput.disabled = true;
-  }
-
-  descWrapper.append(descLabel, descInput);
-
-  return descWrapper;
-};
-
-export const buildProductDropDownRow = async (mode) => {
-  const dropDownRow = document.createElement("div");
-  dropDownRow.className = "drop-down-row";
-
-  const adminSoldToggle = await buildProductSoldToggle(mode);
-  const adminDisplayToggle = await buildProductDisplayToggle(mode);
-  const canShipField = await buildProductCanShip(mode);
-
-  dropDownRow.append(adminSoldToggle, adminDisplayToggle, canShipField);
-
-  return dropDownRow;
-};
-
-export const buildProductDisplayToggle = async (mode) => {
-  // Display select
-  const displayToggle = document.createElement("div");
-  displayToggle.className = "drop-down-half";
-
-  const displayLabel = document.createElement("label");
-  displayLabel.className = "form-label";
-  displayLabel.textContent = "Display on Site?";
-  displayLabel.setAttribute("for", mode === "add" ? "display" : "edit-display");
-
-  const displaySelect = document.createElement("select");
-  displaySelect.className = "form-select";
-  displaySelect.id = mode === "add" ? "display" : "edit-display";
-  displaySelect.name = mode === "add" ? "display" : "edit-display";
-
-  if (mode === "edit") {
-    displaySelect.disabled = true;
-  }
-
-  const displayOptions = [
-    { value: "yes", text: "Yes", selected: true },
-    { value: "no", text: "No" },
-  ];
-
-  for (let i = 0; i < displayOptions.length; i++) {
-    const optionData = displayOptions[i];
-    const option = document.createElement("option");
-    option.value = optionData.value;
-    option.textContent = optionData.text;
-    if (optionData.selected) {
-      option.selected = true;
-    }
-    displaySelect.append(option);
-  }
-
-  displayToggle.append(displayLabel, displaySelect);
-
-  return displayToggle;
-};
-
-export const buildProductSoldToggle = async (mode) => {
-  // Sold select
-  const soldToggle = document.createElement("div");
-  soldToggle.className = "drop-down-half";
-
-  const soldLabel = document.createElement("label");
-  soldLabel.className = "form-label";
-  soldLabel.textContent = "Sold?";
-  soldLabel.setAttribute("for", mode === "add" ? "sold" : "edit-sold");
-
-  const soldSelect = document.createElement("select");
-  soldSelect.className = "form-select";
-  soldSelect.id = mode === "add" ? "sold" : "edit-sold";
-  soldSelect.name = mode === "add" ? "sold" : "edit-sold";
-
-  if (mode === "edit") {
-    soldSelect.disabled = true;
-  }
-
-  const soldOptions = [
-    { value: "yes", text: "Yes" },
-    { value: "no", text: "No", selected: true },
-  ];
-
-  for (let i = 0; i < soldOptions.length; i++) {
-    const optionData = soldOptions[i];
-    const option = document.createElement("option");
-    option.value = optionData.value;
-    option.textContent = optionData.text;
-    if (optionData.selected) {
-      option.selected = true;
-    }
-    soldSelect.append(option);
-  }
-
-  soldToggle.append(soldLabel, soldSelect);
-
-  return soldToggle;
-};
-
-//+++++++++++++++++++
-
-//EVENT FORM FIELDS
 
 export const buildAdminEventSelector = async () => {
   const selectorWrapper = document.createElement("li");
@@ -728,97 +784,76 @@ export const buildAdminEventSelector = async () => {
   return selectorWrapper;
 };
 
-export const buildEventName = async (mode) => {
-  const nameWrapper = document.createElement("div");
-  nameWrapper.className = "form-field";
+//+++++++++++++++++++
 
-  const nameLabel = document.createElement("label");
-  nameLabel.className = "form-label";
-  nameLabel.textContent = "Event Name";
-  nameLabel.setAttribute("for", mode === "add" ? "name" : "edit-name");
+//ADMIN UPLOAD
 
-  const nameInput = document.createElement("input");
-  nameInput.className = "form-input";
-  nameInput.type = "text";
-  nameInput.id = mode === "add" ? "name" : "edit-name";
-  nameInput.name = mode === "add" ? "name" : "edit-name";
+export const buildAdminUpload = async (mode, entityType = "products") => {
+  const uploadSection = document.createElement("div");
+  uploadSection.className = "image-upload-area";
+
+  // Image display container
+  const imageDisplay = document.createElement("div");
+  imageDisplay.className = "image-display";
+  imageDisplay.id = mode === "add" ? "current-image-preview" : "edit-current-image-preview";
+
+  const imagePlaceholder = document.createElement("div");
+  imagePlaceholder.className = "image-placeholder";
+  imagePlaceholder.textContent = "🖼️";
+
+  const currentImage = document.createElement("img");
+  currentImage.id = mode === "add" ? "current-image" : "edit-current-image";
+  currentImage.className = "current-image";
+  currentImage.alt = mode === "add" ? "Selected product image" : "Current product image";
+  currentImage.style.display = "none";
+
+  // Delete button for the image
+  const deleteImageBtn = document.createElement("button");
+  deleteImageBtn.type = "button";
+  deleteImageBtn.className = "delete-image-btn";
+  deleteImageBtn.id = mode === "add" ? "delete-image-btn" : "edit-delete-image-btn";
+  deleteImageBtn.innerHTML = "×";
+  deleteImageBtn.title = "Delete image";
+  deleteImageBtn.setAttribute("data-label", mode === "add" ? "delete-upload-image" : "edit-delete-upload-image");
+  deleteImageBtn.entityType = entityType;
+  deleteImageBtn.style.display = "none";
+
+  imageDisplay.append(imagePlaceholder, currentImage, deleteImageBtn);
+
+  // Hidden file input
+  const picInput = document.createElement("input");
+  picInput.type = "file";
+  picInput.id = mode === "add" ? "upload-pic-input" : "edit-upload-pic-input";
+  picInput.accept = ".jpg,.jpeg,.png,.gif,.webp";
+  picInput.style.display = "none";
 
   if (mode === "edit") {
-    nameInput.disabled = true;
+    picInput.disabled = true;
   }
 
-  nameWrapper.append(nameLabel, nameInput);
+  const uploadButton = document.createElement("button");
+  uploadButton.type = "button";
+  uploadButton.id = mode === "add" ? "upload-button" : "edit-upload-button";
+  uploadButton.className = "upload-btn";
+  uploadButton.textContent = mode === "add" ? "Choose Image" : "Change Image";
+  uploadButton.setAttribute("data-label", mode === "add" ? "upload-click" : "edit-upload-click");
+  uploadButton.entityType = entityType;
 
-  return nameWrapper;
+  if (mode === "edit") {
+    uploadButton.disabled = true;
+  }
+
+  const uploadStatus = document.createElement("span");
+  uploadStatus.id = mode === "add" ? "upload-status" : "edit-upload-status";
+  uploadStatus.className = "upload-status";
+  uploadStatus.style.display = "none";
+
+  uploadSection.append(imageDisplay, picInput, uploadButton, uploadStatus);
+
+  return uploadSection;
 };
 
-export const buildEventDate = async (mode) => {
-  const dateWrapper = document.createElement("li");
-  dateWrapper.className = "form-field";
-
-  const dateLabel = document.createElement("label");
-  dateLabel.className = "form-label";
-  dateLabel.id = mode === "add" ? "event-date-label" : "edit-event-date-label";
-  dateLabel.textContent = "Event Date";
-  dateLabel.setAttribute("for", mode === "add" ? "event-date" : "edit-event-date");
-
-  const dateInput = document.createElement("input");
-  dateInput.className = "form-input";
-  dateInput.type = "date";
-  dateInput.id = mode === "add" ? "event-date" : "edit-event-date";
-  dateInput.name = mode === "add" ? "event-date" : "edit-event-date";
-
-  if (mode === "edit") dateInput.disabled = true;
-
-  dateWrapper.append(dateLabel, dateInput);
-
-  return dateWrapper;
-};
-
-export const buildEventLocation = async (mode) => {
-  const locationWrapper = document.createElement("li");
-  locationWrapper.className = "form-field";
-
-  const locationLabel = document.createElement("label");
-  locationLabel.className = "form-label";
-  locationLabel.id = mode === "add" ? "event-location-label" : "edit-event-location-label";
-  locationLabel.textContent = "Location";
-  locationLabel.setAttribute("for", mode === "add" ? "event-location" : "edit-event-location");
-
-  const locationInput = document.createElement("input");
-  locationInput.className = "form-input";
-  locationInput.type = "text";
-  locationInput.id = mode === "add" ? "event-location" : "edit-event-location";
-  locationInput.name = mode === "add" ? "event-location" : "edit-event-location";
-
-  if (mode === "edit") locationInput.disabled = true;
-
-  locationWrapper.append(locationLabel, locationInput);
-
-  return locationWrapper;
-};
-
-export const buildEventDescription = async (mode) => {
-  const descWrapper = document.createElement("li");
-  descWrapper.className = "form-field";
-
-  const descLabel = document.createElement("label");
-  descLabel.className = "form-label";
-  descLabel.id = mode === "add" ? "event-description-label" : "edit-event-description-label";
-  descLabel.textContent = "Description";
-  descLabel.setAttribute("for", mode === "add" ? "event-description" : "edit-event-description");
-
-  const descInput = document.createElement("textarea");
-  descInput.className = "form-textarea";
-  descInput.id = mode === "add" ? "event-description" : "edit-event-description";
-  descInput.name = mode === "add" ? "event-description" : "edit-event-description";
-
-  if (mode === "edit") descInput.disabled = true;
-
-  descWrapper.append(descLabel, descInput);
-
-  return descWrapper;
-};
+//+++++++++++
 
 //NEWSLETTER FORM FIELDS
 
@@ -915,268 +950,613 @@ export const buildMailingListSection = async () => {
   return section;
 };
 
-//++++++++++++
+//+++++++++++++++++++++++++++++++++++
 
-//ADMIN UPLOAD
+//EVENT FORM FIELDS
 
-export const buildAdminUpload = async (mode, entityType = "products") => {
-  const uploadSection = document.createElement("div");
-  uploadSection.className = "upload-section";
+// export const buildEventName = async (mode) => {
+//   const nameWrapper = document.createElement("div");
+//   nameWrapper.className = "form-field";
 
-  // Current image preview
-  const currentImagePreview = document.createElement("div");
-  currentImagePreview.className = "current-image-preview";
-  currentImagePreview.id = mode === "add" ? "current-image-preview" : "edit-current-image-preview";
-  currentImagePreview.style.display = "none";
+//   const nameLabel = document.createElement("label");
+//   nameLabel.className = "form-label";
+//   nameLabel.textContent = "Event Name";
+//   nameLabel.setAttribute("for", mode === "add" ? "name" : "edit-name");
 
-  const currentImageLabel = document.createElement("span");
-  currentImageLabel.className = "current-image-label";
-  currentImageLabel.textContent = mode === "add" ? "Selected Image:" : "Current Image:";
+//   const nameInput = document.createElement("input");
+//   nameInput.className = "form-input";
+//   nameInput.type = "text";
+//   nameInput.id = mode === "add" ? "name" : "edit-name";
+//   nameInput.name = mode === "add" ? "name" : "edit-name";
 
-  //PROB REMOVE
-  const imageWrapper = document.createElement("div");
-  imageWrapper.className = "image-wrapper";
-
-  const currentImage = document.createElement("img");
-  currentImage.id = mode === "add" ? "current-image" : "edit-current-image";
-  currentImage.className = "current-image";
-  currentImage.alt = mode === "add" ? "Selected product image" : "Current product image";
-
-  // Delete button for the image
-  const deleteImageBtn = document.createElement("button");
-  deleteImageBtn.type = "button";
-  deleteImageBtn.className = "delete-image-btn";
-  deleteImageBtn.id = mode === "add" ? "delete-image-btn" : "edit-delete-image-btn";
-  deleteImageBtn.innerHTML = "×";
-  deleteImageBtn.title = "Delete image";
-  deleteImageBtn.setAttribute("data-label", mode === "add" ? "delete-upload-image" : "edit-delete-upload-image");
-  deleteImageBtn.entityType = entityType;
-
-  imageWrapper.append(currentImage, deleteImageBtn);
-  // currentImagePreview.append(currentImageLabel, currentImage, deleteImageBtn);
-  currentImagePreview.append(currentImageLabel, imageWrapper);
-  uploadSection.append(currentImagePreview);
-
-  console.log("ENTITY TYPE");
-  console.log(entityType);
-
-  // Hidden file input
-  const picInput = document.createElement("input");
-  picInput.type = "file";
-  picInput.id = mode === "add" ? "upload-pic-input" : "edit-upload-pic-input";
-  picInput.accept = ".jpg,.jpeg,.png,.gif,.webp";
-  picInput.style.display = "none";
-  // picInput.entityType = entityType;
-
-  if (mode === "edit") {
-    picInput.disabled = true;
-  }
-
-  const uploadButton = document.createElement("button");
-  uploadButton.type = "button";
-  uploadButton.id = mode === "add" ? "upload-button" : "edit-upload-button";
-  uploadButton.className = "upload-btn";
-  uploadButton.textContent = mode === "add" ? "Choose Image" : "Change Image";
-  uploadButton.setAttribute("data-label", mode === "add" ? "upload-click" : "edit-upload-click");
-  uploadButton.entityType = entityType;
-
-  if (mode === "edit") {
-    uploadButton.disabled = true;
-  }
-
-  const uploadStatus = document.createElement("span");
-  uploadStatus.id = mode === "add" ? "upload-status" : "edit-upload-status";
-  uploadStatus.className = "upload-status";
-  uploadStatus.style.marginLeft = "10px";
-  uploadStatus.style.display = "none";
-
-  uploadSection.append(picInput, uploadButton, uploadStatus);
-
-  return uploadSection;
-};
-
-//===================================
-
-// export const buildEntitySelector = async () => {
-//   const selectorBar = document.createElement("div");
-//   selectorBar.className = "entity-selector-bar";
-
-//   const selectorLabel = document.createElement("label");
-//   selectorLabel.className = "entity-selector-label";
-//   selectorLabel.textContent = "Managing:";
-//   selectorLabel.setAttribute("for", "entity-type-selector");
-
-//   const selectorDropdown = document.createElement("select");
-//   selectorDropdown.className = "entity-selector-dropdown";
-//   selectorDropdown.id = "entity-type-selector";
-//   selectorDropdown.name = "entity-type-selector";
-
-//   const productOption = document.createElement("option");
-//   productOption.value = "products";
-//   productOption.textContent = "Products";
-//   productOption.selected = true;
-
-//   const eventOption = document.createElement("option");
-//   eventOption.value = "events";
-//   eventOption.textContent = "Events";
-
-//   selectorDropdown.append(productOption, eventOption);
-//   selectorBar.append(selectorLabel, selectorDropdown);
-
-//   return selectorBar;
-// };
-
-//navigation buttons at top
-// export const buildTabNav = async () => {
-//   const tabContainer = document.createElement("div");
-//   tabContainer.className = "admin-tab-container";
-
-//   const tabWrapper = document.createElement("div");
-//   tabWrapper.className = "admin-tab-wrapper";
-
-//   // Add Product Tab Button
-//   const addTabButton = document.createElement("button");
-//   addTabButton.className = "admin-tab-button active";
-//   addTabButton.id = "add-tab-button";
-//   addTabButton.textContent = "Add Product";
-//   addTabButton.setAttribute("data-tab", "add");
-
-//   // Edit Product Tab Button
-//   const editTabButton = document.createElement("button");
-//   editTabButton.className = "admin-tab-button";
-//   editTabButton.id = "edit-tab-button";
-//   editTabButton.textContent = "Edit Product";
-//   editTabButton.setAttribute("data-tab", "edit");
-
-//   tabWrapper.append(addTabButton, editTabButton);
-//   tabContainer.append(tabWrapper);
-
-//   return tabContainer;
-// };
-
-// export const buildAdminTab = async (mode = "add") => {
-//   const tabWrapper = document.createElement("ul");
-//   tabWrapper.id = mode === "add" ? "add-tab" : "edit-tab";
-//   tabWrapper.className = "admin-tab active";
-
-//   const tabTitle = await buildTabTitle(mode);
-//   tabWrapper.append(tabTitle);
-
-//   // Hide edit form by default
 //   if (mode === "edit") {
-//     tabWrapper.style.display = "none";
-//     const adminProductSelector = await buildAdminProductSelector();
-//     tabWrapper.append(adminProductSelector);
+//     nameInput.disabled = true;
 //   }
 
-//   const adminName = await buildName(mode);
-//   const productType = await buildProductType(mode);
-//   const formInputList = await buildFormInputList(mode); // price and description
-//   const dropDownRow = await buildDropDownRow(mode); // display and sold toggles
-//   const adminUpload = await buildAdminUpload(mode);
-//   // const deleteButton = mode === "edit" ? await buildDeleteButton() : null;
-//   const adminSubmit = await buildAdminSubmit(mode);
+//   nameWrapper.append(nameLabel, nameInput);
 
-//   tabWrapper.append(adminName, productType, formInputList, dropDownRow, adminUpload, adminSubmit);
-
-//   return tabWrapper;
+//   return nameWrapper;
 // };
 
-// export const buildTabTitle = async (mode) => {
-//   const titleWrapper = document.createElement("div");
-//   titleWrapper.className = "admin-tab-title-wrapper";
+// export const buildEventDate = async (mode) => {
+//   const dateWrapper = document.createElement("li");
+//   dateWrapper.className = "form-field";
 
-//   const tabTitle = document.createElement("h1");
-//   tabTitle.className = "admin-tab-title";
-//   tabTitle.textContent = mode === "add" ? "Add New Product" : "Edit Product";
+//   const dateLabel = document.createElement("label");
+//   dateLabel.className = "form-label";
+//   dateLabel.id = mode === "add" ? "event-date-label" : "edit-event-date-label";
+//   dateLabel.textContent = "Event Date";
+//   dateLabel.setAttribute("for", mode === "add" ? "event-date" : "edit-event-date");
 
-//   titleWrapper.append(tabTitle);
-//   if (mode !== "edit") return titleWrapper;
+//   const dateInput = document.createElement("input");
+//   dateInput.className = "form-input";
+//   dateInput.type = "date";
+//   dateInput.id = mode === "add" ? "event-date" : "edit-event-date";
+//   dateInput.name = mode === "add" ? "event-date" : "edit-event-date";
 
-//   const deleteButton = document.createElement("button");
-//   deleteButton.type = "button";
-//   deleteButton.className = "delete-btn-header";
-//   deleteButton.id = "delete-product-button";
-//   deleteButton.textContent = "Delete Product";
-//   deleteButton.setAttribute("data-label", "delete-product-submit");
-//   deleteButton.style.display = "none"; // Hidden by default
+//   if (mode === "edit") dateInput.disabled = true;
 
-//   titleWrapper.append(deleteButton);
+//   dateWrapper.append(dateLabel, dateInput);
 
-//   return titleWrapper;
+//   return dateWrapper;
 // };
 
-// export const buildFormInputList = async (mode) => {
-//   // Create fields containe
-//   const adminFormInputList = document.createElement("ul");
-//   adminFormInputList.className = "admin-form-input-list";
+// export const buildEventLocation = async (mode) => {
+//   const locationWrapper = document.createElement("li");
+//   locationWrapper.className = "form-field";
 
-//   // Form fields configuration
-//   const fields = [
-//     { name: "price", label: "Price", type: "text", required: true },
-//     { name: "description", label: "Description", type: "textarea" },
+//   const locationLabel = document.createElement("label");
+//   locationLabel.className = "form-label";
+//   locationLabel.id = mode === "add" ? "event-location-label" : "edit-event-location-label";
+//   locationLabel.textContent = "Location";
+//   locationLabel.setAttribute("for", mode === "add" ? "event-location" : "edit-event-location");
+
+//   const locationInput = document.createElement("input");
+//   locationInput.className = "form-input";
+//   locationInput.type = "text";
+//   locationInput.id = mode === "add" ? "event-location" : "edit-event-location";
+//   locationInput.name = mode === "add" ? "event-location" : "edit-event-location";
+
+//   if (mode === "edit") locationInput.disabled = true;
+
+//   locationWrapper.append(locationLabel, locationInput);
+
+//   return locationWrapper;
+// };
+
+// export const buildEventDescription = async (mode) => {
+//   const descWrapper = document.createElement("li");
+//   descWrapper.className = "form-field";
+
+//   const descLabel = document.createElement("label");
+//   descLabel.className = "form-label";
+//   descLabel.id = mode === "add" ? "event-description-label" : "edit-event-description-label";
+//   descLabel.textContent = "Description";
+//   descLabel.setAttribute("for", mode === "add" ? "event-description" : "edit-event-description");
+
+//   const descInput = document.createElement("textarea");
+//   descInput.className = "form-textarea";
+//   descInput.id = mode === "add" ? "event-description" : "edit-event-description";
+//   descInput.name = mode === "add" ? "event-description" : "edit-event-description";
+
+//   if (mode === "edit") descInput.disabled = true;
+
+//   descWrapper.append(descLabel, descInput);
+
+//   return descWrapper;
+// };
+
+// export const buildProductName = async (mode) => {
+//   const nameWrapper = document.createElement("li");
+//   nameWrapper.className = "form-field";
+
+//   const nameLabel = document.createElement("label");
+//   nameLabel.className = "form-label";
+//   nameLabel.textContent = "Product Name";
+//   nameLabel.setAttribute("for", mode === "add" ? "name" : "edit-name");
+
+//   const nameInput = document.createElement("input");
+//   nameInput.className = "form-input";
+//   nameInput.type = "text";
+//   nameInput.id = mode === "add" ? "name" : "edit-name";
+//   nameInput.name = mode === "add" ? "name" : "edit-name";
+
+//   if (mode === "edit") {
+//     nameInput.disabled = true;
+//   }
+
+//   nameWrapper.append(nameLabel, nameInput);
+
+//   return nameWrapper;
+// };
+
+// export const buildProductType = async (mode) => {
+//   const adminProductType = document.createElement("div");
+//   adminProductType.className = "form-field";
+
+//   const productTypeLabel = document.createElement("label");
+//   productTypeLabel.className = "form-label";
+//   productTypeLabel.textContent = "Type";
+//   productTypeLabel.setAttribute("for", mode === "add" ? "product-type" : "edit-product-type");
+
+//   const productTypeSelect = document.createElement("select");
+//   productTypeSelect.className = "form-select";
+//   productTypeSelect.id = mode === "add" ? "product-type" : "edit-product-type";
+
+//   if (mode === "edit") {
+//     productTypeSelect.disabled = true;
+//   }
+
+//   const optionArray = [
+//     { value: "acorns", text: "Acorns", selected: true },
+//     { value: "mountainTreasureBaskets", text: "Mountain Treasure Baskets" },
+//     { value: "animals", text: "Animals" },
+//     { value: "geodes", text: "Geodes" },
+//     { value: "gnomeHouses", text: "Gnome Houses" },
+//     { value: "wallPieces", text: "Wall Pieces" },
+//     { value: "other", text: "Other" },
 //   ];
 
-//   // Create each form field
-//   for (let i = 0; i < fields.length; i++) {
-//     const field = fields[i];
-//     const fieldWrapper = document.createElement("li");
-//     fieldWrapper.className = "form-field";
-
-//     const fieldId = mode === "edit" ? `edit-${field.name}` : field.name;
-
-//     const label = document.createElement("label");
-//     label.className = "form-label";
-//     label.textContent = field.label;
-//     label.setAttribute("for", fieldId);
-
-//     let input;
-//     if (field.type === "textarea") {
-//       input = document.createElement("textarea");
-//       input.className = "form-textarea";
-//     } else {
-//       input = document.createElement("input");
-//       input.className = "form-input";
-//       input.type = field.type;
+//   for (let i = 0; i < optionArray.length; i++) {
+//     const optionData = optionArray[i];
+//     const option = document.createElement("option");
+//     option.value = optionData.value;
+//     option.textContent = optionData.text;
+//     if (optionData.selected) {
+//       option.selected = true;
 //     }
-
-//     input.id = fieldId;
-//     input.name = fieldId;
-
-//     if (mode === "edit") {
-//       input.disabled = true;
-//     }
-
-//     fieldWrapper.append(label, input);
-//     adminFormInputList.append(fieldWrapper);
+//     productTypeSelect.append(option);
 //   }
 
-//   return adminFormInputList;
+//   adminProductType.append(productTypeLabel, productTypeSelect);
+
+//   return adminProductType;
 // };
 
-// export const buildDropDownRow = async (mode) => {
-//   const dropDownRow = document.createElement("li");
+// export const buildProductPrice = async (mode) => {
+//   const priceWrapper = document.createElement("div");
+//   priceWrapper.className = "form-field";
+
+//   const priceLabel = document.createElement("label");
+//   priceLabel.className = "form-label";
+//   priceLabel.textContent = "Price";
+//   priceLabel.setAttribute("for", mode === "add" ? "price" : "edit-price");
+
+//   const priceInput = document.createElement("input");
+//   priceInput.className = "form-input";
+//   priceInput.type = "text";
+//   priceInput.id = mode === "add" ? "price" : "edit-price";
+//   priceInput.name = mode === "add" ? "price" : "edit-price";
+
+//   if (mode === "edit") {
+//     priceInput.disabled = true;
+//   }
+
+//   priceWrapper.append(priceLabel, priceInput);
+
+//   return priceWrapper;
+// };
+
+// //--------------------
+
+// export const buildProductShippingRow = async (mode) => {
+//   const shippingRow = document.createElement("div");
+//   shippingRow.className = "shipping-row";
+
+//   const dimensionsGroup = await buildProductDimensions(mode);
+//   const weightField = await buildProductWeight(mode);
+
+//   shippingRow.append(dimensionsGroup, weightField);
+
+//   return shippingRow;
+// };
+
+// export const buildProductWeight = async (mode) => {
+//   const weightField = document.createElement("div");
+//   weightField.className = "weight-field";
+
+//   const weightLabel = document.createElement("label");
+//   weightLabel.className = "form-label";
+//   weightLabel.textContent = "Ship Weight (lbs)";
+//   weightLabel.setAttribute("for", mode === "add" ? "weight" : "edit-weight");
+
+//   const weightInput = document.createElement("input");
+//   weightInput.className = "form-input";
+//   weightInput.type = "text";
+//   weightInput.id = mode === "add" ? "weight" : "edit-weight";
+//   weightInput.name = mode === "add" ? "weight" : "edit-weight";
+//   weightInput.placeholder = "0.0";
+
+//   if (mode === "edit") {
+//     weightInput.disabled = true;
+//   }
+
+//   weightField.append(weightLabel, weightInput);
+
+//   return weightField;
+// };
+
+// export const buildProductDimensions = async (mode) => {
+//   const dimensionsGroup = document.createElement("div");
+//   dimensionsGroup.className = "dimensions-group";
+
+//   const dimensions = [
+//     { label: "L (in)", name: "length" },
+//     { label: "W (in)", name: "width" },
+//     { label: "H (in)", name: "height" },
+//   ];
+
+//   for (let i = 0; i < dimensions.length; i++) {
+//     const dim = dimensions[i];
+//     const dimensionField = document.createElement("div");
+//     dimensionField.className = "dimension-field";
+
+//     const dimLabel = document.createElement("label");
+//     dimLabel.className = "form-label";
+//     dimLabel.textContent = dim.label;
+//     dimLabel.setAttribute("for", mode === "add" ? dim.name : `edit-${dim.name}`);
+
+//     const dimInput = document.createElement("input");
+//     dimInput.className = "form-input";
+//     dimInput.type = "text";
+//     dimInput.id = mode === "add" ? dim.name : `edit-${dim.name}`;
+//     dimInput.name = mode === "add" ? dim.name : `edit-${dim.name}`;
+//     dimInput.placeholder = "0";
+
+//     if (mode === "edit") {
+//       dimInput.disabled = true;
+//     }
+
+//     dimensionField.append(dimLabel, dimInput);
+//     dimensionsGroup.append(dimensionField);
+//   }
+
+//   return dimensionsGroup;
+// };
+
+// export const buildProductCanShip = async (mode) => {
+//   const canShipField = document.createElement("div");
+//   canShipField.className = "drop-down-half";
+
+//   const canShipLabel = document.createElement("label");
+//   canShipLabel.className = "form-label";
+//   canShipLabel.textContent = "Can Ship?";
+//   canShipLabel.setAttribute("for", mode === "add" ? "can-ship" : "edit-can-ship");
+
+//   const canShipSelect = document.createElement("select");
+//   canShipSelect.className = "form-select";
+//   canShipSelect.id = mode === "add" ? "can-ship" : "edit-can-ship";
+//   canShipSelect.name = mode === "add" ? "can-ship" : "edit-can-ship";
+
+//   if (mode === "edit") {
+//     canShipSelect.disabled = true;
+//   }
+
+//   const canShipOptions = [
+//     { value: "yes", text: "Yes", selected: true },
+//     { value: "no", text: "No" },
+//   ];
+
+//   for (let i = 0; i < canShipOptions.length; i++) {
+//     const optionData = canShipOptions[i];
+//     const option = document.createElement("option");
+//     option.value = optionData.value;
+//     option.textContent = optionData.text;
+//     if (optionData.selected) {
+//       option.selected = true;
+//     }
+//     canShipSelect.append(option);
+//   }
+
+//   canShipField.append(canShipLabel, canShipSelect);
+
+//   return canShipField;
+// };
+
+// //------------
+
+// export const buildProductDescription = async (mode) => {
+//   const descWrapper = document.createElement("div");
+//   descWrapper.className = "form-field";
+
+//   const descLabel = document.createElement("label");
+//   descLabel.className = "form-label";
+//   descLabel.textContent = "Description";
+//   descLabel.setAttribute("for", mode === "add" ? "description" : "edit-description");
+
+//   const descInput = document.createElement("textarea");
+//   descInput.className = "form-textarea";
+//   descInput.id = mode === "add" ? "description" : "edit-description";
+//   descInput.name = mode === "add" ? "description" : "edit-description";
+
+//   if (mode === "edit") {
+//     descInput.disabled = true;
+//   }
+
+//   descWrapper.append(descLabel, descInput);
+
+//   return descWrapper;
+// };
+
+// export const buildProductDropDownRow = async (mode) => {
+//   const dropDownRow = document.createElement("div");
 //   dropDownRow.className = "drop-down-row";
 
-//   const adminDisplayToggle = await buildDisplayToggle(mode);
-//   const adminSoldToggle = await buildSoldToggle(mode);
+//   const adminSoldToggle = await buildProductSoldToggle(mode);
+//   const adminDisplayToggle = await buildProductDisplayToggle(mode);
+//   const canShipField = await buildProductCanShip(mode);
 
-//   dropDownRow.append(adminDisplayToggle, adminSoldToggle);
+//   dropDownRow.append(adminSoldToggle, adminDisplayToggle, canShipField);
 
 //   return dropDownRow;
 // };
 
-// export const buildAdminSubmit = async (mode) => {
-//   const submitButton = document.createElement("button");
-//   submitButton.type = "submit";
-//   submitButton.className = "submit-btn";
-//   submitButton.id = mode === "add" ? "submit-button" : "edit-submit-button";
-//   submitButton.textContent = mode === "add" ? "Submit" : "Update";
-//   submitButton.setAttribute("data-label", mode === "add" ? "new-product-submit" : "edit-product-submit");
+// export const buildProductDisplayToggle = async (mode) => {
+//   // Display select
+//   const displayToggle = document.createElement("div");
+//   displayToggle.className = "drop-down-half";
+
+//   const displayLabel = document.createElement("label");
+//   displayLabel.className = "form-label";
+//   displayLabel.textContent = "Display on Site?";
+//   displayLabel.setAttribute("for", mode === "add" ? "display" : "edit-display");
+
+//   const displaySelect = document.createElement("select");
+//   displaySelect.className = "form-select";
+//   displaySelect.id = mode === "add" ? "display" : "edit-display";
+//   displaySelect.name = mode === "add" ? "display" : "edit-display";
 
 //   if (mode === "edit") {
+//     displaySelect.disabled = true;
+//   }
+
+//   const displayOptions = [
+//     { value: "yes", text: "Yes", selected: true },
+//     { value: "no", text: "No" },
+//   ];
+
+//   for (let i = 0; i < displayOptions.length; i++) {
+//     const optionData = displayOptions[i];
+//     const option = document.createElement("option");
+//     option.value = optionData.value;
+//     option.textContent = optionData.text;
+//     if (optionData.selected) {
+//       option.selected = true;
+//     }
+//     displaySelect.append(option);
+//   }
+
+//   displayToggle.append(displayLabel, displaySelect);
+
+//   return displayToggle;
+// };
+
+// export const buildProductSoldToggle = async (mode) => {
+//   // Sold select
+//   const soldToggle = document.createElement("div");
+//   soldToggle.className = "drop-down-half";
+
+//   const soldLabel = document.createElement("label");
+//   soldLabel.className = "form-label";
+//   soldLabel.textContent = "Sold?";
+//   soldLabel.setAttribute("for", mode === "add" ? "sold" : "edit-sold");
+
+//   const soldSelect = document.createElement("select");
+//   soldSelect.className = "form-select";
+//   soldSelect.id = mode === "add" ? "sold" : "edit-sold";
+//   soldSelect.name = mode === "add" ? "sold" : "edit-sold";
+
+//   if (mode === "edit") {
+//     soldSelect.disabled = true;
+//   }
+
+//   const soldOptions = [
+//     { value: "yes", text: "Yes" },
+//     { value: "no", text: "No", selected: true },
+//   ];
+
+//   for (let i = 0; i < soldOptions.length; i++) {
+//     const optionData = soldOptions[i];
+//     const option = document.createElement("option");
+//     option.value = optionData.value;
+//     option.textContent = optionData.text;
+//     if (optionData.selected) {
+//       option.selected = true;
+//     }
+//     soldSelect.append(option);
+//   }
+
+//   soldToggle.append(soldLabel, soldSelect);
+
+//   return soldToggle;
+// };
+
+// export const buildAdminUpload = async (mode, entityType = "products") => {
+//   const uploadSection = document.createElement("div");
+//   uploadSection.className = "upload-section";
+
+//   // Current image preview
+//   const currentImagePreview = document.createElement("div");
+//   currentImagePreview.className = "current-image-preview";
+//   currentImagePreview.id = mode === "add" ? "current-image-preview" : "edit-current-image-preview";
+//   currentImagePreview.style.display = "none";
+
+//   const currentImageLabel = document.createElement("span");
+//   currentImageLabel.className = "current-image-label";
+//   currentImageLabel.textContent = mode === "add" ? "Selected Image:" : "Current Image:";
+
+//   //PROB REMOVE
+//   const imageWrapper = document.createElement("div");
+//   imageWrapper.className = "image-wrapper";
+
+//   const currentImage = document.createElement("img");
+//   currentImage.id = mode === "add" ? "current-image" : "edit-current-image";
+//   currentImage.className = "current-image";
+//   currentImage.alt = mode === "add" ? "Selected product image" : "Current product image";
+
+//   // Delete button for the image
+//   const deleteImageBtn = document.createElement("button");
+//   deleteImageBtn.type = "button";
+//   deleteImageBtn.className = "delete-image-btn";
+//   deleteImageBtn.id = mode === "add" ? "delete-image-btn" : "edit-delete-image-btn";
+//   deleteImageBtn.innerHTML = "×";
+//   deleteImageBtn.title = "Delete image";
+//   deleteImageBtn.setAttribute("data-label", mode === "add" ? "delete-upload-image" : "edit-delete-upload-image");
+//   deleteImageBtn.entityType = entityType;
+
+//   imageWrapper.append(currentImage, deleteImageBtn);
+//   // currentImagePreview.append(currentImageLabel, currentImage, deleteImageBtn);
+//   currentImagePreview.append(currentImageLabel, imageWrapper);
+//   uploadSection.append(currentImagePreview);
+
+//   console.log("ENTITY TYPE");
+//   console.log(entityType);
+
+//   // Hidden file input
+//   const picInput = document.createElement("input");
+//   picInput.type = "file";
+//   picInput.id = mode === "add" ? "upload-pic-input" : "edit-upload-pic-input";
+//   picInput.accept = ".jpg,.jpeg,.png,.gif,.webp";
+//   picInput.style.display = "none";
+//   // picInput.entityType = entityType;
+
+//   if (mode === "edit") {
+//     picInput.disabled = true;
+//   }
+
+//   const uploadButton = document.createElement("button");
+//   uploadButton.type = "button";
+//   uploadButton.id = mode === "add" ? "upload-button" : "edit-upload-button";
+//   uploadButton.className = "upload-btn";
+//   uploadButton.textContent = mode === "add" ? "Choose Image" : "Change Image";
+//   uploadButton.setAttribute("data-label", mode === "add" ? "upload-click" : "edit-upload-click");
+//   uploadButton.entityType = entityType;
+
+//   if (mode === "edit") {
+//     uploadButton.disabled = true;
+//   }
+
+//   const uploadStatus = document.createElement("span");
+//   uploadStatus.id = mode === "add" ? "upload-status" : "edit-upload-status";
+//   uploadStatus.className = "upload-status";
+//   uploadStatus.style.marginLeft = "10px";
+//   uploadStatus.style.display = "none";
+
+//   uploadSection.append(picInput, uploadButton, uploadStatus);
+
+//   return uploadSection;
+// };
+
+// Modal Body
+// export const buildModalBody = async (mode, entityType) => {
+//   const body = document.createElement("div");
+//   body.className = "modal-body";
+
+//   // Add selector for edit mode
+//   if (mode === "edit") {
+//     const selector = entityType === "products" ? await buildAdminProductSelector() : await buildAdminEventSelector();
+//     body.append(selector);
+//   }
+
+//   if (entityType === "newsletter") {
+//     if (mode === "write") {
+//       const subjectField = await buildNewsletterSubject();
+//       const messageField = await buildNewsletterMessage();
+//       body.append(subjectField, messageField);
+//       return body;
+//     } else if (mode === "edit") {
+//       const mailingListSection = await buildMailingListSection();
+//       body.append(mailingListSection);
+//       return body;
+//     }
+//   }
+
+//   // Build form fields based on entity type
+//   if (entityType === "products") {
+//     const typePriceRow = document.createElement("div");
+//     typePriceRow.className = "form-row";
+
+//     const nameField = await buildProductName(mode);
+//     const typeField = await buildProductType(mode);
+//     const priceField = await buildProductPrice(mode);
+//     const shippingRow = await buildProductShippingRow(mode);
+//     const descriptionField = await buildProductDescription(mode);
+//     const dropDownRow = await buildProductDropDownRow(mode);
+//     const uploadSection = await buildAdminUpload(mode, entityType);
+
+//     typePriceRow.append(typeField, priceField);
+//     body.append(nameField, typePriceRow, dropDownRow, shippingRow, descriptionField, uploadSection);
+//     return body;
+//   }
+
+//   const nameField = await buildEventName(mode);
+//   const dateField = await buildEventDate(mode);
+//   const locationField = await buildEventLocation(mode);
+//   const descriptionField = await buildEventDescription(mode);
+//   const uploadSection = await buildAdminUpload(mode, entityType);
+
+//   body.append(nameField, dateField, locationField, descriptionField, uploadSection);
+
+//   return body;
+// };
+
+// Modal Actions
+// export const buildModalActions = async (mode, entityType) => {
+//   const actions = document.createElement("div");
+//   actions.className = "modal-actions";
+
+//   // Delete button for edit mode
+//   if (mode === "edit" && entityType !== "newsletter") {
+//     const deleteButton = document.createElement("button");
+//     deleteButton.className = "btn btn-admin-delete";
+//     deleteButton.type = "button";
+//     deleteButton.id = entityType === "products" ? "delete-product-button" : "delete-event-button";
+//     deleteButton.textContent = "Delete";
+//     deleteButton.disabled = true;
+//     deleteButton.setAttribute("data-label", entityType === "products" ? "delete-product-submit" : "delete-event-submit");
+//     actions.append(deleteButton);
+//   }
+
+//   // Cancel button
+//   const cancelButton = document.createElement("button");
+//   cancelButton.className = "btn btn-admin-cancel";
+//   cancelButton.type = "button";
+//   cancelButton.textContent = "Cancel";
+//   cancelButton.setAttribute("data-label", `close-modal-${mode}-${entityType}`);
+
+//   // Submit button (ridiculous from claude)
+//   const submitButton = document.createElement("button");
+//   submitButton.className = "btn btn-admin-submit";
+//   submitButton.type = "button";
+
+//   let submitId;
+//   let submitLabel;
+//   let submitText;
+
+//   if (entityType === "newsletter") {
+//     submitId = mode === "write" ? "send-newsletter-button" : "save-mailing-list-button";
+//     submitLabel = mode === "write" ? "send-newsletter-submit" : "save-mailing-list-submit";
+//     submitText = mode === "write" ? "Send Newsletter" : "Save Changes";
+//   } else if (entityType === "products") {
+//     submitId = mode === "add" ? "submit-button" : "edit-submit-button";
+//     submitLabel = mode === "add" ? "new-product-submit" : "edit-product-submit";
+//     submitText = mode === "add" ? "Submit" : "Update";
+//   } else {
+//     submitId = mode === "add" ? "event-submit-button" : "edit-event-submit-button";
+//     submitLabel = mode === "add" ? "new-event-submit" : "edit-event-submit";
+//     submitText = mode === "add" ? "Submit" : "Update";
+//   }
+//   submitButton.id = submitId;
+//   submitButton.textContent = submitText;
+//   submitButton.setAttribute("data-label", submitLabel);
+
+//   if (mode === "edit" && entityType !== "newsletter") {
 //     submitButton.disabled = true;
 //   }
 
-//   return submitButton;
+//   actions.append(cancelButton, submitButton);
+
+//   return actions;
 // };
+
+//+++++++++++++++++++++++++++++
