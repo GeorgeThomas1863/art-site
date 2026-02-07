@@ -2,6 +2,8 @@
 
 //confirm checkout page + shipping fully works.
 
+//add louis armstrong thing
+
 //change product inputs to include weight / dimensions / if shippable or pickup
 
 //build admin newsletter backend, get fully working
