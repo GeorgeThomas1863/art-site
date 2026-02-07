@@ -7,6 +7,8 @@ config/
 .env.*
 .env.*.local
 
+.claude
+
 # logs
 logs
 *.log
