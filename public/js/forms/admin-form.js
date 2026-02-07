@@ -267,7 +267,7 @@ export const buildModalBody = async (mode, entityType) => {
     const uploadSection = await buildAdminUpload(mode, entityType);
 
     typePriceRow.append(typeField, priceField);
-    body.append(nameField, typePriceRow, shippingRow, descriptionField, dropDownRow, uploadSection);
+    body.append(nameField, typePriceRow, dropDownRow, shippingRow, descriptionField, uploadSection);
     return body;
   }
 
@@ -469,11 +469,10 @@ export const buildProductShippingRow = async (mode) => {
   const shippingRow = document.createElement("div");
   shippingRow.className = "shipping-row";
 
-  const canShipField = await buildProductCanShip(mode);
   const dimensionsGroup = await buildProductDimensions(mode);
   const weightField = await buildProductWeight(mode);
 
-  shippingRow.append(canShipField, dimensionsGroup, weightField);
+  shippingRow.append(dimensionsGroup, weightField);
 
   return shippingRow;
 };
@@ -543,7 +542,7 @@ export const buildProductDimensions = async (mode) => {
 
 export const buildProductCanShip = async (mode) => {
   const canShipField = document.createElement("div");
-  canShipField.className = "can-ship-field";
+  canShipField.className = "drop-down-half";
 
   const canShipLabel = document.createElement("label");
   canShipLabel.className = "form-label";
@@ -607,12 +606,13 @@ export const buildProductDescription = async (mode) => {
 
 export const buildProductDropDownRow = async (mode) => {
   const dropDownRow = document.createElement("div");
-  dropDownRow.className = "form-row";
+  dropDownRow.className = "drop-down-row";
 
-  const adminDisplayToggle = await buildProductDisplayToggle(mode);
   const adminSoldToggle = await buildProductSoldToggle(mode);
+  const adminDisplayToggle = await buildProductDisplayToggle(mode);
+  const canShipField = await buildProductCanShip(mode);
 
-  dropDownRow.append(adminDisplayToggle, adminSoldToggle);
+  dropDownRow.append(adminSoldToggle, adminDisplayToggle, canShipField);
 
   return dropDownRow;
 };
