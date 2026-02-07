@@ -95,6 +95,8 @@ export const keyHandler = async (e) => {
   return true;
 };
 
+
+//FIX, standardize like others
 export const changeHandler = async (e) => {
   const changeElement = e.target;
   const changeId = changeElement.id;
@@ -113,6 +115,22 @@ export const changeHandler = async (e) => {
     const entityType = changeElement.entityType;
     await runUploadPic(pic, mode, entityType);
     return true;
+  }
+
+  // Status select color change
+  if (changeId === "display" || changeId === "sold" || changeId === "can-ship" ||
+      changeId === "edit-display" || changeId === "edit-sold" || changeId === "edit-can-ship") {
+    changeElement.classList.remove("status-yes", "status-no");
+    changeElement.classList.add(`status-${changeElement.value}`);
+
+    // Toggle shipping section visibility for can-ship
+    if (changeId === "can-ship" || changeId === "edit-can-ship") {
+      const mode = changeId.includes("edit") ? "edit" : "add";
+      const shippingSection = document.getElementById(`${mode}-shipping-section`);
+      if (shippingSection) {
+        shippingSection.style.display = changeElement.value === "yes" ? "block" : "none";
+      }
+    }
   }
 
   //entity selector

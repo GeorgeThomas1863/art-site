@@ -67,7 +67,15 @@ export const runUploadPic = async (pic, mode = "add", entityType = "products") =
 
   if (currentImage && currentImagePreview && data && data.filename) {
     currentImage.src = `/images/${entityType}/${data.filename}`;
+    currentImage.style.display = "block";
     currentImagePreview.style.display = "flex";
+
+    // Hide placeholder and show delete button
+    const placeholder = currentImagePreview.querySelector(".image-placeholder");
+    if (placeholder) placeholder.style.display = "none";
+
+    const deleteBtn = currentImagePreview.querySelector(".delete-image-btn");
+    if (deleteBtn) deleteBtn.style.display = "block";
   }
 
   return data;
@@ -116,8 +124,16 @@ export const runDeleteUploadImage = async (clickedElement) => {
   uploadStatus.textContent = "";
   uploadStatus.style.display = "none";
   currentImage.src = "";
+  currentImage.style.display = "none";
   currentImagePreview.style.display = "none";
   picInput.value = ""; // Clear the file input
+
+  // Show placeholder and hide delete button
+  const placeholder = currentImagePreview.querySelector(".image-placeholder");
+  if (placeholder) placeholder.style.display = "flex";
+
+  const deleteBtn = currentImagePreview.querySelector(".delete-image-btn");
+  if (deleteBtn) deleteBtn.style.display = "none";
 
   console.log("Image deleted");
 };

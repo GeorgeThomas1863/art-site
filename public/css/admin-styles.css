@@ -431,6 +431,18 @@
   cursor: not-allowed;
 }
 
+.status-select.status-yes {
+  background-color: #dcfce7;
+  color: #16a34a;
+  border-color: #16a34a;
+}
+
+.status-select.status-no {
+  background-color: #fee2e2;
+  color: #dc2626;
+  border-color: #dc2626;
+}
+
 .status-select option[value="yes"] {
   background: #dcfce7;
   color: #16a34a;

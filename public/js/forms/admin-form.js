@@ -424,6 +424,7 @@ export const buildProductStatusSection = async (mode) => {
 export const buildProductShippingSection = async (mode) => {
   const section = document.createElement("div");
   section.className = "product-section";
+  section.id = mode === "add" ? "add-shipping-section" : "edit-shipping-section";
 
   const header = document.createElement("div");
   header.className = "section-header";
@@ -614,6 +615,11 @@ export const buildStatusCard = async (mode, fieldName, labelText) => {
   }
 
   select.append(yesOption, noOption);
+
+  // Set initial color class
+  const initialValue = fieldName === "sold" ? "no" : "yes";
+  select.classList.add(`status-${initialValue}`);
+
   card.append(label, select);
 
   return card;
