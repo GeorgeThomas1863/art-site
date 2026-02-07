@@ -1,4 +1,4 @@
-//MOVE CAN SHIP TO ROW ABOVE, IF NO HIDE WEIGHT / DIMENSIONS
+//FINISH UP ADMIN FORM
 
 //confirm checkout page + shipping fully works.
 
