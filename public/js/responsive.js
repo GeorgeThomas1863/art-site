@@ -3,7 +3,7 @@ import { runAddNewProduct, runEditProduct, runDeleteProduct, changeAdminProductS
 import { runAddNewEvent, runEditEvent, runDeleteEvent, changeAdminEventSelector } from "./helpers/admin-events.js";
 import { runSendNewsletter, runAddSubscriber, runRemoveSubscriber } from "./helpers/admin-newsletter.js";
 import { runUploadClick, runUploadPic, runDeleteUploadImage } from "./helpers/upload-pic.js";
-import { changeProductsFilterButton } from "./helpers/products-run.js";
+import { changeProductsFilterButton, openProductDetailModal, closeProductDetailModal } from "./helpers/products-run.js";
 import { runContactSubmit } from "./helpers/contact-run.js";
 import { runEventsNewsletterToggle, runEventsNewsletterSubmit } from "./helpers/events-run.js";
 import { runAddToCart, runIncreaseQuantity, runDecreaseQuantity, runRemoveFromCart } from "./helpers/cart-run.js";
@@ -48,7 +48,13 @@ export const clickHandler = async (e) => {
 
   if (clickType === "category-filter-btn") await changeProductsFilterButton(clickElement);
 
-  if (clickType === "add-to-cart") await runAddToCart(clickElement);
+  if (clickType === "product-card-click") await openProductDetailModal(clickElement);
+  if (clickType === "close-product-modal") await closeProductDetailModal();
+
+  if (clickType === "add-to-cart") {
+    await runAddToCart(clickElement);
+    if (clickElement.closest(".product-detail-overlay")) await closeProductDetailModal();
+  }
   if (clickType === "increase-quantity") await runIncreaseQuantity(clickElement);
   if (clickType === "decrease-quantity") await runDecreaseQuantity(clickElement);
   if (clickType === "remove-from-cart") await runRemoveFromCart(clickElement);
@@ -80,6 +86,11 @@ export const clickHandler = async (e) => {
 };
 
 export const keyHandler = async (e) => {
+  if (e.key === "Escape") {
+    await closeProductDetailModal();
+    return;
+  }
+
   if (e.key !== "Enter") return null;
   if (e.target.tagName === "TEXTAREA") return null; //textarea
 

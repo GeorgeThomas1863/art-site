@@ -129,6 +129,7 @@ export const buildProductImage = async (productData) => {
 
   const productImage = document.createElement("img");
   productImage.className = "product-image";
+  productImage.setAttribute("data-label", "product-card-click");
   productImage.alt = productData.name;
 
   const picPath = `/images/products/${picData.filename}`;
@@ -180,6 +181,7 @@ export const buildAddToCartButton = async (productData) => {
 export const buildProductName = async (productData) => {
   const productName = document.createElement("h2");
   productName.className = "product-name";
+  productName.setAttribute("data-label", "product-card-click");
   productName.textContent = productData.name;
 
   return productName;
@@ -189,6 +191,7 @@ export const buildProductName = async (productData) => {
 export const buildProductPrice = async (productData) => {
   const productPrice = document.createElement("div");
   productPrice.className = "product-price";
+  productPrice.setAttribute("data-label", "product-card-click");
   productPrice.textContent = `$${productData.price}`;
 
   return productPrice;
@@ -198,6 +201,7 @@ export const buildProductPrice = async (productData) => {
 export const buildProductDescription = async (productData) => {
   const productDescription = document.createElement("p");
   productDescription.className = "product-description";
+  productDescription.setAttribute("data-label", "product-card-click");
   productDescription.textContent = productData.description;
 
   return productDescription;
@@ -207,6 +211,7 @@ export const buildProductDescription = async (productData) => {
 export const buildProductTypeBadge = async (productData) => {
   const productType = document.createElement("span");
   productType.className = "product-type";
+  productType.setAttribute("data-label", "product-card-click");
 
   // Convert camelCase to readable format
   const typeText = await formatProductType(productData.productType);
@@ -272,4 +277,72 @@ In each basket you will find the treasure of written words, strung together invo
 
 If you don't see what you are looking for, please contact us and we will see if we can create something special for you.
 `,
+};
+
+// Build product detail modal
+export const buildProductDetailModal = async (productData) => {
+  const overlay = document.createElement("div");
+  overlay.className = "product-detail-overlay";
+  overlay.setAttribute("data-label", "close-product-modal");
+
+  const wrapper = document.createElement("div");
+  wrapper.className = "product-detail-wrapper";
+
+  // Header with close button
+  const header = document.createElement("div");
+  header.className = "product-detail-header";
+
+  const closeBtn = document.createElement("button");
+  closeBtn.className = "product-detail-close";
+  closeBtn.setAttribute("data-label", "close-product-modal");
+  closeBtn.innerHTML = "&times;";
+  header.append(closeBtn);
+
+  // Body
+  const body = document.createElement("div");
+  body.className = "product-detail-body";
+
+  // Image
+  if (productData.picData) {
+    const img = document.createElement("img");
+    img.className = "product-detail-image";
+    img.src = `/images/products/${productData.picData.filename}`;
+    img.alt = productData.name;
+    body.append(img);
+  }
+
+  // Info section
+  const info = document.createElement("div");
+  info.className = "product-detail-info";
+
+  const name = document.createElement("h2");
+  name.className = "product-detail-name";
+  name.textContent = productData.name;
+
+  const price = document.createElement("div");
+  price.className = "product-detail-price";
+  price.textContent = `$${productData.price}`;
+
+  const description = document.createElement("p");
+  description.className = "product-detail-description";
+  description.textContent = productData.description;
+
+  const typeText = await formatProductType(productData.productType);
+  const typeBadge = document.createElement("span");
+  typeBadge.className = "product-detail-type";
+  typeBadge.textContent = typeText;
+
+  const addToCartBtn = document.createElement("button");
+  addToCartBtn.className = "add-to-cart-btn product-detail-cart-btn";
+  addToCartBtn.textContent = "Add to Cart";
+  addToCartBtn.productId = productData.productId;
+  addToCartBtn.setAttribute("data-label", "add-to-cart");
+
+  info.append(name, price, description, typeBadge, addToCartBtn);
+  body.append(info);
+
+  wrapper.append(header, body);
+  overlay.append(wrapper);
+
+  return overlay;
 };

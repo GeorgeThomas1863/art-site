@@ -1,4 +1,4 @@
-import { buildProductCard, buildCategoryDescription } from "../forms/products-form.js";
+import { buildProductCard, buildCategoryDescription, buildProductDetailModal } from "../forms/products-form.js";
 
 //store locally for filtering
 let productsArray = [];
@@ -115,4 +115,27 @@ export const updateCategoryDescription = async (category) => {
   if (filterBar) filterBar.insertAdjacentElement("afterend", newDescription);
 
   return true;
+};
+
+// Open product detail modal
+export const openProductDetailModal = async (clickElement) => {
+  const card = clickElement.closest(".product-card");
+  if (!card) return null;
+
+  const productId = card.getAttribute("data-product-id");
+  const productData = productsArray.find((p) => String(p.productId) === String(productId));
+  if (!productData) return null;
+
+  const modal = await buildProductDetailModal(productData);
+  const productsElement = document.getElementById("products-element");
+  productsElement.append(modal);
+
+  // Trigger reflow then add visible class for animation
+  requestAnimationFrame(() => modal.classList.add("visible"));
+};
+
+// Close product detail modal
+export const closeProductDetailModal = async () => {
+  const modal = document.querySelector(".product-detail-overlay");
+  if (modal) modal.remove();
 };
