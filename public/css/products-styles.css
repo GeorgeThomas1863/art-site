@@ -366,26 +366,3 @@
   font-size: 0.95rem;
   padding: 0.75rem 2rem;
 }
-
-/* Responsive */
-/* @media (max-width: 600px) {
-  .product-detail-overlay {
-    padding: 1rem;
-  }
-
-  .product-detail-image {
-    max-height: 300px;
-  }
-
-  .product-detail-info {
-    padding: 1rem 1.25rem 1.5rem;
-  }
-
-  .product-detail-name {
-    font-size: 1.25rem;
-  }
-
-  .product-detail-price {
-    font-size: 1.4rem;
-  }
-} */
