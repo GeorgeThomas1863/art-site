@@ -2,6 +2,8 @@
 
 //confirm checkout page + shipping fully works // BUILD SEND EMAIL CONFIRMATION
 
+//starting admin confirm
+
 //add louis armstrong thing
 
 //media queries
