@@ -81,11 +81,6 @@ export const runEditProduct = async () => {
   const popupText = `Product "${data.name}" updated successfully`;
   await displayPopup(popupText, "success");
 
-  const modal = document.querySelector(".modal-overlay");
-  if (modal) modal.remove();
-
-  //!!!!!FIX THIS BELOW (DONT WANT TO DESTROY ON SUBMIT)
-
   // Refresh the product data to reflect changes
   const productData = await sendToBack({ route: "/get-product-data-route" }, "GET");
   if (productData) {
@@ -186,6 +181,9 @@ export const populateAdminProductSelector = async (inputArray) => {
   if (defaultOption) {
     productSelector.append(defaultOption);
   }
+
+  // Sort by most recently added first
+  inputArray.sort((a, b) => new Date(b.dateCreated) - new Date(a.dateCreated));
 
   // Add all products as options
   for (let i = 0; i < inputArray.length; i++) {

@@ -67,9 +67,6 @@ export const runEditEvent = async () => {
   const popupText = `Event "${data.name}" updated successfully`;
   await displayPopup(popupText, "success");
 
-  const modal = document.querySelector(".modal-overlay");
-  if (modal) modal.remove();
-
   const eventData = await sendToBack({ route: "/get-event-data-route" }, "GET");
   if (eventData) {
     await populateAdminEventSelector(eventData);
@@ -168,6 +165,9 @@ export const populateAdminEventSelector = async (inputArray) => {
     eventSelector.append(defaultOption);
   }
 
+  // Sort by most recently added first
+  inputArray.sort((a, b) => new Date(b.dateCreated) - new Date(a.dateCreated));
+
   for (let i = 0; i < inputArray.length; i++) {
     const event = inputArray[i];
     console.log("EVENT");
@@ -216,7 +216,14 @@ export const populateEditFormEvents = async (inputObj) => {
   //set pic data to upload button (to get correct pic when submitting edit)
   editUploadButton.uploadData = picData;
   currentImage.src = `/images/events/${picData.filename}`;
+  currentImage.style.display = "block";
   currentImagePreview.style.display = "flex";
+
+  const deleteImageBtn = document.getElementById("edit-delete-image-btn");
+  if (deleteImageBtn) deleteImageBtn.style.display = "block";
+
+  const placeholder = currentImagePreview.querySelector(".image-placeholder");
+  if (placeholder) placeholder.style.display = "none";
 
   return true;
 };

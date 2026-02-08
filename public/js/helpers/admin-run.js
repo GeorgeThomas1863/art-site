@@ -29,11 +29,6 @@ export const runModalTrigger = async (clickElement) => {
   const modal = await buildModal(mode, entityType);
   adminElement.append(modal);
 
-  // console.log("MODAL");
-  // console.log(modal);
-
-  //HERE FIGURE OUT EVENTS
-
   // Load data for product edit
   if (mode === "edit" && entityType === "products") {
     const productData = await sendToBack({ route: "/get-product-data-route" }, "GET");

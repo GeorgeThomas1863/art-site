@@ -10,6 +10,8 @@
 
 //rotating pics on about?
 
+//media queries
+
 //-----------------
 
 //BUGS: price of items in cart needs to changed based on quantity

@@ -379,7 +379,7 @@ export const buildProductDetailsSection = async (mode) => {
   ]);
 
   // Price Row
-  const priceRow = await buildInfoRow(mode, "price", "Price");
+  const priceRow = await buildInfoRowPrice(mode, "price", "Price");
 
   // Description Row
   const descRow = await buildInfoRowTextarea(mode, "description", "Description");
@@ -508,6 +508,38 @@ export const buildInfoRow = async (mode, fieldName, labelText) => {
   const input = document.createElement("input");
   input.className = "info-content info-input";
   input.type = "text";
+  input.id = mode === "add" ? fieldName : `edit-${fieldName}`;
+  input.name = mode === "add" ? fieldName : `edit-${fieldName}`;
+
+  if (mode === "edit") {
+    input.disabled = true;
+  }
+
+  contentWrapper.append(input);
+  row.append(label, contentWrapper);
+
+  return row;
+};
+
+//--------------
+
+export const buildInfoRowPrice = async (mode, fieldName, labelText) => {
+  const row = document.createElement("div");
+  row.className = "info-row";
+
+  const label = document.createElement("div");
+  label.className = "info-label";
+  label.textContent = labelText;
+
+  const contentWrapper = document.createElement("div");
+  contentWrapper.className = "info-content-wrapper";
+
+  const input = document.createElement("input");
+  input.className = "info-content info-input";
+  input.type = "number";
+  input.min = "0";
+  input.step = "1.00";
+  input.placeholder = "0.00";
   input.id = mode === "add" ? fieldName : `edit-${fieldName}`;
   input.name = mode === "add" ? fieldName : `edit-${fieldName}`;
 
