@@ -35,13 +35,11 @@ export const runCalculateShipping = async (clickElement) => {
       return null;
     }
 
+    //product dimensions / weight calculated on backend
     const params = {
       route: "/shipping/calculate",
       zip: zip,
-      weight: 5, //CALC FROM CART DATA
-      width: 5, //CALC FROM CART DATA
-      length: 10, //CALC FROM CART DATA
-      height: 5, //CALC FROM CART DATA
+      productArray: cartData.cart,
     };
 
     const data = await sendToBack(params);
@@ -118,13 +116,18 @@ export const runCalculateShippingCheckout = async () => {
   await showLoadStatus(checkoutElement, "Calculating shipping rates, should take about 5-10 seconds");
 
   try {
+    const cartData = await sendToBack({ route: "/cart/data" }, "GET");
+    if (!cartData) {
+      await hideLoadStatus();
+      await displayPopup("Failed to get cart data", "error");
+      return null;
+    }
+
+    //product dimensions / weight calculated on backend
     const params = {
       route: "/shipping/calculate",
       zip: zip,
-      weight: 5,
-      width: 5,
-      length: 10,
-      height: 5,
+      productArray: cartData.cart,
     };
 
     const data = await sendToBack(params);

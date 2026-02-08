@@ -10,12 +10,15 @@ export const runAddToCart = async (clickElement) => {
 
   const productId = clickElement.productId;
 
-  // Find product data from the DOM //UNFUCK THIS
+  // Find product data from the DOM
   const productCard = document.querySelector(`[data-product-id="${productId}"]`);
   if (!productCard) {
     console.error("Product card not found");
     return null;
   }
+
+  console.log("PRODUCT CARD");
+  console.dir(productCard);
 
   const name = productCard.querySelector(".product-name")?.textContent;
   const priceText = productCard.querySelector(".product-price")?.textContent;

@@ -1,10 +1,10 @@
 //FINISH UP ADMIN FORM
 
+//if user has calculated shiping and changes order, recalculate shipping
+
 //confirm checkout page + shipping fully works.
 
 //add louis armstrong thing
-
-//change product inputs to include weight / dimensions / if shippable or pickup
 
 //build admin newsletter backend, get fully working
 

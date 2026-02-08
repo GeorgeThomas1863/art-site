@@ -8,6 +8,9 @@ export const buildCart = async (req) => {
 export const runAddToCart = async (req) => {
   await buildCart(req);
 
+  // console.log("ADD TO CART REQ BODY");
+  // console.dir(req.body);
+
   const { productId, quantity } = req.body.data;
 
   let existingItem = null;
@@ -31,8 +34,8 @@ export const runAddToCart = async (req) => {
     req.session.cart.push(req.body.data);
   }
 
-  console.log("ADD TO CART");
-  console.log(req.session.cart);
+  // console.log("ADD TO CART");
+  // console.log(req.session.cart);
 
   return { success: true, cart: req.session.cart, itemCount: itemCount };
 };

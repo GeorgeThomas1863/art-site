@@ -1,8 +1,54 @@
 import axios from "axios";
+import dbModel from "../models/db-model.js";
 
 export const runCalculateShipping = async (req) => {
-  if (!req || !req.body || !req.body.zip) return { success: false, message: "No ZIP code provided" };
-  const { zip, weight, length, width, height } = req.body;
+  if (!req || !req.body || !req.body.zip || !req.body.productArray) return { success: false, message: "No ZIP code or product array provided" };
+  const { zip, productArray } = req.body;
+
+  // console.log("PRODUCT ARRAY");
+  // console.log(productArray);
+
+  let totalWeight = 0;
+  let maxLength = 0;
+  let maxWidth = 0;
+  let maxHeight = 0;
+
+  for (const item of productArray) {
+    const { productId, quantity } = item;
+
+    const productModel = new dbModel({ keyToLookup: "productId", itemValue: productId }, process.env.PRODUCTS_COLLECTION);
+    const productData = await productModel.getUniqueItem();
+    if (!productData || !productData.canShip) continue;
+    console.log("PRODUCT DATA");
+    console.log(productData);
+    totalWeight += (productData.weight || 0) * quantity;
+
+    maxLength = Math.max(maxLength, productData.length || 0);
+    maxWidth = Math.max(maxWidth, productData.width || 0);
+    maxHeight = Math.max(maxHeight, productData.height || 0);
+  }
+
+  // Calculate girth and enforce 100" limit
+  let girth = 2 * (maxWidth + maxHeight);
+
+  if (girth > 100) {
+    // Cap girth at 100 by scaling down the two smaller dimensions proportionally
+    const scale = 100 / girth;
+    maxWidth *= scale;
+    maxHeight *= scale;
+    girth = 100;
+  }
+
+  console.log("WEIGHT");
+  console.log(totalWeight);
+  console.log("LENGTH");
+  console.log(maxLength);
+  console.log("WIDTH");
+  console.log(maxWidth);
+  console.log("HEIGHT");
+  console.log(maxHeight);
+  console.log("GIRTH");
+  console.log(girth);
 
   try {
     const usps = await getUSPS();
@@ -20,20 +66,20 @@ export const runCalculateShipping = async (req) => {
       to_country_code: "US",
       to_postal_code: zip,
       weight: {
-        value: weight,
+        value: totalWeight,
         unit: "pound",
       },
       dimensions: {
         unit: "inch",
-        length: length,
-        width: width,
-        height: height,
+        length: maxLength,
+        width: maxWidth,
+        height: maxHeight,
       },
       address_residential_indicator: "yes",
     };
 
-    console.log("RATE PARAMS");
-    console.log(rateParams);
+    // console.log("RATE PARAMS");
+    // console.log(rateParams);
 
     const res = await axios.post(rateURL, rateParams, {
       headers: {
@@ -42,8 +88,8 @@ export const runCalculateShipping = async (req) => {
       },
     });
 
-    console.log("RATE RESPONSE DATA");
-    console.log(res.data);
+    // console.log("RATE RESPONSE DATA");
+    // console.log(res.data);
 
     // Apply business adjustments before any processing
     const adjustedRates = await applyShippingAdjustments(res.data);
