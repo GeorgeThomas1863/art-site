@@ -76,6 +76,24 @@ export const runModalClose = async (clickElement) => {
   return true;
 };
 
+export const runChangeStatusCard = async (changeElement) => {
+  if (!changeElement) return null;
+
+  const changeId = changeElement.id;
+
+  changeElement.classList.remove("status-yes", "status-no");
+  changeElement.classList.add(`status-${changeElement.value}`);
+
+  // Toggle shipping section visibility for can-ship
+  if (changeId !== "can-ship" && changeId !== "edit-can-ship") return null;
+
+  const mode = changeId.includes("edit") ? "edit" : "add";
+  const shippingSection = document.getElementById(`${mode}-shipping-section`);
+  if (shippingSection) {
+    shippingSection.style.display = changeElement.value === "yes" ? "block" : "none";
+  }
+};
+
 //+++++++++++++++++++++++
 
 //FOR BOTH PRODUCTS AND EVENTS

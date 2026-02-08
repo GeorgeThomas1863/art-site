@@ -1,4 +1,4 @@
-import { runModalTrigger, runModalClose } from "./helpers/admin-run.js"; //prettier-ignore
+import { runModalTrigger, runModalClose, runChangeStatusCard } from "./helpers/admin-run.js"; //prettier-ignore
 import { runAddNewProduct, runEditProduct, runDeleteProduct, changeAdminProductSelector } from "./helpers/admin-products.js";
 import { runAddNewEvent, runEditEvent, runDeleteEvent, changeAdminEventSelector } from "./helpers/admin-events.js";
 import { runSendNewsletter, runAddSubscriber, runRemoveSubscriber } from "./helpers/admin-newsletter.js";
@@ -95,16 +95,18 @@ export const keyHandler = async (e) => {
   return true;
 };
 
-
 //FIX, standardize like others
 export const changeHandler = async (e) => {
   const changeElement = e.target;
   const changeId = changeElement.id;
+  const changeType = changeElement.getAttribute("data-label");
 
   console.log("CHANGE HANDLER");
   console.dir(changeElement);
   console.log("CHANGE ID");
   console.log(changeId);
+  console.log("CHANGE TYPE");
+  console.log(changeType);
 
   //Upload / Edit pic
   if (changeId === "upload-pic-input" || changeId === "edit-upload-pic-input") {
@@ -118,20 +120,7 @@ export const changeHandler = async (e) => {
   }
 
   // Status select color change
-  if (changeId === "display" || changeId === "sold" || changeId === "can-ship" ||
-      changeId === "edit-display" || changeId === "edit-sold" || changeId === "edit-can-ship") {
-    changeElement.classList.remove("status-yes", "status-no");
-    changeElement.classList.add(`status-${changeElement.value}`);
-
-    // Toggle shipping section visibility for can-ship
-    if (changeId === "can-ship" || changeId === "edit-can-ship") {
-      const mode = changeId.includes("edit") ? "edit" : "add";
-      const shippingSection = document.getElementById(`${mode}-shipping-section`);
-      if (shippingSection) {
-        shippingSection.style.display = changeElement.value === "yes" ? "block" : "none";
-      }
-    }
-  }
+  if (changeType === "display-card" || changeType === "sold-card" || changeType === "can-ship-card") await runChangeStatusCard(changeElement);
 
   //entity selector
   if (changeId === "entity-type-selector") await runEntityTypeChange(changeElement);
