@@ -50,7 +50,7 @@ export const runModalTrigger = async (clickElement) => {
   }
 
   if (mode === "edit" && entityType === "newsletter") {
-    const subscriberData = await sendToBack({ route: "/get-subscribers-route" }, "GET");
+    const subscriberData = await sendToBack({ route: "/newsletter/data" }, "GET");
     if (subscriberData && subscriberData.length) {
       await populateSubscriberList(subscriberData);
       await updateSubscriberStats(subscriberData);
@@ -247,7 +247,7 @@ export const clearAdminEditFields = async () => {
 export const updateAdminStats = async () => {
   const productData = await sendToBack({ route: "/get-product-data-route" }, "GET");
   const eventData = await sendToBack({ route: "/get-event-data-route" }, "GET");
-  const subscriberData = await sendToBack({ route: "/get-subscribers-route" }, "GET");
+  const subscriberData = await sendToBack({ route: "/newsletter/data" }, "GET");
 
   if (productData && productData.length) await updateProductStats(productData);
   if (eventData && eventData.length) await updateEventStats(eventData);

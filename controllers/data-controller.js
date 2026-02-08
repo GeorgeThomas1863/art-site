@@ -1,9 +1,15 @@
 import { runAddNewProduct, runEditProduct, runDeleteProduct, runGetProductData } from "../src/products.js";
 import { runAddNewEvent, runEditEvent, runDeleteEvent, runGetEventData } from "../src/events.js";
 import { runContactSubmit } from "../src/contact.js";
-import { runAddToNewsletter } from "../src/newsletter.js";
+import { runAddSubscriber, runGetSubscribers, runRemoveSubscriber, runSendNewsletter } from "../src/newsletter.js";
 import { buildCart, runGetCartStats, runAddToCart, runUpdateCartItem, runRemoveFromCart } from "../src/cart.js";
-import { runCalculateShipping, getShippingFromSession, saveShippingToSession, clearShippingFromSession, updateSelectedRate } from "../src/shipping.js";
+import {
+  runCalculateShipping,
+  getShippingFromSession,
+  saveShippingToSession,
+  clearShippingFromSession,
+  updateSelectedRate,
+} from "../src/shipping.js";
 import { placeNewOrder } from "../src/orders.js";
 import { runDeletePic } from "../src/upload-back.js";
 
@@ -239,12 +245,36 @@ export const contactSubmitControl = async (req, res) => {
   return res.json(data);
 };
 
-export const addToNewsletterControl = async (req, res) => {
+export const addSubscriberControl = async (req, res) => {
   if (!req || !req.body) return res.status(500).json({ error: "No input parameters" });
   if (!req.body.email) return res.status(500).json({ error: "No email provided" });
 
-  const data = await runAddToNewsletter(req.body.email);
+  const data = await runAddSubscriber(req.body.email);
   if (!data || !data.success) return res.status(500).json({ error: "Failed to add email to newsletter" });
+
+  return res.json(data);
+};
+
+export const getSubscribersControl = async (req, res) => {
+  const data = await runGetSubscribers();
+  return res.json(data);
+};
+
+export const sendNewsletterControl = async (req, res) => {
+  if (!req || !req.body) return res.status(500).json({ error: "No input parameters" });
+  if (!req.body.subject || !req.body.message) return res.status(500).json({ error: "No subject or message provided" });
+
+  const data = await runSendNewsletter(req.body);
+  if (!data || !data.success) return res.status(500).json({ error: "Failed to send newsletter" });
+
+  return res.json(data);
+};
+
+export const removeSubscriberControl = async (req, res) => {
+  if (!req || !req.body) return res.status(500).json({ error: "No input parameters" });
+
+  const data = await runRemoveSubscriber(req.body.email);
+  if (!data || !data.success) return res.status(500).json({ error: "Failed to remove subscriber" });
 
   return res.json(data);
 };

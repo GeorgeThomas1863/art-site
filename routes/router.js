@@ -45,7 +45,10 @@ import {
   getShippingControl,
   updateSelectedRateControl,
   contactSubmitControl,
-  addToNewsletterControl,
+  addSubscriberControl,
+  getSubscribersControl,
+  sendNewsletterControl,
+  removeSubscriberControl,
 } from "../controllers/data-controller.js";
 
 const router = express.Router();
@@ -111,7 +114,13 @@ router.post("/shipping/select", updateSelectedRateControl);
 //CONTACT ROUTES
 router.post("/contact-submit", contactSubmitControl);
 
-router.post("/newsletter/add", addToNewsletterControl);
+router.get("/newsletter/data", requireAuth, getSubscribersControl);
+
+router.post("/newsletter/add", addSubscriberControl);
+
+router.post("/newsletter/send", sendNewsletterControl);
+
+router.post("/newsletter/remove", requireAuth, removeSubscriberControl);
 
 //ORDER ROUTES
 router.post("/checkout/place-order", placeOrderControl);

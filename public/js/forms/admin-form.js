@@ -240,7 +240,7 @@ export const buildModalBody = async (mode, entityType) => {
   body.className = "modal-body";
 
   // Add selector for edit mode
-  if (mode === "edit") {
+  if (mode === "edit" && entityType !== "newsletter") {
     const selector = entityType === "products" ? await buildAdminProductSelector() : await buildAdminEventSelector();
     body.append(selector);
   }
@@ -305,7 +305,7 @@ export const buildModalActions = async (mode, entityType) => {
   const cancelButton = document.createElement("button");
   cancelButton.className = "btn btn-admin-cancel";
   cancelButton.type = "button";
-  cancelButton.textContent = "Cancel";
+  cancelButton.textContent = entityType === "newsletter" && mode === "edit" ? "Done" : "Cancel";
   cancelButton.setAttribute("data-label", `close-modal-${mode}-${entityType}`);
 
   // Submit button
@@ -338,7 +338,11 @@ export const buildModalActions = async (mode, entityType) => {
     submitButton.disabled = true;
   }
 
-  actions.append(cancelButton, submitButton);
+  if (entityType === "newsletter" && mode === "edit") {
+    actions.append(cancelButton);
+  } else {
+    actions.append(cancelButton, submitButton);
+  }
 
   return actions;
 };

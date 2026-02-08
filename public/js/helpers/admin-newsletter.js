@@ -17,7 +17,9 @@ export const runSendNewsletter = async () => {
     return null;
   }
 
-  const confirmMessage = "Are you sure you want to send this newsletter to all subscribers?";
+  const subscriberData = await sendToBack({ route: "/newsletter/data" }, "GET");
+  const subscriberCount = subscriberData ? subscriberData.length : 0;
+  const confirmMessage = `Are you sure you want to send this newsletter to your ${subscriberCount} subscriber${subscriberCount !== 1 ? "s" : ""}?`;
   const confirmDialog = await displayConfirmDialog(confirmMessage);
 
   if (!confirmDialog) return null;
@@ -65,7 +67,7 @@ export const runAddSubscriber = async () => {
   }
 
   const subscriberParams = {
-    route: "/add-subscriber-route",
+    route: "/newsletter/add",
     email: email,
   };
 
@@ -84,7 +86,9 @@ export const runAddSubscriber = async () => {
   emailInput.value = "";
 
   // Refresh subscriber list
-  const subscriberData = await sendToBack({ route: "/get-subscribers-route" }, "GET");
+  const subscriberData = await sendToBack({ route: "/newsletter/data" }, "GET");
+  console.log("SUBSCRIBER DATA");
+  console.dir(subscriberData);
   if (subscriberData) {
     await populateSubscriberList(subscriberData);
     await updateSubscriberStats(subscriberData);
@@ -106,7 +110,7 @@ export const runRemoveSubscriber = async (clickElement) => {
   if (!confirmDialog) return null;
 
   const removeParams = {
-    route: "/remove-subscriber-route",
+    route: "/newsletter/remove",
     email: email,
   };
 
@@ -122,7 +126,7 @@ export const runRemoveSubscriber = async (clickElement) => {
   await displayPopup(`Removed ${email} from mailing list`, "success");
 
   // Refresh subscriber list
-  const subscriberData = await sendToBack({ route: "/get-subscribers-route" }, "GET");
+  const subscriberData = await sendToBack({ route: "/newsletter/data" }, "GET");
   if (subscriberData) {
     await populateSubscriberList(subscriberData);
     await updateSubscriberStats(subscriberData);

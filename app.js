@@ -1,16 +1,12 @@
-//FINISH UP ADMIN FORM; test events, newsletter
+//if user has calculated shiping ands changes order, recalculate shipping
 
-//if user has calculated shiping and changes order, recalculate shipping
-
-//confirm checkout page + shipping fully works.
+//confirm checkout page + shipping fully works // BUILD SEND EMAIL CONFIRMATION
 
 //add louis armstrong thing
 
-//build admin newsletter backend, get fully working
-
-//rotating pics on about?
-
 //media queries
+
+//RUN SECURITY AUDIT, esp on USER INPUTS
 
 //-----------------
 
@@ -19,6 +15,8 @@
 //number of events at bottom not updating correctly
 
 //fix square styles for card input
+
+//rotating pics on about?
 
 import dotenv from "dotenv";
 

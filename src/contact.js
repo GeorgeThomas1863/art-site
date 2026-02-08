@@ -1,6 +1,6 @@
 import nodemailer from "nodemailer";
 import dbModel from "../models/db-model.js";
-import { runAddToNewsletter } from "./newsletter.js";
+import { runAddSubscriber } from "./newsletter.js";
 
 export const runContactSubmit = async (inputParams) => {
   if (!inputParams) return { success: false, message: "No input parameters" };
@@ -12,7 +12,7 @@ export const runContactSubmit = async (inputParams) => {
   const { name, email, subject, message, newsletter } = inputParams;
 
   if (newsletter) {
-    const newsletterData = await runAddToNewsletter(email);
+    const newsletterData = await runAddSubscriber(email);
     if (!newsletterData || !newsletterData.success) {
       if (newsletterData.message !== "Email already subscribed") {
         return { success: false, message: "Failed to add email to newsletter" };
