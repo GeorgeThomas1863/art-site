@@ -25,7 +25,12 @@ export const buildDashboardHeader = async () => {
   subtitle.className = "dashboard-subtitle";
   subtitle.textContent = "Manage your products and events";
 
-  header.append(title, subtitle);
+  const viewBtn = document.createElement("button");
+  viewBtn.className = "btn";
+  viewBtn.textContent = "View Products";
+  viewBtn.setAttribute("data-label", "view-products-btn");
+
+  header.append(title, subtitle, viewBtn);
 
   return header;
 };
@@ -454,8 +459,8 @@ export const buildProductShippingSection = async (mode) => {
   const heightItem = await buildShippingItem(mode, "height", "Height");
   const weightItem = await buildShippingItem(mode, "weight", "Weight");
 
-  col1.append(lengthItem, widthItem);
-  col2.append(heightItem, weightItem);
+  col1.append(lengthItem, widthItem, heightItem);
+  col2.append(weightItem);
 
   shippingLayout.append(col1, col2);
   section.append(header, shippingLayout);

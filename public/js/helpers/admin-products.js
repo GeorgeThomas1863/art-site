@@ -203,17 +203,17 @@ export const populateAdminProductSelector = async (inputArray) => {
 export const populateEditFormProducts = async (inputObj) => {
   if (!inputObj) return null;
 
-  const { name, productType, price, description, display, sold, picData } = inputObj;
+  const { name, productType, price, description, display, sold, picData, canShip, length, width, height, weight } = inputObj;
 
   const adminEditMapArray = [
     { id: "edit-name", value: name },
     { id: "edit-product-type", value: productType },
     { id: "edit-price", value: price },
-    { id: "edit-can-ship", value: canShip },
-    { id: "edit-length", value: length },
-    { id: "edit-width", value: width },
-    { id: "edit-height", value: height },
-    { id: "edit-weight", value: weight },
+    { id: "edit-can-ship", value: canShip || "yes" },
+    { id: "edit-length", value: length || 5 },
+    { id: "edit-width", value: width || 5 },
+    { id: "edit-height", value: height || 5 },
+    { id: "edit-weight", value: weight || 5 },
     { id: "edit-description", value: description },
     { id: "edit-display", value: display },
     { id: "edit-sold", value: sold },
@@ -243,7 +243,14 @@ export const populateEditFormProducts = async (inputObj) => {
   //set pic data to upload button (to get correct pic when submitting edit)
   editUploadButton.uploadData = picData;
   currentImage.src = `/images/products/${picData.filename}`;
+  currentImage.style.display = "block";
   currentImagePreview.style.display = "flex";
+
+  const deleteImageBtn = document.getElementById("edit-delete-image-btn");
+  if (deleteImageBtn) deleteImageBtn.style.display = "block";
+
+  const placeholder = currentImagePreview.querySelector(".image-placeholder");
+  if (placeholder) placeholder.style.display = "none";
 
   return true;
 };
