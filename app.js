@@ -1,4 +1,6 @@
-//FINISH UP ADMIN FORM
+//Build page or popup for product detils
+
+//FINISH UP ADMIN FORM; test events, newsletter
 
 //if user has calculated shiping and changes order, recalculate shipping
 
@@ -7,8 +9,6 @@
 //add louis armstrong thing
 
 //build admin newsletter backend, get fully working
-
-//Build page or popup for product details
 
 //rotating pics on about?
 
