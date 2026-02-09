@@ -1,7 +1,6 @@
-//if user has calculated shiping ands changes order, recalculate shipping
+// BUILD SEND EMAIL CONFIRMATION (finish) //confirm checkout page + shipping fully works
 
-//reverting
-//confirm checkout page + shipping fully works // BUILD SEND EMAIL CONFIRMATION
+//if user has calculated shiping ands changes order, recalculate shipping
 
 //starting admin confirm
 

@@ -1,33 +1,32 @@
+import dbModel from "../models/db-model.js";
 import { runGetCartStats } from "./cart.js";
 import { processPayment } from "./payments.js";
-import dbModel from "../models/db-model.js";
+import { storeCustomerData } from "./customer.js";
 
 export const placeNewOrder = async (req) => {
   if (!req || !req.body) return { success: false, message: "No input parameters" };
   const inputParams = req.body;
 
-  const cart = await runGetCartStats(req);
-  if (!cart || !cart.success || !cart.total) return { success: false, message: "Failed to get cart data" };
-
-  // console.log("RUN PLACE ORDER");
-  // console.log("INPUT PARAMS");
-  // console.log(inputParams);
-  // console.log("CART");
-  // console.log(cart);
+  const cartStats = await runGetCartStats(req);
+  if (!cartStats || !cartStats.total) return { success: false, message: "Failed to get cart data" };
 
   //TEST THIS
-  const data = await processPayment(cart.total, inputParams);
-  // console.log("PROCESS PAYMENT DATA");
-  // console.log(data);
-  if (!data || !data.success) return { success: false, message: "Failed to process payment" };
+  const data = await processPayment(cartStats.total, inputParams);
+  if (!data || !data.success || !data.payment) return { success: false, message: "Failed to process payment" };
 
-  const orderData = await storeOrderData(data.payment, cart, inputParams);
+  data.cartData = req.session.cart;
+  data.cartStats = cartStats;
+
+  console.log("DATA");
+  console.log(data);
+
+  //HERE!!!!!, get shipping data?, finish confirm email
+
+  const orderData = await storeOrderData(data, inputParams);
   // console.log("STORE ORDER DATA");
   // console.log(orderData);
 
-  const customerData = await storeCustomerData(orderData, cart, inputParams);
-  // console.log("CUSTOMER DATA");
-  // console.log(customerData);
+  const customerData = await storeCustomerData(orderData, cartStats, inputParams);
   if (!customerData) return { success: false, message: "Failed to store customer data" };
 
   const returnParams = {
@@ -36,7 +35,7 @@ export const placeNewOrder = async (req) => {
     paymentData: data.payment,
     orderData: orderData,
     customerData: customerData,
-    cartData: req.session.cart, //TEST
+    cartData: cartData,
   };
 
   console.log("RETURN PARAMS");
@@ -45,11 +44,12 @@ export const placeNewOrder = async (req) => {
   return returnParams;
 };
 
-export const storeOrderData = async (payment, cart, inputParams) => {
-  if (!payment || !cart || !inputParams) return null;
+export const storeOrderData = async (paymentData, inputParams) => {
+  if (!paymentData || !inputParams) return null;
 
   const { route, paymentToken, ...customerObj } = inputParams;
-  const { total, itemCount } = cart;
+  const { cartData, cartStats, payment } = paymentData;
+  const { total, itemCount } = cartStats;
   const { id: paymentId, orderId: squareOrderId, status, createdAt, totalMoney, approvedMoney, billingAddress, riskEvaluation, delayAction, delayedUntil, receiptNumber, receiptUrl } = payment; //prettier-ignore
 
   const orderNumber = await getOrderNumber();
@@ -107,96 +107,6 @@ export const storeOrderData = async (payment, cart, inputParams) => {
   const returnObj = { ...startParams, ...updateParams };
 
   return returnObj;
-};
-
-export const storeCustomerData = async (orderData, cart, inputParams) => {
-  if (!inputParams || !orderData || !cart) return null;
-  const { firstName, lastName, email, phone, address, city, state, zip } = inputParams;
-  const { orderId, orderDate, amountPaid } = orderData;
-  const { itemCount } = cart;
-
-  const customerParams = {
-    firstName: firstName,
-    lastName: lastName,
-    email: email,
-    phone: phone,
-    address: address,
-    city: city,
-    state: state,
-    zip: zip,
-    lastOrderId: orderId,
-    lastOrderDate: orderDate,
-    lastAmountPaid: +amountPaid,
-    totalPaid: +amountPaid,
-    totalItemsPurchased: +itemCount,
-    totalOrders: 1,
-  };
-
-  //check if customer already exists, returns null if not
-  const updateData = await updateCustomerData(customerParams);
-  if (updateData) return customerParams;
-
-  //otherwise create new customer
-  const newCustomerModel = new dbModel({ firstOrderDate: orderDate }, process.env.CUSTOMERS_COLLECTION);
-  const newCustomerData = await newCustomerModel.storeAny();
-
-  console.log("NEW CUSTOMER DATA");
-  console.log(newCustomerData);
-  if (!newCustomerData) return null;
-  const customerId = newCustomerData.insertedId?.toString() || null;
-  if (!customerId) return null;
-
-  console.log("CUSTOMER ID");
-  console.log(customerId);
-
-  customerParams.customerId = customerId;
-
-  const storeModel = new dbModel(
-    { keyToLookup: "_id", itemValue: newCustomerData.insertedId, updateObj: customerParams },
-    process.env.CUSTOMERS_COLLECTION
-  );
-  const storeData = await storeModel.updateObjItem();
-  if (!storeData) return null;
-  return customerParams;
-};
-
-export const updateCustomerData = async (inputParams) => {
-  if (!inputParams) return null;
-  const { firstName, lastName, address, lastOrderId, lastOrderDate, lastAmountPaid, totalPaid, totalItemsPurchased } = inputParams;
-
-  const checkParams = {
-    keyToLookup1: "firstName",
-    keyToLookup2: "lastName",
-    keyToLookup3: "address",
-    itemValue1: firstName,
-    itemValue2: lastName,
-    itemValue3: address,
-  };
-
-  const checkModel = new dbModel(checkParams, process.env.CUSTOMERS_COLLECTION);
-  const checkData = await checkModel.matchMultiItems();
-
-  console.log("CHECK DATA");
-  console.log(checkData);
-  if (!checkData) return null;
-
-  //otherwise update
-  const updateParams = {
-    lastOrderId: lastOrderId,
-    lastOrderDate: lastOrderDate,
-    lastAmountPaid: +lastAmountPaid,
-    totalPaid: +(Number(checkData.totalPaid || 0) + Number(totalPaid)),
-    totalItemsPurchased: +(Number(checkData.totalItemsPurchased || 0) + Number(totalItemsPurchased)),
-    totalOrders: +(Number(checkData.totalOrders || 0) + 1),
-  };
-
-  const updateModel = new dbModel(
-    { keyToLookup: "customerId", itemValue: checkData.customerId, updateObj: updateParams },
-    process.env.CUSTOMERS_COLLECTION
-  );
-  const updateData = await updateModel.updateObjItem();
-  if (!updateData) return null;
-  return updateParams;
 };
 
 //----------
