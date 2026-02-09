@@ -21,17 +21,13 @@ export const placeNewOrder = async (req) => {
   console.log("PROCESS PAYMENT DATA");
   console.log(data);
 
-  const shippingDataRaw = await getShippingFromSession(req);
+  const shippingData = await getShippingFromSession(req);
   if (!shippingData || !shippingData.shipping || !shippingData.shipping.selectedRate) {
     return { success: false, message: "Failed to get shipping data" };
   }
 
-  const shippingData = await applyShippingAdjustments(shippingDataRaw.shipping.selectedRate);
-
-  //HERE
-  console.log("SELECTED RATE");
-  console.log(shippingData);
-
+  //store just selected shipping rate
+  const selectedRate = shippingData.shipping.selectedRate;
   const orderData = await storeOrderData(data.payment, cart, inputParams, selectedRate);
   console.log("STORE ORDER DATA");
   console.log(orderData);
@@ -41,7 +37,7 @@ export const placeNewOrder = async (req) => {
   console.log(customerData);
   if (!customerData) return { success: false, message: "Failed to store customer data" };
 
-  // const confirmationData = await sendConfirmationEmails(orderData, cart);
+  const confirmationData = await sendConfirmationEmails(orderData, cart);
 
   // const returnParams = {
   //   success: true,
