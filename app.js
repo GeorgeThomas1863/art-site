@@ -12,7 +12,7 @@
 
 //-----------------
 
-//BUGS: price of items in cart needs to changed based on quantity
+//BUGS: in cart price of items themselves need to changed based on quantity
 
 //number of events at bottom not updating correctly
 
