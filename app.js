@@ -1,5 +1,6 @@
 //if user has calculated shiping ands changes order, recalculate shipping
 
+//reverting
 //confirm checkout page + shipping fully works // BUILD SEND EMAIL CONFIRMATION
 
 //starting admin confirm
@@ -12,7 +13,7 @@
 
 //-----------------
 
-//BUGS: in cart price of items themselves need to changed based on quantity
+//BUGS: price of items in cart needs to changed based on quantity
 
 //number of events at bottom not updating correctly
 
