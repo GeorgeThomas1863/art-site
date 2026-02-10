@@ -80,8 +80,8 @@ export const runDeleteEvent = async (eventId) => {
   const checkModel = new dbModel(checkParams, process.env.EVENTS_COLLECTION);
   const checkData = await checkModel.getUniqueItem();
   if (!checkData) return { success: false, message: "Event not found" };
-  console.log("CHECK DATA");
-  console.log(checkData);
+  // console.log("CHECK DATA");
+  // console.log(checkData);
 
   const params = {
     keyToLookup: "eventId",

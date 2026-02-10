@@ -189,29 +189,21 @@ export const updateCheckoutSummary = async () => {
 
   subtotalElement.textContent = `$${cartData.total.toFixed(2)}`;
 
-  const shippingData = await sendToBack({ route: "/shipping/data" }, "GET");
-
-  if (!shippingData || !shippingData.shipping) {
-    await displayPopup("Failed to get shipping data", "error");
-    return null;
-  }
-
-  let shippingCost = 0;
-  if (shippingData.shipping.selectedRate) {
-    shippingCost = shippingData.shipping.selectedRate.shipping_amount.amount;
-    shippingElement.textContent = `$${shippingCost.toFixed(2)}`;
-  } else {
-    shippingElement.textContent = "[Input Zip Code]";
-  }
-
-  if (shippingData.shipping.zip) {
-    zipElement.value = shippingData.shipping.zip;
-  }
-
-  //maybe move to backend?
+  //move to backend later
   const taxRate = 0.08;
   const tax = cartData.total * taxRate;
   taxElement.textContent = `$${tax.toFixed(2)}`;
+
+  const shippingData = await sendToBack({ route: "/shipping/data" }, "GET");
+
+  let shippingCost = 0;
+  if (shippingData && shippingData.shipping && shippingData.shipping.selectedRate) {
+    shippingCost = shippingData.shipping.selectedRate.shipping_amount.amount;
+    shippingElement.textContent = `$${shippingCost.toFixed(2)}`;
+    zipElement.value = shippingData.shipping.zip;
+  } else {
+    shippingElement.textContent = "[Input Zip Code]";
+  }
 
   const finalTotal = cartData.total + tax + shippingCost;
   totalElement.textContent = `$${finalTotal.toFixed(2)}`;

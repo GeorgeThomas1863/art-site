@@ -50,8 +50,8 @@ export const runEditProduct = async (inputParams) => {
   const checkModel = new dbModel(checkParams, process.env.PRODUCTS_COLLECTION);
   const checkData = await checkModel.getUniqueItem();
   if (!checkData) return { success: false, message: "Product not found" };
-  console.log("CHECK DATA");
-  console.log(checkData);
+  // console.log("CHECK DATA");
+  // console.log(checkData);
 
   //otherwise update
   const editParams = {
@@ -81,8 +81,8 @@ export const runDeleteProduct = async (productId) => {
   const checkModel = new dbModel(checkParams, process.env.PRODUCTS_COLLECTION);
   const checkData = await checkModel.getUniqueItem();
   if (!checkData) return { success: false, message: "Product not found" };
-  console.log("CHECK DATA");
-  console.log(checkData);
+  // console.log("CHECK DATA");
+  // console.log(checkData);
 
   const params = {
     keyToLookup: "productId",

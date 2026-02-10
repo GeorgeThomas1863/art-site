@@ -1,5 +1,9 @@
 // BUILD SEND EMAIL CONFIRMATION (finish) //confirm checkout page + shipping fully works
 
+//shipping totals in checkout page are off / selected shipping option when checkout loads fucked
+
+//changeconfirm email to admin to include more shipping info
+
 //if user has calculated shiping ands changes order, recalculate shipping
 
 //starting admin confirm

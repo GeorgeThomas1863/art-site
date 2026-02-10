@@ -54,10 +54,10 @@ export const updateCustomerData = async (inputParams) => {
 
   const checkModel = new dbModel(checkParams, process.env.CUSTOMERS_COLLECTION);
   const checkData = await checkModel.matchMultiItems();
-
-  console.log("CHECK DATA");
-  console.log(checkData);
   if (!checkData) return null;
+
+  // console.log("CHECK DATA");
+  // console.log(checkData);
 
   //otherwise update
   const updateParams = {
