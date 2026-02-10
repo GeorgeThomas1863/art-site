@@ -1,10 +1,9 @@
 import dbModel from "../models/db-model.js";
 
-export const storeCustomerData = async (orderData, cart, inputParams) => {
-  if (!inputParams || !orderData || !cart) return null;
-  const { firstName, lastName, email, phone, address, city, state, zip } = inputParams;
-  const { orderId, orderDate, amountPaid } = orderData;
-  const { itemCount } = cart;
+export const storeCustomerData = async (orderData) => {
+  if (!orderData) return null;
+  const { customerData: customer, orderId, orderDate, amountPaid, itemCount } = orderData;
+  const { firstName, lastName, email, phone, address, city, state, zip } = customer;
 
   const customerParams = {
     firstName: firstName,
@@ -27,27 +26,16 @@ export const storeCustomerData = async (orderData, cart, inputParams) => {
   const updateData = await updateCustomerData(customerParams);
   if (updateData) return customerParams;
 
-  //otherwise create new customer
-  const newCustomerModel = new dbModel({ firstOrderDate: orderDate }, process.env.CUSTOMERS_COLLECTION);
+  const newCustomerModel = new dbModel(customerParams, process.env.CUSTOMERS_COLLECTION);
   const newCustomerData = await newCustomerModel.storeAny();
+  if (!newCustomerData || !newCustomerData.insertedId) return null;
 
   console.log("NEW CUSTOMER DATA");
   console.log(newCustomerData);
-  if (!newCustomerData) return null;
-  const customerId = newCustomerData.insertedId?.toString() || null;
-  if (!customerId) return null;
 
-  console.log("CUSTOMER ID");
-  console.log(customerId);
+  customerParams.customerId = newCustomerData.insertedId.toString();
+  console.log("CUSTOMER ID:", customerParams.customerId);
 
-  customerParams.customerId = customerId;
-
-  const storeModel = new dbModel(
-    { keyToLookup: "_id", itemValue: newCustomerData.insertedId, updateObj: customerParams },
-    process.env.CUSTOMERS_COLLECTION
-  );
-  const storeData = await storeModel.updateObjItem();
-  if (!storeData) return null;
   return customerParams;
 };
 

@@ -108,6 +108,7 @@ export const buildConfirmItemsSection = async () => {
   summaryDetails.className = "confirm-summary-details";
 
   const subtotalRow = await buildSummaryRow("Subtotal:", "$0.00", "confirm-subtotal");
+  const shippingRow = await buildSummaryRow("Shipping:", "$0.00", "confirm-shipping");
   const taxRow = await buildSummaryRow("Tax:", "$0.00", "confirm-tax");
 
   const totalRow = document.createElement("div");
@@ -123,7 +124,7 @@ export const buildConfirmItemsSection = async () => {
   totalValue.textContent = "$0.00";
 
   totalRow.append(totalLabel, totalValue);
-  summaryDetails.append(subtotalRow, taxRow, totalRow);
+  summaryDetails.append(subtotalRow, shippingRow, taxRow, totalRow);
 
     // Receipt Link
     const receiptLink = document.createElement("a");

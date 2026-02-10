@@ -1,25 +1,18 @@
 import SQ from "../middleware/square-config.js";
 import { randomUUID } from "crypto";
 
-export const processPayment = async (cost, inputParams) => {
-  if (!cost || !inputParams) return null;
+export const processPayment = async (totalInCents, inputParams) => {
+  if (!totalInCents || !inputParams) return null;
   const { paymentToken, address, city, state, zip, firstName, lastName, email } = inputParams;
-
-  //INSERT TAX CLOUD API HERE
-  const taxRate = 0.08;
-  const tax = cost * taxRate;
-  const totalCost = cost + tax;
-
-  const costInCents = Math.round(totalCost * 100);
 
   const paymentParams = {
     sourceId: paymentToken,
-    idempotencyKey: randomUUID(), //maybe change
+    idempotencyKey: randomUUID(),
     amountMoney: {
-      amount: BigInt(costInCents),
+      amount: BigInt(totalInCents),
       currency: "USD",
     },
-    locationId: process.env.SQUARE_LOCATION_ID, //SET FOR PROD
+    locationId: process.env.SQUARE_LOCATION_ID,
     buyerEmailAddress: email,
     billingAddress: {
       addressLine1: address,
@@ -29,7 +22,7 @@ export const processPayment = async (cost, inputParams) => {
       firstName: firstName,
       lastName: lastName,
     },
-    note: `Order from ${firstName} ${lastName} for ${totalCost}`,
+    note: `Order from ${firstName} ${lastName} — $${(totalInCents / 100).toFixed(2)}`,
   };
 
   console.log("PAYMENT PARAMS");
@@ -39,14 +32,12 @@ export const processPayment = async (cost, inputParams) => {
   console.log("PAYMENT RESPONSE");
   console.log(data);
 
-  //throw error?
   if (!data || !data.payment) {
     console.error("PAYMENT FAILED WHEN SENT TO SQUARE");
-    console.error(res);
+    console.error(data);
     return null;
   }
   data.success = true;
 
-  //maybe send entire payment obj back
   return data;
 };

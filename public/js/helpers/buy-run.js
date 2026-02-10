@@ -241,17 +241,12 @@ export const populateConfirmOrder = async () => {
   await displayOrderDetails(data);
   await displayOrderItems(data);
 
-  //clear cart on success
-  if (data.orderData.paymentStatus === "COMPLETED") {
-    await sendToBack({ route: "/cart/clear" });
-  }
-
   return true;
 };
 
 export const displayOrderDetails = async (inputData) => {
   if (!inputData || !inputData.orderData || !inputData.customerData) return null;
-  const { orderId, orderDate, paymentStatus, itemCost, tax, totalCost, receiptURL } = inputData.orderData;
+  const { orderId, orderDate, paymentStatus, itemCost, shippingCost, tax, totalCost, receiptURL } = inputData.orderData;
   const { firstName, lastName, email, address, city, state, zip } = inputData.customerData;
 
   const formElements = {
@@ -262,6 +257,7 @@ export const displayOrderDetails = async (inputData) => {
     receiptLink: "receipt-link",
     shippingAddress: "shipping-address",
     subtotal: "confirm-subtotal",
+    shipping: "confirm-shipping",
     tax: "confirm-tax",
     total: "confirm-total",
   };
@@ -280,6 +276,7 @@ export const displayOrderDetails = async (inputData) => {
 
   obj.email.textContent = email;
   obj.subtotal.textContent = `$${itemCost.toFixed(2)}`;
+  obj.shipping.textContent = `$${shippingCost.toFixed(2)}`;
   obj.tax.textContent = `$${tax.toFixed(2)}`;
   obj.total.textContent = `$${totalCost.toFixed(2)}`;
 
