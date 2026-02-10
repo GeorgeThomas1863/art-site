@@ -2,7 +2,9 @@
 
 //shipping totals in checkout page are off / selected shipping option when checkout loads fucked
 
-//changeconfirm email to admin to include more shipping info
+//change confirm email to admin to include more shipping info
+
+//change confirm email to user to NOT include order number  and to include mroe arrival info
 
 //if user has calculated shiping ands changes order, recalculate shipping
 
