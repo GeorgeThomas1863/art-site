@@ -289,7 +289,7 @@ export const buildShippingSection = async () => {
   const calculateBtn = document.createElement("button");
   calculateBtn.className = "shipping-calculator-btn";
   calculateBtn.id = "cart-shipping-calculate-btn";
-  calculateBtn.textContent = "Calculate Shipping";
+  calculateBtn.textContent = "Estimate Shipping";
   calculateBtn.setAttribute("data-label", "calculate-shipping");
 
   shippingForm.append(zipInput, calculateBtn);

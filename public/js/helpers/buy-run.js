@@ -41,12 +41,12 @@ export const runPlaceOrder = async () => {
     console.dir(customerParams);
 
     // Send to backend
-    const data = await sendToBack(customerParams);
-    console.log("DATA");
-    console.dir(data);
+    const orderData = await sendToBack(customerParams);
+    console.log("RUN PLACE ORDER — ORDER DATA");
+    console.dir(orderData);
 
     //fail
-    if (!data || !data.success) {
+    if (!orderData || !orderData.success) {
       const errorContainer = document.getElementById("payment-error");
       if (!errorContainer) return null;
 
@@ -58,7 +58,7 @@ export const runPlaceOrder = async () => {
     }
 
     //store returned data and redirect
-    sessionStorage.setItem("orderData", JSON.stringify(data));
+    sessionStorage.setItem("orderData", JSON.stringify(orderData));
     window.location.href = `/confirm-order`;
   } catch (e) {
     console.error("Error processing order:", e);
@@ -231,22 +231,22 @@ export const populateConfirmOrder = async () => {
     return null;
   }
 
-  const data = JSON.parse(orderDataStr);
+  const orderData = JSON.parse(orderDataStr);
 
-  console.log("DATA");
-  console.dir(data);
+  console.log("POPULATE CONFIRM ORDER — ORDER DATA");
+  console.dir(orderData);
 
   sessionStorage.removeItem("orderData");
 
-  await displayOrderDetails(data);
-  await displayOrderItems(data);
+  await displayOrderDetails(orderData.data);
+  await displayOrderItems(orderData.data);
 
   return true;
 };
 
 export const displayOrderDetails = async (inputData) => {
-  if (!inputData || !inputData.orderData || !inputData.customerData) return null;
-  const { orderId, orderDate, paymentStatus, itemCost, shippingCost, tax, totalCost, receiptURL } = inputData.orderData;
+  if (!inputData || !inputData.customerData) return null;
+  const { orderId, orderNumber, orderDate, paymentStatus, itemCost, shippingCost, tax, totalCost, receiptURL } = inputData;
   const { firstName, lastName, email, address, city, state, zip } = inputData.customerData;
 
   const formElements = {

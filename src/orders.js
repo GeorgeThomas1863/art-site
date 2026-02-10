@@ -63,30 +63,33 @@ export const placeNewOrder = async (req) => {
     const customerData = await storeCustomerData(orderData);
     if (!customerData) return { success: false, message: "Failed to store customer data" };
 
-    const confirmationData = await sendOrderConfirmationEmails(orderData);
-    if (!confirmationData || !confirmationData.success) return { success: false, message: "Failed to send confirmation emails" };
+    const emailResult = await sendOrderConfirmationEmails(orderData);
+    if (!emailResult.buyerSent || !emailResult.adminSent) {
+      console.error("EMAIL ISSUE — buyer:", emailResult.buyerSent, "admin:", emailResult.adminSent);
+    }
 
     req.session.cart = [];
     req.session.shipping = null;
 
-    const { orderId, orderNumber, orderDate, paymentStatus, itemCost, receiptURL } = orderData;
-    return {
+    const returnObj = {
       success: true,
       message: "Order placed successfully",
-      orderData: {
-        orderId,
-        orderNumber,
-        orderDate,
-        paymentStatus,
-        itemCost,
+      data: {
+        orderId: orderData.orderId,
+        orderNumber: orderData.orderNumber,
+        orderDate: orderData.orderDate,
+        paymentStatus: orderData.paymentStatus,
+        itemCost: orderData.itemCost,
         shippingCost: orderData.shippingCost,
         tax: orderData.tax,
         totalCost: orderData.totalCost,
-        receiptURL,
+        receiptURL: orderData.receiptURL,
+        customerData: orderData.customerData,
+        cartData: orderData.items,
       },
-      customerData: orderData.customerData,
-      cartData: orderData.items,
     };
+
+    return returnObj;
   } catch (e) {
     console.error("ORDER ERROR:", e);
     return { success: false, message: "Failed to place order" };
@@ -127,7 +130,73 @@ export const getOrderNumber = async () => {
 //----------
 
 export const sendOrderConfirmationEmails = async (orderData) => {
-  const { orderNumber, orderDate, itemCost, shippingCost, tax, totalCost, receiptURL, items, customerData } = orderData;
+  const { email, firstName, lastName } = orderData.customerData;
+  const { orderNumber } = orderData;
+
+  let buyerSent = false;
+  let adminSent = false;
+
+  const buyerHtml = buildEmailHtml(orderData, "buyer");
+  const adminHtml = buildEmailHtml(orderData, "admin");
+
+  const transport = nodemailer.createTransport({
+    service: process.env.EMAIL_SERVICE,
+    auth: {
+      user: process.env.EMAIL_USER,
+      pass: process.env.EMAIL_PASSWORD,
+    },
+  });
+
+  try {
+    await transport.sendMail({
+      from: process.env.EMAIL_USER,
+      to: email,
+      subject: `Order Confirmation — #${orderNumber}`,
+      html: buyerHtml,
+    });
+    buyerSent = true;
+    console.log("BUYER EMAIL SENT — order #" + orderNumber);
+  } catch (error) {
+    console.error("BUYER EMAIL ERROR:", error);
+  }
+
+  try {
+    await transport.sendMail({
+      from: process.env.EMAIL_USER,
+      to: process.env.EMAIL_RECIPIENT,
+      subject: `New Order — #${orderNumber} from ${firstName} ${lastName}`,
+      html: adminHtml,
+    });
+    adminSent = true;
+    console.log("ADMIN EMAIL SENT — order #" + orderNumber);
+  } catch (error) {
+    console.error("ADMIN EMAIL ERROR:", error);
+  }
+
+  return { buyerSent, adminSent };
+};
+
+//----------
+
+const buildEmailHtml = (orderData, type) => {
+  const {
+    orderNumber,
+    orderDate,
+    itemCost,
+    shippingCost,
+    tax,
+    totalCost,
+    receiptURL,
+    items,
+    customerData,
+    paymentId,
+    squareOrderId,
+    risk,
+    billingAddress,
+    receiptNumber,
+    amountPaid,
+    currency,
+  } = orderData;
   const { firstName, lastName, email, address, city, state, zip } = customerData;
 
   const formattedDate = new Date(orderDate).toLocaleDateString("en-US", {
@@ -147,10 +216,38 @@ export const sendOrderConfirmationEmails = async (orderData) => {
     </tr>`;
   }
 
-  const emailHtml = `
+  const isAdmin = type === "admin";
+  const header = isAdmin
+    ? `<h2>New Order — #${orderNumber}</h2>
+      <p><strong>Customer:</strong> ${firstName} ${lastName} (${email})</p>`
+    : `<h2>Order Confirmation — #${orderNumber}</h2>
+      <p>Thank you for your order, ${firstName} ${lastName}!</p>`;
+
+  let paymentSection = "";
+  if (isAdmin) {
+    const billingLine = billingAddress
+      ? `${billingAddress.addressLine1 || ""}${billingAddress.addressLine2 ? ", " + billingAddress.addressLine2 : ""}, ${
+          billingAddress.locality || ""
+        }, ${billingAddress.administrativeDistrictLevel1 || ""} ${billingAddress.postalCode || ""}, ${billingAddress.country || ""}`
+      : "N/A";
+
+    paymentSection = `
+      <hr style="margin: 24px 0; border: none; border-top: 1px solid #ccc;">
+
+      <h3>Payment Details</h3>
+      <table style="width: 100%; border-collapse: collapse;">
+        <tr><td style="padding: 4px 8px;"><strong>Payment ID:</strong></td><td style="padding: 4px 8px;">${paymentId}</td></tr>
+        <tr><td style="padding: 4px 8px;"><strong>Square Order ID:</strong></td><td style="padding: 4px 8px;">${squareOrderId}</td></tr>
+        <tr><td style="padding: 4px 8px;"><strong>Risk Level:</strong></td><td style="padding: 4px 8px;">${risk || "N/A"}</td></tr>
+        <tr><td style="padding: 4px 8px;"><strong>Billing Address:</strong></td><td style="padding: 4px 8px;">${billingLine}</td></tr>
+        <tr><td style="padding: 4px 8px;"><strong>Receipt Number:</strong></td><td style="padding: 4px 8px;">${receiptNumber}</td></tr>
+        <tr><td style="padding: 4px 8px;"><strong>Amount Paid:</strong></td><td style="padding: 4px 8px;">$${amountPaid} ${currency}</td></tr>
+      </table>`;
+  }
+
+  return `
     <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
-      <h2>Order Confirmation — #${orderNumber}</h2>
-      <p>Thank you for your order, ${firstName} ${lastName}!</p>
+      ${header}
       <p><strong>Date:</strong> ${formattedDate}</p>
 
       <h3>Items</h3>
@@ -175,37 +272,9 @@ export const sendOrderConfirmationEmails = async (orderData) => {
       <h3>Shipping Address</h3>
       <p>${firstName} ${lastName}<br>${address}<br>${city}, ${state} ${zip}</p>
 
+      ${paymentSection}
+
       ${receiptURL ? `<p><a href="${receiptURL}">View Receipt on Square</a></p>` : ""}
     </div>
   `;
-
-  const transport = nodemailer.createTransport({
-    service: process.env.EMAIL_SERVICE,
-    auth: {
-      user: process.env.EMAIL_USER,
-      pass: process.env.EMAIL_PASSWORD,
-    },
-  });
-
-  try {
-    await Promise.all([
-      transport.sendMail({
-        from: process.env.EMAIL_USER,
-        to: email,
-        subject: `Order Confirmation — #${orderNumber}`,
-        html: emailHtml,
-      }),
-      transport.sendMail({
-        from: process.env.EMAIL_USER,
-        to: process.env.EMAIL_RECIPIENT,
-        subject: `New Order — #${orderNumber} from ${firstName} ${lastName}`,
-        html: emailHtml,
-      }),
-    ]);
-    console.log("ORDER EMAILS SENT — order #" + orderNumber);
-    return { success: true };
-  } catch (error) {
-    console.error("ORDER EMAIL ERROR:", error);
-    return { success: false };
-  }
 };

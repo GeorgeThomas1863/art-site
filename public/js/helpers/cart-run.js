@@ -288,7 +288,7 @@ export const updateCartSummary = async (shippingCost = 0) => {
   if (shippingCost > 0) {
     shippingElement.textContent = `$${shippingCost.toFixed(2)}`;
   } else {
-    shippingElement.textContent = "[Calculate below]";
+    shippingElement.textContent = "[Estimate below]";
   }
 
   const finalTotal = total + shippingCost;
