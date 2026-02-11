@@ -131,6 +131,7 @@ export const buildCartItem = async (itemData) => {
   const cartItem = document.createElement("div");
   cartItem.className = "cart-item";
   cartItem.setAttribute("data-product-id", itemData.productId);
+  cartItem.setAttribute("data-price", itemData.price);
 
   const itemImage = await buildCartItemImage(itemData);
   const itemDetails = await buildCartItemDetails(itemData);

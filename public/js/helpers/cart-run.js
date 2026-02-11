@@ -308,11 +308,8 @@ export const updateItemTotal = async (productId, quantity) => {
   const cartItem = document.querySelector(`[data-product-id="${productId}"]`);
   if (!cartItem) return null;
 
-  const priceElement = cartItem.querySelector(".cart-item-price");
-  if (!priceElement) return null;
-
-  const priceText = priceElement.textContent;
-  const price = parseFloat(priceText.replace("$", ""));
+  const price = parseFloat(cartItem.dataset.price);
+  if (isNaN(price)) return null;
 
   const total = price * quantity;
   itemTotalElement.textContent = `$${total.toFixed(2)}`;
