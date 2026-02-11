@@ -9,6 +9,7 @@ import { runEventsNewsletterToggle, runEventsNewsletterSubmit } from "./helpers/
 import { runAddToCart, runIncreaseQuantity, runDecreaseQuantity, runRemoveFromCart } from "./helpers/cart-run.js";
 import { runPlaceOrder } from "./helpers/buy-run.js";
 import { runCalculateShipping, runShippingOptionSelect, runCheckoutShippingOptionSelect, runCalculateShippingCheckout } from "./helpers/shipping-calc.js"; //prettier-ignore
+import { runToggleAudio } from "./helpers/about-run.js";
 import { runAuthSubmit, runPwToggle } from "./auth.js";
 import { closePopup, closeConfirmDialog } from "./util/popup.js";
 import debounce from "./util/debounce.js";
@@ -20,6 +21,7 @@ const productsElement = document.getElementById("products-element");
 const eventsElement = document.getElementById("events-element");
 const contactElement = document.getElementById("contact-element");
 const cartElement = document.getElementById("cart-element");
+const aboutElement = document.getElementById("about-element");
 const checkoutElement = document.getElementById("checkout-element");
 
 export const clickHandler = async (e) => {
@@ -69,6 +71,8 @@ export const clickHandler = async (e) => {
 
   if (clickType === "events-newsletter-checkbox") await runEventsNewsletterToggle(clickElement);
   if (clickType === "events-newsletter-submit") await runEventsNewsletterSubmit();
+
+  if (clickType === "toggle-audio") await runToggleAudio();
 
   if (clickType === "contact-submit") await runContactSubmit();
 
@@ -189,6 +193,10 @@ if (contactElement) {
   contactElement.addEventListener("click", clickHandler);
   contactElement.addEventListener("keydown", keyHandler);
   contactElement.addEventListener("change", changeHandler);
+}
+
+if (aboutElement) {
+  aboutElement.addEventListener("click", clickHandler);
 }
 
 if (cartElement) {

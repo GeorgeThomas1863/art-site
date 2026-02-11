@@ -75,9 +75,34 @@ export const buildAboutText = async () => {
   const aboutTitle = await buildAboutTitle();
   const aboutParagraph = await buildAboutParagraph();
 
-  aboutText.append(aboutTitle, aboutParagraph);
+  const audioPlayer = buildAudioPlayer();
+  aboutText.append(aboutTitle, aboutParagraph, audioPlayer);
 
   return aboutText;
+};
+
+export const buildAudioPlayer = () => {
+  const container = document.createElement("div");
+  container.className = "audio-player";
+  container.setAttribute("data-label", "toggle-audio");
+
+  const btn = document.createElement("div");
+  btn.className = "audio-play-btn";
+  btn.setAttribute("data-label", "toggle-audio");
+
+  const icon = document.createElement("div");
+  icon.className = "audio-icon-play";
+  icon.setAttribute("data-label", "toggle-audio");
+
+  btn.appendChild(icon);
+
+  const title = document.createElement("span");
+  title.className = "audio-song-title";
+  title.textContent = "What a Wonderful World — Louis Armstrong";
+  title.setAttribute("data-label", "toggle-audio");
+
+  container.append(btn, title);
+  return container;
 };
 
 // Build title
