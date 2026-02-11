@@ -1,5 +1,3 @@
-//change confirm email to user to NOT include order number  and to include mroe arrival info
-
 //add louis armstrong thing
 
 //finalize frontend display main page / products / about

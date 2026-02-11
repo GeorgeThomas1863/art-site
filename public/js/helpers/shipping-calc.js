@@ -25,7 +25,7 @@ export const runCalculateShipping = async (clickElement) => {
 
   const cartElement = document.getElementById("cart-element");
   if (!cartElement) return null;
-  await showLoadStatus(cartElement, "Calculating shipping rates, should take about 5-10 seconds");
+  await showLoadStatus(cartElement, "Calculating shipping rates, should take 5-10 seconds");
 
   try {
     const cartData = await sendToBack({ route: "/cart/data" }, "GET");

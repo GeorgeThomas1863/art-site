@@ -59,7 +59,7 @@ export const buildConfirmDetails = async () => {
   detailsGrid.className = "confirm-details-grid";
 
   // Order Number
-  const orderNumberRow = await buildDetailRow("Order Number", "Loading...", "order-number");
+  const orderNumberRow = await buildDetailRow("Receipt Number", "Loading...", "order-number");
 
   // Order Date
   const orderDateRow = await buildDetailRow("Order Date", "Loading...", "order-date");

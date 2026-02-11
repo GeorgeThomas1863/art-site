@@ -170,7 +170,7 @@ export const buildCheckoutSummarySection = async () => {
   summaryDetails.className = "checkout-summary-details";
 
   const subtotalRow = await buildSummaryRow("Subtotal:", "$0.00", "checkout-subtotal");
-  const shippingRow = await buildSummaryRow("Shipping:", "[Input Zip Code]", "checkout-shipping");
+  const shippingRow = await buildSummaryRow("Shipping:", "[Input ZIP Code]", "checkout-shipping");
   const taxRow = await buildSummaryRow("Tax:", "$0.00", "checkout-tax");
 
   const totalRow = document.createElement("div");

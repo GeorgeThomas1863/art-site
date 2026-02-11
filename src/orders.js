@@ -84,7 +84,7 @@ export const placeNewOrder = async (req) => {
       message: "Order placed successfully",
       data: {
         orderId: orderData.orderId,
-        orderNumber: orderData.orderNumber,
+        receiptNumber: orderData.receiptNumber,
         orderDate: orderData.orderDate,
         paymentStatus: orderData.paymentStatus,
         itemCost: orderData.itemCost,
@@ -140,7 +140,10 @@ export const getOrderNumber = async () => {
 
 export const sendOrderConfirmationEmails = async (orderData) => {
   const { email, firstName, lastName } = orderData.customerData;
-  const { orderNumber } = orderData;
+  const { orderNumber, receiptNumber } = orderData;
+
+  console.log("ORDER DATA");
+  console.log(orderData);
 
   let buyerSent = false;
   let adminSent = false;
@@ -160,11 +163,11 @@ export const sendOrderConfirmationEmails = async (orderData) => {
     await transport.sendMail({
       from: process.env.EMAIL_USER,
       to: email,
-      subject: `Order Confirmation — #${orderNumber}`,
+      subject: `Order Confirmation — Receipt #${receiptNumber}`,
       html: buyerHtml,
     });
     buyerSent = true;
-    console.log("BUYER EMAIL SENT — order #" + orderNumber);
+    console.log("BUYER EMAIL SENT — receipt #" + receiptNumber);
   } catch (error) {
     console.error("BUYER EMAIL ERROR:", error);
   }
@@ -173,11 +176,11 @@ export const sendOrderConfirmationEmails = async (orderData) => {
     await transport.sendMail({
       from: process.env.EMAIL_USER,
       to: process.env.EMAIL_RECIPIENT,
-      subject: `New Order — #${orderNumber} from ${firstName} ${lastName}`,
+      subject: `New Order — Receipt #${receiptNumber} from ${firstName} ${lastName}`,
       html: adminHtml,
     });
     adminSent = true;
-    console.log("ADMIN EMAIL SENT — order #" + orderNumber);
+    console.log("ADMIN EMAIL SENT — receipt #" + receiptNumber);
   } catch (error) {
     console.error("ADMIN EMAIL ERROR:", error);
   }
@@ -202,8 +205,12 @@ const buildShippingSection = (details, isAdmin) => {
       <table style="width: 100%; border-collapse: collapse;">
         <tr><td style="padding: 4px 8px;"><strong>Carrier:</strong></td><td style="padding: 4px 8px;">${details.carrier || "N/A"}</td></tr>
         <tr><td style="padding: 4px 8px;"><strong>Service:</strong></td><td style="padding: 4px 8px;">${details.serviceType || "N/A"}</td></tr>
-        <tr><td style="padding: 4px 8px;"><strong>Estimated Delivery Days:</strong></td><td style="padding: 4px 8px;">${details.deliveryDays || "N/A"}</td></tr>
-        <tr><td style="padding: 4px 8px;"><strong>Estimated Delivery Date:</strong></td><td style="padding: 4px 8px;">${formattedDate || "N/A"}</td></tr>
+        <tr><td style="padding: 4px 8px;"><strong>Estimated Delivery Days:</strong></td><td style="padding: 4px 8px;">${
+          details.deliveryDays || "N/A"
+        }</td></tr>
+        <tr><td style="padding: 4px 8px;"><strong>Estimated Delivery Date:</strong></td><td style="padding: 4px 8px;">${
+          formattedDate || "N/A"
+        }</td></tr>
       </table>`;
   }
 
@@ -256,7 +263,7 @@ const buildEmailHtml = (orderData, type) => {
   const header = isAdmin
     ? `<h2>New Order — #${orderNumber}</h2>
       <p><strong>Customer:</strong> ${firstName} ${lastName} (${email})</p>`
-    : `<h2>Order Confirmation — #${orderNumber}</h2>
+    : `<h2>Order Confirmation — #${receiptNumber}</h2>
       <p>Thank you for your order, ${firstName} ${lastName}!</p>`;
 
   let paymentSection = "";

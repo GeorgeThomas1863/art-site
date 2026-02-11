@@ -4,6 +4,7 @@ import { buildSquarePayment, tokenizePaymentMethod } from "./square-payment.js";
 import { getCustomerParams } from "../util/params.js";
 import { buildConfirmItem } from "../forms/confirm-form.js";
 import { displayPopup } from "../util/popup.js";
+import { showLoadStatus, hideLoadStatus } from "../util/loading.js";
 
 //main purchase function
 export const runPlaceOrder = async () => {
@@ -19,6 +20,9 @@ export const runPlaceOrder = async () => {
   placeOrderBtn.disabled = true;
   placeOrderBtn.textContent = "Processing...";
 
+  const checkoutElement = document.getElementById("checkout-element");
+  await showLoadStatus(checkoutElement, "Processing your order, should take 5-10 seconds");
+
   try {
     // Get payment token from Square
     const paymentToken = await tokenizePaymentMethod();
@@ -27,6 +31,7 @@ export const runPlaceOrder = async () => {
 
     if (!paymentToken) {
       // Error already displayed by tokenizePaymentMethod
+      await hideLoadStatus();
       placeOrderBtn.disabled = false;
       placeOrderBtn.textContent = "Place Order";
       return null;
@@ -47,6 +52,7 @@ export const runPlaceOrder = async () => {
 
     //fail
     if (!orderData || !orderData.success) {
+      await hideLoadStatus();
       const errorContainer = document.getElementById("payment-error");
       if (!errorContainer) return null;
 
@@ -58,10 +64,12 @@ export const runPlaceOrder = async () => {
     }
 
     //store returned data and redirect
+    await hideLoadStatus();
     sessionStorage.setItem("orderData", JSON.stringify(orderData));
     window.location.href = `/confirm-order`;
   } catch (e) {
     console.error("Error processing order:", e);
+    await hideLoadStatus();
     const errorContainer = document.getElementById("payment-error");
     if (!errorContainer) return null;
     errorContainer.textContent = "An error occurred. Please try again.";
@@ -202,7 +210,7 @@ export const updateCheckoutSummary = async () => {
     shippingElement.textContent = `$${shippingCost.toFixed(2)}`;
     zipElement.value = shippingData.shipping.zip;
   } else {
-    shippingElement.textContent = "[Input Zip Code]";
+    shippingElement.textContent = "[Input ZIP Code]";
   }
 
   const finalTotal = cartData.total + tax + shippingCost;
@@ -238,7 +246,7 @@ export const populateConfirmOrder = async () => {
 
 export const displayOrderDetails = async (inputData) => {
   if (!inputData || !inputData.customerData) return null;
-  const { orderId, orderNumber, orderDate, paymentStatus, itemCost, shippingCost, tax, totalCost, receiptURL } = inputData;
+  const { orderId, receiptNumber, orderDate, paymentStatus, itemCost, shippingCost, tax, totalCost, receiptURL } = inputData;
   const { firstName, lastName, email, address, city, state, zip } = inputData.customerData;
 
   const formElements = {
@@ -266,7 +274,7 @@ export const displayOrderDetails = async (inputData) => {
     }
   }
 
-  obj.orderNumber.textContent = orderId;
+  obj.orderNumber.textContent = receiptNumber;
 
   obj.email.textContent = email;
   obj.subtotal.textContent = `$${itemCost.toFixed(2)}`;
