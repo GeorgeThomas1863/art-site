@@ -161,7 +161,7 @@ export const loadCheckoutShippingOptions = async () => {
 
     const radio = optionElement.querySelector("input[type='radio']");
     // Pre-select: either the saved selection OR the first (cheapest) option
-    if (selectedRate && selectedRate.service_code === rate.service_code) {
+    if (selectedRate && selectedRate.rateId === rate.rateId) {
       if (radio) radio.checked = true;
     } else if (i === 0 && !selectedRate) {
       if (radio) radio.checked = true;

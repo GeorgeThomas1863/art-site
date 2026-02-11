@@ -94,6 +94,10 @@ export const runCalculateShipping = async (req) => {
     // Apply business adjustments before any processing
     const adjustedRates = await applyShippingAdjustments(res.data);
 
+    for (let i = 0; i < adjustedRates.length; i++) {
+      adjustedRates[i].rateId = i;
+    }
+
     let cheapestRate = null;
     for (let i = 0; i < adjustedRates.length; i++) {
       const rate = adjustedRates[i];

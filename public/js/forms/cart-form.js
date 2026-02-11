@@ -312,7 +312,7 @@ export const buildShippingOption = async (rateData) => {
   const radioInput = document.createElement("input");
   radioInput.type = "radio";
   radioInput.name = "shipping-option";
-  radioInput.id = `shipping-${rateData.service_code}`;
+  radioInput.id = `shipping-${rateData.rateId}`;
   radioInput.className = "shipping-option-radio";
   radioInput.value = rateData.shipping_amount.amount;
 

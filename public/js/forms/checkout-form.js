@@ -242,7 +242,7 @@ export const buildCheckoutShippingOption = async (rateData) => {
   const radioInput = document.createElement("input");
   radioInput.type = "radio";
   radioInput.name = "checkout-shipping-option";
-  radioInput.id = `checkout-shipping-${rateData.service_code}`;
+  radioInput.id = `checkout-shipping-${rateData.rateId}`;
   radioInput.className = "checkout-shipping-option-radio";
   radioInput.value = rateData.shipping_amount.amount;
 
