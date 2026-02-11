@@ -132,8 +132,8 @@ export const applyShippingAdjustments = async (rateArray) => {
     }
     if (rate.estimated_delivery_date) {
       const deliveryDate = new Date(rate.estimated_delivery_date);
-      deliveryDate.setDate(deliveryDate.getDate() + 2);
-      rate.estimated_delivery_date = deliveryDate.toISOString();
+      deliveryDate.setUTCDate(deliveryDate.getUTCDate() + 2);
+      rate.estimated_delivery_date = deliveryDate.toISOString().split("T")[0];
     }
     if (rate.shipping_amount && rate.shipping_amount.amount !== undefined) {
       rate.shipping_amount.amount = rate.shipping_amount.amount + 2;

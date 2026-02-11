@@ -1,30 +1,16 @@
-// BUILD SEND EMAIL CONFIRMATION (finish) //confirm checkout page + shipping fully works
-
-//shipping totals in checkout page are off / selected shipping option when checkout loads fucked
-
-//change confirm email to admin to include more shipping info
-
 //change confirm email to user to NOT include order number  and to include mroe arrival info
 
-//if user has calculated shiping ands changes order, recalculate shipping
-
-//starting admin confirm
-
 //add louis armstrong thing
+
+//finalize frontend display main page / products / about
 
 //media queries
 
 //RUN SECURITY AUDIT, esp on USER INPUTS
 
-//-----------------
-
-//BUGS: price of items in cart needs to changed based on quantity
-
-//number of events at bottom not updating correctly
-
-//fix square styles for card input
-
 //rotating pics on about?
+
+//-----------------
 
 import dotenv from "dotenv";
 

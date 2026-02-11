@@ -327,7 +327,11 @@ export const buildShippingOption = async (rateData) => {
 
   const nameSpan = document.createElement("span");
   nameSpan.className = "shipping-option-name";
-  nameSpan.textContent = `${rateData.carrier_friendly_name} - ${rateData.service_type}`;
+  let label = `${rateData.carrier_friendly_name} - ${rateData.service_type}`;
+  if (rateData.package_type && rateData.package_type !== "package") {
+    label += ` (${rateData.package_type.replace(/_/g, " ")})`;
+  }
+  nameSpan.textContent = label;
   nameSpan.setAttribute("data-label", "shipping-option-select");
 
   const priceSpan = document.createElement("span");

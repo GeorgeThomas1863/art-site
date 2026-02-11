@@ -16,7 +16,8 @@ export const placeNewOrder = async (req) => {
     return { success: false, message: "No shipping rate selected" };
   }
 
-  const shippingCost = +Number(req.session.shipping.selectedRate.shipping_amount.amount).toFixed(2);
+  const selectedRate = req.session.shipping.selectedRate;
+  const shippingCost = +Number(selectedRate.shipping_amount.amount).toFixed(2);
   if (!shippingCost) return { success: false, message: "Failed to get shipping cost" };
 
   const cartStats = await runGetCartStats(req);
@@ -55,6 +56,13 @@ export const placeNewOrder = async (req) => {
       risk: payment.riskEvaluation?.riskLevel || null,
       receiptNumber: payment.receiptNumber,
       receiptURL: payment.receiptUrl,
+      shippingDetails: {
+        carrier: selectedRate.carrier_friendly_name,
+        serviceType: selectedRate.service_type,
+        deliveryDays: selectedRate.delivery_days,
+        estimatedDelivery: selectedRate.estimated_delivery_date,
+        cost: shippingCost,
+      },
     };
 
     const orderData = await storeOrderData(orderObj);
@@ -86,6 +94,7 @@ export const placeNewOrder = async (req) => {
         receiptURL: orderData.receiptURL,
         customerData: orderData.customerData,
         cartData: orderData.items,
+        shippingDetails: orderData.shippingDetails,
       },
     };
 
@@ -178,6 +187,32 @@ export const sendOrderConfirmationEmails = async (orderData) => {
 
 //----------
 
+const formatDeliveryDate = (dateStr) => {
+  if (!dateStr) return null;
+  const date = new Date(dateStr + "T00:00:00");
+  return date.toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric" });
+};
+
+const buildShippingSection = (details, isAdmin) => {
+  const formattedDate = formatDeliveryDate(details.estimatedDelivery);
+
+  if (isAdmin) {
+    return `
+      <h3>Shipping Method</h3>
+      <table style="width: 100%; border-collapse: collapse;">
+        <tr><td style="padding: 4px 8px;"><strong>Carrier:</strong></td><td style="padding: 4px 8px;">${details.carrier || "N/A"}</td></tr>
+        <tr><td style="padding: 4px 8px;"><strong>Service:</strong></td><td style="padding: 4px 8px;">${details.serviceType || "N/A"}</td></tr>
+        <tr><td style="padding: 4px 8px;"><strong>Estimated Delivery Days:</strong></td><td style="padding: 4px 8px;">${details.deliveryDays || "N/A"}</td></tr>
+        <tr><td style="padding: 4px 8px;"><strong>Estimated Delivery Date:</strong></td><td style="padding: 4px 8px;">${formattedDate || "N/A"}</td></tr>
+      </table>`;
+  }
+
+  return `
+    <h3>Shipping Method</h3>
+    <p>${details.carrier || ""} ${details.serviceType || ""}</p>
+    ${formattedDate ? `<p><strong>Estimated Delivery:</strong> ${formattedDate}</p>` : ""}`;
+};
+
 const buildEmailHtml = (orderData, type) => {
   const {
     orderNumber,
@@ -189,6 +224,7 @@ const buildEmailHtml = (orderData, type) => {
     receiptURL,
     items,
     customerData,
+    shippingDetails,
     paymentId,
     squareOrderId,
     risk,
@@ -271,6 +307,8 @@ const buildEmailHtml = (orderData, type) => {
 
       <h3>Shipping Address</h3>
       <p>${firstName} ${lastName}<br>${address}<br>${city}, ${state} ${zip}</p>
+
+      ${shippingDetails ? buildShippingSection(shippingDetails, isAdmin) : ""}
 
       ${paymentSection}
 

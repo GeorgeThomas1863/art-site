@@ -82,7 +82,15 @@ export const buildConfirmDetails = async () => {
   shippingAddress.id = "shipping-address";
   shippingAddress.textContent = "Loading...";
 
-  detailsCard.append(cardTitle, detailsGrid, shippingTitle, shippingAddress);
+  // Shipping Method Section
+  const shippingMethodTitle = document.createElement("h3");
+  shippingMethodTitle.className = "confirm-subsection-title";
+  shippingMethodTitle.textContent = "Shipping Method";
+
+  const shippingMethodRow = await buildDetailRow("Service", "Loading...", "shipping-method");
+  const estimatedDeliveryRow = await buildDetailRow("Estimated Delivery", "Loading...", "estimated-delivery");
+
+  detailsCard.append(cardTitle, detailsGrid, shippingTitle, shippingAddress, shippingMethodTitle, shippingMethodRow, estimatedDeliveryRow);
   detailsSection.append(detailsCard);
 
   return detailsSection;

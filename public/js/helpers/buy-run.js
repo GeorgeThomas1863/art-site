@@ -248,6 +248,8 @@ export const displayOrderDetails = async (inputData) => {
     email: "customer-email",
     receiptLink: "receipt-link",
     shippingAddress: "shipping-address",
+    shippingMethod: "shipping-method",
+    estimatedDelivery: "estimated-delivery",
     subtotal: "confirm-subtotal",
     shipping: "confirm-shipping",
     tax: "confirm-tax",
@@ -289,6 +291,22 @@ export const displayOrderDetails = async (inputData) => {
         ${address}<br>
         ${city}, ${state} ${zip}
       `;
+
+  if (inputData.shippingDetails) {
+    const sd = inputData.shippingDetails;
+    obj.shippingMethod.textContent = `${sd.carrier || ""} — ${sd.serviceType || ""}`;
+
+    if (sd.estimatedDelivery) {
+      const deliveryDate = new Date(sd.estimatedDelivery + "T00:00:00");
+      obj.estimatedDelivery.textContent = deliveryDate.toLocaleDateString("en-US", {
+        year: "numeric",
+        month: "long",
+        day: "numeric",
+      });
+    } else {
+      obj.estimatedDelivery.textContent = "N/A";
+    }
+  }
 
   return true;
 };
