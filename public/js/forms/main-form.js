@@ -239,6 +239,11 @@ export const buildSplitImage = async () => {
   rotatingLeftText.textContent = "Unique Products";
   rotatingLeft.appendChild(rotatingLeftText);
 
+  const rotatingLeftTextMobile = document.createElement("div");
+  rotatingLeftTextMobile.className = "split-image-text split-image-text-mobile";
+  rotatingLeftTextMobile.textContent = "Unique Products, Natural Materials";
+  rotatingLeft.appendChild(rotatingLeftTextMobile);
+
   const rotatingRight = document.createElement("a");
   rotatingRight.className = "split-image-rotating";
   rotatingRight.id = "split-image-right";

@@ -234,6 +234,10 @@ h3 {
   backdrop-filter: blur(4px);
 }
 
+.split-image-text-mobile {
+  display: none;
+}
+
 .split-title {
   font-size: 4rem;
   /* font-weight: 500; */
