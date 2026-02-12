@@ -1,7 +1,3 @@
-//add louis armstrong thing
-
-//finalize frontend display main page / products / about
-
 //media queries
 
 //RUN SECURITY AUDIT, esp on USER INPUTS
