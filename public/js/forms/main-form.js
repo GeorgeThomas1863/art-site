@@ -52,6 +52,29 @@ export const buildNavBar = async () => {
     ul.appendChild(li);
   }
 
+  // Mobile social icons row (last item in dropdown)
+  const mobileSocialLi = document.createElement("li");
+  mobileSocialLi.className = "mobile-social-row";
+
+  const mobileFbLink = document.createElement("a");
+  mobileFbLink.href = "https://www.facebook.com/people/Two-Sisters-Fiber-Art/100087889424782";
+  mobileFbLink.target = "_blank";
+  mobileFbLink.rel = "noopener noreferrer";
+  mobileFbLink.className = "social-icon";
+  mobileFbLink.setAttribute("aria-label", "Visit our Facebook page");
+  mobileFbLink.innerHTML = FACEBOOK_ICON_SVG;
+
+  const mobileIgLink = document.createElement("a");
+  mobileIgLink.href = "https://www.instagram.com/twosistersfiberart";
+  mobileIgLink.target = "_blank";
+  mobileIgLink.rel = "noopener noreferrer";
+  mobileIgLink.className = "social-icon";
+  mobileIgLink.setAttribute("aria-label", "Visit our Instagram page");
+  mobileIgLink.innerHTML = INSTAGRAM_ICON_SVG;
+
+  mobileSocialLi.append(mobileFbLink, mobileIgLink);
+  ul.appendChild(mobileSocialLi);
+
   const rightContainer = document.createElement("div");
   rightContainer.className = "nav-right-container";
 
