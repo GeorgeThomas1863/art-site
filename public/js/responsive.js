@@ -10,6 +10,7 @@ import { runAddToCart, runIncreaseQuantity, runDecreaseQuantity, runRemoveFromCa
 import { runPlaceOrder } from "./helpers/buy-run.js";
 import { runCalculateShipping, runShippingOptionSelect, runCheckoutShippingOptionSelect, runCalculateShippingCheckout } from "./helpers/shipping-calc.js"; //prettier-ignore
 import { runToggleAudio } from "./helpers/about-run.js";
+import { runToggleMenu } from "./util/collapse.js";
 import { runAuthSubmit, runPwToggle } from "./auth.js";
 import { closePopup, closeConfirmDialog } from "./util/popup.js";
 import debounce from "./util/debounce.js";
@@ -73,6 +74,8 @@ export const clickHandler = async (e) => {
   if (clickType === "events-newsletter-submit") await runEventsNewsletterSubmit();
 
   if (clickType === "toggle-audio") await runToggleAudio();
+
+  if (clickType === "toggle-menu") await runToggleMenu();
 
   if (clickType === "contact-submit") await runContactSubmit();
 

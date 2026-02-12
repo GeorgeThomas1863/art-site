@@ -1,4 +1,5 @@
-import { FACEBOOK_ICON_SVG, INSTAGRAM_ICON_SVG } from "../util/define-things.js"; // Update path
+import { FACEBOOK_ICON_SVG, INSTAGRAM_ICON_SVG } from "../util/define-things.js";
+// import { initMobileMenu } from "../util/collapse.js";
 
 // Main function to build and render the photography site
 export const buildMainForm = async () => {
@@ -100,8 +101,21 @@ export const buildNavBar = async () => {
   socialContainer.append(facebookLink, instagramLink);
   rightContainer.append(cartLi, socialContainer);
 
-  navContainer.append(logo, ul, rightContainer);
+  const hamburgerBtn = document.createElement("button");
+  hamburgerBtn.className = "hamburger-btn";
+  hamburgerBtn.setAttribute("aria-label", "Toggle menu");
+  hamburgerBtn.setAttribute("data-label", "toggle-menu");
+  for (let i = 0; i < 3; i++) {
+    const line = document.createElement("span");
+    line.className = "hamburger-line";
+    line.setAttribute("data-label", "toggle-menu");
+    hamburgerBtn.appendChild(line);
+  }
+
+  navContainer.append(logo, hamburgerBtn, ul, rightContainer);
   nav.appendChild(navContainer);
+
+  // initMobileMenu(nav);
 
   return nav;
 };

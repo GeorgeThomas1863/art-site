@@ -78,6 +78,33 @@ export const unhideArray = async (inputs) => {
   }
 };
 
+export const runToggleMenu = async () => {
+  const hamburger = document.querySelector(".hamburger-btn");
+  const navLinks = document.querySelector(".nav-links");
+  if (!hamburger || !navLinks) return;
+  hamburger.classList.toggle("active");
+  navLinks.classList.toggle("mobile-open");
+};
+
+// export const initMobileMenu = (navElement) => {
+//   if (!navElement) return;
+//   const hamburger = navElement.querySelector(".hamburger-btn");
+//   const navLinks = navElement.querySelector(".nav-links");
+//   if (!hamburger || !navLinks) return;
+
+//   hamburger.addEventListener("click", () => {
+//     navLinks.classList.toggle("mobile-open");
+//     hamburger.classList.toggle("active");
+//   });
+
+//   navLinks.querySelectorAll("a").forEach((link) => {
+//     link.addEventListener("click", () => {
+//       navLinks.classList.remove("mobile-open");
+//       hamburger.classList.remove("active");
+//     });
+//   });
+// };
+
 // export const getHideArray = async () => {
 //   const selectModelListItem = document.getElementById("select-model-list-item");
 //   const tokenTempListItem = document.getElementById("token-temp-list-item");
