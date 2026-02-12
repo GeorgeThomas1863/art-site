@@ -9,6 +9,8 @@ config/
 
 .claude
 
+.claude/screenshots/*
+
 # logs
 logs
 *.log

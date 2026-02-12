@@ -302,7 +302,12 @@
   }
 
   .split-image {
+    grid-template-columns: 1fr;
     height: 40vh;
+  }
+
+  #split-image-right {
+    display: none;
   }
 
   .split-cta {
@@ -500,7 +505,6 @@
   }
 
   .split-image {
-    grid-template-columns: 1fr;
     height: 30vh;
   }
 
