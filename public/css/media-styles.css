@@ -77,10 +77,22 @@
     margin-left: 1rem;
   }
 
-  /* Hero */
+  /* Hero — flexbox fill for homepage */
+  #main-container {
+    display: flex;
+    flex-direction: column;
+    height: 100dvh;
+  }
+
+  .content-container {
+    flex: 1;
+    min-height: 0;
+  }
+
   .split-hero {
     grid-template-columns: 1fr;
-    height: auto;
+    grid-template-rows: auto 1fr;
+    height: 100%;
   }
 
   .split-content {
@@ -88,7 +100,7 @@
   }
 
   .split-image {
-    height: 50vh;
+    height: auto;
   }
 
   /* About */
@@ -279,15 +291,6 @@
   }
 
   /* Hero */
-  .split-hero {
-    height: calc(100dvh - 72.5px);
-    grid-template-rows: auto 1fr;
-  }
-
-  .split-image {
-    height: auto;
-  }
-
   .split-title {
     font-size: 2.5rem;
   }
@@ -368,7 +371,12 @@
     height: 200px;
   }
 
-  /* About - mobile rotating image */
+  /* About - mobile layout */
+  .about-content {
+    grid-template-columns: 1fr;
+    height: auto;
+  }
+
   .about-image-mobile {
     display: block;
     width: 100%;
@@ -378,6 +386,10 @@
 
   .about-right {
     display: none;
+  }
+
+  .about-image-static {
+    height: 300px;
   }
 
   /* Contact */
@@ -480,10 +492,6 @@
   }
 
   /* Hero */
-  .split-hero {
-    height: calc(100dvh - 71px);
-  }
-
   .split-title {
     font-size: 1.3rem;
   }

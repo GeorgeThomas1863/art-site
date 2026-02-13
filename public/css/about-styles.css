@@ -19,6 +19,7 @@
 .about-left {
   display: flex;
   flex-direction: column;
+  overflow-y: auto;
 }
 
 /* right side - 2 rotating images stacked equally */
@@ -34,7 +35,6 @@
   display: flex;
   flex-direction: column;
   justify-content: center;
-  height: 60%;
 }
 
 .about-image-rotating,
@@ -47,7 +47,7 @@
 }
 
 .about-image-static {
-  height: 40%;
+  height: 300px;
   background-position: 50% 25%;
 }
 
