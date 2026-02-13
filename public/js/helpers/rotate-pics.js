@@ -63,19 +63,22 @@ export const startAboutPicRotation = async () => {
   const aboutImageTop = document.getElementById("about-image-top");
   const aboutImageBottom = document.getElementById("about-image-bottom");
   const aboutImageStatic = document.getElementById("about-image-static");
+  const aboutImageMobile = document.getElementById("about-image-mobile");
 
   // Set initial images
   await setCurrentPic(aboutImageTop, aboutPicArray[aboutIndexTop]);
   await setCurrentPic(aboutImageBottom, aboutPicArray[aboutIndexBottom]);
   await setCurrentPic(aboutImageStatic, aboutStaticPic);
+  await setCurrentPic(aboutImageMobile, aboutPicArray[aboutIndexTop]);
 
-  // Rotate top image
+  // Rotate top image (and mobile image in sync)
   setInterval(async () => {
     aboutIndexTop++;
     if (aboutIndexTop >= aboutPicArray.length) {
       aboutIndexTop = 0;
     }
     await setCurrentPic(aboutImageTop, aboutPicArray[aboutIndexTop]);
+    await setCurrentPic(aboutImageMobile, aboutPicArray[aboutIndexTop]);
   }, 5000);
 
   // Rotate middle image (offset by 2.5 seconds for visual interest)

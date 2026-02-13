@@ -11,6 +11,8 @@ config/
 
 .claude/screenshots/*
 
+.playwright-mcp
+
 # logs
 logs
 *.log

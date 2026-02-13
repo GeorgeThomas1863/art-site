@@ -92,22 +92,9 @@
   }
 
   /* About */
-  .about-content {
-    grid-template-columns: 1fr;
-    height: auto;
-  }
-
-  .about-right {
-    height: 60vh;
-  }
-
   .about-text {
     height: auto;
     padding: 3rem 2rem;
-  }
-
-  .about-image-static {
-    height: 300px;
   }
 
   /* Cart */
@@ -381,6 +368,18 @@
     height: 200px;
   }
 
+  /* About - mobile rotating image */
+  .about-image-mobile {
+    display: block;
+    width: 100%;
+    height: 250px;
+    margin-bottom: 1rem;
+  }
+
+  .about-right {
+    display: none;
+  }
+
   /* Contact */
   .contact-form-content {
     padding: 1.5rem;
@@ -622,8 +621,8 @@
     font-size: 1rem;
   }
 
-  .about-right {
-    height: 50vh;
+  .about-image-mobile {
+    height: 200px;
   }
 
   .about-image-static {

@@ -55,6 +55,10 @@
   transition: background-image 1s ease-in-out;
 }
 
+.about-image-mobile {
+  display: none;
+}
+
 .about-title {
   font-size: 1.5rem;
   font-weight: bold;

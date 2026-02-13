@@ -75,8 +75,12 @@ export const buildAboutText = async () => {
   const aboutTitle = await buildAboutTitle();
   const aboutParagraph = await buildAboutParagraph();
 
+  const mobileRotating = document.createElement("div");
+  mobileRotating.className = "about-image-rotating about-image-mobile";
+  mobileRotating.id = "about-image-mobile";
+
   const audioPlayer = buildAudioPlayer();
-  aboutText.append(aboutTitle, aboutParagraph, audioPlayer);
+  aboutText.append(aboutTitle, mobileRotating, aboutParagraph, audioPlayer);
 
   return aboutText;
 };
