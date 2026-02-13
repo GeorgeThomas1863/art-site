@@ -78,6 +78,7 @@ h3 {
 }
 
 .nav-links {
+  margin-left: 1rem;
   display: flex;
   gap: 3rem;
   list-style: none;
@@ -87,7 +88,7 @@ h3 {
 .nav-links a {
   text-decoration: none;
   color: #ccc;
-  font-size: 1.5rem;
+  font-size: 2rem;
   font-weight: 400;
   letter-spacing: 1px;
   transition: color 0.3s;

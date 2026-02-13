@@ -8,9 +8,9 @@
 }
 
 /* ================================================ */
-/* 1200px — Small Desktop                           */
+/* 1300px — Small Desktop                           */
 /* ================================================ */
-@media (max-width: 1200px) {
+@media (max-width: 1300px) {
   /* Navbar */
   .navbar {
     padding: 1.2rem 2rem;
