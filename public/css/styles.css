@@ -46,7 +46,7 @@ h3 {
   font-family: "Indie Flower", cursive;
   background-color: rgba(0, 0, 0, 0.95);
 
-  padding: 1.2rem 4rem;
+  padding: 1.2rem 2rem;
   border-bottom: 1px solid #333;
   position: sticky;
   top: 0;
@@ -69,6 +69,7 @@ h3 {
 }
 
 .logo {
+  margin-left: 1rem;
   font-size: 1.8rem;
   font-weight: 400;
   letter-spacing: 3px;
@@ -106,6 +107,7 @@ h3 {
 } */
 
 .nav-right-container {
+  margin-right: 1rem;
   display: flex;
   align-items: center;
   gap: 1.5rem;

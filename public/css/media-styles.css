@@ -493,11 +493,11 @@
 
   /* Hero */
   .split-title {
-    font-size: 1.3rem;
+    font-size: 2rem;
   }
 
   .split-text {
-    font-size: 1rem;
+    font-size: 1.1rem;
     margin-bottom: 1.5rem;
   }
 
@@ -743,7 +743,7 @@
 @media (max-width: 400px) {
   /* Hero */
   .split-title {
-    font-size: 1.1rem;
+    font-size: 1.5rem;
   }
 
   /* Navbar */
