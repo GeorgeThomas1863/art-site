@@ -69,6 +69,29 @@
   border-bottom: 2px solid #e0e0e0;
 }
 
+/* Collapse overrides for admin sections */
+.category-section .collapse-header {
+  padding: 0;
+}
+
+.category-section .collapse-header:hover {
+  background-color: transparent;
+}
+
+.category-section .collapse-header .category-title {
+  margin-bottom: 0;
+  padding-bottom: 0;
+  border-bottom: none;
+}
+
+.category-section .collapse-content {
+  padding: 1.5rem 0 0 0;
+}
+
+.category-section .collapse-content.hidden {
+  padding: 0;
+}
+
 /* Action Cards */
 .action-cards {
   display: grid;

@@ -1,3 +1,5 @@
+import { buildCollapseContainer } from "../util/collapse.js";
+
 export const buildAdminForm = async () => {
   const adminFormWrapper = document.createElement("div");
   adminFormWrapper.className = "admin-dashboard-wrapper";
@@ -50,7 +52,15 @@ export const buildProductsSection = async () => {
   const editCard = await buildActionCard("edit", "products");
 
   actionCards.append(addCard, editCard);
-  section.append(title, actionCards);
+
+  const collapseContainer = await buildCollapseContainer({
+    titleElement: title,
+    contentElement: actionCards,
+    isExpanded: true,
+    dataAttribute: "products-collapse",
+  });
+
+  section.append(collapseContainer);
 
   return section;
 };
@@ -70,7 +80,15 @@ export const buildEventsSection = async () => {
   const editCard = await buildActionCard("edit", "events");
 
   actionCards.append(addCard, editCard);
-  section.append(title, actionCards);
+
+  const collapseContainer = await buildCollapseContainer({
+    titleElement: title,
+    contentElement: actionCards,
+    isExpanded: true,
+    dataAttribute: "events-collapse",
+  });
+
+  section.append(collapseContainer);
 
   return section;
 };
@@ -90,7 +108,15 @@ export const buildNewsletterSection = async () => {
   const editCard = await buildActionCard("edit", "newsletter");
 
   actionCards.append(writeCard, editCard);
-  section.append(title, actionCards);
+
+  const collapseContainer = await buildCollapseContainer({
+    titleElement: title,
+    contentElement: actionCards,
+    isExpanded: true,
+    dataAttribute: "newsletter-collapse",
+  });
+
+  section.append(collapseContainer);
 
   return section;
 };

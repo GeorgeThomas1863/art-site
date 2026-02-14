@@ -483,6 +483,25 @@
     padding: 1rem;
   }
 
+  .stats-section {
+    padding: 1rem;
+    gap: 0.25rem;
+  }
+
+  .stat-icon {
+    font-size: 1.3rem;
+    margin-bottom: 0.25rem;
+  }
+
+  .stat-value {
+    font-size: 1.1rem;
+  }
+
+  .stat-label {
+    font-size: 0.65rem;
+    letter-spacing: 0.5px;
+  }
+
   /* Global */
   .popup-notification {
     min-width: 0;
@@ -748,12 +767,6 @@
   .modal-actions .btn {
     width: 100%;
     text-align: center;
-  }
-
-  .stats-section {
-    flex-direction: column;
-    gap: 1.5rem;
-    padding: 1.5rem;
   }
 
   .image-upload-area {
