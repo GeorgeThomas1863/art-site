@@ -1,5 +1,6 @@
 import { buildAuthForm } from "./forms/auth-form.js";
 import { sendToBack } from "./util/api-front.js";
+import { EYE_OPEN_SVG, EYE_CLOSED_SVG } from "./util/define-things.js";
 
 const authElement = document.getElementById("auth-element");
 

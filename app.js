@@ -1,8 +1,4 @@
-//image links are all broken
-
-//image upload broken on pics and events
-
-//button for auth pw toggle broken
+//newsletter is prob fucked in contacts, double check
 
 //have the can ship selection NOT cause shit to disappear but instead change shipping info to N/A / make not editable
 
