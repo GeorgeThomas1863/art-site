@@ -1,6 +1,8 @@
-//newsletter is prob fucked in contacts, double check
+//set up new email
 
 //have the can ship selection NOT cause shit to disappear but instead change shipping info to N/A / make not editable
+
+//newsletter is prob fucked in contacts, double check
 
 //current subscribers simply listed as "fail"
 
@@ -8,7 +10,7 @@
 
 //RUN ANOTHER SECURITY AUDIT, specifically on USER INPUTS
 
-//rotating pics on about?
+//DEPLOY, hten make style edits
 
 //-----------------
 
