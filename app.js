@@ -1,6 +1,16 @@
+//image links are all broken
+
+//image upload broken on pics and events
+
+//button for auth pw toggle broken
+
+//have the can ship selection NOT cause shit to disappear but instead change shipping info to N/A / make not editable
+
+//current subscribers simply listed as "fail"
+
 //media queries, changed back
 
-//RUN SECURITY AUDIT, esp on USER INPUTS
+//RUN ANOTHER SECURITY AUDIT, specifically on USER INPUTS
 
 //rotating pics on about?
 

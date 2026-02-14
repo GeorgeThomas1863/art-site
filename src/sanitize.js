@@ -1,16 +1,7 @@
-/**
- * Input sanitization and validation utilities
- */
-
 // Escape HTML special characters for safe embedding in email templates
 export const escapeHtml = (str) => {
   if (typeof str !== "string") return "";
-  return str
-    .replace(/&/g, "&amp;")
-    .replace(/</g, "&lt;")
-    .replace(/>/g, "&gt;")
-    .replace(/"/g, "&quot;")
-    .replace(/'/g, "&#x27;");
+  return str.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#x27;");
 };
 
 // Prevent NoSQL operator injection — if value is an object with $-prefixed keys, convert to string
