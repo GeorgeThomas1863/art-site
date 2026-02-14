@@ -143,12 +143,19 @@ export const buildCartItem = async (itemData) => {
 };
 
 export const buildCartItemImage = async (itemData) => {
+  // if (!itemData || !itemData.picData || !itemData.picData.path) return null;
+
   const imageContainer = document.createElement("div");
   imageContainer.className = "cart-item-image-container";
 
+  console.log("ITEM DATA:");
+  console.dir(itemData);
+
   const image = document.createElement("img");
   image.className = "cart-item-image";
-  image.src = itemData.image;
+  const fullPath = itemData.picData?.path || "";
+  const imagePath = fullPath.indexOf("/images/");
+  image.src = imagePath !== -1 ? fullPath.substring(imagePath) : "";
   image.alt = itemData.name;
 
   imageContainer.append(image);

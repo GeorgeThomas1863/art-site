@@ -212,7 +212,9 @@ export const buildConfirmItem = async (itemData) => {
 
   const itemImage = document.createElement("img");
   itemImage.className = "confirm-item-image";
-  itemImage.src = itemData.image;
+  const fullPath = itemData.picData?.path || "";
+  const imagePath = fullPath.indexOf("/images/");
+  itemImage.src = imagePath !== -1 ? fullPath.substring(imagePath) : "";
   itemImage.alt = itemData.name;
 
   const itemDetails = document.createElement("div");

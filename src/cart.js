@@ -49,7 +49,7 @@ export const runAddToCart = async (req) => {
       name: productData.name,
       price: productData.price,
       quantity: safeQuantity,
-      picData: productData.picData || req.body.data.picData,
+      picData: productData.picData,
       canShip: productData.canShip,
       weight: productData.weight,
       length: productData.length,
