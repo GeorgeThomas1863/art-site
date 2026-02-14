@@ -8,25 +8,67 @@
 }
 
 /* ================================================ */
-/* 1300px — Small Desktop                           */
+/* 1400px — Medium Desktop                           */
 /* ================================================ */
-@media (max-width: 1300px) {
+@media (max-width: 1400px) {
   /* Navbar */
   .navbar {
     padding: 1.2rem 2rem;
   }
 
-  .nav-links {
-    gap: 2rem;
+  .nav-links a {
+    font-size: 1.7rem;
   }
 
-  /* Hero */
+  .logo {
+    font-size: 1.5rem;
+  }
+
   .split-title {
     font-size: 3rem;
   }
 
   .split-content {
     padding: 3rem;
+  }
+
+  .split-text {
+    font-size: 1.4rem;
+  }
+}
+
+/* ================================================ */
+/* 1250px — Small Desktop                           */
+/* ================================================ */
+@media (max-width: 1250px) {
+  /* Navbar */
+
+  .nav-links {
+    gap: 1.5rem;
+  }
+
+  .nav-links a {
+    font-size: 1.5rem;
+  }
+
+  .logo {
+    font-size: 1.3rem;
+  }
+
+  .split-title {
+    font-size: 2.7rem;
+  }
+
+  .split-text {
+    font-size: 1.3rem;
+  }
+
+  #split-image-right {
+    display: none;
+  }
+
+  .split-image {
+    grid-template-columns: 1fr;
   }
 
   /* Cart */
@@ -60,16 +102,12 @@
 /* ================================================ */
 @media (max-width: 992px) {
   /* Navbar */
-  .nav-links {
-    gap: 1.5rem;
-  }
-
   .nav-links a {
     font-size: 1.2rem;
   }
 
   .logo {
-    font-size: 1.5rem;
+    letter-spacing: 1px;
   }
 
   .social-icons {
@@ -275,9 +313,9 @@
     display: flex;
     justify-content: center;
     gap: 1.5rem;
-    padding: 1rem 0;
+    padding: 1.5rem 0 1rem;
     border-top: 1px solid #333;
-    margin-top: 0.5rem;
+    margin-top: -1rem;
   }
 
   .mobile-social-row .social-icon {
@@ -484,11 +522,6 @@
   /* Navbar */
   .navbar {
     padding: 0.8rem 1rem;
-  }
-
-  .logo {
-    font-size: 1.3rem;
-    letter-spacing: 1px;
   }
 
   /* Hero */
