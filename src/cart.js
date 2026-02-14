@@ -1,3 +1,6 @@
+import dbModel from "../models/db-model.js";
+import { validatePositiveInt, sanitizeMongoValue } from "./sanitize.js";
+
 export const buildCart = async (req) => {
   if (!req.session.cart) {
     req.session.cart = [];
@@ -8,14 +11,23 @@ export const buildCart = async (req) => {
 export const runAddToCart = async (req) => {
   await buildCart(req);
 
-  // console.log("ADD TO CART REQ BODY");
-  // console.dir(req.body);
-
   const { productId, quantity } = req.body.data;
+
+  // Validate inputs
+  const safeProductId = sanitizeMongoValue(productId);
+  const safeQuantity = validatePositiveInt(quantity);
+  if (!safeProductId || !safeQuantity) {
+    return { success: false, message: "Invalid product ID or quantity" };
+  }
+
+  // Look up the real product from DB to get trusted price
+  const productModel = new dbModel({ keyToLookup: "productId", itemValue: safeProductId }, process.env.PRODUCTS_COLLECTION);
+  const productData = await productModel.getUniqueItem();
+  if (!productData) return { success: false, message: "Product not found" };
 
   let existingItem = null;
   for (let i = 0; i < req.session.cart.length; i++) {
-    if (req.session.cart[i].productId !== productId) continue;
+    if (req.session.cart[i].productId !== safeProductId) continue;
 
     existingItem = req.session.cart[i];
     break;
@@ -28,14 +40,24 @@ export const runAddToCart = async (req) => {
 
   // Update quantity if already exists
   if (existingItem) {
-    existingItem.quantity += quantity;
+    existingItem.quantity += safeQuantity;
+    existingItem.price = productData.price; // Always use DB price
   } else {
-    // Add new item
-    req.session.cart.push(req.body.data);
+    // Build cart item from DB data — never trust client-supplied price
+    const cartItem = {
+      productId: safeProductId,
+      name: productData.name,
+      price: productData.price,
+      quantity: safeQuantity,
+      picData: productData.picData || req.body.data.picData,
+      canShip: productData.canShip,
+      weight: productData.weight,
+      length: productData.length,
+      width: productData.width,
+      height: productData.height,
+    };
+    req.session.cart.push(cartItem);
   }
-
-  // console.log("ADD TO CART");
-  // console.log(req.session.cart);
 
   return { success: true, cart: req.session.cart, itemCount: itemCount };
 };

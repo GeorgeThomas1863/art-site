@@ -1,6 +1,7 @@
 import nodemailer from "nodemailer";
 import dbModel from "../models/db-model.js";
 import { runAddSubscriber } from "./newsletter.js";
+import { escapeHtml, sanitizeEmailHeader, validateEmail } from "./sanitize.js";
 
 export const runContactSubmit = async (inputParams) => {
   if (!inputParams) return { success: false, message: "No input parameters" };
@@ -11,6 +12,10 @@ export const runContactSubmit = async (inputParams) => {
 
   const { name, email, subject, message, newsletter } = inputParams;
 
+  if (!validateEmail(email)) {
+    return { success: false, message: "Invalid email address" };
+  }
+
   if (newsletter) {
     const newsletterData = await runAddSubscriber(email);
     if (!newsletterData || !newsletterData.success) {
@@ -20,18 +25,23 @@ export const runContactSubmit = async (inputParams) => {
     }
   }
 
+  const safeName = escapeHtml(name);
+  const safeEmail = escapeHtml(email);
+  const safeSubject = escapeHtml(subject);
+  const safeMessage = escapeHtml(message).replace(/\n/g, "<br>");
+
   const mailParams = {
     from: process.env.EMAIL_USER,
     to: process.env.EMAIL_RECIPIENT,
-    subject: `SITE MESSAGE FROM ${name} | SUBJECT: ${subject}`,
+    subject: `SITE MESSAGE FROM ${sanitizeEmailHeader(name)} | SUBJECT: ${sanitizeEmailHeader(subject)}`,
     html: `
       <h4>NEW CONTACT FORM SUBMISSION:</h4>
-      <p><strong>Name:</strong> ${name}</p>
-      <p><strong>Email:</strong> ${email}</p>
-      <p><strong>Subject:</strong> ${subject || "No subject provided"}</p>
-      <p><strong>Message:</strong> ${message.replace(/\n/g, "<br>")}</p>`,
+      <p><strong>Name:</strong> ${safeName}</p>
+      <p><strong>Email:</strong> ${safeEmail}</p>
+      <p><strong>Subject:</strong> ${safeSubject || "No subject provided"}</p>
+      <p><strong>Message:</strong> ${safeMessage}</p>`,
 
-    replyTo: email,
+    replyTo: sanitizeEmailHeader(email),
   };
 
   const transport = nodemailer.createTransport({

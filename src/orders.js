@@ -3,6 +3,7 @@ import dbModel from "../models/db-model.js";
 import { runGetCartStats } from "./cart.js";
 import { processPayment } from "./payments.js";
 import { storeCustomerData } from "./customer.js";
+import { escapeHtml, sanitizeEmailHeader } from "./sanitize.js";
 
 export const placeNewOrder = async (req) => {
   if (!req || !req.body) return { success: false, message: "No input parameters" };
@@ -176,7 +177,7 @@ export const sendOrderConfirmationEmails = async (orderData) => {
     await transport.sendMail({
       from: process.env.EMAIL_USER,
       to: process.env.EMAIL_RECIPIENT,
-      subject: `New Order — Receipt #${receiptNumber} from ${firstName} ${lastName}`,
+      subject: `New Order — Receipt #${receiptNumber} from ${sanitizeEmailHeader(firstName)} ${sanitizeEmailHeader(lastName)}`,
       html: adminHtml,
     });
     adminSent = true;
@@ -242,6 +243,15 @@ const buildEmailHtml = (orderData, type) => {
   } = orderData;
   const { firstName, lastName, email, address, city, state, zip } = customerData;
 
+  // Escape all user-provided data for safe HTML embedding
+  const safeFirstName = escapeHtml(firstName);
+  const safeLastName = escapeHtml(lastName);
+  const safeEmail = escapeHtml(email);
+  const safeAddress = escapeHtml(address);
+  const safeCity = escapeHtml(city);
+  const safeState = escapeHtml(state);
+  const safeZip = escapeHtml(zip);
+
   const formattedDate = new Date(orderDate).toLocaleDateString("en-US", {
     year: "numeric",
     month: "long",
@@ -253,7 +263,7 @@ const buildEmailHtml = (orderData, type) => {
     const item = items[i];
     const lineTotal = (item.price * item.quantity).toFixed(2);
     itemRows += `<tr>
-      <td style="padding: 8px; border-bottom: 1px solid #eee;">${item.name}</td>
+      <td style="padding: 8px; border-bottom: 1px solid #eee;">${escapeHtml(item.name)}</td>
       <td style="padding: 8px; border-bottom: 1px solid #eee; text-align: center;">${item.quantity}</td>
       <td style="padding: 8px; border-bottom: 1px solid #eee; text-align: right;">$${lineTotal}</td>
     </tr>`;
@@ -262,16 +272,16 @@ const buildEmailHtml = (orderData, type) => {
   const isAdmin = type === "admin";
   const header = isAdmin
     ? `<h2>New Order — #${orderNumber}</h2>
-      <p><strong>Customer:</strong> ${firstName} ${lastName} (${email})</p>`
+      <p><strong>Customer:</strong> ${safeFirstName} ${safeLastName} (${safeEmail})</p>`
     : `<h2>Order Confirmation — #${receiptNumber}</h2>
-      <p>Thank you for your order, ${firstName} ${lastName}!</p>`;
+      <p>Thank you for your order, ${safeFirstName} ${safeLastName}!</p>`;
 
   let paymentSection = "";
   if (isAdmin) {
     const billingLine = billingAddress
-      ? `${billingAddress.addressLine1 || ""}${billingAddress.addressLine2 ? ", " + billingAddress.addressLine2 : ""}, ${
-          billingAddress.locality || ""
-        }, ${billingAddress.administrativeDistrictLevel1 || ""} ${billingAddress.postalCode || ""}, ${billingAddress.country || ""}`
+      ? `${escapeHtml(billingAddress.addressLine1 || "")}${billingAddress.addressLine2 ? ", " + escapeHtml(billingAddress.addressLine2) : ""}, ${
+          escapeHtml(billingAddress.locality || "")
+        }, ${escapeHtml(billingAddress.administrativeDistrictLevel1 || "")} ${escapeHtml(billingAddress.postalCode || "")}, ${escapeHtml(billingAddress.country || "")}`
       : "N/A";
 
     paymentSection = `
@@ -313,7 +323,7 @@ const buildEmailHtml = (orderData, type) => {
       </div>
 
       <h3>Shipping Address</h3>
-      <p>${firstName} ${lastName}<br>${address}<br>${city}, ${state} ${zip}</p>
+      <p>${safeFirstName} ${safeLastName}<br>${safeAddress}<br>${safeCity}, ${safeState} ${safeZip}</p>
 
       ${shippingDetails ? buildShippingSection(shippingDetails, isAdmin) : ""}
 

@@ -1,9 +1,12 @@
 import axios from "axios";
 import dbModel from "../models/db-model.js";
+import { validateZip, sanitizeMongoValue, validatePositiveInt } from "./sanitize.js";
 
 export const runCalculateShipping = async (req) => {
   if (!req || !req.body || !req.body.zip || !req.body.productArray) return { success: false, message: "No ZIP code or product array provided" };
   const { zip, productArray } = req.body;
+
+  if (!validateZip(zip)) return { success: false, message: "Invalid ZIP code format" };
 
   // console.log("PRODUCT ARRAY");
   // console.log(productArray);
@@ -15,13 +18,16 @@ export const runCalculateShipping = async (req) => {
 
   for (const item of productArray) {
     const { productId, quantity } = item;
+    const safeProductId = sanitizeMongoValue(productId);
+    const safeQuantity = validatePositiveInt(quantity);
+    if (!safeProductId || !safeQuantity) continue;
 
-    const productModel = new dbModel({ keyToLookup: "productId", itemValue: productId }, process.env.PRODUCTS_COLLECTION);
+    const productModel = new dbModel({ keyToLookup: "productId", itemValue: safeProductId }, process.env.PRODUCTS_COLLECTION);
     const productData = await productModel.getUniqueItem();
     if (!productData || !productData.canShip) continue;
     console.log("PRODUCT DATA");
     console.log(productData);
-    totalWeight += (productData.weight || 0) * quantity;
+    totalWeight += (productData.weight || 0) * safeQuantity;
 
     maxLength = Math.max(maxLength, productData.length || 0);
     maxWidth = Math.max(maxWidth, productData.width || 0);
@@ -193,11 +199,19 @@ export const updateSelectedRate = async (req) => {
     return { success: false, message: "No selected rate provided" };
   }
 
-  if (!req.session.shipping) {
-    req.session.shipping = {};
+  // Validate against session data — use server-side rate, not client-sent object
+  if (!req.session.shipping || !req.session.shipping.rateData) {
+    return { success: false, message: "No shipping rates in session. Calculate shipping first." };
   }
 
-  req.session.shipping.selectedRate = selectedRate;
+  const rateId = selectedRate.rateId;
+  const sessionRate = req.session.shipping.rateData[rateId];
+  if (rateId === undefined || rateId === null || !sessionRate) {
+    return { success: false, message: "Invalid rate selection" };
+  }
+
+  // Use the rate from session, not the client-sent object
+  req.session.shipping.selectedRate = sessionRate;
 
   return { success: true, shipping: req.session.shipping };
 };

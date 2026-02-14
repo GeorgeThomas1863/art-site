@@ -12,6 +12,15 @@ import {
 } from "../src/shipping.js";
 import { placeNewOrder } from "../src/orders.js";
 import { runDeletePic } from "../src/upload-back.js";
+import {
+  validateEmail,
+  validateZip,
+  validateString,
+  validatePositiveInt,
+  sanitizeMongoValue,
+  whitelistFields,
+  sanitizeFilename,
+} from "../src/sanitize.js";
 
 //returns data for all products
 export const getProductDataControl = async (req, res) => {
@@ -44,8 +53,12 @@ export const deletePicControl = async (req, res) => {
   const filename = req.body.filename;
   if (!filename) return res.status(400).json({ error: "No filename provided" });
 
+  // Validate filename contains no path separators or traversal
+  const safeName = sanitizeFilename(filename);
+  if (!safeName || safeName !== filename) return res.status(400).json({ error: "Invalid filename" });
+
   try {
-    const data = await runDeletePic(filename);
+    const data = await runDeletePic(safeName);
     if (!data || !data.success) return res.status(500).json({ error: data.message });
 
     return res.json(data);
@@ -59,7 +72,8 @@ export const addNewProductControl = async (req, res) => {
   const inputParams = req.body;
   if (!inputParams) return res.status(500).json({ error: "No input parameters" });
 
-  const data = await runAddNewProduct(inputParams);
+  const safeParams = whitelistFields(inputParams, ["name", "productType", "price", "canShip", "length", "width", "height", "weight", "description", "display", "sold", "picData", "dateCreated"]);
+  const data = await runAddNewProduct(safeParams);
   return res.json(data);
 };
 
@@ -67,13 +81,15 @@ export const editProductControl = async (req, res) => {
   const inputParams = req.body;
   if (!inputParams) return res.status(500).json({ error: "No input parameters" });
 
-  const data = await runEditProduct(inputParams);
+  const safeParams = whitelistFields(inputParams, ["name", "productType", "price", "canShip", "length", "width", "height", "weight", "description", "display", "sold", "picData", "productId"]);
+  const data = await runEditProduct(safeParams);
   return res.json(data);
 };
 
 export const deleteProductControl = async (req, res) => {
   const productId = req.body.productId;
   if (!productId) return res.status(500).json({ error: "No product ID" });
+  if (typeof productId === "object") return res.status(400).json({ error: "Invalid product ID" });
 
   const data = await runDeleteProduct(productId);
   return res.json(data);
@@ -83,7 +99,8 @@ export const addNewEventControl = async (req, res) => {
   const inputParams = req.body;
   if (!inputParams) return res.status(500).json({ error: "No input parameters" });
 
-  const data = await runAddNewEvent(inputParams);
+  const safeParams = whitelistFields(inputParams, ["name", "eventDate", "eventLocation", "eventDescription", "picData", "dateCreated"]);
+  const data = await runAddNewEvent(safeParams);
   return res.json(data);
 };
 
@@ -91,13 +108,15 @@ export const editEventControl = async (req, res) => {
   const inputParams = req.body;
   if (!inputParams) return res.status(500).json({ error: "No input parameters" });
 
-  const data = await runEditEvent(inputParams);
+  const safeParams = whitelistFields(inputParams, ["name", "eventDate", "eventLocation", "eventDescription", "picData", "eventId"]);
+  const data = await runEditEvent(safeParams);
   return res.json(data);
 };
 
 export const deleteEventControl = async (req, res) => {
   const eventId = req.body.eventId;
   if (!eventId) return res.status(500).json({ error: "No event ID" });
+  if (typeof eventId === "object") return res.status(400).json({ error: "Invalid event ID" });
 
   const data = await runDeleteEvent(eventId);
   return res.json(data);
@@ -124,8 +143,12 @@ export const getCartStatsControl = async (req, res) => {
 export const addToCartControl = async (req, res) => {
   if (!req || !req.body || !req.body.data) return res.status(500).json({ error: "No input parameters" });
 
+  const { productId, quantity } = req.body.data;
+  if (typeof productId === "object") return res.status(400).json({ error: "Invalid product ID" });
+  if (!validatePositiveInt(quantity)) return res.status(400).json({ error: "Invalid quantity" });
+
   const data = await runAddToCart(req);
-  if (!data || !data.success) return res.status(500).json({ error: "Failed to add item to cart" });
+  if (!data || !data.success) return res.status(500).json({ error: data?.message || "Failed to add item to cart" });
 
   res.json(data);
 };
@@ -175,11 +198,10 @@ export const calculateShippingControl = async (req, res) => {
   if (!req || !req.body) return res.status(500).json({ error: "No input parameters" });
   if (!req.body.zip) return res.status(500).json({ error: "No ZIP code provided" });
 
-  // console.log("ZIP");
-  // console.log(req.body);
+  if (!validateZip(req.body.zip)) return res.status(400).json({ error: "Invalid ZIP code format" });
 
   const data = await runCalculateShipping(req);
-  if (!data || !data.success) return res.status(500).json({ error: "Failed to calculate shipping" });
+  if (!data || !data.success) return res.status(500).json({ error: data?.message || "Failed to calculate shipping" });
 
   return res.json(data);
 };
@@ -221,6 +243,15 @@ export const placeOrderControl = async (req, res) => {
   if (!req || !req.body) return res.status(500).json({ error: "No input parameters" });
   if (!req.body.paymentToken) return res.status(500).json({ error: "No payment token" });
 
+  // Validate customer fields
+  const { firstName, lastName, email, address, city, state, zip } = req.body;
+  if (!validateString(firstName, 100) || !validateString(lastName, 100)) return res.status(400).json({ error: "Invalid name" });
+  if (!validateEmail(email)) return res.status(400).json({ error: "Invalid email" });
+  if (!validateString(address, 200)) return res.status(400).json({ error: "Invalid address" });
+  if (!validateString(city, 100)) return res.status(400).json({ error: "Invalid city" });
+  if (!validateString(state, 50)) return res.status(400).json({ error: "Invalid state" });
+  if (!validateZip(zip)) return res.status(400).json({ error: "Invalid ZIP code" });
+
   const data = await placeNewOrder(req);
 
   //json throws error with "bigint" type, converting to numbers
@@ -234,13 +265,16 @@ export const placeOrderControl = async (req, res) => {
 //CONTACT CONTROLLER
 
 export const contactSubmitControl = async (req, res) => {
-  console.log("CONTACT SUBMIT CONTROL");
-  console.log("REQUEST BODY");
-  console.log(req.body);
   if (!req || !req.body) return res.status(500).json({ error: "No input parameters" });
 
+  const { name, email, subject, message } = req.body;
+  if (!validateString(name, 100)) return res.status(400).json({ error: "Invalid name" });
+  if (!validateEmail(email)) return res.status(400).json({ error: "Invalid email" });
+  if (!validateString(subject, 200)) return res.status(400).json({ error: "Invalid subject" });
+  if (!validateString(message, 5000)) return res.status(400).json({ error: "Invalid message" });
+
   const data = await runContactSubmit(req.body);
-  if (!data || !data.success) return res.status(500).json({ error: "Failed to submit contact form" });
+  if (!data || !data.success) return res.status(500).json({ error: data?.message || "Failed to submit contact form" });
 
   return res.json(data);
 };
@@ -248,6 +282,7 @@ export const contactSubmitControl = async (req, res) => {
 export const addSubscriberControl = async (req, res) => {
   if (!req || !req.body) return res.status(500).json({ error: "No input parameters" });
   if (!req.body.email) return res.status(500).json({ error: "No email provided" });
+  if (!validateEmail(req.body.email)) return res.status(400).json({ error: "Invalid email format" });
 
   const data = await runAddSubscriber(req.body.email);
   if (!data || !data.success) return res.status(500).json({ error: "Failed to add email to newsletter" });

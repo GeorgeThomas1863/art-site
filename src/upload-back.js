@@ -3,10 +3,9 @@ import fs from "fs";
 
 import multer from "multer";
 
-// import CONFIG from "../config/config.js";
-
 import { fileURLToPath } from "url";
 import { dirname } from "path";
+import { sanitizeFilename } from "./sanitize.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -31,8 +30,7 @@ const storage = multer.diskStorage({
     cb(null, targetDir);
   },
   filename: function (req, file, cb) {
-    // keep the original name since we're only storing one file
-    cb(null, file.originalname);
+    cb(null, Date.now() + "-" + sanitizeFilename(file.originalname));
   },
 });
 
@@ -59,14 +57,23 @@ export const upload = multer({
 //-------------------
 
 export const runDeletePic = async (filename) => {
-  const filePath = path.join(uploadDir, filename);
+  const safeName = sanitizeFilename(filename);
+  if (!safeName) return { success: false, message: "Invalid filename" };
+
+  const filePath = path.join(uploadDir, safeName);
+  const resolvedPath = path.resolve(filePath);
+
+  // Verify the resolved path is within the upload directory
+  if (!resolvedPath.startsWith(path.resolve(uploadDir))) {
+    return { success: false, message: "Invalid file path" };
+  }
 
   // Check if file exists
-  if (!fs.existsSync(filePath)) {
+  if (!fs.existsSync(resolvedPath)) {
     return { success: false, message: "File not found" };
   }
 
-  fs.unlinkSync(filePath);
+  fs.unlinkSync(resolvedPath);
   return { success: true, message: "File deleted successfully" };
 };
 

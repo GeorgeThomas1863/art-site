@@ -294,11 +294,12 @@ export const displayOrderDetails = async (inputData) => {
     day: "numeric",
   });
 
-  obj.shippingAddress.innerHTML = `
-        ${firstName} ${lastName}<br>
-        ${address}<br>
-        ${city}, ${state} ${zip}
-      `;
+  obj.shippingAddress.textContent = "";
+  const addrLines = [`${firstName} ${lastName}`, address, `${city}, ${state} ${zip}`];
+  addrLines.forEach((line, i) => {
+    if (i > 0) obj.shippingAddress.appendChild(document.createElement("br"));
+    obj.shippingAddress.appendChild(document.createTextNode(line));
+  });
 
   if (inputData.shippingDetails) {
     const sd = inputData.shippingDetails;
