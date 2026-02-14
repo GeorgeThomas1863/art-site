@@ -116,9 +116,9 @@ router.post("/contact-submit", contactSubmitControl);
 
 router.get("/newsletter/data", requireAuth, getSubscribersControl);
 
-router.post("/newsletter/add", addSubscriberControl);
+router.post("/newsletter/add", requireAuth, addSubscriberControl);
 
-router.post("/newsletter/send", sendNewsletterControl);
+router.post("/newsletter/send", requireAuth, sendNewsletterControl);
 
 router.post("/newsletter/remove", requireAuth, removeSubscriberControl);
 
