@@ -1,9 +1,3 @@
-//set up new email
-
-//change frontend / backend duplicative names
-
-//images in shopping cart fucked
-
 //about display still wrong
 
 //upcoming events value in admin section is off
@@ -15,8 +9,6 @@
 //have the can ship selection NOT cause shit to disappear but instead change shipping info to N/A / make not editable
 
 //newsletter is prob fucked in contacts, double check
-
-//current subscribers simply listed as "fail"
 
 //media queries, changed back
 

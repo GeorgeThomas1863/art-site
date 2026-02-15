@@ -153,9 +153,7 @@ export const buildCartItemImage = async (itemData) => {
 
   const image = document.createElement("img");
   image.className = "cart-item-image";
-  const fullPath = itemData.picData?.path || "";
-  const imagePath = fullPath.indexOf("/images/");
-  image.src = imagePath !== -1 ? fullPath.substring(imagePath) : "";
+  image.src = `/images/products/${itemData.picData?.filename || ""}`;
   image.alt = itemData.name;
 
   imageContainer.append(image);

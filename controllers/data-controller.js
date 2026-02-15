@@ -282,6 +282,11 @@ export const placeOrderControl = async (req, res) => {
 
   const data = await placeNewOrder(req);
 
+  // After successful order, subscribe to newsletter if opted in
+  if (data.success && req.body.newsletter && req.body.email) {
+    storeSubscriber(req.body.email).catch((e) => console.error("NEWSLETTER SUBSCRIBE ERROR:", e));
+  }
+
   //json throws error with "bigint" type, converting to numbers
   const jsonData = JSON.parse(JSON.stringify(data, (key, value) => (typeof value === "bigint" ? Number(value) : value)));
 

@@ -73,6 +73,7 @@ export const getCustomerParams = async () => {
     city: document.getElementById("city").value,
     state: document.getElementById("state").value,
     zip: document.getElementById("zip").value,
+    newsletter: document.getElementById("checkout-newsletter").checked,
   };
 
   return params;

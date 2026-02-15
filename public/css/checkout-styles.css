@@ -119,6 +119,30 @@
   border-radius: 4px;
 }
 
+/* Newsletter Checkbox */
+.checkout-newsletter-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  margin-top: -0.75rem;
+}
+
+.checkout-newsletter-checkbox {
+  width: 16px;
+  height: 16px;
+  cursor: pointer;
+  accent-color: #000000;
+  flex-shrink: 0;
+}
+
+.checkout-newsletter-label {
+  font-size: 0.85rem;
+  font-weight: 400;
+  letter-spacing: 0.5px;
+  color: #555;
+  cursor: pointer;
+}
+
 .checkout-form-input:focus {
   outline: none;
   border-color: #bbb;

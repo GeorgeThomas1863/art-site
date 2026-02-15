@@ -99,7 +99,9 @@ export const buildCustomerInfoCard = async () => {
   shippingHelper.className = "checkout-form-helper";
   shippingHelper.textContent = "Shipping rates update automatically based on ZIP code";
 
-  form.append(nameRow, emailField, phoneField, shippingTitle, addressField, locationRow, shippingHelper);
+  const newsletterCheckbox = await buildCheckoutNewsletterCheckbox();
+
+  form.append(nameRow, emailField, newsletterCheckbox, phoneField, shippingTitle, addressField, locationRow, shippingHelper);
 
   card.append(cardTitle, form);
 
@@ -338,9 +340,7 @@ export const buildCheckoutItem = async (itemData) => {
 
   const itemImage = document.createElement("img");
   itemImage.className = "checkout-item-image";
-  const fullPath = itemData.picData?.path || "";
-  const imagePath = fullPath.indexOf("/images/");
-  itemImage.src = imagePath !== -1 ? fullPath.substring(imagePath) : "";
+  itemImage.src = `/images/products/${itemData.picData?.filename || ""}`;
   itemImage.alt = itemData.name;
 
   const itemDetails = document.createElement("div");
@@ -366,6 +366,26 @@ export const buildCheckoutItem = async (itemData) => {
 };
 
 //--------------
+
+export const buildCheckoutNewsletterCheckbox = async () => {
+  const wrapper = document.createElement("div");
+  wrapper.className = "checkout-newsletter-wrapper";
+
+  const checkbox = document.createElement("input");
+  checkbox.type = "checkbox";
+  checkbox.id = "checkout-newsletter";
+  checkbox.name = "checkout-newsletter";
+  checkbox.className = "checkout-newsletter-checkbox";
+
+  const label = document.createElement("label");
+  label.className = "checkout-newsletter-label";
+  label.setAttribute("for", "checkout-newsletter");
+  label.textContent = "Yes, I want to receive newsletters and updates!";
+
+  wrapper.append(checkbox, label);
+
+  return wrapper;
+};
 
 export const buildFormField = async (label, type, name, id, required = false) => {
   const field = document.createElement("div");
