@@ -2,6 +2,16 @@
 
 //change frontend / backend duplicative names
 
+//images in shopping cart fucked
+
+//about display still wrong
+
+//upcoming events value in admin section is off
+
+//popup display of product category should be under add to cart
+
+//product display media styles
+
 //have the can ship selection NOT cause shit to disappear but instead change shipping info to N/A / make not editable
 
 //newsletter is prob fucked in contacts, double check
