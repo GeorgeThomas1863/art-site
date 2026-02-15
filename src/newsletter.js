@@ -7,7 +7,7 @@ export const runGetSubscribers = async () => {
   return data;
 };
 
-export const runAddSubscriber = async (email) => {
+export const storeSubscriber = async (email) => {
   if (!email) return { success: false, message: "No email provided" };
 
   console.log("RUN ADD SUBSCRIBER");
@@ -26,7 +26,7 @@ export const runAddSubscriber = async (email) => {
   return subscriberData;
 };
 
-export const runRemoveSubscriber = async (email) => {
+export const deleteSubscriber = async (email) => {
   if (!email) return { success: false, message: "No email provided" };
 
   const removeModel = new dbModel({ keyToLookup: "email", itemValue: email }, process.env.SUBSCRIBERS_COLLECTION);
@@ -37,7 +37,7 @@ export const runRemoveSubscriber = async (email) => {
   return removeData;
 };
 
-export const runSendNewsletter = async (inputParams) => {
+export const dispatchNewsletter = async (inputParams) => {
   if (!inputParams) return { success: false, message: "No input parameters" };
   const { subject, message } = inputParams;
   if (!subject || !message) return { success: false, message: "No subject or message provided" };

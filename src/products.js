@@ -1,7 +1,7 @@
 // import CONFIG from "../config/config.js";
 import dbModel from "../models/db-model.js";
 
-export const runAddNewProduct = async (inputParams) => {
+export const storeProduct = async (inputParams) => {
   const { route: _, ...params } = inputParams;
 
   console.log("PARAMS");
@@ -39,7 +39,7 @@ export const runAddNewProduct = async (inputParams) => {
   return params;
 };
 
-export const runEditProduct = async (inputParams) => {
+export const updateProduct = async (inputParams) => {
   const { route: _, ...params } = inputParams;
 
   const checkParams = {
@@ -72,7 +72,7 @@ export const runEditProduct = async (inputParams) => {
   return params;
 };
 
-export const runDeleteProduct = async (productId) => {
+export const deleteProduct = async (productId) => {
   const checkParams = {
     keyToLookup: "productId",
     itemValue: productId,

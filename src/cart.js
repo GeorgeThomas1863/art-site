@@ -8,7 +8,7 @@ export const buildCart = async (req) => {
   return req.session.cart;
 };
 
-export const runAddToCart = async (req) => {
+export const addCartItem = async (req) => {
   await buildCart(req);
 
   const { productId, quantity } = req.body.data;
@@ -110,7 +110,7 @@ export const runUpdateCartItem = async (req) => {
   return { success: true, cart: req.session.cart };
 };
 
-export const runRemoveFromCart = async (req) => {
+export const removeCartItem = async (req) => {
   const { productId } = req.body;
   if (!productId) return { success: false, error: "No product ID" };
   await buildCart(req);

@@ -1,10 +1,10 @@
-import { runAddNewProduct, runEditProduct, runDeleteProduct, runGetProductData } from "../src/products.js";
-import { runAddNewEvent, runEditEvent, runDeleteEvent, runGetEventData } from "../src/events.js";
+import { storeProduct, updateProduct, deleteProduct, runGetProductData } from "../src/products.js";
+import { storeEvent, updateEvent, deleteEvent, runGetEventData } from "../src/events.js";
 import { runContactSubmit } from "../src/contact.js";
-import { runAddSubscriber, runGetSubscribers, runRemoveSubscriber, runSendNewsletter } from "../src/newsletter.js";
-import { buildCart, runGetCartStats, runAddToCart, runUpdateCartItem, runRemoveFromCart } from "../src/cart.js";
+import { storeSubscriber, runGetSubscribers, deleteSubscriber, dispatchNewsletter } from "../src/newsletter.js";
+import { buildCart, runGetCartStats, addCartItem, runUpdateCartItem, removeCartItem } from "../src/cart.js";
 import {
-  runCalculateShipping,
+  fetchShippingRates,
   getShippingFromSession,
   saveShippingToSession,
   clearShippingFromSession,
@@ -87,7 +87,7 @@ export const addNewProductControl = async (req, res) => {
     "picData",
     "dateCreated",
   ]);
-  const data = await runAddNewProduct(safeParams);
+  const data = await storeProduct(safeParams);
   return res.json(data);
 };
 
@@ -110,7 +110,7 @@ export const editProductControl = async (req, res) => {
     "picData",
     "productId",
   ]);
-  const data = await runEditProduct(safeParams);
+  const data = await updateProduct(safeParams);
   return res.json(data);
 };
 
@@ -119,7 +119,7 @@ export const deleteProductControl = async (req, res) => {
   if (!productId) return res.status(500).json({ error: "No product ID" });
   if (typeof productId === "object") return res.status(400).json({ error: "Invalid product ID" });
 
-  const data = await runDeleteProduct(productId);
+  const data = await deleteProduct(productId);
   return res.json(data);
 };
 
@@ -128,7 +128,7 @@ export const addNewEventControl = async (req, res) => {
   if (!inputParams) return res.status(500).json({ error: "No input parameters" });
 
   const safeParams = whitelistFields(inputParams, ["name", "eventDate", "eventLocation", "eventDescription", "picData", "dateCreated"]);
-  const data = await runAddNewEvent(safeParams);
+  const data = await storeEvent(safeParams);
   return res.json(data);
 };
 
@@ -137,7 +137,7 @@ export const editEventControl = async (req, res) => {
   if (!inputParams) return res.status(500).json({ error: "No input parameters" });
 
   const safeParams = whitelistFields(inputParams, ["name", "eventDate", "eventLocation", "eventDescription", "picData", "eventId"]);
-  const data = await runEditEvent(safeParams);
+  const data = await updateEvent(safeParams);
   return res.json(data);
 };
 
@@ -146,7 +146,7 @@ export const deleteEventControl = async (req, res) => {
   if (!eventId) return res.status(500).json({ error: "No event ID" });
   if (typeof eventId === "object") return res.status(400).json({ error: "Invalid event ID" });
 
-  const data = await runDeleteEvent(eventId);
+  const data = await deleteEvent(eventId);
   return res.json(data);
 };
 
@@ -175,7 +175,7 @@ export const addToCartControl = async (req, res) => {
   if (typeof productId === "object") return res.status(400).json({ error: "Invalid product ID" });
   if (!validatePositiveInt(quantity)) return res.status(400).json({ error: "Invalid quantity" });
 
-  const data = await runAddToCart(req);
+  const data = await addCartItem(req);
   if (!data || !data.success) return res.status(500).json({ error: data?.message || "Failed to add item to cart" });
 
   res.json(data);
@@ -196,7 +196,7 @@ export const updateCartItemControl = async (req, res) => {
 export const removeFromCartControl = async (req, res) => {
   if (!req || !req.body) return res.status(500).json({ error: "No input parameters" });
 
-  const data = await runRemoveFromCart(req);
+  const data = await removeCartItem(req);
   if (!data || !data.success) return res.status(500).json({ error: "Failed to remove item from cart" });
 
   res.json(data);
@@ -228,7 +228,7 @@ export const calculateShippingControl = async (req, res) => {
 
   if (!validateZip(req.body.zip)) return res.status(400).json({ error: "Invalid ZIP code format" });
 
-  const data = await runCalculateShipping(req);
+  const data = await fetchShippingRates(req);
   if (!data || !data.success) return res.status(500).json({ error: data?.message || "Failed to calculate shipping" });
 
   return res.json(data);
@@ -311,7 +311,7 @@ export const addSubscriberControl = async (req, res) => {
   if (!req.body.email) return res.status(500).json({ error: "No email provided" });
   if (!validateEmail(req.body.email)) return res.status(400).json({ error: "Invalid email format" });
 
-  const data = await runAddSubscriber(req.body.email);
+  const data = await storeSubscriber(req.body.email);
   if (!data || !data.success) return res.status(500).json({ error: "Failed to add email to newsletter" });
 
   return res.json(data);
@@ -326,7 +326,7 @@ export const sendNewsletterControl = async (req, res) => {
   if (!req || !req.body) return res.status(500).json({ error: "No input parameters" });
   if (!req.body.subject || !req.body.message) return res.status(500).json({ error: "No subject or message provided" });
 
-  const data = await runSendNewsletter(req.body);
+  const data = await dispatchNewsletter(req.body);
   if (!data || !data.success) return res.status(500).json({ error: "Failed to send newsletter" });
 
   return res.json(data);
@@ -335,7 +335,7 @@ export const sendNewsletterControl = async (req, res) => {
 export const removeSubscriberControl = async (req, res) => {
   if (!req || !req.body) return res.status(500).json({ error: "No input parameters" });
 
-  const data = await runRemoveSubscriber(req.body.email);
+  const data = await deleteSubscriber(req.body.email);
   if (!data || !data.success) return res.status(500).json({ error: "Failed to remove subscriber" });
 
   return res.json(data);

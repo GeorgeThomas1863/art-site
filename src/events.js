@@ -1,6 +1,6 @@
 import dbModel from "../models/db-model.js";
 
-export const runAddNewEvent = async (inputParams) => {
+export const storeEvent = async (inputParams) => {
   const { route: _, ...params } = inputParams;
 
   console.log("PARAMS");
@@ -38,7 +38,7 @@ export const runAddNewEvent = async (inputParams) => {
   return params;
 };
 
-export const runEditEvent = async (inputParams) => {
+export const updateEvent = async (inputParams) => {
   const { route: _, ...params } = inputParams;
 
   const checkParams = {
@@ -71,7 +71,7 @@ export const runEditEvent = async (inputParams) => {
   return params;
 };
 
-export const runDeleteEvent = async (eventId) => {
+export const deleteEvent = async (eventId) => {
   const checkParams = {
     keyToLookup: "eventId",
     itemValue: eventId,
