@@ -62,7 +62,7 @@ export const addCartItem = async (req) => {
   return { success: true, cart: req.session.cart, itemCount: itemCount };
 };
 
-export const runGetCartStats = async (req) => {
+export const getCartStats = async (req) => {
   await buildCart(req);
 
   let itemCount = 0;
@@ -78,7 +78,7 @@ export const runGetCartStats = async (req) => {
   return { itemCount, total, success: true };
 };
 
-export const runUpdateCartItem = async (req) => {
+export const updateCartItem = async (req) => {
   const { quantity, productId } = req.body;
   await buildCart(req);
 

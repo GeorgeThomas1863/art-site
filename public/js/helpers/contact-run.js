@@ -2,7 +2,7 @@ import { buildContactParams } from "../util/params.js";
 import { sendToBack } from "../util/api-front.js";
 import { displayPopup } from "../util/popup.js";
 
-export const sendContactForm = async () => {
+export const runContactSubmit = async () => {
   const contactParams = await buildContactParams();
   console.log("CONTACT PARAMS:");
   console.dir(contactParams);

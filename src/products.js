@@ -102,7 +102,7 @@ export const deleteProduct = async (productId) => {
 
 //---------------
 
-export const runGetProductData = async () => {
+export const getProductData = async () => {
   const dataModel = new dbModel("", process.env.PRODUCTS_COLLECTION);
   const data = await dataModel.getAll();
   // console.log("DATA");

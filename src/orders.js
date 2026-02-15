@@ -1,6 +1,6 @@
 import nodemailer from "nodemailer";
 import dbModel from "../models/db-model.js";
-import { runGetCartStats } from "./cart.js";
+import { getCartStats } from "./cart.js";
 import { processPayment } from "./payments.js";
 import { storeCustomerData } from "./customer.js";
 import { escapeHtml, sanitizeEmailHeader } from "./sanitize.js";
@@ -21,7 +21,7 @@ export const placeNewOrder = async (req) => {
   const shippingCost = +Number(selectedRate.shipping_amount.amount).toFixed(2);
   if (!shippingCost) return { success: false, message: "Failed to get shipping cost" };
 
-  const cartStats = await runGetCartStats(req);
+  const cartStats = await getCartStats(req);
   if (!cartStats || !cartStats.total) return { success: false, message: "Failed to get cart data" };
 
   const subtotal = +Number(cartStats.total).toFixed(2);

@@ -1,7 +1,7 @@
 import nodemailer from "nodemailer";
 import dbModel from "../models/db-model.js";
 
-export const runGetSubscribers = async () => {
+export const getSubscribers = async () => {
   const dataModel = new dbModel("", process.env.SUBSCRIBERS_COLLECTION);
   const data = await dataModel.getAll();
   return data;
@@ -42,7 +42,7 @@ export const dispatchNewsletter = async (inputParams) => {
   const { subject, message } = inputParams;
   if (!subject || !message) return { success: false, message: "No subject or message provided" };
 
-  const subscriberArray = await runGetSubscribers();
+  const subscriberArray = await getSubscribers();
   if (!subscriberArray || !subscriberArray.length) return { success: false, message: "No subscribers found" };
 
   const transport = nodemailer.createTransport({

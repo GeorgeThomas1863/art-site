@@ -99,7 +99,7 @@ export const deleteEvent = async (eventId) => {
   return params;
 };
 
-export const runGetEventData = async () => {
+export const getEventData = async () => {
   const dataModel = new dbModel("", process.env.EVENTS_COLLECTION);
   const data = await dataModel.getAll();
   // console.log("EVENT DATA");

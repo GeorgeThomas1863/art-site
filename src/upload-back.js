@@ -56,7 +56,7 @@ export const upload = multer({
 
 //-------------------
 
-export const runDeletePic = async (filename) => {
+export const deletePic = async (filename) => {
   const safeName = sanitizeFilename(filename);
   if (!safeName) return { success: false, message: "Invalid filename" };
 

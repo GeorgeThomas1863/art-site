@@ -1,8 +1,8 @@
-import { storeProduct, updateProduct, deleteProduct, runGetProductData } from "../src/products.js";
-import { storeEvent, updateEvent, deleteEvent, runGetEventData } from "../src/events.js";
-import { runContactSubmit } from "../src/contact.js";
-import { storeSubscriber, runGetSubscribers, deleteSubscriber, dispatchNewsletter } from "../src/newsletter.js";
-import { buildCart, runGetCartStats, addCartItem, runUpdateCartItem, removeCartItem } from "../src/cart.js";
+import { storeProduct, updateProduct, deleteProduct, getProductData } from "../src/products.js";
+import { storeEvent, updateEvent, deleteEvent, getEventData } from "../src/events.js";
+import { submitContact } from "../src/contact.js";
+import { storeSubscriber, getSubscribers, deleteSubscriber, dispatchNewsletter } from "../src/newsletter.js";
+import { buildCart, getCartStats, addCartItem, updateCartItem, removeCartItem } from "../src/cart.js";
 import {
   fetchShippingRates,
   getShippingFromSession,
@@ -11,7 +11,7 @@ import {
   updateSelectedRate,
 } from "../src/shipping.js";
 import { placeNewOrder } from "../src/orders.js";
-import { runDeletePic } from "../src/upload-back.js";
+import { deletePic } from "../src/upload-back.js";
 import {
   validateEmail,
   validateZip,
@@ -24,12 +24,12 @@ import {
 
 //returns data for all products
 export const getProductDataControl = async (req, res) => {
-  const data = await runGetProductData();
+  const data = await getProductData();
   return res.json(data);
 };
 
 export const getEventDataControl = async (req, res) => {
-  const data = await runGetEventData();
+  const data = await getEventData();
   return res.json(data);
 };
 
@@ -58,7 +58,7 @@ export const deletePicControl = async (req, res) => {
   if (!safeName || safeName !== filename) return res.status(400).json({ error: "Invalid filename" });
 
   try {
-    const data = await runDeletePic(safeName);
+    const data = await deletePic(safeName);
     if (!data || !data.success) return res.status(500).json({ error: data.message });
 
     return res.json(data);
@@ -162,7 +162,7 @@ export const getCartDataControl = async (req, res) => {
 export const getCartStatsControl = async (req, res) => {
   if (!req || !req.session || !req.session.cart) return res.status(500).json({ error: "No cart data" });
 
-  const data = await runGetCartStats(req);
+  const data = await getCartStats(req);
   if (!data || !data.success) return res.status(500).json({ error: "Failed to get cart stats" });
 
   res.json(data);
@@ -184,7 +184,7 @@ export const addToCartControl = async (req, res) => {
 export const updateCartItemControl = async (req, res) => {
   if (!req || !req.body) return res.status(500).json({ error: "No input parameters" });
 
-  const data = await runUpdateCartItem(req);
+  const data = await updateCartItem(req);
   console.log("UPDATE CART ITEM DATA:");
   console.log(data);
   if (!data || !data.success) return res.status(500).json({ error: "Failed to update cart item" });
@@ -300,7 +300,7 @@ export const contactSubmitControl = async (req, res) => {
   if (!validateEmail(email)) return res.status(400).json({ error: "Invalid email" });
   if (!validateString(message, 5000)) return res.status(400).json({ error: "Invalid message" });
 
-  const data = await runContactSubmit(req.body);
+  const data = await submitContact(req.body);
   if (!data || !data.success) return res.status(500).json({ error: data?.message || "Failed to submit contact form" });
 
   return res.json(data);
@@ -318,7 +318,7 @@ export const addSubscriberControl = async (req, res) => {
 };
 
 export const getSubscribersControl = async (req, res) => {
-  const data = await runGetSubscribers();
+  const data = await getSubscribers();
   return res.json(data);
 };
 

@@ -3,7 +3,7 @@ import dbModel from "../models/db-model.js";
 import { storeSubscriber } from "./newsletter.js";
 import { escapeHtml, sanitizeEmailHeader, validateEmail } from "./sanitize.js";
 
-export const runContactSubmit = async (inputParams) => {
+export const submitContact = async (inputParams) => {
   if (!inputParams) return { success: false, message: "No input parameters" };
 
   console.log("RUN CONTACT SUBMIT");
