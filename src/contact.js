@@ -32,7 +32,7 @@ export const runContactSubmit = async (inputParams) => {
 
   const mailParams = {
     from: process.env.EMAIL_USER,
-    to: process.env.EMAIL_RECIPIENT,
+    to: [process.env.EMAIL_RECIPIENT_1, process.env.EMAIL_RECIPIENT_2].filter(Boolean).join(", "),
     subject: `SITE MESSAGE FROM ${sanitizeEmailHeader(name)} | SUBJECT: ${sanitizeEmailHeader(subject)}`,
     html: `
       <h4>NEW CONTACT FORM SUBMISSION:</h4>

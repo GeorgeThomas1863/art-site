@@ -176,7 +176,7 @@ export const sendOrderConfirmationEmails = async (orderData) => {
   try {
     await transport.sendMail({
       from: process.env.EMAIL_USER,
-      to: process.env.EMAIL_RECIPIENT,
+      to: [process.env.EMAIL_RECIPIENT_1, process.env.EMAIL_RECIPIENT_2].filter(Boolean).join(", "),
       subject: `New Order — Receipt #${receiptNumber} from ${sanitizeEmailHeader(firstName)} ${sanitizeEmailHeader(lastName)}`,
       html: adminHtml,
     });
@@ -279,9 +279,11 @@ const buildEmailHtml = (orderData, type) => {
   let paymentSection = "";
   if (isAdmin) {
     const billingLine = billingAddress
-      ? `${escapeHtml(billingAddress.addressLine1 || "")}${billingAddress.addressLine2 ? ", " + escapeHtml(billingAddress.addressLine2) : ""}, ${
-          escapeHtml(billingAddress.locality || "")
-        }, ${escapeHtml(billingAddress.administrativeDistrictLevel1 || "")} ${escapeHtml(billingAddress.postalCode || "")}, ${escapeHtml(billingAddress.country || "")}`
+      ? `${escapeHtml(billingAddress.addressLine1 || "")}${
+          billingAddress.addressLine2 ? ", " + escapeHtml(billingAddress.addressLine2) : ""
+        }, ${escapeHtml(billingAddress.locality || "")}, ${escapeHtml(billingAddress.administrativeDistrictLevel1 || "")} ${escapeHtml(
+          billingAddress.postalCode || ""
+        )}, ${escapeHtml(billingAddress.country || "")}`
       : "N/A";
 
     paymentSection = `
