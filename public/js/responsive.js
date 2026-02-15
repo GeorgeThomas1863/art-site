@@ -4,7 +4,7 @@ import { runAddNewEvent, runEditEvent, runDeleteEvent, changeAdminEventSelector 
 import { runSendNewsletter, runAddSubscriber, runRemoveSubscriber } from "./helpers/admin-newsletter.js";
 import { runUploadClick, runUploadPic, runDeleteUploadImage } from "./helpers/upload-pic.js";
 import { changeProductsFilterButton, openProductDetailModal, closeProductDetailModal } from "./helpers/products-run.js";
-import { runContactSubmit } from "./helpers/contact-run.js";
+import { sendContactForm } from "./helpers/contact-run.js";
 import { runEventsNewsletterToggle, runEventsNewsletterSubmit } from "./helpers/events-run.js";
 import { runAddToCart, runIncreaseQuantity, runDecreaseQuantity, runRemoveFromCart } from "./helpers/cart-run.js";
 import { runPlaceOrder } from "./helpers/buy-run.js";
@@ -77,7 +77,7 @@ export const clickHandler = async (e) => {
 
   if (clickType === "toggle-menu") await runToggleMenu();
 
-  if (clickType === "contact-submit") await runContactSubmit();
+  if (clickType === "contact-submit") await sendContactForm();
 
   if (clickType === "new-product-submit") await runAddNewProduct();
   if (clickType === "edit-product-submit") await runEditProduct();

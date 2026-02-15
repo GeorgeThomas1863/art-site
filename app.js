@@ -1,6 +1,6 @@
 //set up new email
 
-//change email receipient to ms g and me
+//change frontend / backend duplicative names
 
 //have the can ship selection NOT cause shit to disappear but instead change shipping info to N/A / make not editable
 

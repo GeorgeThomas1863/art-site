@@ -72,7 +72,21 @@ export const addNewProductControl = async (req, res) => {
   const inputParams = req.body;
   if (!inputParams) return res.status(500).json({ error: "No input parameters" });
 
-  const safeParams = whitelistFields(inputParams, ["name", "productType", "price", "canShip", "length", "width", "height", "weight", "description", "display", "sold", "picData", "dateCreated"]);
+  const safeParams = whitelistFields(inputParams, [
+    "name",
+    "productType",
+    "price",
+    "canShip",
+    "length",
+    "width",
+    "height",
+    "weight",
+    "description",
+    "display",
+    "sold",
+    "picData",
+    "dateCreated",
+  ]);
   const data = await runAddNewProduct(safeParams);
   return res.json(data);
 };
@@ -81,7 +95,21 @@ export const editProductControl = async (req, res) => {
   const inputParams = req.body;
   if (!inputParams) return res.status(500).json({ error: "No input parameters" });
 
-  const safeParams = whitelistFields(inputParams, ["name", "productType", "price", "canShip", "length", "width", "height", "weight", "description", "display", "sold", "picData", "productId"]);
+  const safeParams = whitelistFields(inputParams, [
+    "name",
+    "productType",
+    "price",
+    "canShip",
+    "length",
+    "width",
+    "height",
+    "weight",
+    "description",
+    "display",
+    "sold",
+    "picData",
+    "productId",
+  ]);
   const data = await runEditProduct(safeParams);
   return res.json(data);
 };
@@ -267,10 +295,9 @@ export const placeOrderControl = async (req, res) => {
 export const contactSubmitControl = async (req, res) => {
   if (!req || !req.body) return res.status(500).json({ error: "No input parameters" });
 
-  const { name, email, subject, message } = req.body;
+  const { name, email, message } = req.body;
   if (!validateString(name, 100)) return res.status(400).json({ error: "Invalid name" });
   if (!validateEmail(email)) return res.status(400).json({ error: "Invalid email" });
-  if (!validateString(subject, 200)) return res.status(400).json({ error: "Invalid subject" });
   if (!validateString(message, 5000)) return res.status(400).json({ error: "Invalid message" });
 
   const data = await runContactSubmit(req.body);
