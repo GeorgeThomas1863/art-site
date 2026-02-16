@@ -67,7 +67,8 @@ export const buildProductsDisplay = async () => {
   // console.dir(productData);
 
   await updateNavbarCart();
-  await populateProducts(productData);
+  const displayedProducts = productData ? productData.filter((p) => p.display !== "no") : [];
+  await populateProducts(displayedProducts);
 
   await updateCategoryDescription("all");
 

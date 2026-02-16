@@ -1,4 +1,4 @@
-import { storeProduct, updateProduct, deleteProduct, getProductData } from "../src/products.js";
+import { storeProduct, updateProduct, deleteProduct, getProductData, hideOrderedProducts } from "../src/products.js";
 import { storeEvent, updateEvent, deleteEvent, getEventData } from "../src/events.js";
 import { submitContact } from "../src/contact.js";
 import { storeSubscriber, getSubscribers, deleteSubscriber, dispatchNewsletter } from "../src/newsletter.js";
@@ -84,6 +84,7 @@ export const addNewProductControl = async (req, res) => {
     "description",
     "display",
     "sold",
+    "removeWhenSold",
     "picData",
     "dateCreated",
   ]);
@@ -107,6 +108,7 @@ export const editProductControl = async (req, res) => {
     "description",
     "display",
     "sold",
+    "removeWhenSold",
     "picData",
     "productId",
   ]);
@@ -285,6 +287,11 @@ export const placeOrderControl = async (req, res) => {
   // After successful order, subscribe to newsletter if opted in
   if (data.success && req.body.newsletter && req.body.email) {
     storeSubscriber(req.body.email).catch((e) => console.error("NEWSLETTER SUBSCRIBE ERROR:", e));
+  }
+
+  // After successful order, hide products flagged with removeWhenSold
+  if (data.success && data.data && data.data.cartData) {
+    hideOrderedProducts(data.data.cartData).catch((e) => console.error("HIDE PRODUCTS ERROR:", e));
   }
 
   //json throws error with "bigint" type, converting to numbers

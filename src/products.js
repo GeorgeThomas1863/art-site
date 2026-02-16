@@ -102,6 +102,30 @@ export const deleteProduct = async (productId) => {
 
 //---------------
 
+export const hideOrderedProducts = async (cartItems) => {
+  if (!cartItems || !cartItems.length) return;
+
+  for (const item of cartItems) {
+    const checkParams = {
+      keyToLookup: "productId",
+      itemValue: item.productId,
+    };
+
+    const checkModel = new dbModel(checkParams, process.env.PRODUCTS_COLLECTION);
+    const product = await checkModel.getUniqueItem();
+    if (!product || product.removeWhenSold !== "yes") continue;
+
+    const updateParams = {
+      keyToLookup: "productId",
+      itemValue: item.productId,
+      updateObj: { display: "no" },
+    };
+
+    const updateModel = new dbModel(updateParams, process.env.PRODUCTS_COLLECTION);
+    await updateModel.updateObjItem();
+  }
+};
+
 export const getProductData = async () => {
   const dataModel = new dbModel("", process.env.PRODUCTS_COLLECTION);
   const data = await dataModel.getAll();
