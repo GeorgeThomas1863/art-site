@@ -120,7 +120,7 @@ export const runChangeStatusCard = async (changeElement) => {
       input.value = "N/A";
       input.disabled = true;
     } else {
-      input.value = "";
+      input.value = (!input.value || input.value === "N/A" || input.value === "0") ? "5" : input.value;
       input.disabled = false;
     }
   }

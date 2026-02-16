@@ -1,4 +1,6 @@
-//shipping flag
+//enforce shipping flag for products on checkout, make new display for no?
+
+//put image first in modal?
 
 //remove console log
 
