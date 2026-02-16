@@ -1,4 +1,6 @@
-//AUTO MARK AS SOLD / REMOVE FROM DISPLAY / add option to admin remove from dispaly if sold
+//shipping flag
+
+//remove console log
 
 //about display still wrong
 

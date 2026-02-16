@@ -107,13 +107,22 @@ export const runChangeStatusCard = async (changeElement) => {
     }
   }
 
-  // Toggle shipping section visibility for can-ship
+  // Update shipping fields for can-ship toggle
   if (changeId !== "can-ship" && changeId !== "edit-can-ship") return null;
 
-  const mode = changeId.includes("edit") ? "edit" : "add";
-  const shippingSection = document.getElementById(`${mode}-shipping-section`);
-  if (shippingSection) {
-    shippingSection.style.display = changeElement.value === "yes" ? "block" : "none";
+  const prefix = changeId.includes("edit") ? "edit-" : "";
+  const shippingIds = [`${prefix}length`, `${prefix}width`, `${prefix}height`, `${prefix}weight`];
+
+  for (const id of shippingIds) {
+    const input = document.getElementById(id);
+    if (!input) continue;
+    if (changeElement.value === "no") {
+      input.value = "N/A";
+      input.disabled = true;
+    } else {
+      input.value = "";
+      input.disabled = false;
+    }
   }
 };
 

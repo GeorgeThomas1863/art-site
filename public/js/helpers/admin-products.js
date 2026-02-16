@@ -246,6 +246,19 @@ export const populateEditFormProducts = async (inputObj) => {
     displayEl.classList.add("status-no");
   }
 
+  // Show N/A in shipping fields when can-ship is "no"
+  const canShipEl = document.getElementById("edit-can-ship");
+  if (canShipEl?.value === "no") {
+    const shippingIds = ["edit-length", "edit-width", "edit-height", "edit-weight"];
+    for (const id of shippingIds) {
+      const input = document.getElementById(id);
+      if (input) {
+        input.value = "N/A";
+        input.disabled = true;
+      }
+    }
+  }
+
   const deleteButton = document.getElementById("delete-product-button");
   if (deleteButton) {
     // deleteButton.style.display = "block";
