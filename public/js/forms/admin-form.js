@@ -446,10 +446,13 @@ export const buildProductStatusSection = async (mode) => {
   // Sold Status Card
   const soldCard = await buildStatusCard(mode, "sold", "Sold?", "sold-card");
 
+  // Remove When Sold Status Card
+  const removeWhenSoldCard = await buildStatusCard(mode, "remove-when-sold", "Remove If Sold", "remove-when-sold-card");
+
   // Can Ship Status Card
   const canShipCard = await buildStatusCard(mode, "can-ship", "Can Ship", "can-ship-card");
 
-  statusGrid.append(soldCard, displayCard, canShipCard);
+  statusGrid.append(soldCard, displayCard, removeWhenSoldCard, canShipCard);
   section.append(header, statusGrid);
 
   return section;
@@ -673,7 +676,7 @@ export const buildStatusCard = async (mode, fieldName, labelText, dataLabel = nu
   const yesOption = document.createElement("option");
   yesOption.value = "yes";
   yesOption.textContent = "Yes";
-  if (fieldName === "display" || fieldName === "can-ship") {
+  if (fieldName === "display" || fieldName === "can-ship" || fieldName === "remove-when-sold") {
     yesOption.selected = true;
   }
 

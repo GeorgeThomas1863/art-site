@@ -1,5 +1,3 @@
-//total orders fucking updating wrong in customers db
-
 //AUTO MARK AS SOLD / REMOVE FROM DISPLAY / add option to admin remove from dispaly if sold
 
 //about display still wrong

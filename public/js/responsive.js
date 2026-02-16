@@ -139,7 +139,7 @@ export const changeHandler = async (e) => {
   }
 
   // Status select color change
-  if (changeType === "display-card" || changeType === "sold-card" || changeType === "can-ship-card") await runChangeStatusCard(changeElement);
+  if (changeType === "display-card" || changeType === "sold-card" || changeType === "can-ship-card" || changeType === "remove-when-sold-card") await runChangeStatusCard(changeElement);
 
   //entity selector
   if (changeId === "entity-type-selector") await runEntityTypeChange(changeElement);

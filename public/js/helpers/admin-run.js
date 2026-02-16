@@ -102,6 +102,7 @@ export const enableAdminEditFields = async () => {
     "edit-display",
     "edit-sold",
     "edit-can-ship",
+    "edit-remove-when-sold",
     "edit-length",
     "edit-width",
     "edit-height",
@@ -133,6 +134,7 @@ export const disableAdminEditFields = async () => {
     "edit-display",
     "edit-sold",
     "edit-can-ship",
+    "edit-remove-when-sold",
     "edit-length",
     "edit-width",
     "edit-height",
@@ -174,6 +176,9 @@ export const clearAdminAddFields = async () => {
 
   const soldSelect = document.getElementById("sold");
   if (soldSelect) soldSelect.value = "no"; // Reset to default
+
+  const removeWhenSoldSelect = document.getElementById("remove-when-sold");
+  if (removeWhenSoldSelect) removeWhenSoldSelect.value = "yes"; // Reset to default
 
   // Clear image preview
   const currentImagePreview = document.getElementById("current-image-preview");

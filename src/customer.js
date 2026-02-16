@@ -34,22 +34,27 @@ export const storeCustomerData = async (orderData) => {
   console.log(newCustomerData);
 
   customerParams.customerId = newCustomerData.insertedId.toString();
-  console.log("CUSTOMER ID:", customerParams.customerId);
+
+  const backfillModel = new dbModel(
+    { keyToLookup: "_id", itemValue: newCustomerData.insertedId, updateObj: { customerId: customerParams.customerId } },
+    process.env.CUSTOMERS_COLLECTION
+  );
+  await backfillModel.updateObjItem();
 
   return customerParams;
 };
 
 export const updateCustomerData = async (inputParams) => {
   if (!inputParams) return null;
-  const { firstName, lastName, address, lastOrderId, lastOrderDate, lastAmountPaid, totalPaid, totalItemsPurchased } = inputParams;
+  const { firstName, lastName, email, lastOrderId, lastOrderDate, lastAmountPaid, totalPaid, totalItemsPurchased } = inputParams;
 
   const checkParams = {
     keyToLookup1: "firstName",
     keyToLookup2: "lastName",
-    keyToLookup3: "address",
+    keyToLookup3: "email",
     itemValue1: firstName,
     itemValue2: lastName,
-    itemValue3: address,
+    itemValue3: email,
   };
 
   const checkModel = new dbModel(checkParams, process.env.CUSTOMERS_COLLECTION);
@@ -69,10 +74,7 @@ export const updateCustomerData = async (inputParams) => {
     totalOrders: +(Number(checkData.totalOrders || 0) + 1),
   };
 
-  const updateModel = new dbModel(
-    { keyToLookup: "customerId", itemValue: checkData.customerId, updateObj: updateParams },
-    process.env.CUSTOMERS_COLLECTION
-  );
+  const updateModel = new dbModel({ keyToLookup: "_id", itemValue: checkData._id, updateObj: updateParams }, process.env.CUSTOMERS_COLLECTION);
   const updateData = await updateModel.updateObjItem();
   if (!updateData) return null;
   return updateParams;
