@@ -79,6 +79,34 @@ export const runChangeStatusCard = async (changeElement) => {
   changeElement.classList.remove("status-yes", "status-no");
   changeElement.classList.add(`status-${changeElement.value}`);
 
+  // Cross-flag logic for sold / removeWhenSold / display
+  const soldIds = ["sold", "edit-sold"];
+  const removeIds = ["remove-when-sold", "edit-remove-when-sold"];
+  const displayIds = ["display", "edit-display"];
+
+  if (soldIds.includes(changeId) || removeIds.includes(changeId) || displayIds.includes(changeId)) {
+    const prefix = changeId.startsWith("edit-") ? "edit-" : "";
+    const soldEl = document.getElementById(`${prefix}sold`);
+    const removeEl = document.getElementById(`${prefix}remove-when-sold`);
+    const displayEl = document.getElementById(`${prefix}display`);
+
+    // sold=yes + removeWhenSold=yes → display=no
+    if ((soldIds.includes(changeId) || removeIds.includes(changeId))
+        && soldEl?.value === "yes" && removeEl?.value === "yes" && displayEl) {
+      displayEl.value = "no";
+      displayEl.classList.remove("status-yes", "status-no");
+      displayEl.classList.add("status-no");
+    }
+
+    // display=yes + sold=yes → removeWhenSold=no
+    if (displayIds.includes(changeId) && changeElement.value === "yes"
+        && soldEl?.value === "yes" && removeEl) {
+      removeEl.value = "no";
+      removeEl.classList.remove("status-yes", "status-no");
+      removeEl.classList.add("status-no");
+    }
+  }
+
   // Toggle shipping section visibility for can-ship
   if (changeId !== "can-ship" && changeId !== "edit-can-ship") return null;
 

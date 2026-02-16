@@ -225,6 +225,27 @@ export const populateEditFormProducts = async (inputObj) => {
     }
   }
 
+  // Sync CSS classes on status selects to match their values
+  const statusIds = ["edit-display", "edit-sold", "edit-can-ship", "edit-remove-when-sold"];
+  for (const id of statusIds) {
+    const el = document.getElementById(id);
+    if (el) {
+      el.classList.remove("status-yes", "status-no");
+      el.classList.add(`status-${el.value}`);
+    }
+  }
+
+  // Enforce cross-flag invariant on legacy data
+  const soldEl = document.getElementById("edit-sold");
+  const removeEl = document.getElementById("edit-remove-when-sold");
+  const displayEl = document.getElementById("edit-display");
+
+  if (soldEl?.value === "yes" && removeEl?.value === "yes" && displayEl) {
+    displayEl.value = "no";
+    displayEl.classList.remove("status-yes", "status-no");
+    displayEl.classList.add("status-no");
+  }
+
   const deleteButton = document.getElementById("delete-product-button");
   if (deleteButton) {
     // deleteButton.style.display = "block";

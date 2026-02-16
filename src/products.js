@@ -113,12 +113,15 @@ export const hideOrderedProducts = async (cartItems) => {
 
     const checkModel = new dbModel(checkParams, process.env.PRODUCTS_COLLECTION);
     const product = await checkModel.getUniqueItem();
-    if (!product || product.removeWhenSold !== "yes") continue;
+    if (!product) continue;
+
+    const updateObj = { sold: "yes" };
+    if (product.removeWhenSold === "yes") updateObj.display = "no";
 
     const updateParams = {
       keyToLookup: "productId",
       itemValue: item.productId,
-      updateObj: { display: "no" },
+      updateObj,
     };
 
     const updateModel = new dbModel(updateParams, process.env.PRODUCTS_COLLECTION);
