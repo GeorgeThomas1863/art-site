@@ -1,10 +1,10 @@
-//enforce shipping flag for products on checkout, make new display for no?
+//about display still wrong in modal
 
-//put image first in modal?
+//get rid of estimate shipping button, and make it same as debounce on checkout
 
 //remove console log
 
-//about display still wrong
+// do another security audit
 
 //upcoming events value in admin section is off
 
