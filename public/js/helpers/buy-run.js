@@ -148,7 +148,16 @@ export const loadCheckoutShippingOptions = async () => {
     return null;
   }
 
-  const { rateData, selectedRate } = data.shipping;
+  const { rateData, selectedRate, allPickup } = data.shipping;
+
+  // All items are pickup only — show pickup message instead of rate options
+  if (allPickup) {
+    const pickupMsg = document.createElement("div");
+    pickupMsg.className = "checkout-pickup-message";
+    pickupMsg.textContent = "All items in your cart are pickup only — no shipping required";
+    shippingContainer.append(pickupMsg);
+    return true;
+  }
 
   if (!rateData || !rateData.length) {
     const noShippingMsg = document.createElement("div");
@@ -303,17 +312,23 @@ export const displayOrderDetails = async (inputData) => {
 
   if (inputData.shippingDetails) {
     const sd = inputData.shippingDetails;
-    obj.shippingMethod.textContent = `${sd.carrier || ""} — ${sd.serviceType || ""}`;
 
-    if (sd.estimatedDelivery) {
-      const deliveryDate = new Date(sd.estimatedDelivery + "T00:00:00");
-      obj.estimatedDelivery.textContent = deliveryDate.toLocaleDateString("en-US", {
-        year: "numeric",
-        month: "long",
-        day: "numeric",
-      });
+    if (sd.carrier === "Pickup") {
+      obj.shippingMethod.textContent = "In-Store Pickup";
+      obj.estimatedDelivery.textContent = "We will contact you";
     } else {
-      obj.estimatedDelivery.textContent = "N/A";
+      obj.shippingMethod.textContent = `${sd.carrier || ""} — ${sd.serviceType || ""}`;
+
+      if (sd.estimatedDelivery) {
+        const deliveryDate = new Date(sd.estimatedDelivery + "T00:00:00");
+        obj.estimatedDelivery.textContent = deliveryDate.toLocaleDateString("en-US", {
+          year: "numeric",
+          month: "long",
+          day: "numeric",
+        });
+      } else {
+        obj.estimatedDelivery.textContent = "N/A";
+      }
     }
   }
 
@@ -334,10 +349,18 @@ export const displayOrderItems = async (inputData) => {
   itemsContainer.innerHTML = "";
 
   // Build and append confirmation items
+  let hasPickupItems = false;
   for (let i = 0; i < cartData.length; i++) {
     const item = cartData[i];
     const confirmItem = await buildConfirmItem(item);
     itemsContainer.append(confirmItem);
+    if (item.canShip === "no") hasPickupItems = true;
+  }
+
+  // Show pickup note if any items are pickup-only
+  if (hasPickupItems) {
+    const pickupNote = document.getElementById("confirm-pickup-note");
+    if (pickupNote) pickupNote.classList.remove("hidden");
   }
 
   return true;

@@ -24,7 +24,7 @@ export const fetchShippingRates = async (req) => {
 
     const productModel = new dbModel({ keyToLookup: "productId", itemValue: safeProductId }, process.env.PRODUCTS_COLLECTION);
     const productData = await productModel.getUniqueItem();
-    if (!productData || !productData.canShip) continue;
+    if (!productData || productData.canShip === "no") continue;
     console.log("PRODUCT DATA");
     console.log(productData);
     totalWeight += (productData.weight || 0) * safeQuantity;
@@ -32,6 +32,27 @@ export const fetchShippingRates = async (req) => {
     maxLength = Math.max(maxLength, productData.length || 0);
     maxWidth = Math.max(maxWidth, productData.width || 0);
     maxHeight = Math.max(maxHeight, productData.height || 0);
+  }
+
+  // All items were non-shippable — return a synthetic pickup rate
+  if (totalWeight === 0 && maxLength === 0 && maxWidth === 0 && maxHeight === 0) {
+    const pickupRate = {
+      rateId: 0,
+      carrier_friendly_name: "Pickup",
+      service_type: "In-Store Pickup",
+      shipping_amount: { amount: 0, currency: "usd" },
+      delivery_days: null,
+      estimated_delivery_date: null,
+      allPickup: true,
+    };
+    req.session.shipping = {
+      zip,
+      selectedRate: pickupRate,
+      rateData: [pickupRate],
+      calculatedAt: new Date().toISOString(),
+      allPickup: true,
+    };
+    return { success: true, message: "All items are pickup only", rateData: [pickupRate], allPickup: true };
   }
 
   // Calculate girth and enforce 100" limit

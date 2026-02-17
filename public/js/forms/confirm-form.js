@@ -143,10 +143,30 @@ export const buildConfirmItemsSection = async () => {
     receiptLink.textContent = "View Receipt on Square";
     receiptLink.style.display = "none"; // Hidden until URL is set
 
-  itemsCard.append(cardTitle, itemsContainer, summaryDetails, receiptLink);
+  const pickupNote = await buildPickupNote();
+
+  itemsCard.append(cardTitle, itemsContainer, pickupNote, summaryDetails, receiptLink);
   itemsSection.append(itemsCard);
 
   return itemsSection;
+};
+
+export const buildPickupNote = async () => {
+  const note = document.createElement("div");
+  note.className = "confirm-pickup-note hidden";
+  note.id = "confirm-pickup-note";
+
+  const iconCircle = document.createElement("div");
+  iconCircle.className = "confirm-pickup-note-icon";
+  iconCircle.textContent = "i";
+
+  const text = document.createElement("p");
+  text.className = "confirm-pickup-note-text";
+  text.textContent = "Some items in your order are pickup only and cannot be shipped. We will be in touch to arrange how you'll receive those items.";
+
+  note.append(iconCircle, text);
+
+  return note;
 };
 
 export const buildConfirmActions = async () => {
@@ -232,6 +252,14 @@ export const buildConfirmItem = async (itemData) => {
   itemPrice.textContent = `$${totalPrice.toFixed(2)}`;
 
   itemDetails.append(itemName, itemQuantity);
+
+  if (itemData.canShip === "no") {
+    const badge = document.createElement("span");
+    badge.className = "pickup-badge";
+    badge.textContent = "Pickup Only";
+    itemDetails.append(badge);
+  }
+
   confirmItem.append(itemImage, itemDetails, itemPrice);
 
   return confirmItem;

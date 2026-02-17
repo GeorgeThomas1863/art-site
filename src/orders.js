@@ -19,7 +19,7 @@ export const placeNewOrder = async (req) => {
 
   const selectedRate = req.session.shipping.selectedRate;
   const shippingCost = +Number(selectedRate.shipping_amount.amount).toFixed(2);
-  if (!shippingCost) return { success: false, message: "Failed to get shipping cost" };
+  if (shippingCost === null || shippingCost === undefined || isNaN(shippingCost)) return { success: false, message: "Failed to get shipping cost" };
 
   const cartStats = await getCartStats(req);
   if (!cartStats || !cartStats.total) return { success: false, message: "Failed to get cart data" };
@@ -198,6 +198,19 @@ const formatDeliveryDate = (dateStr) => {
 };
 
 const buildShippingSection = (details, isAdmin) => {
+  // Pickup-only orders get a cleaner message
+  if (details.carrier === "Pickup") {
+    const pickupMsg = "This order contains pickup-only items. Please coordinate with the customer for pickup arrangements.";
+    if (isAdmin) {
+      return `
+        <h3>Fulfillment</h3>
+        <p style="padding: 8px; background: #fef3c7; border-radius: 4px; color: #92400e;">${pickupMsg}</p>`;
+    }
+    return `
+      <h3>Fulfillment</h3>
+      <p>Your order contains pickup-only items. We will be in touch to arrange how you'll receive those items.</p>`;
+  }
+
   const formattedDate = formatDeliveryDate(details.estimatedDelivery);
 
   if (isAdmin) {
@@ -270,6 +283,9 @@ const buildEmailHtml = (orderData, type) => {
   }
 
   const isAdmin = type === "admin";
+  const hasPickupItems = items.some((item) => item.canShip === "no");
+  const isAllPickup = shippingDetails?.carrier === "Pickup";
+
   const header = isAdmin
     ? `<h2>New Order — #${orderNumber}</h2>
       <p><strong>Customer:</strong> ${safeFirstName} ${safeLastName} (${safeEmail})</p>`
@@ -328,6 +344,14 @@ const buildEmailHtml = (orderData, type) => {
       <p>${safeFirstName} ${safeLastName}<br>${safeAddress}<br>${safeCity}, ${safeState} ${safeZip}</p>
 
       ${shippingDetails ? buildShippingSection(shippingDetails, isAdmin) : ""}
+
+      ${
+        hasPickupItems && !isAllPickup
+          ? isAdmin
+            ? `<p style="padding: 8px; margin-top: 12px; background: #fef3c7; border-radius: 4px; color: #92400e;">This order contains pickup-only items. Please coordinate with the customer for pickup arrangements.</p>`
+            : `<p style="padding: 8px; margin-top: 12px; background: #fef3c7; border-radius: 4px; color: #92400e;">Some items in your order are pickup-only. We will be in touch to arrange how you'll receive those items.</p>`
+          : ""
+      }
 
       ${paymentSection}
 

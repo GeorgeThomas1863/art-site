@@ -681,3 +681,18 @@ h3 {
   font-size: 16px;
   font-weight: 500;
 }
+
+/* ++++++++++++++++++++++++++++ */
+
+/* Shared Pickup Badge (used on cart, checkout, confirm pages) */
+.pickup-badge {
+  font-size: 0.65rem;
+  font-weight: 400;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  padding: 0.15rem 0.4rem;
+  border-radius: 3px;
+  background: #fef3c7;
+  color: #92400e;
+  width: fit-content;
+}

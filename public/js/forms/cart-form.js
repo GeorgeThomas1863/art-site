@@ -177,6 +177,13 @@ export const buildCartItemDetails = async (itemData) => {
 
   details.append(itemTotal, name);
 
+  if (itemData.canShip === "no") {
+    const badge = document.createElement("span");
+    badge.className = "pickup-badge";
+    badge.textContent = "Pickup Only";
+    details.append(badge);
+  }
+
   return details;
 };
 

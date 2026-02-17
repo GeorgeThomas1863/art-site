@@ -360,6 +360,14 @@ export const buildCheckoutItem = async (itemData) => {
   itemPrice.textContent = `$${totalPrice.toFixed(2)}`;
 
   itemDetails.append(itemName, itemQuantity);
+
+  if (itemData.canShip === "no") {
+    const badge = document.createElement("span");
+    badge.className = "pickup-badge";
+    badge.textContent = "Pickup Only";
+    itemDetails.append(badge);
+  }
+
   checkoutItem.append(itemImage, itemDetails, itemPrice);
 
   return checkoutItem;

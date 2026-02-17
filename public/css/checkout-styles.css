@@ -510,6 +510,19 @@
   letter-spacing: 0.5px;
 }
 
+/* Checkout Pickup Message */
+.checkout-pickup-message {
+  padding: 1rem 1.2rem;
+  background: #fef3c7;
+  border: 1px solid #fbbf24;
+  border-radius: 4px;
+  color: #92400e;
+  font-size: 0.9rem;
+  letter-spacing: 0.3px;
+  line-height: 1.5;
+  text-align: center;
+}
+
 /* Style Square's input fields to match your form */
 #card-container {
   font-family: "Georgia", serif;

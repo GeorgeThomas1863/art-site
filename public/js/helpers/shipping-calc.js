@@ -51,11 +51,6 @@ export const runCalculateShipping = async (clickElement) => {
     console.log("DATA");
     console.dir(data);
 
-    const rateArray = data.rateData;
-
-    // Rates are already adjusted by backend - just sort by cost
-    rateArray.sort((a, b) => a.shipping_amount.amount - b.shipping_amount.amount);
-
     const resultContainer = document.getElementById("shipping-calculator-result");
     if (!resultContainer) {
       await hideLoadStatus();
@@ -65,6 +60,24 @@ export const runCalculateShipping = async (clickElement) => {
 
     // Clear previous results
     resultContainer.innerHTML = "";
+
+    // All items are pickup only — show pickup message instead of shipping options
+    if (data.allPickup) {
+      const pickupMsg = document.createElement("div");
+      pickupMsg.className = "shipping-pickup-message";
+      pickupMsg.textContent = "All items in your cart are pickup only — no shipping required";
+      resultContainer.appendChild(pickupMsg);
+      resultContainer.classList.remove("hidden");
+      await updateCartSummary(0);
+      await hideLoadStatus();
+      await displayPopup("All items are pickup only", "success");
+      return true;
+    }
+
+    const rateArray = data.rateData;
+
+    // Rates are already adjusted by backend - just sort by cost
+    rateArray.sort((a, b) => a.shipping_amount.amount - b.shipping_amount.amount);
 
     // Add title
     const title = document.createElement("h4");
