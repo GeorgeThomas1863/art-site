@@ -148,8 +148,8 @@ export const buildCartItemImage = async (itemData) => {
   const imageContainer = document.createElement("div");
   imageContainer.className = "cart-item-image-container";
 
-  console.log("ITEM DATA:");
-  console.dir(itemData);
+  // console.log("ITEM DATA:");
+  // console.dir(itemData);
 
   const image = document.createElement("img");
   image.className = "cart-item-image";

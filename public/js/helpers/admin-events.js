@@ -131,8 +131,8 @@ export const changeAdminEventSelector = async (changeElement) => {
   if (!changeElement) return null;
 
   const selectedOption = changeElement.options[changeElement.selectedIndex];
-  console.log("SELECTED OPTION");
-  console.log(selectedOption);
+  // console.log("SELECTED OPTION");
+  // console.log(selectedOption);
   if (!selectedOption.value) {
     await clearAdminEditFields();
     await disableAdminEditFields();
@@ -140,8 +140,8 @@ export const changeAdminEventSelector = async (changeElement) => {
   }
 
   const eventObj = selectedOption.eventData;
-  console.log("EVENT OBJ");
-  console.log(eventObj);
+  // console.log("EVENT OBJ");
+  // console.log(eventObj);
   if (!eventObj) return null;
 
   await enableAdminEditFields();
@@ -153,8 +153,8 @@ export const changeAdminEventSelector = async (changeElement) => {
 export const populateAdminEventSelector = async (inputArray) => {
   if (!inputArray || !inputArray.length) return null;
 
-  console.log("INPUT ARRAY");
-  console.log(inputArray);
+  // console.log("INPUT ARRAY");
+  // console.log(inputArray);
 
   const eventSelector = document.getElementById("event-selector");
   if (!eventSelector) return;
@@ -170,8 +170,8 @@ export const populateAdminEventSelector = async (inputArray) => {
 
   for (let i = 0; i < inputArray.length; i++) {
     const event = inputArray[i];
-    console.log("EVENT");
-    console.log(event);
+    // console.log("EVENT");
+    // console.log(event);
     const option = document.createElement("option");
     option.value = event.eventId;
     option.textContent = `${event.name}`;

@@ -3,20 +3,20 @@ import dbModel from "../models/db-model.js";
 export const storeEvent = async (inputParams) => {
   const { route: _, ...params } = inputParams;
 
-  console.log("PARAMS");
-  console.log(params);
+  // console.log("PARAMS");
+  // console.log(params);
 
   //store
   const storeModel = new dbModel(params, process.env.EVENTS_COLLECTION);
   const storeData = await storeModel.storeAny();
   if (!storeData) return { success: false, message: "Failed to store product" };
-  console.log("STORE DATA");
-  console.log(storeData);
+  // console.log("STORE DATA");
+  // console.log(storeData);
 
   //get id
   const newEventId = storeData.insertedId?.toString() || null;
-  console.log("NEW event ID");
-  console.log(newEventId);
+  // console.log("NEW event ID");
+  // console.log(newEventId);
 
   params.eventId = newEventId;
 
@@ -29,8 +29,8 @@ export const storeEvent = async (inputParams) => {
   const updateModel = new dbModel(updateParams, process.env.EVENTS_COLLECTION);
   const updateData = await updateModel.updateObjItem();
   if (!updateData) return { success: false, message: "Failed to update product" };
-  console.log("UPDATE DATA");
-  console.log(updateData);
+  // console.log("UPDATE DATA");
+  // console.log(updateData);
 
   params.success = true;
   params.message = "Product added successfully";
@@ -49,8 +49,8 @@ export const updateEvent = async (inputParams) => {
   const checkModel = new dbModel(checkParams, process.env.EVENTS_COLLECTION);
   const checkData = await checkModel.getUniqueItem();
   if (!checkData) return { success: false, message: "Event not found" };
-  console.log("CHECK DATA");
-  console.log(checkData);
+  // console.log("CHECK DATA");
+  // console.log(checkData);
 
   //otherwise update
   const editParams = {
@@ -62,8 +62,8 @@ export const updateEvent = async (inputParams) => {
   const editModel = new dbModel(editParams, process.env.EVENTS_COLLECTION);
   const editData = await editModel.updateObjItem();
   if (!editData) return { success: false, message: "Failed to update event" };
-  console.log("EDIT DATA");
-  console.log(editData);
+  // console.log("EDIT DATA");
+  // console.log(editData);
 
   params.success = true;
   params.message = "Event updated successfully";

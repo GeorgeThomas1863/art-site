@@ -113,7 +113,7 @@ export const storeOrderData = async (orderObj) => {
 
   const orderNumber = await getOrderNumber();
   if (!orderNumber) return null;
-  console.log("ORDER NUMBER:", orderNumber);
+  // console.log("ORDER NUMBER:", orderNumber);
 
   orderObj.orderNumber = orderNumber;
 
@@ -122,7 +122,7 @@ export const storeOrderData = async (orderObj) => {
   if (!result || !result.insertedId) return null;
 
   orderObj.orderId = result.insertedId.toString();
-  console.log("ORDER STORED — ID:", orderObj.orderId);
+  // console.log("ORDER STORED — ID:", orderObj.orderId);
 
   return orderObj;
 };
@@ -143,8 +143,8 @@ export const sendOrderConfirmationEmails = async (orderData) => {
   const { email, firstName, lastName } = orderData.customerData;
   const { orderNumber, receiptNumber } = orderData;
 
-  console.log("ORDER DATA");
-  console.log(orderData);
+  // console.log("ORDER DATA");
+  // console.log(orderData);
 
   let buyerSent = false;
   let adminSent = false;
@@ -168,7 +168,7 @@ export const sendOrderConfirmationEmails = async (orderData) => {
       html: buyerHtml,
     });
     buyerSent = true;
-    console.log("BUYER EMAIL SENT — receipt #" + receiptNumber);
+    // console.log("BUYER EMAIL SENT — receipt #" + receiptNumber);
   } catch (error) {
     console.error("BUYER EMAIL ERROR:", error);
   }
@@ -181,7 +181,7 @@ export const sendOrderConfirmationEmails = async (orderData) => {
       html: adminHtml,
     });
     adminSent = true;
-    console.log("ADMIN EMAIL SENT — receipt #" + receiptNumber);
+    // console.log("ADMIN EMAIL SENT — receipt #" + receiptNumber);
   } catch (error) {
     console.error("ADMIN EMAIL ERROR:", error);
   }

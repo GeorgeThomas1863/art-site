@@ -26,8 +26,8 @@ export const runPlaceOrder = async () => {
   try {
     // Get payment token from Square
     const paymentToken = await tokenizePaymentMethod();
-    console.log("PAYMENT TOKEN");
-    console.log(paymentToken);
+    // console.log("PAYMENT TOKEN");
+    // console.log(paymentToken);
 
     if (!paymentToken) {
       // Error already displayed by tokenizePaymentMethod
@@ -42,13 +42,13 @@ export const runPlaceOrder = async () => {
     customerParams.route = "/checkout/place-order";
     customerParams.paymentToken = paymentToken;
 
-    console.log("CUSTOMER PARAMS");
-    console.dir(customerParams);
+    // console.log("CUSTOMER PARAMS");
+    // console.dir(customerParams);
 
     // Send to backend
     const orderData = await sendToBack(customerParams);
-    console.log("RUN PLACE ORDER — ORDER DATA");
-    console.dir(orderData);
+    // console.log("RUN PLACE ORDER — ORDER DATA");
+    // console.dir(orderData);
 
     //fail
     if (!orderData || !orderData.success) {
@@ -140,8 +140,8 @@ export const loadCheckoutShippingOptions = async () => {
   shippingContainer.innerHTML = "";
 
   const data = await sendToBack({ route: "/shipping/data" }, "GET");
-  console.log("SHIPPING DATA");
-  console.dir(data);
+  // console.log("SHIPPING DATA");
+  // console.dir(data);
 
   if (!data || !data.shipping) {
     await displayPopup("Failed to get shipping data", "error");
@@ -242,8 +242,8 @@ export const populateConfirmOrder = async () => {
 
   const orderData = JSON.parse(orderDataStr);
 
-  console.log("POPULATE CONFIRM ORDER — ORDER DATA");
-  console.dir(orderData);
+  // console.log("POPULATE CONFIRM ORDER — ORDER DATA");
+  // console.dir(orderData);
 
   sessionStorage.removeItem("orderData");
 

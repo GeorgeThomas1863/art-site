@@ -17,8 +17,8 @@ export const runAddToCart = async (clickElement) => {
     return null;
   }
 
-  console.log("PRODUCT CARD");
-  console.dir(productCard);
+  // console.log("PRODUCT CARD");
+  // console.dir(productCard);
 
   const name = productCard.querySelector(".product-name")?.textContent;
   const priceText = productCard.querySelector(".product-price")?.textContent;
@@ -36,15 +36,15 @@ export const runAddToCart = async (clickElement) => {
     },
   });
 
-  console.log("ADD TO CART RES:");
-  console.log(res);
+  // console.log("ADD TO CART RES:");
+  // console.log(res);
 
   if (!res || !res.success) {
     await displayPopup("Failed to add item to cart", "error");
     return null;
   }
 
-  console.log("ITEM ADDED TO CART");
+  // console.log("ITEM ADDED TO CART");
 
   await displayPopup("Item added to cart!", "success");
   await updateNavbarCart();
@@ -57,12 +57,12 @@ export const runIncreaseQuantity = async (clickElement) => {
   if (!clickElement) return null;
   const productId = clickElement.dataset.productId;
 
-  console.log("CLICK ELEMENT:");
-  console.log(clickElement);
+  // console.log("CLICK ELEMENT:");
+  // console.log(clickElement);
 
-  console.log("INCREASE QUANTITY CLICKED");
-  console.log("Product ID:");
-  console.log(productId);
+  // console.log("INCREASE QUANTITY CLICKED");
+  // console.log("Product ID:");
+  // console.log(productId);
 
   // Get current quantity
   const quantityElement = document.getElementById(`quantity-${productId}`);
@@ -71,11 +71,11 @@ export const runIncreaseQuantity = async (clickElement) => {
   const currentQuantity = parseInt(quantityElement.textContent);
   const newQuantity = currentQuantity + 1;
 
-  console.log("CURRENT QUANTITY:");
-  console.log(currentQuantity);
+  // console.log("CURRENT QUANTITY:");
+  // console.log(currentQuantity);
 
-  console.log("NEW QUANTITY:");
-  console.log(newQuantity);
+  // console.log("NEW QUANTITY:");
+  // console.log(newQuantity);
 
   const params = {
     route: "/cart/update",
@@ -180,8 +180,8 @@ export const runRemoveFromCart = async (clickElement) => {
 export const updateNavbarCart = async () => {
   const res = await sendToBack({ route: "/cart/stats" }, "GET");
 
-  console.log("UPDATE NAVBAR CART RESPONSE:");
-  console.log(res);
+  // console.log("UPDATE NAVBAR CART RESPONSE:");
+  // console.log(res);
 
   if (!res || !res.success) return null;
 
@@ -189,10 +189,10 @@ export const updateNavbarCart = async () => {
 
   const cartContainer = document.getElementById("nav-cart-container");
   const cartCountElement = document.getElementById("nav-cart-count");
-  console.log("CART CONTAINER:");
-  console.log(cartContainer);
-  console.log("CART COUNT ELEMENT:");
-  console.log(cartCountElement);
+  // console.log("CART CONTAINER:");
+  // console.log(cartContainer);
+  // console.log("CART COUNT ELEMENT:");
+  // console.log(cartCountElement);
 
   if (!cartContainer || !cartCountElement) return null;
 

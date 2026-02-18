@@ -4,7 +4,7 @@ let card;
 let payments;
 
 export const buildSquarePayment = async () => {
-  console.log("BUILD SQUARE PAYMENT");
+  // console.log("BUILD SQUARE PAYMENT");
   if (!window.Square) {
     throw new Error("Square.js failed to load properly");
   }
@@ -20,7 +20,7 @@ export const buildSquarePayment = async () => {
     card = await payments.card();
     await card.attach("#card-container");
 
-    console.log("Square payment form initialized");
+    // console.log("Square payment form initialized");
     return true;
   } catch (error) {
     console.error("Failed to initialize Square payment:", error);

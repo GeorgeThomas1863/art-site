@@ -11,8 +11,8 @@ export const runAddNewProduct = async () => {
     return null;
   }
 
-  console.log("NEW PRODUCT PARAMS");
-  console.dir(newProductParams);
+  // console.log("NEW PRODUCT PARAMS");
+  // console.dir(newProductParams);
 
   //check if image uploaded
   const uploadButton = document.getElementById("upload-button");
@@ -27,8 +27,8 @@ export const runAddNewProduct = async () => {
     return null;
   }
 
-  console.log("DATA");
-  console.dir(data);
+  // console.log("DATA");
+  // console.dir(data);
 
   const popupText = `Product "${data.name}" added successfully`;
   await displayPopup(popupText, "success");
@@ -69,8 +69,8 @@ export const runEditProduct = async () => {
   const productId = selectedOption.value;
   editProductParams.productId = productId;
   editProductParams.route = "/edit-product-route";
-  console.log("UPDATE PRODUCT PARAMS");
-  console.dir(editProductParams);
+  // console.log("UPDATE PRODUCT PARAMS");
+  // console.dir(editProductParams);
 
   const data = await sendToBack(editProductParams);
   if (!data || !data.success) {

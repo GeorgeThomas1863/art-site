@@ -11,9 +11,9 @@ const adminElement = document.getElementById("admin-element");
 //MODAL CONTROLS
 export const runModalTrigger = async (clickElement) => {
   if (!clickElement) return null;
-  console.log("RUN MODAL TRIGGER");
-  console.log("CLICK ELEMENT");
-  console.log(clickElement);
+  // console.log("RUN MODAL TRIGGER");
+  // console.log("CLICK ELEMENT");
+  // console.log(clickElement);
 
   const modalType = clickElement.getAttribute("data-label");
   if (!modalType) return null;
@@ -21,10 +21,10 @@ export const runModalTrigger = async (clickElement) => {
   const modalStr = modalType.split("-").slice(2).join("-");
   const [mode, entityType] = modalStr.split("-");
 
-  console.log("MODE");
-  console.log(mode);
-  console.log("ENTITY TYPE");
-  console.log(entityType);
+  // console.log("MODE");
+  // console.log(mode);
+  // console.log("ENTITY TYPE");
+  // console.log(entityType);
 
   const modal = await buildModal(mode, entityType);
   adminElement.append(modal);
@@ -33,8 +33,8 @@ export const runModalTrigger = async (clickElement) => {
   if (mode === "edit" && entityType === "products") {
     const productData = await sendToBack({ route: "/get-product-data-route" }, "GET");
     if (productData && productData.length) {
-      console.log("PRODUCT DATA");
-      console.log(productData);
+      // console.log("PRODUCT DATA");
+      // console.log(productData);
       await populateAdminProductSelector(productData);
       await updateProductStats(productData);
     }
@@ -305,12 +305,12 @@ export const updateProductStats = async (productData) => {
   const displayedProducts = productData.filter((p) => p.display === "yes").length;
   const soldProducts = productData.filter((p) => p.sold === "yes").length;
 
-  console.log("TOTAL PRODUCTS");
-  console.log(totalProducts);
-  console.log("DISPLAYED PRODUCTS");
-  console.log(displayedProducts);
-  console.log("SOLD PRODUCTS");
-  console.log(soldProducts);
+  // console.log("TOTAL PRODUCTS");
+  // console.log(totalProducts);
+  // console.log("DISPLAYED PRODUCTS");
+  // console.log(displayedProducts);
+  // console.log("SOLD PRODUCTS");
+  // console.log(soldProducts);
 
   const totalStat = document.getElementById("total-products-stat");
   const displayedStat = document.getElementById("displayed-products-stat");

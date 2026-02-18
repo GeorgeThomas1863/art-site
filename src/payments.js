@@ -25,12 +25,12 @@ export const processPayment = async (totalInCents, inputParams) => {
     note: `Order from ${firstName} ${lastName} — $${(totalInCents / 100).toFixed(2)}`,
   };
 
-  console.log("PAYMENT PARAMS");
-  console.log(paymentParams);
+  // console.log("PAYMENT PARAMS");
+  // console.log(paymentParams);
 
   const data = await SQ.payments.create(paymentParams);
-  console.log("PAYMENT RESPONSE");
-  console.log(data);
+  // console.log("PAYMENT RESPONSE");
+  // console.log(data);
 
   if (!data || !data.payment) {
     console.error("PAYMENT FAILED WHEN SENT TO SQUARE");

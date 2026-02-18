@@ -10,9 +10,9 @@ export const getSubscribers = async () => {
 export const storeSubscriber = async (email) => {
   if (!email) return { success: false, message: "No email provided" };
 
-  console.log("RUN ADD SUBSCRIBER");
-  console.log("EMAIL");
-  console.log(email);
+  // console.log("RUN ADD SUBSCRIBER");
+  // console.log("EMAIL");
+  // console.log(email);
 
   const checkModel = new dbModel({ keyToLookup: "email", itemValue: email }, process.env.SUBSCRIBERS_COLLECTION);
   const checkData = await checkModel.getUniqueItem();

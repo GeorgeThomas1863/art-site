@@ -31,10 +31,10 @@ export const clickHandler = async (e) => {
   const clickType = clickElement.getAttribute("data-label");
   // const tabType = clickElement.getAttribute("data-tab");
 
-  console.log("CLICK HANDLER");
-  console.log(clickId);
-  console.log("CLICK TYPE");
-  console.log(clickType);
+  // console.log("CLICK HANDLER");
+  // console.log(clickId);
+  // console.log("CLICK TYPE");
+  // console.log(clickType);
 
   if (clickType === "auth-submit") await runAuthSubmit();
   if (clickType === "pwToggle") await runPwToggle();
@@ -106,8 +106,8 @@ export const keyHandler = async (e) => {
   const keyElement = e.target;
   const keyId = keyElement.id;
 
-  console.log("KEY HANDLER");
-  console.log(keyId);
+  // console.log("KEY HANDLER");
+  // console.log(keyId);
 
   if (keyId === "auth-pw-input") await runAuthSubmit();
 
@@ -120,12 +120,12 @@ export const changeHandler = async (e) => {
   const changeId = changeElement.id;
   const changeType = changeElement.getAttribute("data-label");
 
-  console.log("CHANGE HANDLER");
-  console.dir(changeElement);
-  console.log("CHANGE ID");
-  console.log(changeId);
-  console.log("CHANGE TYPE");
-  console.log(changeType);
+  // console.log("CHANGE HANDLER");
+  // console.dir(changeElement);
+  // console.log("CHANGE ID");
+  // console.log(changeId);
+  // console.log("CHANGE TYPE");
+  // console.log(changeType);
 
   //Upload / Edit pic
   if (changeId === "upload-pic-input" || changeId === "edit-upload-pic-input") {
@@ -156,8 +156,8 @@ export const inputHandler = async (e) => {
   const inputElement = e.target;
   const inputId = inputElement.id;
 
-  console.log("INPUT HANDLER");
-  console.log(inputId);
+  // console.log("INPUT HANDLER");
+  // console.log(inputId);
 
   // Debounced shipping calculation when typing in checkout zip field
   if (inputId === "zip") {

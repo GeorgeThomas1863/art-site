@@ -30,8 +30,8 @@ export const storeCustomerData = async (orderData) => {
   const newCustomerData = await newCustomerModel.storeAny();
   if (!newCustomerData || !newCustomerData.insertedId) return null;
 
-  console.log("NEW CUSTOMER DATA");
-  console.log(newCustomerData);
+  // console.log("NEW CUSTOMER DATA");
+  // console.log(newCustomerData);
 
   customerParams.customerId = newCustomerData.insertedId.toString();
 

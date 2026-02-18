@@ -187,8 +187,8 @@ export const updateCartItemControl = async (req, res) => {
   if (!req || !req.body) return res.status(500).json({ error: "No input parameters" });
 
   const data = await updateCartItem(req);
-  console.log("UPDATE CART ITEM DATA:");
-  console.log(data);
+  // console.log("UPDATE CART ITEM DATA:");
+  // console.log(data);
   if (!data || !data.success) return res.status(500).json({ error: "Failed to update cart item" });
 
   res.json(data);

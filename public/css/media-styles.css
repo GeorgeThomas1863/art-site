@@ -71,6 +71,15 @@
     grid-template-columns: 1fr;
   }
 
+  /* About */
+  .about-title {
+    font-size: 1.2rem;
+  }
+
+  .about-paragraph {
+    font-size: 1rem;
+  }
+
   /* Cart */
   .cart-content {
     grid-template-columns: 1fr 350px;
@@ -130,9 +139,24 @@
   }
 
   /* About */
-  .about-text {
-    height: auto;
-    padding: 3rem 2rem;
+  .about-title-row {
+    gap: 1rem;
+  }
+
+  .about-title {
+    font-size: 1rem;
+  }
+
+  .about-paragraph {
+    font-size: 0.9rem;
+  }
+
+  .audio-player {
+    gap: 0.25rem;
+  }
+
+  .audio-song-title {
+    font-size: 0.75rem;
   }
 
   /* Cart */
@@ -420,6 +444,14 @@
 
   .about-image-static {
     height: 300px;
+  }
+
+  .about-title {
+    font-size: 1.5rem;
+  }
+
+  .about-paragraph {
+    font-size: 1.1rem;
   }
 
   /* Contact */

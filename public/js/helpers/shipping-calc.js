@@ -14,8 +14,8 @@ export const runCalculateShipping = async (clickElement) => {
 
   const zip = zipInput.value.trim();
 
-  console.log("ZIP");
-  console.log(zip);
+  // console.log("ZIP");
+  // console.log(zip);
 
   // Validate ZIP
   if (!zip || zip.length !== 5 || !/^\d{5}$/.test(zip)) {
@@ -48,8 +48,8 @@ export const runCalculateShipping = async (clickElement) => {
       await displayPopup("Failed to calculate shipping rates from backend", "error");
       return null;
     }
-    console.log("DATA");
-    console.dir(data);
+    // console.log("DATA");
+    // console.dir(data);
 
     const resultContainer = document.getElementById("shipping-calculator-result");
     if (!resultContainer) {

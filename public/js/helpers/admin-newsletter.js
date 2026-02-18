@@ -30,8 +30,8 @@ export const runSendNewsletter = async () => {
     message: message.value.trim(),
   };
 
-  console.log("SEND NEWSLETTER PARAMS");
-  console.dir(newsletterParams);
+  // console.log("SEND NEWSLETTER PARAMS");
+  // console.dir(newsletterParams);
 
   const data = await sendToBack(newsletterParams);
   if (!data || !data.success) {
@@ -71,8 +71,8 @@ export const runAddSubscriber = async () => {
     email: email,
   };
 
-  console.log("ADD SUBSCRIBER PARAMS");
-  console.dir(subscriberParams);
+  // console.log("ADD SUBSCRIBER PARAMS");
+  // console.dir(subscriberParams);
 
   const data = await sendToBack(subscriberParams);
   if (!data || !data.success) {
@@ -87,8 +87,8 @@ export const runAddSubscriber = async () => {
 
   // Refresh subscriber list
   const subscriberData = await sendToBack({ route: "/newsletter/data" }, "GET");
-  console.log("SUBSCRIBER DATA");
-  console.dir(subscriberData);
+  // console.log("SUBSCRIBER DATA");
+  // console.dir(subscriberData);
   if (subscriberData) {
     await populateSubscriberList(subscriberData);
     await updateSubscriberStats(subscriberData);
@@ -114,8 +114,8 @@ export const runRemoveSubscriber = async (clickElement) => {
     email: email,
   };
 
-  console.log("REMOVE SUBSCRIBER PARAMS");
-  console.dir(removeParams);
+  // console.log("REMOVE SUBSCRIBER PARAMS");
+  // console.dir(removeParams);
 
   const data = await sendToBack(removeParams);
   if (!data || !data.success) {

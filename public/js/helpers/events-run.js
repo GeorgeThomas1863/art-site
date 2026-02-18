@@ -60,8 +60,8 @@ export const runEventsNewsletterSubmit = async () => {
   };
 
   const data = await sendToBack(params);
-  console.log("DATA");
-  console.dir(data);
+  // console.log("DATA");
+  // console.dir(data);
 
   if (!data || !data.success) {
     await displayPopup("Failed to subscribe. Please try again.", "error");

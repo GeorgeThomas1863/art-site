@@ -39,8 +39,8 @@ export const runUploadPic = async (pic, mode = "add", entityType = "products") =
 
   const data = await sendToBackFile({ route: route, formData: formData });
 
-  console.log("DATA");
-  console.log(data);
+  // console.log("DATA");
+  // console.log(data);
 
   if (data === "FAIL") {
     uploadStatus.textContent = "✗ Upload failed";
@@ -135,5 +135,5 @@ export const runDeleteUploadImage = async (clickedElement) => {
   const deleteBtn = currentImagePreview.querySelector(".delete-image-btn");
   if (deleteBtn) deleteBtn.style.display = "none";
 
-  console.log("Image deleted");
+  // console.log("Image deleted");
 };

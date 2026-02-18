@@ -20,7 +20,7 @@ export const sendToBack = async (inputParams, method = "POST") => {
 
     return data;
   } catch (error) {
-    console.log(error);
+    // console.log(error);
     return "FAIL";
   }
 };
@@ -35,16 +35,16 @@ export const sendToBackFile = async (inputParams) => {
     });
 
     if (res.error) {
-      console.log("UPLOAD ERROR");
-      console.log(res.error);
+      // console.log("UPLOAD ERROR");
+      // console.log(res.error);
       return "FAIL";
     }
 
     const data = await res.json();
     return data;
   } catch (e) {
-    console.log("UPLOAD ERROR");
-    console.log(e);
+    // console.log("UPLOAD ERROR");
+    // console.log(e);
     return "FAIL";
   }
 };

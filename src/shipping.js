@@ -25,8 +25,8 @@ export const fetchShippingRates = async (req) => {
     const productModel = new dbModel({ keyToLookup: "productId", itemValue: safeProductId }, process.env.PRODUCTS_COLLECTION);
     const productData = await productModel.getUniqueItem();
     if (!productData || productData.canShip === "no") continue;
-    console.log("PRODUCT DATA");
-    console.log(productData);
+    // console.log("PRODUCT DATA");
+    // console.log(productData);
     totalWeight += (productData.weight || 0) * safeQuantity;
 
     maxLength = Math.max(maxLength, productData.length || 0);
@@ -66,21 +66,21 @@ export const fetchShippingRates = async (req) => {
     girth = 100;
   }
 
-  console.log("WEIGHT");
-  console.log(totalWeight);
-  console.log("LENGTH");
-  console.log(maxLength);
-  console.log("WIDTH");
-  console.log(maxWidth);
-  console.log("HEIGHT");
-  console.log(maxHeight);
-  console.log("GIRTH");
-  console.log(girth);
+  // console.log("WEIGHT");
+  // console.log(totalWeight);
+  // console.log("LENGTH");
+  // console.log(maxLength);
+  // console.log("WIDTH");
+  // console.log(maxWidth);
+  // console.log("HEIGHT");
+  // console.log(maxHeight);
+  // console.log("GIRTH");
+  // console.log(girth);
 
   try {
     const usps = await getUSPS();
-    console.log("USPS");
-    console.log(usps);
+    // console.log("USPS");
+    // console.log(usps);
 
     if (!usps) return { success: false, message: "Failed to get USPS carrier data" };
 
@@ -143,9 +143,9 @@ export const fetchShippingRates = async (req) => {
 
     return { success: true, message: "Shipping rate calculated successfully", rateData: adjustedRates };
   } catch (e) {
-    console.log("RATE ERROR");
-    console.log(e);
-    console.log(e.response.data);
+    // console.log("RATE ERROR");
+    // console.log(e);
+    // console.log(e.response.data);
     return { success: false, message: "Failed to calculate shipping rate" };
   }
 };
@@ -176,8 +176,8 @@ export const getUSPS = async () => {
     },
   });
 
-  console.log("CARRIER RESPONSE DATA");
-  console.log(res.data);
+  // console.log("CARRIER RESPONSE DATA");
+  // console.log(res.data);
 
   for (const carrier of res.data.carriers) {
     if (carrier.friendly_name === "USPS") return carrier.carrier_id;

@@ -9,7 +9,7 @@ export const buildAuthDisplay = async () => {
 
   const authForm = await buildAuthForm();
   if (!authForm) {
-    console.log("FAILED TO BUILD AUTH FORM");
+    // console.log("FAILED TO BUILD AUTH FORM");
     return null;
   }
 

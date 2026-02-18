@@ -33,8 +33,8 @@ export const buildMainDisplay = async () => {
 
   const data = await buildMainForm();
 
-  console.log("BUILD MAIN DISPLAY");
-  console.log(data);
+  // console.log("BUILD MAIN DISPLAY");
+  // console.log(data);
   displayElement.append(data);
   await updateNavbarCart();
 

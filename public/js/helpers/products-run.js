@@ -69,8 +69,8 @@ export const changeProductsFilterButton = async (clickElement) => {
   if (!clickElement) return null;
 
   const categoryFilter = clickElement.getAttribute("data-category");
-  console.log("FILTERING BY CATEGORY:");
-  console.log(categoryFilter);
+  // console.log("FILTERING BY CATEGORY:");
+  // console.log(categoryFilter);
 
   // Update active button state
   const allFilterButtons = document.querySelectorAll(".products-filter-btn");

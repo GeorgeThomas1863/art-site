@@ -6,9 +6,9 @@ import { escapeHtml, sanitizeEmailHeader, validateEmail } from "./sanitize.js";
 export const submitContact = async (inputParams) => {
   if (!inputParams) return { success: false, message: "No input parameters" };
 
-  console.log("RUN CONTACT SUBMIT");
-  console.log("INPUT PARAMS");
-  console.log(inputParams);
+  // console.log("RUN CONTACT SUBMIT");
+  // console.log("INPUT PARAMS");
+  // console.log(inputParams);
 
   const { name, email, subject, message, newsletter } = inputParams;
 
@@ -54,7 +54,7 @@ export const submitContact = async (inputParams) => {
 
   try {
     const data = await transport.sendMail(mailParams);
-    console.log("EMAIL SENT:", data);
+    // console.log("EMAIL SENT:", data);
     if (!data) return { success: false, message: "Failed to send email" };
 
     mailParams.emailData = data;
