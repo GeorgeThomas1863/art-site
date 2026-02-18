@@ -80,7 +80,11 @@ export const buildAboutText = async () => {
   mobileRotating.id = "about-image-mobile";
 
   const audioPlayer = buildAudioPlayer();
-  aboutText.append(aboutTitle, mobileRotating, aboutParagraph, audioPlayer);
+
+  const titleRow = document.createElement("div");
+  titleRow.className = "about-title-row";
+  titleRow.append(aboutTitle, audioPlayer);
+  aboutText.append(titleRow, mobileRotating, aboutParagraph);
 
   return aboutText;
 };

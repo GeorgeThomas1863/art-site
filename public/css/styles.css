@@ -176,7 +176,15 @@ h3 {
 
 /* ++++++++++++++++++++ */
 
+#main-container {
+  display: flex;
+  flex-direction: column;
+  height: 100dvh;
+}
+
 .content-container {
+  flex: 1;
+  min-height: 0;
   width: 100%;
 }
 
@@ -185,7 +193,7 @@ h3 {
   /* grid-template-columns: 60% 40%; */
   grid-template-columns: 40% 60%;
   /* height: calc(100vh - 120px); */
-  height: calc(100vh - 72.5px);
+  height: 100%;
 }
 
 .split-content {

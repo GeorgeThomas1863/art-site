@@ -1,6 +1,14 @@
 /* ABOUT FORM STYLES */
 
+#about-element {
+  display: flex;
+  flex-direction: column;
+  height: 100dvh;
+}
+
 .about-container {
+  flex: 1;
+  min-height: 0;
   width: 100%;
   margin: 0;
   padding: 0;
@@ -12,10 +20,9 @@
   grid-template-columns: 60% 40%;
   /* grid-template-columns: 45% 55%; */
   gap: 0;
-  height: calc(100vh - 72.5px);
+  height: 100%;
 }
 
-/* left side - text (70%) and static image (30%) */
 .about-left {
   display: flex;
   flex-direction: column;
@@ -31,7 +38,7 @@
 
 .about-text {
   /* background: rgb(190, 233, 148); */
-  padding: 4rem;
+  padding: 1rem 2rem;
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -47,7 +54,8 @@
 }
 
 .about-image-static {
-  height: 300px;
+  /* height: 300px; */
+  height: 100%;
   background-position: 50% 25%;
 }
 
@@ -59,11 +67,17 @@
   display: none;
 }
 
+.about-title-row {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+  margin-bottom: 1rem;
+}
+
 .about-title {
   font-size: 1.5rem;
   font-weight: bold;
   letter-spacing: 3px;
-  margin-bottom: 1rem;
   color: #000000;
 }
 

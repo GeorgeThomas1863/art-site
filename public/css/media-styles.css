@@ -116,22 +116,9 @@
     margin-left: 1rem;
   }
 
-  /* Hero — flexbox fill for homepage */
-  #main-container {
-    display: flex;
-    flex-direction: column;
-    height: 100dvh;
-  }
-
-  .content-container {
-    flex: 1;
-    min-height: 0;
-  }
-
   .split-hero {
     grid-template-columns: 1fr;
     grid-template-rows: auto 1fr;
-    height: 100%;
   }
 
   .split-content {
@@ -411,6 +398,10 @@
   }
 
   /* About - mobile layout */
+  .about-title-row {
+    flex-wrap: wrap;
+  }
+
   .about-content {
     grid-template-columns: 1fr;
     height: auto;
