@@ -299,13 +299,12 @@ export const buildShippingSection = async () => {
   zipInput.placeholder = "Enter ZIP Code";
   zipInput.maxLength = "5";
 
-  const calculateBtn = document.createElement("button");
-  calculateBtn.className = "shipping-calculator-btn";
-  calculateBtn.id = "cart-shipping-calculate-btn";
-  calculateBtn.textContent = "Estimate Shipping";
-  calculateBtn.setAttribute("data-label", "calculate-shipping");
+  const shippingHelper = document.createElement("span");
+  shippingHelper.className = "shipping-calculator-helper";
+  shippingHelper.textContent =
+    "Shipping rates update automatically based on ZIP code";
 
-  shippingForm.append(zipInput, calculateBtn);
+  shippingForm.append(zipInput, shippingHelper);
 
   const resultContainer = document.createElement("div");
   resultContainer.id = "shipping-calculator-result";

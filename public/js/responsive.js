@@ -62,7 +62,6 @@ export const clickHandler = async (e) => {
   if (clickType === "decrease-quantity") await runDecreaseQuantity(clickElement);
   if (clickType === "remove-from-cart") await runRemoveFromCart(clickElement);
 
-  if (clickType === "calculate-shipping") await runCalculateShipping(clickElement);
   if (clickType === "shipping-option-select") await runShippingOptionSelect(clickElement);
   if (clickType === "checkout-shipping-option-select") await runCheckoutShippingOptionSelect(clickElement);
 
@@ -151,6 +150,7 @@ export const changeHandler = async (e) => {
 };
 
 const debouncedCheckoutZipShipping = debounce(runCalculateShippingCheckout);
+const debouncedCartZipShipping = debounce(runCalculateShipping);
 
 export const inputHandler = async (e) => {
   const inputElement = e.target;
@@ -162,6 +162,11 @@ export const inputHandler = async (e) => {
   // Debounced shipping calculation when typing in checkout zip field
   if (inputId === "zip") {
     await debouncedCheckoutZipShipping();
+  }
+
+  // Debounced shipping calculation when typing in cart zip field
+  if (inputId === "cart-shipping-zip-input") {
+    await debouncedCartZipShipping();
   }
 };
 
@@ -204,6 +209,7 @@ if (aboutElement) {
 
 if (cartElement) {
   cartElement.addEventListener("click", clickHandler);
+  cartElement.addEventListener("input", inputHandler);
 }
 
 if (checkoutElement) {

@@ -6,20 +6,14 @@ import { buildShippingOption } from "../forms/cart-form.js";
 import { showLoadStatus, hideLoadStatus } from "../util/loading.js";
 
 //SHIPPING
-export const runCalculateShipping = async (clickElement) => {
-  if (!clickElement) return null;
-
+export const runCalculateShipping = async () => {
   const zipInput = document.getElementById("cart-shipping-zip-input");
   if (!zipInput) return null;
 
   const zip = zipInput.value.trim();
 
-  // console.log("ZIP");
-  // console.log(zip);
-
-  // Validate ZIP
+  // Silently validate 5-digit zip (no popups while typing)
   if (!zip || zip.length !== 5 || !/^\d{5}$/.test(zip)) {
-    await displayPopup("Please enter a valid 5-digit ZIP code", "error");
     return null;
   }
 
