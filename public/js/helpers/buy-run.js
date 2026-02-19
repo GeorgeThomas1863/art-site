@@ -263,6 +263,7 @@ export const displayOrderDetails = async (inputData) => {
     orderDate: "order-date",
     paymentStatus: "payment-status",
     email: "customer-email",
+    emailSentNote: "confirm-email-sent-note",
     receiptLink: "receipt-link",
     shippingAddress: "shipping-address",
     shippingMethod: "shipping-method",
@@ -286,6 +287,7 @@ export const displayOrderDetails = async (inputData) => {
   obj.orderNumber.textContent = receiptNumber;
 
   obj.email.textContent = email;
+  obj.emailSentNote.textContent = `A confirmation email was sent to ${email}. Check your spam folder if you don't see it in your inbox.`;
   obj.subtotal.textContent = `$${itemCost.toFixed(2)}`;
   obj.shipping.textContent = `$${shippingCost.toFixed(2)}`;
   obj.tax.textContent = `$${tax.toFixed(2)}`;

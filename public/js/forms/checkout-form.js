@@ -78,7 +78,7 @@ export const buildCustomerInfoCard = async () => {
   const phoneField = await buildFormField("Phone", "tel", "phone", "phone", true);
 
   // Shipping Address Title
-  const shippingTitle = document.createElement("h3");
+  const shippingTitle = document.createElement("h2");
   shippingTitle.className = "checkout-subsection-title";
   shippingTitle.textContent = "Shipping Address";
 

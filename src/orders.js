@@ -195,11 +195,11 @@ const buildShippingSection = (details, isAdmin) => {
     const pickupMsg = "This order contains pickup-only items. Please coordinate with the customer for pickup arrangements.";
     if (isAdmin) {
       return `
-        <h3>Fulfillment</h3>
+        <h2>Fulfillment</h2>
         <p style="padding: 8px; background: #fef3c7; border-radius: 4px; color: #92400e;">${pickupMsg}</p>`;
     }
     return `
-      <h3>Fulfillment</h3>
+      <h2>Fulfillment</h2>
       <p>Your order contains pickup-only items. We will be in touch to arrange how you'll receive those items.</p>`;
   }
 
@@ -207,7 +207,7 @@ const buildShippingSection = (details, isAdmin) => {
 
   if (isAdmin) {
     return `
-      <h3>Shipping Method</h3>
+      <h2>Shipping Method</h2>
       <table style="width: 100%; border-collapse: collapse;">
         <tr><td style="padding: 4px 8px;"><strong>Carrier:</strong></td><td style="padding: 4px 8px;">${details.carrier || "N/A"}</td></tr>
         <tr><td style="padding: 4px 8px;"><strong>Service:</strong></td><td style="padding: 4px 8px;">${details.serviceType || "N/A"}</td></tr>
@@ -221,7 +221,7 @@ const buildShippingSection = (details, isAdmin) => {
   }
 
   return `
-    <h3>Shipping Method</h3>
+    <h2>Shipping Method</h2>
     <p>${details.carrier || ""} ${details.serviceType || ""}</p>
     ${formattedDate ? `<p><strong>Estimated Delivery:</strong> ${formattedDate}</p>` : ""}`;
 };
@@ -297,7 +297,7 @@ const buildEmailHtml = (orderData, type) => {
     paymentSection = `
       <hr style="margin: 24px 0; border: none; border-top: 1px solid #ccc;">
 
-      <h3>Payment Details</h3>
+      <h2>Payment Details</h2>
       <table style="width: 100%; border-collapse: collapse;">
         <tr><td style="padding: 4px 8px;"><strong>Payment ID:</strong></td><td style="padding: 4px 8px;">${paymentId}</td></tr>
         <tr><td style="padding: 4px 8px;"><strong>Square Order ID:</strong></td><td style="padding: 4px 8px;">${squareOrderId}</td></tr>
@@ -313,7 +313,7 @@ const buildEmailHtml = (orderData, type) => {
       ${header}
       <p><strong>Date:</strong> ${formattedDate}</p>
 
-      <h3>Items</h3>
+      <h2>Items</h2>
       <table style="width: 100%; border-collapse: collapse;">
         <thead>
           <tr style="background: #f5f5f5;">
@@ -332,7 +332,7 @@ const buildEmailHtml = (orderData, type) => {
         <p style="font-size: 18px;"><strong>Total:</strong> $${totalCost.toFixed(2)}</p>
       </div>
 
-      <h3>Shipping Address</h3>
+      <h2>Shipping Address</h2>
       <p>${safeFirstName} ${safeLastName}<br>${safeAddress}<br>${safeCity}, ${safeState} ${safeZip}</p>
 
       ${shippingDetails ? buildShippingSection(shippingDetails, isAdmin) : ""}

@@ -31,6 +31,7 @@ export const buildConfirmHeader = async () => {
   return confirmHeader;
 };
 
+
 export const buildConfirmContent = async () => {
   const confirmContent = document.createElement("div");
   confirmContent.className = "confirm-content";
@@ -72,8 +73,13 @@ export const buildConfirmDetails = async () => {
 
   detailsGrid.append(orderNumberRow, orderDateRow, paymentStatusRow, emailRow);
 
+  const emailSentNote = document.createElement("p");
+  emailSentNote.className = "confirm-email-sent-note";
+  emailSentNote.id = "confirm-email-sent-note";
+  emailSentNote.textContent = "...";
+
   // Shipping Address Section
-  const shippingTitle = document.createElement("h3");
+  const shippingTitle = document.createElement("h2");
   shippingTitle.className = "confirm-subsection-title";
   shippingTitle.textContent = "Shipping Address";
 
@@ -83,14 +89,14 @@ export const buildConfirmDetails = async () => {
   shippingAddress.textContent = "Loading...";
 
   // Shipping Method Section
-  const shippingMethodTitle = document.createElement("h3");
+  const shippingMethodTitle = document.createElement("h2");
   shippingMethodTitle.className = "confirm-subsection-title";
   shippingMethodTitle.textContent = "Shipping Method";
 
   const shippingMethodRow = await buildDetailRow("Service", "Loading...", "shipping-method");
   const estimatedDeliveryRow = await buildDetailRow("Estimated Delivery", "Loading...", "estimated-delivery");
 
-  detailsCard.append(cardTitle, detailsGrid, shippingTitle, shippingAddress, shippingMethodTitle, shippingMethodRow, estimatedDeliveryRow);
+  detailsCard.append(cardTitle, detailsGrid, emailSentNote, shippingTitle, shippingAddress, shippingMethodTitle, shippingMethodRow, estimatedDeliveryRow);
   detailsSection.append(detailsCard);
 
   return detailsSection;

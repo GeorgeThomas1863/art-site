@@ -171,7 +171,7 @@ export const buildCartItemDetails = async (itemData) => {
   const totalValue = itemData.price * itemData.quantity;
   itemTotal.textContent = `$${totalValue.toFixed(2)}`;
 
-  const name = document.createElement("h3");
+  const name = document.createElement("h2");
   name.className = "cart-item-name";
   name.textContent = itemData.name;
 

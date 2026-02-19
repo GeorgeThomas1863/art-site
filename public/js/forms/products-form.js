@@ -77,7 +77,7 @@ export const buildCategoryDescription = async (category) => {
   const descriptionObj = categoryDescriptions[category];
   if (!descriptionObj) return null;
 
-  const titleElement = document.createElement("h3");
+  const titleElement = document.createElement("h2");
   titleElement.textContent = `${descriptionObj.title}`;
   titleElement.className = "category-description-title";
 

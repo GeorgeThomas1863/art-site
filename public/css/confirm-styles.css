@@ -76,13 +76,14 @@
 }
 
 .confirm-subsection-title {
+  text-align: center;
   font-size: 1rem;
   font-weight: 400;
   letter-spacing: 1px;
   text-transform: uppercase;
   color: #666;
-  margin-top: 0.5rem;
-  margin-bottom: 0.5rem;
+  margin-top: 1rem;
+  margin-bottom: -0.5rem;
 }
 
 .confirm-details-grid {
@@ -324,6 +325,18 @@
   font-size: 0.9rem;
   font-weight: 600;
   margin-top: 0.1rem;
+}
+
+/* Email sent note */
+.confirm-email-sent-note {
+  font-size: 0.9rem;
+  color: #555;
+  letter-spacing: 0.3px;
+  line-height: 1.5;
+  padding: 0.5rem 1rem;
+  background: #fafafa;
+  border: 1px solid #e0e0e0;
+  border-radius: 4px;
 }
 
 .confirm-pickup-note-text {
