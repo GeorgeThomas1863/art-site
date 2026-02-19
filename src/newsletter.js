@@ -1,4 +1,4 @@
-import nodemailer from "nodemailer";
+import { sendMail } from "./mailer.js";
 import dbModel from "../models/db-model.js";
 
 export const getSubscribers = async () => {
@@ -45,14 +45,6 @@ export const dispatchNewsletter = async (inputParams) => {
   const subscriberArray = await getSubscribers();
   if (!subscriberArray || !subscriberArray.length) return { success: false, message: "No subscribers found" };
 
-  const transport = nodemailer.createTransport({
-    service: process.env.EMAIL_SERVICE,
-    auth: {
-      user: process.env.EMAIL_USER,
-      pass: process.env.EMAIL_PASSWORD,
-    },
-  });
-
   const emailList = subscriberArray.map((s) => s.email);
 
   const mailParams = {
@@ -63,7 +55,7 @@ export const dispatchNewsletter = async (inputParams) => {
   };
 
   try {
-    const data = await transport.sendMail(mailParams);
+    const data = await sendMail(mailParams);
     if (!data) return { success: false, message: "Failed to send newsletter" };
 
     const storeParams = { ...mailParams, emailData: data, messageId: data.messageId };

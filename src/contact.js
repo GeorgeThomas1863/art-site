@@ -1,4 +1,4 @@
-import nodemailer from "nodemailer";
+import { sendMail } from "./mailer.js";
 import dbModel from "../models/db-model.js";
 import { storeSubscriber } from "./newsletter.js";
 import { escapeHtml, sanitizeEmailHeader, validateEmail } from "./sanitize.js";
@@ -44,16 +44,8 @@ export const submitContact = async (inputParams) => {
     replyTo: sanitizeEmailHeader(email),
   };
 
-  const transport = nodemailer.createTransport({
-    service: process.env.EMAIL_SERVICE,
-    auth: {
-      user: process.env.EMAIL_USER,
-      pass: process.env.EMAIL_PASSWORD,
-    },
-  });
-
   try {
-    const data = await transport.sendMail(mailParams);
+    const data = await sendMail(mailParams);
     // console.log("EMAIL SENT:", data);
     if (!data) return { success: false, message: "Failed to send email" };
 

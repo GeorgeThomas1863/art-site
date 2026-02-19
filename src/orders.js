@@ -1,4 +1,4 @@
-import nodemailer from "nodemailer";
+import { sendMail } from "./mailer.js";
 import dbModel from "../models/db-model.js";
 import { getCartStats } from "./cart.js";
 import { processPayment } from "./payments.js";
@@ -152,16 +152,8 @@ export const sendOrderConfirmationEmails = async (orderData) => {
   const buyerHtml = buildEmailHtml(orderData, "buyer");
   const adminHtml = buildEmailHtml(orderData, "admin");
 
-  const transport = nodemailer.createTransport({
-    service: process.env.EMAIL_SERVICE,
-    auth: {
-      user: process.env.EMAIL_USER,
-      pass: process.env.EMAIL_PASSWORD,
-    },
-  });
-
   try {
-    await transport.sendMail({
+    await sendMail({
       from: process.env.EMAIL_USER,
       to: email,
       subject: `Order Confirmation — Receipt #${receiptNumber}`,
@@ -174,7 +166,7 @@ export const sendOrderConfirmationEmails = async (orderData) => {
   }
 
   try {
-    await transport.sendMail({
+    await sendMail({
       from: process.env.EMAIL_USER,
       to: [process.env.EMAIL_RECIPIENT_1, process.env.EMAIL_RECIPIENT_2].filter(Boolean).join(", "),
       subject: `New Order — Receipt #${receiptNumber} from ${sanitizeEmailHeader(firstName)} ${sanitizeEmailHeader(lastName)}`,
