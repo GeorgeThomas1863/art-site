@@ -1,3 +1,5 @@
+//make transitions a bit slower between images in rotating pics
+
 // figure out the cloudflare problem and fix it
 
 //figure out how to receive email from mailgun through admin email
