@@ -1,7 +1,3 @@
-// change the default shipping to 8 X 6 X 6
-
-//Remove .00 display if even number for product
-
 // figure out the cloudflare problem and fix it
 
 //figure out how to receive email from mailgun through admin email
