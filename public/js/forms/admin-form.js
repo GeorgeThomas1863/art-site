@@ -487,10 +487,10 @@ export const buildProductShippingSection = async (mode) => {
   col2.className = "shipping-col";
 
   // Dimensions
-  const lengthItem = await buildShippingItem(mode, "length", "Length");
-  const widthItem = await buildShippingItem(mode, "width", "Width");
-  const heightItem = await buildShippingItem(mode, "height", "Height");
-  const weightItem = await buildShippingItem(mode, "weight", "Weight");
+  const lengthItem = await buildShippingItem(mode, "length", "Length", 8);
+  const widthItem = await buildShippingItem(mode, "width", "Width", 6);
+  const heightItem = await buildShippingItem(mode, "height", "Height", 6);
+  const weightItem = await buildShippingItem(mode, "weight", "Weight", 2);
 
   col1.append(lengthItem, widthItem, heightItem);
   col2.append(weightItem);
@@ -699,7 +699,7 @@ export const buildStatusCard = async (mode, fieldName, labelText, dataLabel = nu
 };
 
 // NEW HELPER: Build Shipping Item
-export const buildShippingItem = async (mode, fieldName, labelText) => {
+export const buildShippingItem = async (mode, fieldName, labelText, defaultValue = null) => {
   const item = document.createElement("div");
   item.className = "shipping-item";
 
@@ -715,7 +715,7 @@ export const buildShippingItem = async (mode, fieldName, labelText) => {
   input.type = "text";
   input.id = mode === "add" ? fieldName : `edit-${fieldName}`;
   input.name = mode === "add" ? fieldName : `edit-${fieldName}`;
-  input.placeholder = "0";
+  input.placeholder = defaultValue !== null ? String(defaultValue) : "0";
 
   if (mode === "edit") {
     input.disabled = true;

@@ -1,4 +1,4 @@
-import { formatProductType } from "../helpers/products-run.js";
+import { formatProductType, formatPrice } from "../helpers/products-run.js";
 import { buildCollapseContainer } from "../util/collapse.js";
 
 // Build the entire products page
@@ -75,7 +75,7 @@ export const buildProductsFilterBar = async () => {
 
 export const buildCategoryDescription = async (category) => {
   const descriptionObj = categoryDescriptions[category];
-  if (!descriptionObj) return null;
+  if (!descriptionObj || !descriptionObj.title || !descriptionObj.details) return null;
 
   const titleElement = document.createElement("h2");
   titleElement.textContent = `${descriptionObj.title}`;
@@ -192,7 +192,7 @@ export const buildProductPrice = async (productData) => {
   const productPrice = document.createElement("div");
   productPrice.className = "product-price";
   productPrice.setAttribute("data-label", "product-card-click");
-  productPrice.textContent = `$${productData.price}`;
+  productPrice.textContent = formatPrice(productData.price);
 
   return productPrice;
 };
@@ -321,7 +321,7 @@ export const buildProductDetailModal = async (productData) => {
 
   const price = document.createElement("div");
   price.className = "product-detail-price";
-  price.textContent = `$${productData.price}`;
+  price.textContent = formatPrice(productData.price);
 
   const description = document.createElement("p");
   description.className = "product-detail-description";

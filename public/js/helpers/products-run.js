@@ -44,6 +44,11 @@ export const filterProducts = async (inputArray, category) => {
   return filteredProducts;
 };
 
+export const formatPrice = (price) => {
+  const num = parseFloat(price);
+  return num % 1 === 0 ? `$${num}` : `$${num.toFixed(2)}`;
+};
+
 // Helper function to format product type from camelCase to readable text
 export const formatProductType = async (productType) => {
   if (!productType) return null;
