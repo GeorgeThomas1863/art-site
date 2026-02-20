@@ -255,7 +255,7 @@ export const populateConfirmOrder = async () => {
 
 export const displayOrderDetails = async (inputData) => {
   if (!inputData || !inputData.customerData) return null;
-  const { orderId, receiptNumber, orderDate, paymentStatus, itemCost, shippingCost, tax, totalCost, receiptURL } = inputData;
+  const { orderId, receiptNumber, orderDate, paymentStatus, itemCost, shippingCost, tax, totalCost } = inputData;
   const { firstName, lastName, email, address, city, state, zip } = inputData.customerData;
 
   const formElements = {
@@ -264,7 +264,6 @@ export const displayOrderDetails = async (inputData) => {
     paymentStatus: "payment-status",
     email: "customer-email",
     emailSentNote: "confirm-email-sent-note",
-    receiptLink: "receipt-link",
     shippingAddress: "shipping-address",
     shippingMethod: "shipping-method",
     estimatedDelivery: "estimated-delivery",
@@ -296,9 +295,6 @@ export const displayOrderDetails = async (inputData) => {
   obj.paymentStatus.textContent = paymentStatus || "Completed";
   obj.paymentStatus.style.color = "#22c55e";
   obj.paymentStatus.style.fontWeight = "500";
-  obj.receiptLink.href = receiptURL;
-  obj.receiptLink.style.display = "inline-block";
-
   obj.orderDate.textContent = new Date(orderDate).toLocaleDateString("en-US", {
     year: "numeric",
     month: "long",

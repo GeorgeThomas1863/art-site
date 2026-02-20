@@ -11,12 +11,6 @@ export const runAddNewEvent = async () => {
     return null;
   }
 
-  const uploadButton = document.getElementById("upload-button");
-  if (!uploadButton.uploadData) {
-    await displayPopup("Please upload an image for the event first", "error");
-    return null;
-  }
-
   const data = await sendToBack(newEventParams);
   if (!data || !data.success) {
     await displayPopup("Failed to add new event", "error");

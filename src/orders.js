@@ -56,7 +56,6 @@ export const placeNewOrder = async (req) => {
       billingAddress: payment.billingAddress,
       risk: payment.riskEvaluation?.riskLevel || null,
       receiptNumber: payment.receiptNumber,
-      receiptURL: payment.receiptUrl,
       shippingDetails: {
         carrier: selectedRate.carrier_friendly_name,
         serviceType: selectedRate.service_type,
@@ -92,7 +91,6 @@ export const placeNewOrder = async (req) => {
         shippingCost: orderData.shippingCost,
         tax: orderData.tax,
         totalCost: orderData.totalCost,
-        receiptURL: orderData.receiptURL,
         customerData: orderData.customerData,
         cartData: orderData.items,
         shippingDetails: orderData.shippingDetails,
@@ -234,7 +232,6 @@ const buildEmailHtml = (orderData, type) => {
     shippingCost,
     tax,
     totalCost,
-    receiptURL,
     items,
     customerData,
     shippingDetails,
@@ -347,7 +344,6 @@ const buildEmailHtml = (orderData, type) => {
 
       ${paymentSection}
 
-      ${receiptURL ? `<p><a href="${receiptURL}">View Receipt on Square</a></p>` : ""}
     </div>
   `;
 };

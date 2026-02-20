@@ -274,8 +274,22 @@
   width: 100%;
   max-height: calc(100vh - 4rem);
   overflow-y: auto;
-  scrollbar-width: none;
+  /* scrollbar-width: thin; */
+  scrollbar-color: rgba(150, 150, 150, 0.9) transparent;
   border-radius: 8px;
+}
+
+.modal-wrapper::-webkit-scrollbar {
+  width: 4px;
+}
+
+.modal-wrapper::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.modal-wrapper::-webkit-scrollbar-thumb {
+  background-color: rgba(150, 150, 150, 0.9);
+  border-radius: 4px;
 }
 
 /* Modal Content */

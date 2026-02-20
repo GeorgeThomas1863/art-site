@@ -140,18 +140,9 @@ export const buildConfirmItemsSection = async () => {
   totalRow.append(totalLabel, totalValue);
   summaryDetails.append(subtotalRow, shippingRow, taxRow, totalRow);
 
-    // Receipt Link
-    const receiptLink = document.createElement("a");
-    receiptLink.className = "confirm-receipt-link";
-    receiptLink.id = "receipt-link";
-    receiptLink.href = "#";
-    receiptLink.target = "_blank";
-    receiptLink.textContent = "View Receipt on Square";
-    receiptLink.style.display = "none"; // Hidden until URL is set
-
   const pickupNote = await buildPickupNote();
 
-  itemsCard.append(cardTitle, itemsContainer, pickupNote, summaryDetails, receiptLink);
+  itemsCard.append(cardTitle, itemsContainer, pickupNote, summaryDetails);
   itemsSection.append(itemsCard);
 
   return itemsSection;

@@ -24,7 +24,7 @@
 
 .products-page-subtitle {
   font-size: 1.2rem;
-  font-weight: 400;
+  font-weight: 700;
   letter-spacing: 1px;
   /* color: #666; */
 }
@@ -44,8 +44,8 @@
 }
 
 .products-filter-label {
-  font-size: 0.9rem;
-  font-weight: 400;
+  font-size: 1rem;
+  font-weight: 700;
   letter-spacing: 1px;
   color: #000000;
   text-transform: uppercase;
@@ -63,8 +63,8 @@
 .products-filter-btn {
   /* font-family: "Georgia", serif; */
   font-family: "Indie Flower", cursive;
-  font-size: 0.85rem;
-  font-weight: 400;
+  font-size: 1rem;
+  font-weight: 600;
   letter-spacing: 1px;
   /* color: #666; */
   background-color: transparent;
@@ -103,10 +103,16 @@
   border: 1px solid #e0e0e0;
 }
 
+.category-description-container .collapse-title {
+  font-size: 1.2rem;
+  font-weight: 700;
+}
+
 .category-description-text {
   font-size: 1.2rem;
+  font-weight: 600;
   line-height: 1.8;
-  /* color: #333; */
+  color: #333;
   /* margin-bottom: 1rem; */
 }
 
@@ -161,8 +167,8 @@
 }
 
 .product-name {
-  font-size: 1.1rem;
-  font-weight: 400;
+  font-size: 1.3rem;
+  font-weight: 700;
   letter-spacing: 1px;
   color: #000000;
   margin: 1rem 0;
@@ -171,7 +177,7 @@
 
 .product-price {
   font-size: 1.5rem;
-  font-weight: 400;
+  font-weight: 700;
   letter-spacing: 2px;
   color: #000000;
   margin-bottom: 1rem;
@@ -179,8 +185,9 @@
 }
 
 .product-description {
-  font-size: 0.9rem;
-  color: #666;
+  font-size: 1.05rem;
+  color: #333;
+  font-weight: 700;
   line-height: 1.6;
   margin-bottom: 1.2rem;
   display: -webkit-box;
@@ -196,11 +203,11 @@
 .product-type {
   margin-top: auto;
   display: inline-block;
-  font-size: 0.75rem;
-  font-weight: 400;
+  font-size: 0.85rem;
+  font-weight: 600;
   letter-spacing: 1px;
   text-transform: uppercase;
-  color: #666;
+  color: #444;
   background-color: #f5f5f5;
   padding: 0.4rem 0.8rem;
   border-radius: 4px;
@@ -212,8 +219,8 @@
 .add-to-cart-btn {
   /* font-family: "Georgia", serif; */
   /* font-family: "Indie Flower", cursive; */
-  font-size: 0.85rem;
-  font-weight: 400;
+  font-size: 1rem;
+  font-weight: 600;
   letter-spacing: 2px;
   background-color: transparent;
   border: 1px solid #333;
@@ -322,8 +329,8 @@
 }
 
 .product-detail-name {
-  font-size: 1.5rem;
-  font-weight: 400;
+  font-size: 1.75rem;
+  font-weight: 700;
   letter-spacing: 1px;
   color: #000;
   margin-bottom: 0.75rem;
@@ -332,7 +339,7 @@
 
 .product-detail-price {
   font-size: 1.8rem;
-  font-weight: 400;
+  font-weight: 700;
   letter-spacing: 2px;
   color: #000;
   margin-bottom: 1rem;
@@ -340,19 +347,19 @@
 }
 
 .product-detail-description {
-  font-size: 1rem;
-  color: #555;
+  font-size: 1.1rem;
+  color: #333;
   line-height: 1.7;
   margin-bottom: 1.25rem;
 }
 
 .product-detail-type {
   display: inline-block;
-  font-size: 0.75rem;
-  font-weight: 400;
+  font-size: 0.85rem;
+  font-weight: 600;
   letter-spacing: 1px;
   text-transform: uppercase;
-  color: #666;
+  color: #444;
   background-color: #f5f5f5;
   padding: 0.4rem 0.8rem;
   border-radius: 4px;
@@ -363,6 +370,7 @@
 .product-detail-cart-btn {
   display: block;
   margin: 0 auto;
-  font-size: 0.95rem;
+  font-size: 1.1rem;
+  font-weight: 600;
   padding: 0.75rem 2rem;
 }

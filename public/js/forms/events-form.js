@@ -46,7 +46,8 @@ export const buildEventCard = async (eventData) => {
   const eventImage = await buildEventImage(eventData);
   const eventContent = await buildEventContent(eventData);
 
-  eventCard.append(eventImage, eventContent);
+  if (eventImage) eventCard.append(eventImage);
+  eventCard.append(eventContent);
 
   return eventCard;
 };
