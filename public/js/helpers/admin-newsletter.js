@@ -25,8 +25,8 @@ export const runSendNewsletter = async () => {
     message: message.value.trim(),
   };
 
-  console.log("SEND NEWSLETTER PARAMS");
-  console.dir(newsletterParams);
+  // console.log("SEND NEWSLETTER PARAMS");
+  // console.dir(newsletterParams);
 
   const data = await sendToBack(newsletterParams);
   if (!data || !data.success) {
@@ -34,8 +34,8 @@ export const runSendNewsletter = async () => {
     return null;
   }
 
-  console.log("SEND NEWSLETTER DATA");
-  console.dir(data);
+  // console.log("SEND NEWSLETTER DATA");
+  // console.dir(data);
 
   await displayPopup("Newsletter sent successfully", "success");
 

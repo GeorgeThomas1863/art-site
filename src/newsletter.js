@@ -60,8 +60,8 @@ export const dispatchNewsletter = async (inputParams) => {
     text: message,
   };
 
-  console.log("MAIL PARAMS");
-  console.dir(mailParams);
+  // console.log("MAIL PARAMS");
+  // console.dir(mailParams);
 
   try {
     const data = await sendMail(mailParams);
