@@ -1,4 +1,4 @@
-//TEST NEWSLETTER
+//figure out how to get email to NOT go to spam
 
 //make transitions a bit slower between images in rotating pics
 
