@@ -1,3 +1,5 @@
+//TEST NEWSLETTER
+
 //make transitions a bit slower between images in rotating pics
 
 // figure out the cloudflare problem and fix it
