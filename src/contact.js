@@ -1,7 +1,7 @@
 import { sendMail } from "./mailer.js";
 import dbModel from "../models/db-model.js";
 import { storeSubscriber } from "./newsletter.js";
-import { escapeHtml, sanitizeEmailHeader, validateEmail } from "./sanitize.js";
+import { escapeHtml, sanitizeEmailHeader, validateEmail, validateString } from "./sanitize.js";
 
 export const submitContact = async (inputParams) => {
   if (!inputParams) return { success: false, message: "No input parameters" };
@@ -27,13 +27,14 @@ export const submitContact = async (inputParams) => {
 
   const safeName = escapeHtml(name);
   const safeEmail = escapeHtml(email);
-  const safeSubject = escapeHtml(subject);
+  const cleanSubject = validateString(subject, 200) ?? "";
+  const safeSubject = escapeHtml(cleanSubject);
   const safeMessage = escapeHtml(message).replace(/\n/g, "<br>");
 
   const mailParams = {
     from: process.env.EMAIL_USER,
     to: [process.env.EMAIL_RECIPIENT_1, process.env.EMAIL_RECIPIENT_2].filter(Boolean).join(", "),
-    subject: `SITE MESSAGE FROM ${sanitizeEmailHeader(name)} | SUBJECT: ${sanitizeEmailHeader(subject)}`,
+    subject: `SITE MESSAGE FROM ${sanitizeEmailHeader(name)} | SUBJECT: ${sanitizeEmailHeader(cleanSubject)}`,
     html: `
       <h4>NEW CONTACT FORM SUBMISSION:</h4>
       <p><strong>Name:</strong> ${safeName}</p>

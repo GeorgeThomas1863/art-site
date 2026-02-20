@@ -56,7 +56,9 @@ export const buildContactFormElement = async () => {
   const nameGroup = await buildFormGroup("name", "Name", "text");
   const emailGroup = await buildFormGroup("email", "Email Address", "email");
   const subjectGroup = await buildFormGroup("subject", "Subject", "text");
-  subjectGroup.querySelector("input").required = false;
+  const subjectInput = subjectGroup.querySelector("input");
+  subjectInput.required = false;
+  subjectInput.maxLength = 200;
   const messageGroup = await buildFormGroup("message", "Message", "textarea");
   const newsletterSection = await buildNewsletterSection();
   const submitButton = await buildSubmitButton();

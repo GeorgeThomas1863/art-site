@@ -1,4 +1,5 @@
 import { sendMail } from "./mailer.js";
+import { sanitizeEmailHeader } from "./sanitize.js";
 import dbModel from "../models/db-model.js";
 
 export const getSubscribers = async () => {
@@ -40,7 +41,8 @@ export const deleteSubscriber = async (email) => {
 export const dispatchNewsletter = async (inputParams) => {
   if (!inputParams) return { success: false, message: "No input parameters" };
   const { subject, message } = inputParams;
-  if (!subject || !message) return { success: false, message: "No subject or message provided" };
+  if (!message) return { success: false, message: "No message provided" };
+  const cleanSubject = sanitizeEmailHeader(subject || "");
 
   const subscriberArray = await getSubscribers();
   if (!subscriberArray || !subscriberArray.length) return { success: false, message: "No subscribers found" };
@@ -50,7 +52,7 @@ export const dispatchNewsletter = async (inputParams) => {
   const mailParams = {
     from: process.env.EMAIL_USER,
     bcc: emailList,
-    subject: subject,
+    subject: cleanSubject,
     text: message,
   };
 

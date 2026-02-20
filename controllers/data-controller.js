@@ -336,7 +336,7 @@ export const getSubscribersControl = async (req, res) => {
 
 export const sendNewsletterControl = async (req, res) => {
   if (!req || !req.body) return res.status(500).json({ error: "No input parameters" });
-  if (!req.body.subject || !req.body.message) return res.status(500).json({ error: "No subject or message provided" });
+  if (!req.body.message) return res.status(500).json({ error: "No message provided" });
 
   const data = await dispatchNewsletter(req.body);
   if (!data || !data.success) return res.status(500).json({ error: "Failed to send newsletter" });

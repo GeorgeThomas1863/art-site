@@ -7,11 +7,6 @@ export const runSendNewsletter = async () => {
   const subject = document.getElementById("newsletter-subject");
   const message = document.getElementById("newsletter-message");
 
-  if (!subject || !subject.value.trim()) {
-    await displayPopup("Please enter a subject line", "error");
-    return null;
-  }
-
   if (!message || !message.value.trim()) {
     await displayPopup("Please enter a message", "error");
     return null;
@@ -30,14 +25,17 @@ export const runSendNewsletter = async () => {
     message: message.value.trim(),
   };
 
-  // console.log("SEND NEWSLETTER PARAMS");
-  // console.dir(newsletterParams);
+  console.log("SEND NEWSLETTER PARAMS");
+  console.dir(newsletterParams);
 
   const data = await sendToBack(newsletterParams);
   if (!data || !data.success) {
     await displayPopup("Failed to send newsletter", "error");
     return null;
   }
+
+  console.log("SEND NEWSLETTER DATA");
+  console.dir(data);
 
   await displayPopup("Newsletter sent successfully", "success");
 
