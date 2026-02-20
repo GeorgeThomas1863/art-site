@@ -39,6 +39,9 @@ export const deleteSubscriber = async (email) => {
 };
 
 export const dispatchNewsletter = async (inputParams) => {
+  // console.log("DISPATCH NEWSLETTER");
+  // console.dir(inputParams);
+
   if (!inputParams) return { success: false, message: "No input parameters" };
   const { subject, message } = inputParams;
   if (!message) return { success: false, message: "No message provided" };
@@ -51,10 +54,14 @@ export const dispatchNewsletter = async (inputParams) => {
 
   const mailParams = {
     from: process.env.EMAIL_USER,
+    to: process.env.EMAIL_USER,
     bcc: emailList,
     subject: cleanSubject,
     text: message,
   };
+
+  console.log("MAIL PARAMS");
+  console.dir(mailParams);
 
   try {
     const data = await sendMail(mailParams);
@@ -66,7 +73,7 @@ export const dispatchNewsletter = async (inputParams) => {
 
     return { success: true, message: "Newsletter sent successfully", messageId: data.messageId };
   } catch (e) {
-    console.error("EMAIL ERROR:", e);
+    console.error("EMAIL ERROR:", e.data?.message || e.message || "Unknown error");
     return { success: false, message: "Failed to send newsletter" };
   }
 };
