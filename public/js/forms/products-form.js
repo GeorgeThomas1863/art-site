@@ -1,6 +1,6 @@
 import { formatProductType, formatPrice } from "../helpers/products-run.js";
 import { buildCollapseContainer } from "../util/collapse.js";
-import { categoryDescriptions } from "../util/define-things.js";
+import { categoryDescriptions, CAROUSEL_PREV_SVG, CAROUSEL_NEXT_SVG } from "../util/define-things.js";
 
 // Build the entire products page
 export const buildProductsForm = async () => {
@@ -145,13 +145,13 @@ const buildCarouselElement = (pics, altText, isCard) => {
   prevBtn.className = "carousel-arrow carousel-arrow-prev";
   prevBtn.setAttribute("data-label", "carousel-prev");
   prevBtn.type = "button";
-  prevBtn.innerHTML = "&#8249;";
+  prevBtn.innerHTML = CAROUSEL_PREV_SVG;
 
   const nextBtn = document.createElement("button");
   nextBtn.className = "carousel-arrow carousel-arrow-next";
   nextBtn.setAttribute("data-label", "carousel-next");
   nextBtn.type = "button";
-  nextBtn.innerHTML = "&#8250;";
+  nextBtn.innerHTML = CAROUSEL_NEXT_SVG;
 
   const dotsContainer = document.createElement("div");
   dotsContainer.className = "carousel-dots";
