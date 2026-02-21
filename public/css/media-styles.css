@@ -63,6 +63,15 @@
     font-size: 1.3rem;
   }
 
+  .split-buttons {
+    gap: 0.5rem;
+  }
+
+  .split-cta {
+    font-size: 0.9rem;
+    padding: 0.8rem 1.5rem;
+  }
+
   #split-image-right {
     display: none;
   }
@@ -125,17 +134,13 @@
     margin-left: 1rem;
   }
 
-  .split-hero {
-    grid-template-columns: 1fr;
-    grid-template-rows: auto 1fr;
-  }
-
   .split-content {
     padding: 3rem 2rem;
   }
 
-  .split-image {
-    height: auto;
+  .split-cta {
+    font-size: 0.8rem;
+    padding: 0.6rem 1rem;
   }
 
   /* About */
@@ -341,6 +346,15 @@
   }
 
   /* Hero */
+  .split-hero {
+    grid-template-columns: 1fr;
+    grid-template-rows: auto 1fr;
+  }
+
+  .split-image {
+    height: auto;
+  }
+
   .split-title {
     font-size: 2.5rem;
   }
