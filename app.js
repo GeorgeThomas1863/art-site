@@ -2,6 +2,8 @@
 
 //item that is currently open in pics should open in popup
 
+//swipe works on mobile but not desktop
+
 //fix event dates / display
 
 //border problem in modal
