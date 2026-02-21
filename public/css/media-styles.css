@@ -143,25 +143,44 @@
     padding: 0.6rem 1rem;
   }
 
-  /* About */
+  /* About - mobile layout at tablet */
   .about-title-row {
     gap: 1rem;
+    flex-wrap: wrap;
+  }
+
+  .about-content {
+    grid-template-columns: 1fr;
+    grid-template-rows: auto;
+  }
+
+  .about-left {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .about-image-mobile {
+    display: block;
+    width: 100%;
+    height: 250px;
+    margin-bottom: 1rem;
+  }
+
+  .about-right {
+    display: none;
+  }
+
+  .about-image-static {
+    height: 600px;
+    background-position: 50% 25%;
   }
 
   .about-title {
-    font-size: 1rem;
+    font-size: 1.5rem;
   }
 
   .about-paragraph {
-    font-size: 0.9rem;
-  }
-
-  .audio-player {
-    gap: 0.25rem;
-  }
-
-  .audio-song-title {
-    font-size: 0.75rem;
+    font-size: 1.1rem;
   }
 
   /* Cart */
@@ -211,7 +230,12 @@
 
   /* Products */
   .products-grid {
-    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    grid-template-columns: 1fr;
+  }
+
+  .product-image {
+    height: auto;
+    background-color: transparent;
   }
 
   .products-filter-bar {
@@ -369,15 +393,6 @@
     font-size: 0.95rem;
   }
 
-  /* Products */
-  .products-grid {
-    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-  }
-
-  .product-image {
-    height: 250px;
-  }
-
   .product-detail-overlay {
     padding: 0.5rem;
   }
@@ -433,39 +448,6 @@
 
   .event-image {
     height: 200px;
-  }
-
-  /* About - mobile layout */
-  .about-title-row {
-    flex-wrap: wrap;
-  }
-
-  .about-content {
-    grid-template-columns: 1fr;
-    height: auto;
-  }
-
-  .about-image-mobile {
-    display: block;
-    width: 100%;
-    height: 250px;
-    margin-bottom: 1rem;
-  }
-
-  .about-right {
-    display: none;
-  }
-
-  .about-image-static {
-    height: 300px;
-  }
-
-  .about-title {
-    font-size: 1.5rem;
-  }
-
-  .about-paragraph {
-    font-size: 1.1rem;
   }
 
   /* Contact */
@@ -614,14 +596,6 @@
     padding: 1rem;
   }
 
-  .products-grid {
-    grid-template-columns: 1fr;
-  }
-
-  .product-image {
-    height: 220px;
-  }
-
   .products-page-title {
     font-size: 2rem;
   }
@@ -711,7 +685,8 @@
   }
 
   .about-image-static {
-    height: 200px;
+    height: 400px;
+    background-position: 50% 25%;
   }
 
   /* Contact */

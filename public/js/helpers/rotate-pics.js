@@ -78,7 +78,7 @@ export const setCurrentPic = async (element, picURL) => {
         layer.style.transition = "";
       });
     });
-  }, 850); // slightly longer than the 0.8s CSS transition
+  }, 1600); // slightly longer than the 1.5s CSS transition
 };
 
 // Initialize image rotation

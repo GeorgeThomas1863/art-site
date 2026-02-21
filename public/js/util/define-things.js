@@ -69,10 +69,6 @@ We create our geodes with both wet felting and dry needle felting. Our geodes em
     details: `For those who like to use their frames we have available 5 by 7 inch needle felted scenes. These are matted to 8 by 10 inches.
 
 These one of a kind scenes are created using wool, sari silk, throwsters waste, and other assorted fibers.
-
-We select antique and vintage frames to complete each piece making them truly on of a kind. Many of our antique frames have history, nicks, paint loss, etc adding integrity and interest to the work.
-
-We are unable to ship some of these pieces due to size, fragility of aged glass, and delicate design. That will be noted in each item's description.
 `,
   },
   mountainTreasureBaskets: {
