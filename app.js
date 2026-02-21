@@ -1,20 +1,15 @@
-//figure out how to get email to NOT go to spam
+//fix event dates / display
 
-//make transitions a bit slower between images in rotating pics
+//figure out how to get email to NOT go to spam
 
 // figure out the cloudflare problem and fix it
 
 //figure out how to receive email from mailgun through admin email
 
-// do another security audit
-
 //popup display of product category should be under add to cart
-
-//product display media styles
 
 //RUN ANOTHER SECURITY AUDIT, specifically on USER INPUTS
 
-//DEPLOY, hten make style edits
 
 //-----------------
 
