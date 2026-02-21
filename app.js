@@ -1,5 +1,7 @@
 //FIX FUCKING MULTI PIC ARROWS
 
+//item that is currently open in pics should open in popup
+
 //fix event dates / display
 
 //border problem in modal
