@@ -1,4 +1,8 @@
+//FIX FUCKING MULTI PIC ARROWS
+
 //fix event dates / display
+
+//border problem in modal
 
 //figure out how to get email to NOT go to spam
 
