@@ -2,6 +2,7 @@ import { clearAdminEditFields, disableAdminEditFields, enableAdminEditFields, up
 import { sendToBack } from "../util/api-front.js";
 import { buildNewProductParams, getEditProductParams } from "../util/params.js";
 import { displayPopup, displayConfirmDialog } from "../util/popup.js";
+import { buildPicSlot } from "../forms/admin-form.js";
 
 //Add product
 export const runAddNewProduct = async () => {
@@ -11,13 +12,14 @@ export const runAddNewProduct = async () => {
     return null;
   }
 
-  // console.log("NEW PRODUCT PARAMS");
-  // console.dir(newProductParams);
-
-  //check if image uploaded
-  const uploadButton = document.getElementById("upload-button");
-  if (!uploadButton.uploadData) {
-    await displayPopup("Please upload an image of the product first", "error");
+  // check if at least one image uploaded
+  const slotBtns = document.querySelectorAll(".pic-slots-container .upload-btn");
+  let hasImage = false;
+  for (let i = 0; i < slotBtns.length; i++) {
+    if (slotBtns[i].uploadData) { hasImage = true; break; }
+  }
+  if (!hasImage) {
+    await displayPopup("Please upload at least one image of the product", "error");
     return null;
   }
 
@@ -144,12 +146,50 @@ export const runDeleteProduct = async () => {
   return data;
 };
 
+export const runAddPicSlot = async () => {
+  const container = document.querySelector(".pic-slots-container");
+  if (!container) return null;
+  const index = container.children.length;
+  const slot = buildPicSlot(index);
+  container.append(slot);
+};
+
+export const runRemovePicSlot = async (removeBtn) => {
+  if (!removeBtn) return null;
+  const slot = removeBtn.closest(".pic-slot");
+  if (!slot) return null;
+
+  const uploadBtn = slot.querySelector(".upload-btn");
+  const filename = uploadBtn?.uploadData?.filename;
+
+  if (filename) {
+    await sendToBack({ route: "/delete-pic-route", filename: filename });
+  }
+
+  slot.remove();
+};
+
 //++++++++++++++++++
 
 export const changeAdminProductSelector = async (changeElement) => {
   if (!changeElement) return null;
 
   await clearAdminEditFields();
+
+  // Reset product image slots to a single disabled empty slot
+  const container = document.querySelector(".pic-slots-container");
+  if (container) {
+    container.innerHTML = "";
+    const emptySlot = buildPicSlot(0);
+    const slotUploadBtn = emptySlot.querySelector(".upload-btn");
+    const slotFileInput = emptySlot.querySelector(".pic-file-input");
+    if (slotUploadBtn) slotUploadBtn.disabled = true;
+    if (slotFileInput) slotFileInput.disabled = true;
+    container.append(emptySlot);
+  }
+  const addBtn = document.querySelector("[data-label='add-pic-slot']");
+  if (addBtn) addBtn.disabled = true;
+
   const selectedOption = changeElement.options[changeElement.selectedIndex];
   if (!selectedOption.value) {
     // User selected the default "-- Select a product --" option
@@ -261,29 +301,42 @@ export const populateEditFormProducts = async (inputObj) => {
 
   const deleteButton = document.getElementById("delete-product-button");
   if (deleteButton) {
-    // deleteButton.style.display = "block";
     deleteButton.disabled = false;
   }
 
-  // Image preview - UPDATED IDs
-  if (!picData || !picData.filename) return null;
+  // Rebuild image slots
+  const pics = picData ? (Array.isArray(picData) ? picData : [picData]) : [];
+  const slotsContainer = document.querySelector(".pic-slots-container");
+  if (!slotsContainer) return null;
 
-  const currentImage = document.getElementById("edit-current-image");
-  const currentImagePreview = document.getElementById("edit-current-image-preview");
-  const editUploadButton = document.getElementById("edit-upload-button");
-  if (!currentImage || !currentImagePreview || !editUploadButton) return null;
+  slotsContainer.innerHTML = "";
+  for (let i = 0; i < pics.length; i++) {
+    const slot = buildPicSlot(i);
+    const slotUploadBtn = slot.querySelector(".upload-btn");
+    const slotCurrentImage = slot.querySelector(".current-image");
+    const slotPlaceholder = slot.querySelector(".image-placeholder");
+    const slotDeleteBtn = slot.querySelector(".delete-image-btn");
 
-  //set pic data to upload button (to get correct pic when submitting edit)
-  editUploadButton.uploadData = picData;
-  currentImage.src = `/images/products/${picData.filename}`;
-  currentImage.style.display = "block";
-  currentImagePreview.style.display = "flex";
+    if (slotUploadBtn) {
+      slotUploadBtn.uploadData = pics[i];
+      slotUploadBtn.textContent = "Change Image";
+    }
+    if (slotCurrentImage) {
+      slotCurrentImage.src = `/images/products/${pics[i].filename}`;
+      slotCurrentImage.classList.remove("hidden");
+    }
+    if (slotPlaceholder) slotPlaceholder.classList.add("hidden");
+    if (slotDeleteBtn) slotDeleteBtn.classList.remove("hidden");
 
-  const deleteImageBtn = document.getElementById("edit-delete-image-btn");
-  if (deleteImageBtn) deleteImageBtn.style.display = "block";
+    slotsContainer.append(slot);
+  }
+  if (pics.length === 0) {
+    slotsContainer.append(buildPicSlot(0));
+  }
 
-  const placeholder = currentImagePreview.querySelector(".image-placeholder");
-  if (placeholder) placeholder.style.display = "none";
+  // Enable add-image button
+  const addBtn = document.querySelector("[data-label='add-pic-slot']");
+  if (addBtn) addBtn.disabled = false;
 
   return true;
 };

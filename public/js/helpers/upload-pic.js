@@ -1,5 +1,104 @@
 import { sendToBack, sendToBackFile } from "../util/api-front.js";
 
+// SLOT-BASED UPLOAD FUNCTIONS (for multi-image products)
+
+export const runSlotUploadClick = async (uploadBtn) => {
+  if (!uploadBtn) return null;
+  const slot = uploadBtn.closest(".pic-slot");
+  if (!slot) return null;
+  const fileInput = slot.querySelector(".pic-file-input");
+  if (!fileInput) return null;
+  fileInput.click();
+};
+
+export const runSlotUploadPic = async (fileInput) => {
+  if (!fileInput) return null;
+  const pic = fileInput.files[0];
+  if (!pic) return null;
+
+  const slot = fileInput.closest(".pic-slot");
+  if (!slot) return null;
+
+  const uploadBtn = slot.querySelector(".upload-btn");
+  const uploadStatus = slot.querySelector(".upload-status");
+  const currentImage = slot.querySelector(".current-image");
+  const imagePlaceholder = slot.querySelector(".image-placeholder");
+  const deleteImageBtn = slot.querySelector(".delete-image-btn");
+
+  if (!uploadBtn || !uploadStatus) return null;
+
+  uploadBtn.uploadData = null;
+  uploadStatus.textContent = "Uploading...";
+  uploadStatus.classList.remove("hidden");
+  uploadBtn.disabled = true;
+
+  const formData = new FormData();
+  formData.append("image", pic);
+
+  const data = await sendToBackFile({ route: "/upload-product-pic-route", formData: formData });
+
+  if (data === "FAIL") {
+    uploadStatus.textContent = "✗ Upload failed";
+    uploadStatus.style.color = "red";
+    uploadBtn.uploadData = null;
+    uploadBtn.disabled = false;
+    return null;
+  }
+
+  uploadStatus.textContent = `✓ ${pic.name}`;
+  uploadStatus.style.color = "green";
+  uploadBtn.textContent = "Change Image";
+  uploadBtn.disabled = false;
+  uploadBtn.uploadData = data;
+
+  if (currentImage && data && data.filename) {
+    currentImage.src = `/images/products/${data.filename}`;
+    currentImage.classList.remove("hidden");
+    if (imagePlaceholder) imagePlaceholder.classList.add("hidden");
+    if (deleteImageBtn) deleteImageBtn.classList.remove("hidden");
+  }
+
+  return data;
+};
+
+export const runDeleteSlotImage = async (deleteBtn) => {
+  if (!deleteBtn) return null;
+
+  const slot = deleteBtn.closest(".pic-slot");
+  if (!slot) return null;
+
+  const uploadBtn = slot.querySelector(".upload-btn");
+  const uploadStatus = slot.querySelector(".upload-status");
+  const currentImage = slot.querySelector(".current-image");
+  const imagePlaceholder = slot.querySelector(".image-placeholder");
+  const fileInput = slot.querySelector(".pic-file-input");
+
+  const filename = uploadBtn?.uploadData?.filename;
+
+  if (filename) {
+    const result = await sendToBack({ route: "/delete-pic-route", filename: filename });
+    if (result === "FAIL") {
+      console.error("Failed to delete image from server");
+    }
+  }
+
+  if (uploadBtn) {
+    uploadBtn.uploadData = null;
+    uploadBtn.textContent = "Choose Image";
+  }
+  if (uploadStatus) {
+    uploadStatus.textContent = "";
+    uploadStatus.classList.add("hidden");
+  }
+  if (currentImage) {
+    currentImage.src = "";
+    currentImage.classList.add("hidden");
+  }
+  if (imagePlaceholder) imagePlaceholder.classList.remove("hidden");
+  deleteBtn.classList.add("hidden");
+  if (fileInput) fileInput.value = "";
+};
+
 //PIC
 export const runUploadClick = async (clickedElement) => {
   if (!clickedElement) return null;

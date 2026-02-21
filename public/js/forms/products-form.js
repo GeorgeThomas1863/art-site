@@ -123,22 +123,68 @@ export const buildProductCard = async (productData) => {
   return productCard;
 };
 
+// Internal helper — builds a carousel element for grid cards or the detail modal
+const buildCarouselElement = (pics, altText, isCard) => {
+  const carousel = document.createElement("div");
+  carousel.className = "product-carousel";
+  if (isCard) carousel.setAttribute("data-label", "product-card-click");
+
+  const track = document.createElement("div");
+  track.className = "carousel-track";
+
+  for (let i = 0; i < pics.length; i++) {
+    const slide = document.createElement("img");
+    slide.className = "carousel-slide";
+    if (isCard) slide.setAttribute("data-label", "product-card-click");
+    slide.src = `/images/products/${pics[i].filename}`;
+    slide.alt = altText;
+    track.append(slide);
+  }
+
+  const prevBtn = document.createElement("button");
+  prevBtn.className = "carousel-arrow carousel-arrow-prev";
+  prevBtn.setAttribute("data-label", "carousel-prev");
+  prevBtn.type = "button";
+  prevBtn.innerHTML = "&#8249;";
+
+  const nextBtn = document.createElement("button");
+  nextBtn.className = "carousel-arrow carousel-arrow-next";
+  nextBtn.setAttribute("data-label", "carousel-next");
+  nextBtn.type = "button";
+  nextBtn.innerHTML = "&#8250;";
+
+  const dotsContainer = document.createElement("div");
+  dotsContainer.className = "carousel-dots";
+
+  for (let i = 0; i < pics.length; i++) {
+    const dot = document.createElement("button");
+    dot.className = "carousel-dot" + (i === 0 ? " active" : "");
+    dot.setAttribute("data-label", "product-carousel-dot");
+    dot.setAttribute("data-index", String(i));
+    dot.type = "button";
+    dotsContainer.append(dot);
+  }
+
+  carousel.append(track, prevBtn, nextBtn, dotsContainer);
+  return carousel;
+};
+
 // Build product image element
 export const buildProductImage = async (productData) => {
   const { picData } = productData;
-  if (!picData) return null;
+  const pics = picData ? (Array.isArray(picData) ? picData : [picData]) : [];
+  if (pics.length === 0) return null;
 
-  const productImage = document.createElement("img");
-  productImage.className = "product-image";
-  productImage.setAttribute("data-label", "product-card-click");
-  productImage.alt = productData.name;
+  if (pics.length === 1) {
+    const productImage = document.createElement("img");
+    productImage.className = "product-image";
+    productImage.setAttribute("data-label", "product-card-click");
+    productImage.alt = productData.name;
+    productImage.src = `/images/products/${pics[0].filename}`;
+    return productImage;
+  }
 
-  const picPath = `/images/products/${picData.filename}`;
-  if (!picPath) return null;
-
-  productImage.src = picPath;
-
-  return productImage;
+  return buildCarouselElement(pics, productData.name, true);
 };
 
 // Build product info section (name, price, description, footer)
@@ -246,13 +292,17 @@ export const buildProductDetailModal = async (productData) => {
   const body = document.createElement("div");
   body.className = "product-detail-body";
 
-  // Image
-  if (productData.picData) {
+  // Images
+  const pics = productData.picData ? (Array.isArray(productData.picData) ? productData.picData : [productData.picData]) : [];
+  if (pics.length === 1) {
     const img = document.createElement("img");
     img.className = "product-detail-image";
-    img.src = `/images/products/${productData.picData.filename}`;
+    img.src = `/images/products/${pics[0].filename}`;
     img.alt = productData.name;
     body.append(img);
+  } else if (pics.length > 1) {
+    const carousel = buildCarouselElement(pics, productData.name, false);
+    body.append(carousel);
   }
 
   // Info section

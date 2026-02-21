@@ -1,9 +1,9 @@
 import { runModalTrigger, runModalClose, runChangeStatusCard } from "./helpers/admin-run.js"; //prettier-ignore
-import { runAddNewProduct, runEditProduct, runDeleteProduct, changeAdminProductSelector } from "./helpers/admin-products.js";
+import { runAddNewProduct, runEditProduct, runDeleteProduct, changeAdminProductSelector, runAddPicSlot, runRemovePicSlot } from "./helpers/admin-products.js";
 import { runAddNewEvent, runEditEvent, runDeleteEvent, changeAdminEventSelector } from "./helpers/admin-events.js";
 import { runSendNewsletter, runAddSubscriber, runRemoveSubscriber } from "./helpers/admin-newsletter.js";
-import { runUploadClick, runUploadPic, runDeleteUploadImage } from "./helpers/upload-pic.js";
-import { changeProductsFilterButton, openProductDetailModal, closeProductDetailModal } from "./helpers/products-run.js";
+import { runUploadClick, runUploadPic, runDeleteUploadImage, runSlotUploadClick, runSlotUploadPic, runDeleteSlotImage } from "./helpers/upload-pic.js";
+import { changeProductsFilterButton, openProductDetailModal, closeProductDetailModal, runProductCarouselDot, runCarouselPrev, runCarouselNext, advanceCarousel } from "./helpers/products-run.js";
 import { runContactSubmit } from "./helpers/contact-run.js";
 import { runEventsNewsletterToggle, runEventsNewsletterSubmit } from "./helpers/events-run.js";
 import { runAddToCart, runIncreaseQuantity, runDecreaseQuantity, runRemoveFromCart } from "./helpers/cart-run.js";
@@ -14,6 +14,9 @@ import { runToggleMenu } from "./util/collapse.js";
 import { runAuthSubmit, runPwToggle } from "./auth.js";
 import { closePopup, closeConfirmDialog } from "./util/popup.js";
 import debounce from "./util/debounce.js";
+
+let touchStartX = null;
+let swipeHandled = false;
 
 const authElement = document.getElementById("auth-element");
 const displayElement = document.getElementById("display-element");
@@ -26,15 +29,16 @@ const aboutElement = document.getElementById("about-element");
 const checkoutElement = document.getElementById("checkout-element");
 
 export const clickHandler = async (e) => {
+  if (swipeHandled) { swipeHandled = false; return; }
   const clickElement = e.target;
   const clickId = clickElement.id;
   const clickType = clickElement.getAttribute("data-label");
   // const tabType = clickElement.getAttribute("data-tab");
 
-  // console.log("CLICK HANDLER");
-  // console.log(clickId);
-  // console.log("CLICK TYPE");
-  // console.log(clickType);
+  console.log("CLICK HANDLER");
+  console.log(clickId);
+  console.log("CLICK TYPE");
+  console.log(clickType);
 
   if (clickType === "auth-submit") await runAuthSubmit();
   if (clickType === "pwToggle") await runPwToggle();
@@ -48,6 +52,14 @@ export const clickHandler = async (e) => {
 
   if (clickType === "upload-click" || clickType === "edit-upload-click") await runUploadClick(clickElement);
   if (clickType === "delete-upload-image" || clickType === "edit-delete-upload-image") await runDeleteUploadImage(clickElement);
+
+  if (clickType === "slot-upload-click") await runSlotUploadClick(clickElement);
+  if (clickType === "delete-slot-image") await runDeleteSlotImage(clickElement);
+  if (clickType === "remove-pic-slot") await runRemovePicSlot(clickElement);
+  if (clickType === "add-pic-slot") await runAddPicSlot();
+  if (clickType === "product-carousel-dot") await runProductCarouselDot(clickElement);
+  if (clickType === "carousel-prev") await runCarouselPrev(clickElement);
+  if (clickType === "carousel-next") await runCarouselNext(clickElement);
 
   if (clickType === "category-filter-btn") await changeProductsFilterButton(clickElement);
 
@@ -126,7 +138,7 @@ export const changeHandler = async (e) => {
   // console.log("CHANGE TYPE");
   // console.log(changeType);
 
-  //Upload / Edit pic
+  //Upload / Edit pic (legacy single-image for events)
   if (changeId === "upload-pic-input" || changeId === "edit-upload-pic-input") {
     const pic = e.target.files[0];
     if (!pic) return null;
@@ -134,6 +146,14 @@ export const changeHandler = async (e) => {
     const mode = changeId.includes("edit") ? "edit" : "add";
     const entityType = changeElement.entityType;
     await runUploadPic(pic, mode, entityType);
+    return true;
+  }
+
+  // Slot-based upload (multi-image products)
+  if (changeElement.classList.contains("pic-file-input")) {
+    const pic = e.target.files[0];
+    if (!pic) return null;
+    await runSlotUploadPic(changeElement);
     return true;
   }
 
@@ -187,10 +207,28 @@ if (adminElement) {
   // adminElement.addEventListener("click", overlayClickHandler);
 }
 
+const touchStartHandler = (e) => {
+  if (!e.target.closest(".product-carousel")) return;
+  touchStartX = e.changedTouches[0].clientX;
+};
+
+const touchEndHandler = (e) => {
+  if (touchStartX === null) return;
+  const carousel = e.target.closest(".product-carousel");
+  if (!carousel) { touchStartX = null; return; }
+  const deltaX = e.changedTouches[0].clientX - touchStartX;
+  touchStartX = null;
+  if (Math.abs(deltaX) < 30) return;
+  swipeHandled = true;
+  advanceCarousel(carousel, deltaX < 0 ? "next" : "prev");
+};
+
 if (productsElement) {
   productsElement.addEventListener("click", clickHandler);
   productsElement.addEventListener("keydown", keyHandler);
   productsElement.addEventListener("change", changeHandler);
+  productsElement.addEventListener("touchstart", touchStartHandler, { passive: true });
+  productsElement.addEventListener("touchend", touchEndHandler);
 }
 
 if (eventsElement) {

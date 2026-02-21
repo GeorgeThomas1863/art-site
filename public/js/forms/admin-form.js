@@ -441,7 +441,7 @@ export const buildProductStatusSection = async (mode) => {
   statusGrid.className = "status-grid";
 
   // Display Status Card
-  const displayCard = await buildStatusCard(mode, "display", "Display on Site", "display-card");
+  const displayCard = await buildStatusCard(mode, "display", "Show on Site", "display-card");
 
   // Sold Status Card
   const soldCard = await buildStatusCard(mode, "sold", "Sold?", "sold-card");
@@ -515,15 +515,83 @@ export const buildProductImageSection = async (mode) => {
 
   const title = document.createElement("h4");
   title.className = "section-title";
-  title.textContent = "Product Image";
+  title.textContent = "Product Images";
 
   header.append(icon, title);
 
-  const uploadSection = await buildAdminUpload(mode, "products");
+  const slotsContainer = document.createElement("div");
+  slotsContainer.className = "pic-slots-container";
 
-  section.append(header, uploadSection);
+  const initialSlot = buildPicSlot(0);
+  if (mode === "edit") {
+    const slotUploadBtn = initialSlot.querySelector(".upload-btn");
+    const slotFileInput = initialSlot.querySelector(".pic-file-input");
+    if (slotUploadBtn) slotUploadBtn.disabled = true;
+    if (slotFileInput) slotFileInput.disabled = true;
+  }
+  slotsContainer.append(initialSlot);
+
+  const addBtn = document.createElement("button");
+  addBtn.type = "button";
+  addBtn.className = "btn-add-image";
+  addBtn.textContent = "+ Add Image";
+  addBtn.setAttribute("data-label", "add-pic-slot");
+  if (mode === "edit") addBtn.disabled = true;
+
+  section.append(header, slotsContainer, addBtn);
 
   return section;
+};
+
+export const buildPicSlot = (index) => {
+  const slot = document.createElement("div");
+  slot.className = "pic-slot";
+  slot.setAttribute("data-slot-index", String(index));
+
+  const imageDisplay = document.createElement("div");
+  imageDisplay.className = "image-display";
+
+  const imagePlaceholder = document.createElement("div");
+  imagePlaceholder.className = "image-placeholder";
+  imagePlaceholder.textContent = "🖼️";
+
+  const currentImage = document.createElement("img");
+  currentImage.className = "current-image hidden";
+  currentImage.alt = "Product image";
+
+  const deleteImageBtn = document.createElement("button");
+  deleteImageBtn.type = "button";
+  deleteImageBtn.className = "delete-image-btn hidden";
+  deleteImageBtn.innerHTML = "×";
+  deleteImageBtn.title = "Delete image";
+  deleteImageBtn.setAttribute("data-label", "delete-slot-image");
+
+  imageDisplay.append(imagePlaceholder, currentImage, deleteImageBtn);
+
+  const picInput = document.createElement("input");
+  picInput.type = "file";
+  picInput.className = "pic-file-input hidden";
+  picInput.accept = ".jpg,.jpeg,.png,.gif,.webp";
+
+  const uploadBtn = document.createElement("button");
+  uploadBtn.type = "button";
+  uploadBtn.className = "upload-btn";
+  uploadBtn.textContent = "Choose Image";
+  uploadBtn.setAttribute("data-label", "slot-upload-click");
+
+  const uploadStatus = document.createElement("span");
+  uploadStatus.className = "upload-status hidden";
+
+  const removeSlotBtn = document.createElement("button");
+  removeSlotBtn.type = "button";
+  removeSlotBtn.className = "remove-slot-btn";
+  removeSlotBtn.textContent = "Remove slot";
+  removeSlotBtn.setAttribute("data-label", "remove-pic-slot");
+  if (index === 0) removeSlotBtn.classList.add("hidden");
+
+  slot.append(imageDisplay, picInput, uploadBtn, uploadStatus, removeSlotBtn);
+
+  return slot;
 };
 
 // NEW HELPER: Build Info Row (for text inputs)

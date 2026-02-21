@@ -377,3 +377,100 @@
   font-weight: 600;
   padding: 0.75rem 2rem;
 }
+
+/* ++++++++++++++++++++++++++ */
+/* PRODUCT CAROUSEL           */
+/* ++++++++++++++++++++++++++ */
+
+.product-carousel {
+  position: relative;
+  overflow: hidden;
+  cursor: pointer;
+  border-bottom: 1px solid #e0e0e0;
+}
+
+.carousel-track {
+  display: flex;
+  transition: transform 0.3s ease;
+}
+
+.carousel-slide {
+  flex-shrink: 0;
+  width: 100%;
+  height: 320px;
+  object-fit: contain;
+  background-color: #ffffff;
+}
+
+.carousel-dots {
+  display: flex;
+  justify-content: center;
+  gap: 6px;
+  padding: 6px 0;
+  background: #ffffff;
+}
+
+.carousel-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background-color: #ccc;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  transition: background-color 0.2s;
+}
+
+.carousel-dot.active {
+  background-color: #333;
+}
+
+.carousel-dot:hover {
+  background-color: #888;
+}
+
+/* ++++++++++++++++++++ */
+/* CAROUSEL ARROWS      */
+/* ++++++++++++++++++++ */
+
+.carousel-arrow {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  background: rgba(0, 0, 0, 0.55);
+  color: #ffffff;
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  cursor: pointer;
+  font-size: 1.7rem;
+  line-height: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10;
+  padding: 0;
+  opacity: 0.82;
+  transition: background 0.2s, opacity 0.2s;
+}
+
+.carousel-arrow:hover {
+  background: rgba(0, 0, 0, 0.78);
+  opacity: 1;
+}
+
+.carousel-arrow-prev { left: 6px; }
+.carousel-arrow-next { right: 6px; }
+
+/* ++++++++++++++++++++++++++++++++ */
+/* PRODUCT DETAIL - MODAL CAROUSEL  */
+/* ++++++++++++++++++++++++++++++++ */
+
+.product-detail-wrapper .product-carousel {
+  cursor: default;
+}
+
+.product-detail-wrapper .carousel-slide {
+  height: 420px;
+}

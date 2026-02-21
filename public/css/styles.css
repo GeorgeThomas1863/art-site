@@ -7,6 +7,10 @@
   box-sizing: border-box;
 }
 
+.hidden {
+  display: none !important;
+}
+
 body {
   background-color: rgb(190, 233, 148);
   font-family: "Indie Flower", cursive;

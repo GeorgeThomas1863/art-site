@@ -238,6 +238,11 @@
     background-color: transparent;
   }
 
+  .carousel-slide {
+    height: auto;
+    background-color: transparent;
+  }
+
   .products-filter-bar {
     flex-direction: column;
     align-items: stretch;

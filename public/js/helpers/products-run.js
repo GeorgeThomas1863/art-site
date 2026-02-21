@@ -144,3 +144,42 @@ export const closeProductDetailModal = async () => {
   const modal = document.querySelector(".product-detail-overlay");
   if (modal) modal.remove();
 };
+
+const goToSlide = (carousel, index) => {
+  const track = carousel.querySelector(".carousel-track");
+  const dots = carousel.querySelectorAll(".carousel-dot");
+  if (track) track.style.transform = `translateX(-${index * 100}%)`;
+  for (let i = 0; i < dots.length; i++) dots[i].classList.remove("active");
+  if (dots[index]) dots[index].classList.add("active");
+};
+
+const getActiveIndex = (carousel) => {
+  const dot = carousel.querySelector(".carousel-dot.active");
+  return dot ? parseInt(dot.getAttribute("data-index")) : 0;
+};
+
+export const runProductCarouselDot = async (dot) => {
+  const carousel = dot.closest(".product-carousel");
+  if (!carousel) return null;
+  goToSlide(carousel, parseInt(dot.getAttribute("data-index")));
+};
+
+export const advanceCarousel = (carousel, direction) => {
+  const total = carousel.querySelectorAll(".carousel-dot").length;
+  if (total <= 1) return;
+  const current = getActiveIndex(carousel);
+  if (direction === "next" && current === total - 1) return;
+  if (direction === "prev" && current === 0) return;
+  const next = direction === "next" ? current + 1 : current - 1;
+  goToSlide(carousel, next);
+};
+
+export const runCarouselPrev = async (btn) => {
+  const carousel = btn.closest(".product-carousel");
+  if (carousel) advanceCarousel(carousel, "prev");
+};
+
+export const runCarouselNext = async (btn) => {
+  const carousel = btn.closest(".product-carousel");
+  if (carousel) advanceCarousel(carousel, "next");
+};

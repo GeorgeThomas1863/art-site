@@ -1,4 +1,10 @@
 export const buildNewProductParams = async () => {
+  const slotBtns = document.querySelectorAll(".pic-slots-container .upload-btn");
+  const picData = [];
+  for (let i = 0; i < slotBtns.length; i++) {
+    if (slotBtns[i].uploadData) picData.push(slotBtns[i].uploadData);
+  }
+
   const params = {
     route: "/add-new-product-route",
     name: document.getElementById("name").value,
@@ -13,13 +19,19 @@ export const buildNewProductParams = async () => {
     display: document.getElementById("display").value,
     sold: document.getElementById("sold").value,
     removeWhenSold: document.getElementById("remove-when-sold").value,
-    picData: document.getElementById("upload-button").uploadData,
+    picData: picData,
     dateCreated: new Date().toISOString(),
   };
   return params;
 };
 
 export const getEditProductParams = async () => {
+  const slotBtns = document.querySelectorAll(".pic-slots-container .upload-btn");
+  const picData = [];
+  for (let i = 0; i < slotBtns.length; i++) {
+    if (slotBtns[i].uploadData) picData.push(slotBtns[i].uploadData);
+  }
+
   //product id and route added later
   const params = {
     name: document.getElementById("edit-name").value,
@@ -34,7 +46,7 @@ export const getEditProductParams = async () => {
     display: document.getElementById("edit-display").value,
     sold: document.getElementById("edit-sold").value,
     removeWhenSold: document.getElementById("edit-remove-when-sold").value,
-    picData: document.getElementById("edit-upload-button").uploadData,
+    picData: picData,
   };
 
   return params;
