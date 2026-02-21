@@ -92,10 +92,11 @@
 }
 
 .newsletter-description {
-  font-size: 1rem;
+  font-size: 1.1rem;
   color: #333;
   margin-bottom: 1rem;
   line-height: 1.4;
+  font-weight: 600;
 }
 
 .checkbox-wrapper {
@@ -113,6 +114,7 @@
 
 .checkbox-wrapper label {
   font-size: 1rem;
+  font-weight: 600;
   color: #000000;
   cursor: pointer;
 }
