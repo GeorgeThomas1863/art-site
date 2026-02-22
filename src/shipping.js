@@ -121,13 +121,31 @@ export const fetchShippingRates = async (req) => {
     // Apply business adjustments before any processing
     const adjustedRates = await applyShippingAdjustments(res.data);
 
-    for (let i = 0; i < adjustedRates.length; i++) {
-      adjustedRates[i].rateId = i;
+    // Filter out envelope-type shipping options
+    const ENVELOPE_PACKAGE_TYPES = new Set([
+      "letter",
+      "thick_envelope",
+      "large_envelope_or_flat",
+      "flat_rate_envelope",
+      "flat_rate_padded_envelope",
+      "flat_rate_legal_envelope",
+    ]);
+
+    const nonEnvelopeRates = [];
+    for (const rate of adjustedRates) {
+      const isEnvelopeByPackage = ENVELOPE_PACKAGE_TYPES.has(rate.package_type);
+      const svcLower = rate.service_type ? rate.service_type.toLowerCase() : "";
+      const isEnvelopeByName = svcLower.includes("envelope") || svcLower.includes("media mail");
+      if (!isEnvelopeByPackage && !isEnvelopeByName) nonEnvelopeRates.push(rate);
+    }
+
+    for (let i = 0; i < nonEnvelopeRates.length; i++) {
+      nonEnvelopeRates[i].rateId = i;
     }
 
     let cheapestRate = null;
-    for (let i = 0; i < adjustedRates.length; i++) {
-      const rate = adjustedRates[i];
+    for (let i = 0; i < nonEnvelopeRates.length; i++) {
+      const rate = nonEnvelopeRates[i];
       if (!cheapestRate || rate.shipping_amount.amount < cheapestRate.shipping_amount.amount) {
         cheapestRate = rate;
       }
@@ -137,11 +155,11 @@ export const fetchShippingRates = async (req) => {
     req.session.shipping = {
       zip: zip,
       selectedRate: cheapestRate,
-      rateData: adjustedRates,
+      rateData: nonEnvelopeRates,
       calculatedAt: new Date().toISOString(),
     };
 
-    return { success: true, message: "Shipping rate calculated successfully", rateData: adjustedRates };
+    return { success: true, message: "Shipping rate calculated successfully", rateData: nonEnvelopeRates };
   } catch (e) {
     // console.log("RATE ERROR");
     // console.log(e);

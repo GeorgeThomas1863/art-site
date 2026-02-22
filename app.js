@@ -1,19 +1,12 @@
-//border problem in modal
-
-//remove some mail options
-
-//put confirmation line above order details in confirm page
+// figure out the cloudflare problem and fix it
 
 //figure out how to get email to NOT go to spam
 
-// figure out the cloudflare problem and fix it
-
 //figure out how to receive email from mailgun through admin email
 
-//popup display of product category should be under add to cart
+//popup display of product category should be under add to cart?
 
 //RUN ANOTHER SECURITY AUDIT, specifically on USER INPUTS
-
 
 //-----------------
 
