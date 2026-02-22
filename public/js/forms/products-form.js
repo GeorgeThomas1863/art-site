@@ -124,7 +124,7 @@ export const buildProductCard = async (productData) => {
 };
 
 // Internal helper — builds a carousel element for grid cards or the detail modal
-const buildCarouselElement = (pics, altText, isCard) => {
+const buildCarouselElement = (pics, altText, isCard, startIndex = 0) => {
   const carousel = document.createElement("div");
   carousel.className = "product-carousel";
   if (isCard) carousel.setAttribute("data-label", "product-card-click");
@@ -158,7 +158,7 @@ const buildCarouselElement = (pics, altText, isCard) => {
 
   for (let i = 0; i < pics.length; i++) {
     const dot = document.createElement("button");
-    dot.className = "carousel-dot" + (i === 0 ? " active" : "");
+    dot.className = "carousel-dot" + (i === startIndex ? " active" : "");
     dot.setAttribute("data-label", "product-carousel-dot");
     dot.setAttribute("data-index", String(i));
     dot.type = "button";
@@ -166,6 +166,7 @@ const buildCarouselElement = (pics, altText, isCard) => {
   }
 
   carousel.append(track, prevBtn, nextBtn, dotsContainer);
+  if (startIndex > 0) track.style.transform = `translateX(-${startIndex * 100}%)`;
   return carousel;
 };
 
@@ -270,7 +271,7 @@ export const buildProductTypeBadge = async (productData) => {
 //----------------------
 
 // Build product detail modal
-export const buildProductDetailModal = async (productData) => {
+export const buildProductDetailModal = async (productData, startIndex = 0) => {
   const overlay = document.createElement("div");
   overlay.className = "product-detail-overlay";
   overlay.setAttribute("data-label", "close-product-modal");
@@ -301,7 +302,7 @@ export const buildProductDetailModal = async (productData) => {
     img.alt = productData.name;
     body.append(img);
   } else if (pics.length > 1) {
-    const carousel = buildCarouselElement(pics, productData.name, false);
+    const carousel = buildCarouselElement(pics, productData.name, false, startIndex);
     body.append(carousel);
   }
 

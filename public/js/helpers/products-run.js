@@ -131,7 +131,10 @@ export const openProductDetailModal = async (clickElement) => {
   const productData = productsArray.find((p) => String(p.productId) === String(productId));
   if (!productData) return null;
 
-  const modal = await buildProductDetailModal(productData);
+  const cardCarousel = card.querySelector(".product-carousel");
+  const startIndex = cardCarousel ? getActiveIndex(cardCarousel) : 0;
+
+  const modal = await buildProductDetailModal(productData, startIndex);
   const productsElement = document.getElementById("products-element");
   productsElement.append(modal);
 
