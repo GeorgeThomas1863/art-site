@@ -96,7 +96,7 @@ export const buildConfirmDetails = async () => {
   const shippingMethodRow = await buildDetailRow("Service", "Loading...", "shipping-method");
   const estimatedDeliveryRow = await buildDetailRow("Estimated Delivery", "Loading...", "estimated-delivery");
 
-  detailsCard.append(cardTitle, detailsGrid, emailSentNote, shippingTitle, shippingAddress, shippingMethodTitle, shippingMethodRow, estimatedDeliveryRow);
+  detailsCard.append(cardTitle, emailSentNote, detailsGrid, shippingTitle, shippingAddress, shippingMethodTitle, shippingMethodRow, estimatedDeliveryRow);
   detailsSection.append(detailsCard);
 
   return detailsSection;

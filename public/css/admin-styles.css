@@ -273,10 +273,11 @@
   max-width: 800px;
   width: 100%;
   max-height: calc(100vh - 4rem);
-  overflow-y: auto;
-  /* scrollbar-width: thin; */
-  scrollbar-color: rgba(150, 150, 150, 0.9) transparent;
+  overflow: hidden;
   border-radius: 8px;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
 }
 
 .modal-wrapper::-webkit-scrollbar {
@@ -295,8 +296,10 @@
 /* Modal Content */
 .modal-content {
   background: #ffffff;
-  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
   border-radius: 0 0 8px 8px;
+  overflow-y: auto;
+  flex: 1;
+  min-height: 0;
 }
 
 /* Modal Header */

@@ -1,8 +1,8 @@
-
-
-//fix event dates / display
-
 //border problem in modal
+
+//remove some mail options
+
+//put confirmation line above order details in confirm page
 
 //figure out how to get email to NOT go to spam
 

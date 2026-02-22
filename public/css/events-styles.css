@@ -10,7 +10,7 @@
 }
 
 .events-page-title {
-  font-size: 2.5rem;
+  font-size: 3rem;
   font-weight: bold;
   letter-spacing: 3px;
   color: #000000;
@@ -60,11 +60,11 @@
   color: #e74c3c;
   font-weight: bold;
   margin-bottom: 0.75rem;
-  font-size: 1.1rem;
+  font-size: 1.35rem;
 }
 
 .event-title {
-  font-size: 1.5rem;
+  font-size: 1.8rem;
   color: #000000;
   margin-bottom: 1rem;
   font-weight: bold;
@@ -77,8 +77,8 @@
   align-items: center;
   gap: 0.5rem;
   margin-bottom: 1rem;
-  font-size: 1.05rem;
-  font-weight: 600;
+  font-size: 1.25rem;
+  font-weight: 700;
 }
 
 .event-location-link {
@@ -94,8 +94,8 @@
 .event-description {
   color: #555;
   line-height: 1.6;
-  font-size: 1.05rem;
-  font-weight: 600;
+  font-size: 1.2rem;
+  font-weight: 700;
 }
 
 .events-newsletter-section {
@@ -110,7 +110,7 @@
 }
 
 .events-newsletter-title {
-  font-size: 1.5rem;
+  font-size: 1.8rem;
   color: #000000;
   margin-bottom: 1rem;
   font-weight: bold;
@@ -119,8 +119,8 @@
 }
 
 .events-newsletter-description {
-  font-size: 1.1rem;
-  font-weight: 600;
+  font-size: 1.3rem;
+  font-weight: 700;
   color: #333;
   margin-bottom: 1.5rem;
   line-height: 1.4;
@@ -142,7 +142,7 @@
 }
 
 .events-newsletter-checkbox-wrapper label {
-  font-size: 1.1rem;
+  font-size: 1.3rem;
   color: #000000;
   cursor: pointer;
   font-weight: bold;
