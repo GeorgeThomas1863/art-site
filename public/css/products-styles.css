@@ -193,6 +193,7 @@
   font-weight: 700;
   line-height: 1.6;
   margin-bottom: 1.2rem;
+  white-space: pre-wrap;
   display: -webkit-box;
   /* -webkit-line-clamp: 3; */
   -webkit-box-orient: vertical;
@@ -354,6 +355,7 @@
   color: #333;
   line-height: 1.7;
   margin-bottom: 1.25rem;
+  white-space: pre-wrap;
 }
 
 .product-detail-type {
