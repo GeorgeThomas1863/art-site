@@ -1,8 +1,6 @@
-//FIX FUCKING MULTI PIC ARROWS
+//TEXT WRAP ERROR
 
-//item that is currently open in pics should open in popup
-
-//swipe works on mobile but not desktop
+//CONFIRM swipe works on mobile but not desktop
 
 //fix event dates / display
 
