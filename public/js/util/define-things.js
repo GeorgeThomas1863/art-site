@@ -30,9 +30,9 @@ export const INSTAGRAM_ICON_SVG = `
       </svg>
     `;
 
-export const CAROUSEL_PREV_SVG = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" width="20" height="20"><polyline points="15,6 9,12 15,18"></polyline></svg>`;
+export const CAROUSEL_PREV_SVG = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" width="30" height="30" data-label="carousel-prev"><polyline points="15,6 9,12 15,18" data-label="carousel-prev"></polyline></svg>`;
 
-export const CAROUSEL_NEXT_SVG = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" width="20" height="20"><polyline points="9,6 15,12 9,18"></polyline></svg>`;
+export const CAROUSEL_NEXT_SVG = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" width="30" height="30" data-label="carousel-next"><polyline points="9,6 15,12 9,18" data-label="carousel-next"></polyline></svg>`;
 
 //--------------------
 
