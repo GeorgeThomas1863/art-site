@@ -77,7 +77,15 @@ export const buildEventContent = async (eventData) => {
 
   const eventDateElement = document.createElement("div");
   eventDateElement.className = "event-date";
-  eventDateElement.textContent = `📅 ${eventDate}`;
+  const [year, month, day] = eventDate.split('-').map(Number);
+  const dateObj = new Date(year, month - 1, day);
+  const formatted = dateObj.toLocaleDateString('en-US', {
+    weekday: 'long',
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric',
+  });
+  eventDateElement.textContent = `📅 ${formatted}`;
 
   const eventTitleElement = document.createElement("div");
   eventTitleElement.className = "event-title";
@@ -85,7 +93,16 @@ export const buildEventContent = async (eventData) => {
 
   const eventLocationElement = document.createElement("div");
   eventLocationElement.className = "event-location";
-  eventLocationElement.textContent = `📍 ${eventLocation}`;
+
+  const mapsUrl = `https://maps.google.com/?q=${encodeURIComponent(eventLocation)}`;
+  const locationLink = document.createElement("a");
+  locationLink.href = mapsUrl;
+  locationLink.target = "_blank";
+  locationLink.rel = "noopener noreferrer";
+  locationLink.className = "event-location-link";
+  locationLink.textContent = `📍 ${eventLocation}`;
+
+  eventLocationElement.appendChild(locationLink);
 
   const eventDescriptionElement = document.createElement("div");
   eventDescriptionElement.className = "event-description";

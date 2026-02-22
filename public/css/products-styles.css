@@ -387,8 +387,13 @@
 .product-carousel {
   position: relative;
   overflow: hidden;
-  cursor: pointer;
+  cursor: grab;
+  user-select: none;
   border-bottom: 1px solid #e0e0e0;
+}
+
+.product-carousel:active {
+  cursor: grabbing;
 }
 
 .carousel-track {
@@ -402,6 +407,7 @@
   height: 320px;
   object-fit: contain;
   background-color: #ffffff;
+  -webkit-user-drag: none;
 }
 
 .carousel-dots {
@@ -468,7 +474,11 @@
 /* ++++++++++++++++++++++++++++++++ */
 
 .product-detail-wrapper .product-carousel {
-  cursor: default;
+  cursor: grab;
+}
+
+.product-detail-wrapper .product-carousel:active {
+  cursor: grabbing;
 }
 
 .product-detail-wrapper .carousel-slide {

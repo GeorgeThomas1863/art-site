@@ -255,7 +255,12 @@
 
   /* Events */
   .events-grid {
-    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    grid-template-columns: 1fr;
+  }
+
+  .event-image {
+    height: auto;
+    background: transparent;
   }
 }
 
@@ -444,15 +449,6 @@
 
   .checkout-form-row-location {
     grid-template-columns: 1fr;
-  }
-
-  /* Events */
-  .events-grid {
-    grid-template-columns: 1fr;
-  }
-
-  .event-image {
-    height: 200px;
   }
 
   /* Contact */
@@ -658,10 +654,6 @@
 
   .events-page-title {
     font-size: 2rem;
-  }
-
-  .event-image {
-    height: 180px;
   }
 
   .events-newsletter-section {

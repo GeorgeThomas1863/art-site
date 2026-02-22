@@ -138,6 +138,7 @@ const buildCarouselElement = (pics, altText, isCard, startIndex = 0) => {
     if (isCard) slide.setAttribute("data-label", "product-card-click");
     slide.src = `/images/products/${pics[i].filename}`;
     slide.alt = altText;
+    slide.draggable = false;
     track.append(slide);
   }
 

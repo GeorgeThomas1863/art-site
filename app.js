@@ -1,6 +1,4 @@
-//TEXT WRAP ERROR
 
-//CONFIRM swipe works on mobile but not desktop
 
 //fix event dates / display
 

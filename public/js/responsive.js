@@ -17,6 +17,9 @@ import debounce from "./util/debounce.js";
 
 let touchStartX = null;
 let swipeHandled = false;
+let mouseStartX = null;
+let mouseDragCarousel = null;
+let recentTouchSwipe = false;
 
 const authElement = document.getElementById("auth-element");
 const displayElement = document.getElementById("display-element");
@@ -220,6 +223,30 @@ const touchEndHandler = (e) => {
   touchStartX = null;
   if (Math.abs(deltaX) < 30) return;
   swipeHandled = true;
+  recentTouchSwipe = true;
+  setTimeout(() => { recentTouchSwipe = false; }, 500);
+  advanceCarousel(carousel, deltaX < 0 ? "next" : "prev");
+};
+
+const mouseDownHandler = (e) => {
+  if (recentTouchSwipe) return;
+  const carousel = e.target.closest(".product-carousel");
+  if (!carousel) return;
+  if (e.target.closest(".carousel-arrow") || e.target.closest(".carousel-dot")) return;
+  mouseStartX = e.clientX;
+  mouseDragCarousel = carousel;
+};
+
+const mouseUpHandler = (e) => {
+  if (mouseStartX === null) return;
+  const startX = mouseStartX;
+  const carousel = mouseDragCarousel;
+  mouseStartX = null;
+  mouseDragCarousel = null;
+  if (!carousel) return;
+  const deltaX = e.clientX - startX;
+  if (Math.abs(deltaX) < 30) return;
+  swipeHandled = true;
   advanceCarousel(carousel, deltaX < 0 ? "next" : "prev");
 };
 
@@ -229,6 +256,8 @@ if (productsElement) {
   productsElement.addEventListener("change", changeHandler);
   productsElement.addEventListener("touchstart", touchStartHandler, { passive: true });
   productsElement.addEventListener("touchend", touchEndHandler);
+  productsElement.addEventListener("mousedown", mouseDownHandler);
+  document.addEventListener("mouseup", mouseUpHandler);
 }
 
 if (eventsElement) {
