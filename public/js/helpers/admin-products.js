@@ -149,9 +149,18 @@ export const runDeleteProduct = async () => {
 export const runAddPicSlot = async () => {
   const container = document.querySelector(".pic-slots-container");
   if (!container) return null;
+
+  const existingSlots = container.querySelectorAll(".pic-slot");
+  const lastSlot = existingSlots[existingSlots.length - 1];
+  const lastHasImage = !!(lastSlot && lastSlot.querySelector(".upload-btn")?.uploadData);
+
   const index = container.children.length;
   const slot = buildPicSlot(index);
   container.append(slot);
+
+  if (lastHasImage) {
+    slot.querySelector(".pic-file-input").click();
+  }
 };
 
 export const runRemovePicSlot = async (removeBtn) => {
