@@ -1,3 +1,5 @@
+//deploy
+
 // figure out the cloudflare problem and fix it
 
 //figure out how to get email to NOT go to spam
