@@ -11,9 +11,9 @@ export const buildSquarePayment = async () => {
 
   try {
     // SANDBOX (active) — comment out when deploying
-    payments = window.Square.payments("sandbox-sq0idb-47M2yMYCAcisSRPLrPzRzA", "LMD9YKFJWX7P0");
+    // payments = window.Square.payments("sandbox-sq0idb-47M2yMYCAcisSRPLrPzRzA", "LMD9YKFJWX7P0");
     // PRODUCTION — uncomment when deploying (replace with App ID + Location ID from Square Dashboard)
-    // payments = window.Square.payments("YOUR_PROD_APP_ID", "YOUR_PROD_LOCATION_ID");
+    payments = window.Square.payments("sq0idp-o7NHeVqwyzt-7c5suUVt9Q", "0BVFD28S2J9AF");
 
     card = await payments.card();
     await card.attach("#card-container");
