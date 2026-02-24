@@ -150,6 +150,7 @@
 
   .split-image {
     height: auto;
+    min-height: 350px;
   }
 
   /* About - mobile layout at tablet */
@@ -389,6 +390,10 @@
   }
 
   /* Hero */
+  .split-image {
+    min-height: 280px;
+  }
+
   .split-title {
     font-size: 2.5rem;
   }
