@@ -1,6 +1,6 @@
-// import { sendToBack } from "../util/api-front.js";
+import { sendToBack } from "../util/api-front.js";
 
-// Array of image URLs to rotate through
+// Fallback array of image URLs to rotate through
 const mainPicArray = [
   "/images/background/acorn1.jpg",
   "/images/background/acorn2.jpg",
@@ -20,9 +20,6 @@ const aboutPicArray = [
 ];
 
 const aboutStaticPic = "/images/background/selfie1.jpg";
-
-let mainIndexLeft = 0;
-let mainIndexRight = 3; //start at different spot to avoid overlap
 
 let aboutIndexTop = 0;
 let aboutIndexBottom = 4;
@@ -81,35 +78,71 @@ export const setCurrentPic = async (element, picURL) => {
   }, 1600); // slightly longer than the 1.5s CSS transition
 };
 
+// Returns sorted/shuffled product image URL array, or null on failure/empty
+const getProductImages = async () => {
+  const productData = await sendToBack({ route: "/get-product-data-route" }, "GET");
+  if (!productData || !Array.isArray(productData) || productData.length === 0) return null;
+
+  const filtered = [];
+  for (let i = 0; i < productData.length; i++) {
+    const p = productData[i];
+    if (p.display === "no") continue;
+    const pics = Array.isArray(p.picData) ? p.picData : (p.picData ? [p.picData] : []);
+    if (!pics[0]?.filename) continue;
+    filtered.push(p);
+  }
+  if (filtered.length === 0) return null;
+
+  filtered.sort((a, b) => new Date(b.dateCreated) - new Date(a.dateCreated));
+  const rest = filtered.slice(1);
+  for (let i = rest.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    const temp = rest[i]; rest[i] = rest[j]; rest[j] = temp;
+  }
+  const sorted = [filtered[0], ...rest];
+  const urls = [];
+  for (let i = 0; i < sorted.length; i++) {
+    const pics = Array.isArray(sorted[i].picData) ? sorted[i].picData : [sorted[i].picData];
+    urls.push(`/images/products/${pics[0].filename}`);
+  }
+  return urls;
+};
+
 // Initialize image rotation
 export const startMainPicRotation = async () => {
+  const productImages = await getProductImages();
+  const images = (productImages && productImages.length > 0) ? productImages : mainPicArray;
+
   const splitImageLeft = document.getElementById("split-image-left");
   const splitImageRight = document.getElementById("split-image-right");
 
   initCrossfadeLayer(splitImageLeft);
   initCrossfadeLayer(splitImageRight);
 
+  let mainIndexLeft = 0;
+  let mainIndexRight = Math.min(Math.floor(images.length / 2), images.length - 1);
+
   // Set initial image
-  await setCurrentPic(splitImageLeft, mainPicArray[mainIndexLeft]);
-  await setCurrentPic(splitImageRight, mainPicArray[mainIndexRight]);
+  await setCurrentPic(splitImageLeft, images[mainIndexLeft]);
+  await setCurrentPic(splitImageRight, images[mainIndexRight]);
 
   // Rotate left image
   setInterval(async () => {
     mainIndexLeft++;
-    if (mainIndexLeft >= mainPicArray.length) {
+    if (mainIndexLeft >= images.length) {
       mainIndexLeft = 0;
     }
-    await setCurrentPic(splitImageLeft, mainPicArray[mainIndexLeft]);
+    await setCurrentPic(splitImageLeft, images[mainIndexLeft]);
   }, 5000);
 
   // Rotate right image (offset by 2.5 seconds for visual interest)
   setTimeout(() => {
     setInterval(async () => {
       mainIndexRight++;
-      if (mainIndexRight >= mainPicArray.length) {
+      if (mainIndexRight >= images.length) {
         mainIndexRight = 0;
       }
-      await setCurrentPic(splitImageRight, mainPicArray[mainIndexRight]);
+      await setCurrentPic(splitImageRight, images[mainIndexRight]);
     }, 5000);
   }, 2500);
 };

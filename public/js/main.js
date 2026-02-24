@@ -37,7 +37,6 @@ export const buildMainDisplay = async () => {
   // console.log(data);
   displayElement.append(data);
   await updateNavbarCart();
-
   await startMainPicRotation();
 
   return true;
