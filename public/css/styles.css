@@ -208,12 +208,18 @@ h3 {
   gap: 0;
 }
 
+.split-image-col {
+  display: flex;
+  flex-direction: column;
+}
+
 .split-image-rotating {
   position: relative;
   background-position: center;
   background-size: cover;
   /* background-size: 100% 100%;  */
   background-repeat: no-repeat;
+  flex: 1;
 }
 
 .image-crossfade-layer {
@@ -234,10 +240,6 @@ h3 {
 }
 
 .split-image-text {
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  right: 0;
   padding: 1rem 1.5rem;
   background: rgba(0, 0, 0, 0.6);
   color: #ffffff;
@@ -246,12 +248,7 @@ h3 {
   letter-spacing: 2px;
   text-transform: uppercase;
   text-align: center;
-  backdrop-filter: blur(4px);
-  z-index: 2;
-}
-
-.split-image-text-mobile {
-  display: none;
+  flex-shrink: 0;
 }
 
 .split-title {

@@ -36,7 +36,7 @@
     font-size: 1.4rem;
   }
 
-  #split-image-right {
+  .split-image-col:last-child {
     display: none;
   }
 
@@ -150,6 +150,9 @@
 
   .split-image {
     height: auto;
+  }
+
+  .split-image-rotating {
     min-height: 350px;
   }
 
@@ -390,7 +393,7 @@
   }
 
   /* Hero */
-  .split-image {
+  .split-image-rotating {
     min-height: 280px;
   }
 
@@ -580,16 +583,8 @@
     width: 100%;
   }
 
-  .split-image {
+  .split-image-rotating {
     min-height: 200px;
-  }
-
-  #split-image-left .split-image-text:not(.split-image-text-mobile) {
-    display: none;
-  }
-
-  #split-image-left .split-image-text-mobile {
-    display: block;
   }
 
   /* Products */

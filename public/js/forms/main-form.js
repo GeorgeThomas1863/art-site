@@ -228,7 +228,10 @@ export const buildSplitImage = async () => {
   const splitImage = document.createElement("div");
   splitImage.className = "split-image";
 
-  // Top rotating section with 2 images
+  // Left column
+  const leftCol = document.createElement("div");
+  leftCol.className = "split-image-col";
+
   const rotatingLeft = document.createElement("a");
   rotatingLeft.className = "split-image-rotating";
   rotatingLeft.id = "split-image-left";
@@ -237,12 +240,12 @@ export const buildSplitImage = async () => {
   const rotatingLeftText = document.createElement("div");
   rotatingLeftText.className = "split-image-text";
   rotatingLeftText.textContent = "Unique Products";
-  rotatingLeft.appendChild(rotatingLeftText);
 
-  const rotatingLeftTextMobile = document.createElement("div");
-  rotatingLeftTextMobile.className = "split-image-text split-image-text-mobile";
-  rotatingLeftTextMobile.textContent = "Unique Products, Natural Materials";
-  rotatingLeft.appendChild(rotatingLeftTextMobile);
+  leftCol.append(rotatingLeft, rotatingLeftText);
+
+  // Right column
+  const rightCol = document.createElement("div");
+  rightCol.className = "split-image-col";
 
   const rotatingRight = document.createElement("a");
   rotatingRight.className = "split-image-rotating";
@@ -252,9 +255,10 @@ export const buildSplitImage = async () => {
   const rotatingRightText = document.createElement("div");
   rotatingRightText.className = "split-image-text";
   rotatingRightText.textContent = "Natural Materials";
-  rotatingRight.appendChild(rotatingRightText);
 
-  splitImage.append(rotatingLeft, rotatingRight);
+  rightCol.append(rotatingRight, rotatingRightText);
+
+  splitImage.append(leftCol, rightCol);
 
   return splitImage;
 };
