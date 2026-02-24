@@ -32,17 +32,31 @@ const initCrossfadeLayer = (element) => {
   element.appendChild(layer);
 };
 
-// Preload an image, returns a Promise that resolves with the URL
+const RATIO_MISMATCH_THRESHOLD = 1.35;
+
+// Preload an image, returns a Promise that resolves with the Image object
 const preloadImage = (url) =>
   new Promise((resolve, reject) => {
     const img = new Image();
-    img.onload = () => resolve(url);
+    img.onload = () => resolve(img);
     img.onerror = () => reject(url);
     img.src = url;
   });
 
+const needsContain = (img, element) => {
+  if (!element.offsetWidth || !element.offsetHeight) return false;
+  const imageRatio = img.naturalWidth / img.naturalHeight;
+  const containerRatio = element.offsetWidth / element.offsetHeight;
+  const mismatch = Math.max(imageRatio / containerRatio, containerRatio / imageRatio);
+  return mismatch > RATIO_MISMATCH_THRESHOLD;
+};
+
+const applyContainMode = (element, enable) => {
+  element.classList.toggle("bg-contain-mode", enable);
+};
+
 // Set background image with crossfade transition
-export const setCurrentPic = async (element, picURL) => {
+export const setCurrentPic = async (element, picURL, checkRatio = false) => {
   if (!element) return;
 
   // First call (no layer yet — init was just called): just set directly
@@ -52,14 +66,18 @@ export const setCurrentPic = async (element, picURL) => {
     return;
   }
 
+  let loadedImg;
   try {
-    await preloadImage(picURL);
+    loadedImg = await preloadImage(picURL);
   } catch {
     // Fallback on load error — set directly without crossfade
     element.style.backgroundImage = `url('${picURL}')`;
     return;
   }
 
+  const isExtreme = checkRatio && needsContain(loadedImg, element);
+
+  applyContainMode(layer, isExtreme);
   // Set image on the crossfade layer and fade it in
   layer.style.backgroundImage = `url('${picURL}')`;
   layer.style.opacity = "1";
@@ -67,6 +85,8 @@ export const setCurrentPic = async (element, picURL) => {
   // After fade completes, promote to parent and reset layer instantly
   setTimeout(() => {
     element.style.backgroundImage = `url('${picURL}')`;
+    applyContainMode(element, isExtreme);
+    applyContainMode(layer, false);
     layer.style.transition = "none";
     layer.style.opacity = "0";
     // Restore transition after the instant reset settles
@@ -123,8 +143,8 @@ export const startMainPicRotation = async () => {
   let mainIndexRight = Math.min(Math.floor(images.length / 2), images.length - 1);
 
   // Set initial image
-  await setCurrentPic(splitImageLeft, images[mainIndexLeft]);
-  await setCurrentPic(splitImageRight, images[mainIndexRight]);
+  await setCurrentPic(splitImageLeft, images[mainIndexLeft], true);
+  await setCurrentPic(splitImageRight, images[mainIndexRight], true);
 
   // Rotate left image
   setInterval(async () => {
@@ -132,7 +152,7 @@ export const startMainPicRotation = async () => {
     if (mainIndexLeft >= images.length) {
       mainIndexLeft = 0;
     }
-    await setCurrentPic(splitImageLeft, images[mainIndexLeft]);
+    await setCurrentPic(splitImageLeft, images[mainIndexLeft], true);
   }, 5000);
 
   // Rotate right image (offset by 2.5 seconds for visual interest)
@@ -142,7 +162,7 @@ export const startMainPicRotation = async () => {
       if (mainIndexRight >= images.length) {
         mainIndexRight = 0;
       }
-      await setCurrentPic(splitImageRight, images[mainIndexRight]);
+      await setCurrentPic(splitImageRight, images[mainIndexRight], true);
     }, 5000);
   }, 2500);
 };

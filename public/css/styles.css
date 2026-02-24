@@ -227,6 +227,12 @@ h3 {
   z-index: 1;
 }
 
+.split-image-rotating.bg-contain-mode,
+.image-crossfade-layer.bg-contain-mode {
+  background-size: contain;
+  background-color: rgb(190, 233, 148);
+}
+
 .split-image-text {
   position: absolute;
   bottom: 0;
