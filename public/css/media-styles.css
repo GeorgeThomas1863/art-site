@@ -43,6 +43,14 @@
   .split-image {
     grid-template-columns: 1fr;
   }
+
+  .split-image-text-desktop {
+    display: none;
+  }
+
+  .split-image-text-mobile {
+    display: block;
+  }
 }
 
 /* ================================================ */
@@ -566,11 +574,12 @@
 
   .split-text {
     font-size: 1.1rem;
-    margin-bottom: 1.5rem;
+    margin-bottom: 1rem;
   }
 
   .split-content {
-    padding: 2rem 1.5rem;
+    padding: 1.5rem;
+    padding-bottom: 1rem;
   }
 
   .split-buttons {

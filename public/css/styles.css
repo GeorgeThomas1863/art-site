@@ -251,6 +251,10 @@ h3 {
   flex-shrink: 0;
 }
 
+.split-image-text-mobile {
+  display: none;
+}
+
 .split-title {
   font-size: 4rem;
   /* font-weight: 500; */

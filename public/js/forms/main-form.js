@@ -198,7 +198,7 @@ export const buildSplitText = async () => {
   const splitText = document.createElement("p");
   splitText.className = "split-text";
   splitText.textContent =
-    "Creating beautiful fiber art pieces from natural materials. Each piece tells a story of craftsmanship, sustainability, and timeless beauty.";
+    "Creating beautiful fiber art pieces from natural materials. Each piece tells a story of craftsmanship and timeless beauty.";
 
   return splitText;
 };
@@ -238,10 +238,14 @@ export const buildSplitImage = async () => {
   rotatingLeft.href = "/products";
 
   const rotatingLeftText = document.createElement("div");
-  rotatingLeftText.className = "split-image-text";
+  rotatingLeftText.className = "split-image-text split-image-text-desktop";
   rotatingLeftText.textContent = "Unique Products";
 
-  leftCol.append(rotatingLeft, rotatingLeftText);
+  const rotatingLeftTextMobile = document.createElement("div");
+  rotatingLeftTextMobile.className = "split-image-text split-image-text-mobile";
+  rotatingLeftTextMobile.textContent = "Unique Products, Natural Materials";
+
+  leftCol.append(rotatingLeft, rotatingLeftText, rotatingLeftTextMobile);
 
   // Right column
   const rightCol = document.createElement("div");
