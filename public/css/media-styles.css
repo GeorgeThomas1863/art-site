@@ -570,11 +570,12 @@
   /* Hero */
   .split-title {
     font-size: 2rem;
+    margin-bottom: 1rem;
   }
 
   .split-text {
     font-size: 1rem;
-    /* margin-bottom: 1rem; */
+    margin-bottom: 1rem;
   }
 
   .split-content {
@@ -582,14 +583,9 @@
     padding-bottom: 1rem;
   }
 
-  .split-buttons {
-    flex-direction: column;
-    align-items: stretch;
-  }
-
   .split-cta {
     text-align: center;
-    width: 100%;
+    flex: 1;
   }
 
   .split-image-rotating {
