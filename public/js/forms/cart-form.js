@@ -7,7 +7,6 @@ export const buildCartForm = async () => {
   const cartContent = await buildCartContent();
 
   cartContainer.append(pageHeader, cartContent);
-  cartContainer.append(cartContent);
 
   return cartContainer;
 };
@@ -153,7 +152,8 @@ export const buildCartItemImage = async (itemData) => {
 
   const image = document.createElement("img");
   image.className = "cart-item-image";
-  image.src = `/images/products/${itemData.picData?.filename || ""}`;
+  const pic = Array.isArray(itemData.picData) ? itemData.picData[0] : itemData.picData;
+  image.src = `/images/products/${pic?.filename || ""}`;
   image.alt = itemData.name;
 
   imageContainer.append(image);

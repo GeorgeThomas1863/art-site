@@ -340,7 +340,8 @@ export const buildCheckoutItem = async (itemData) => {
 
   const itemImage = document.createElement("img");
   itemImage.className = "checkout-item-image";
-  itemImage.src = `/images/products/${itemData.picData?.filename || ""}`;
+  const pic = Array.isArray(itemData.picData) ? itemData.picData[0] : itemData.picData;
+  itemImage.src = `/images/products/${pic?.filename || ""}`;
   itemImage.alt = itemData.name;
 
   const itemDetails = document.createElement("div");
