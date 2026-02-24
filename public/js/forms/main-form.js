@@ -198,7 +198,7 @@ export const buildSplitText = async () => {
   const splitText = document.createElement("p");
   splitText.className = "split-text";
   splitText.textContent =
-    "Creating beautiful fiber art pieces from natural materials. Each piece tells a story of craftsmanship and timeless beauty.";
+    "Creating beautiful fiber art pieces from natural materials. Each piece tells a story of craftsmanship, creativity, and timeless beauty.";
 
   return splitText;
 };
