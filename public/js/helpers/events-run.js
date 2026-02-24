@@ -6,6 +6,8 @@ import { displayPopup } from "../util/popup.js";
 export const populateEvents = async (inputArray) => {
   if (!inputArray || !inputArray.length) return null;
 
+  inputArray.sort((a, b) => a.eventDate.localeCompare(b.eventDate));
+
   const eventsGrid = document.getElementById("events-grid");
 
   if (!eventsGrid) {
