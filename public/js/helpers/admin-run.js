@@ -132,6 +132,7 @@ export const runChangeStatusCard = async (changeElement) => {
 
 export const enableAdminEditFields = async () => {
   const enableFieldsArray = [
+    "edit-item-id",
     "edit-name",
     "edit-product-type",
     "edit-price",
@@ -164,6 +165,7 @@ export const enableAdminEditFields = async () => {
 
 export const disableAdminEditFields = async () => {
   const disableFieldsArray = [
+    "edit-item-id",
     "edit-name",
     "edit-product-type",
     "edit-price",
@@ -195,7 +197,7 @@ export const disableAdminEditFields = async () => {
 };
 
 export const clearAdminAddFields = async () => {
-  const clearFieldsArray = ["name", "price", "description", "event-date", "event-location", "event-description"];
+  const clearFieldsArray = ["item-id", "name", "price", "description", "event-date", "event-location", "event-description"];
 
   for (let i = 0; i < clearFieldsArray.length; i++) {
     const field = document.getElementById(clearFieldsArray[i]);
@@ -242,7 +244,7 @@ export const clearAdminAddFields = async () => {
 };
 
 export const clearAdminEditFields = async () => {
-  const clearFieldsArray = ["edit-name", "edit-price", "edit-description", "edit-event-date", "edit-event-location", "edit-event-description"];
+  const clearFieldsArray = ["edit-item-id", "edit-name", "edit-price", "edit-description", "edit-event-date", "edit-event-location", "edit-event-description"];
 
   for (let i = 0; i < clearFieldsArray.length; i++) {
     const field = document.getElementById(clearFieldsArray[i]);

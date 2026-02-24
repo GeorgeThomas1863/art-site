@@ -46,6 +46,7 @@ export const addCartItem = async (req) => {
     // Build cart item from DB data — never trust client-supplied price
     const cartItem = {
       productId: safeProductId,
+      itemId: productData.itemId,
       name: productData.name,
       price: productData.price,
       quantity: safeQuantity,

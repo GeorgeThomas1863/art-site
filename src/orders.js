@@ -260,18 +260,19 @@ const buildEmailHtml = (orderData, type) => {
     day: "numeric",
   });
 
+  const isAdmin = type === "admin";
+
   let itemRows = "";
   for (let i = 0; i < items.length; i++) {
     const item = items[i];
     const lineTotal = (item.price * item.quantity).toFixed(2);
     itemRows += `<tr>
+      ${isAdmin ? `<td style="padding: 8px; border-bottom: 1px solid #eee;">${escapeHtml(item.itemId || "")}</td>` : ""}
       <td style="padding: 8px; border-bottom: 1px solid #eee;">${escapeHtml(item.name)}</td>
       <td style="padding: 8px; border-bottom: 1px solid #eee; text-align: center;">${item.quantity}</td>
       <td style="padding: 8px; border-bottom: 1px solid #eee; text-align: right;">$${lineTotal}</td>
     </tr>`;
   }
-
-  const isAdmin = type === "admin";
   const hasPickupItems = items.some((item) => item.canShip === "no");
   const isAllPickup = shippingDetails?.carrier === "Pickup";
 
@@ -314,6 +315,7 @@ const buildEmailHtml = (orderData, type) => {
       <table style="width: 100%; border-collapse: collapse;">
         <thead>
           <tr style="background: #f5f5f5;">
+            ${isAdmin ? `<th style="padding: 8px; text-align: left;">Item Id</th>` : ""}
             <th style="padding: 8px; text-align: left;">Item</th>
             <th style="padding: 8px; text-align: center;">Qty</th>
             <th style="padding: 8px; text-align: right;">Price</th>

@@ -7,6 +7,7 @@ export const buildNewProductParams = async () => {
 
   const params = {
     route: "/add-new-product-route",
+    itemId: document.getElementById("item-id").value,
     name: document.getElementById("name").value,
     productType: document.getElementById("product-type").value,
     price: document.getElementById("price").value,
@@ -34,6 +35,7 @@ export const getEditProductParams = async () => {
 
   //product id and route added later
   const params = {
+    itemId: document.getElementById("edit-item-id").value,
     name: document.getElementById("edit-name").value,
     productType: document.getElementById("edit-product-type").value,
     price: document.getElementById("edit-price").value,

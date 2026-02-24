@@ -394,6 +394,9 @@ export const buildProductDetailsSection = async (mode) => {
 
   header.append(icon, title);
 
+  // Item Id Row
+  const itemIdRow = await buildInfoRow(mode, "item-id", "Item Id");
+
   // Product Name Row
   const nameRow = await buildInfoRow(mode, "name", "Product Name");
 
@@ -414,7 +417,7 @@ export const buildProductDetailsSection = async (mode) => {
   // Description Row
   const descRow = await buildInfoRowTextarea(mode, "description", "Description");
 
-  section.append(header, nameRow, typeRow, priceRow, descRow);
+  section.append(header, itemIdRow, nameRow, typeRow, priceRow, descRow);
 
   return section;
 };
