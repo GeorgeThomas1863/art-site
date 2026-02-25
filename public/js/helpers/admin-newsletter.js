@@ -78,6 +78,11 @@ export const runAddSubscriber = async () => {
     return null;
   }
 
+  if (data.duplicate) {
+    await displayPopup(`${email} is already subscribed`, "error");
+    return null;
+  }
+
   await displayPopup(`Added ${email} to mailing list`, "success");
 
   // Clear input

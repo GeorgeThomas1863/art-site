@@ -53,7 +53,7 @@ export const runModalTrigger = async (clickElement) => {
 
   if (mode === "edit" && entityType === "newsletter") {
     const subscriberData = await sendToBack({ route: "/newsletter/data" }, "GET");
-    if (subscriberData && subscriberData.length) {
+    if (subscriberData) {
       await populateSubscriberList(subscriberData);
       await updateSubscriberStats(subscriberData);
     }

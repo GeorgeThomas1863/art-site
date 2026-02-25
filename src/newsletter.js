@@ -17,7 +17,7 @@ export const storeSubscriber = async (email) => {
 
   const checkModel = new dbModel({ keyToLookup: "email", itemValue: email }, process.env.SUBSCRIBERS_COLLECTION);
   const checkData = await checkModel.getUniqueItem();
-  if (checkData) return { success: true, message: "Email already subscribed", email: email };
+  if (checkData) return { success: true, duplicate: true, message: "Email already subscribed", email: email };
 
   const subscriberModel = new dbModel({ email: email }, process.env.SUBSCRIBERS_COLLECTION);
   const subscriberData = await subscriberModel.storeAny();
