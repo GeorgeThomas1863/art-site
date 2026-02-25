@@ -144,8 +144,21 @@ export const runCalculateShippingCheckout = async () => {
       return null;
     }
 
-    // Refresh shipping options UI and update totals
+    // Capture local pickup state before DOM is rebuilt
+    const localPickupWasSelected = document.querySelector("[data-is-local-pickup]")?.checked ?? false;
+
+    // Refresh shipping options UI
     await loadCheckoutShippingOptions();
+
+    // Restore local pickup selection if it was active before recalculation
+    if (localPickupWasSelected) {
+      const localPickupRadio = document.querySelector("[data-is-local-pickup]");
+      if (localPickupRadio) {
+        localPickupRadio.checked = true;
+        await sendToBack({ route: "/shipping/select", selectedRate: { carrier_friendly_name: "Pickup" } });
+      }
+    }
+
     await updateCheckoutSummary();
 
     await hideLoadStatus();

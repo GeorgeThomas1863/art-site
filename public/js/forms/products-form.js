@@ -201,7 +201,17 @@ export const buildProductInfo = async (productData) => {
   const productDescription = await buildProductDescription(productData);
   const productType = await buildProductTypeBadge(productData);
 
-  productInfo.append(productHeader, productName, productPrice, productDescription, productType);
+  const badgesRow = document.createElement("div");
+  badgesRow.className = "product-card-badges";
+  badgesRow.append(productType);
+  if (productData.canShip === "no") {
+    const pickupBadge = document.createElement("span");
+    pickupBadge.className = "pickup-badge";
+    pickupBadge.textContent = "Pickup Only";
+    badgesRow.append(pickupBadge);
+  }
+
+  productInfo.append(productHeader, productName, productPrice, productDescription, badgesRow);
 
   return productInfo;
 };
@@ -335,7 +345,14 @@ export const buildProductDetailModal = async (productData, startIndex = 0) => {
   addToCartBtn.productId = productData.productId;
   addToCartBtn.setAttribute("data-label", "add-to-cart");
 
-  info.append(name, price, description, typeBadge, addToCartBtn);
+  if (productData.canShip === "no") {
+    const pickupBadge = document.createElement("span");
+    pickupBadge.className = "pickup-badge";
+    pickupBadge.textContent = "Pickup Only";
+    info.append(name, price, description, typeBadge, pickupBadge, addToCartBtn);
+  } else {
+    info.append(name, price, description, typeBadge, addToCartBtn);
+  }
   body.append(info);
 
   wrapper.append(header, body);

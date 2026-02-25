@@ -238,6 +238,20 @@ export const updateSelectedRate = async (req) => {
     return { success: false, message: "No selected rate provided" };
   }
 
+  // Local pickup: fixed $0 cost — no rateData lookup needed, backend constructs the rate
+  if (selectedRate.carrier_friendly_name === "Pickup") {
+    const localPickupRate = {
+      carrier_friendly_name: "Pickup",
+      service_type: "Local Pickup",
+      shipping_amount: { amount: 0, currency: "usd" },
+      delivery_days: null,
+      estimated_delivery_date: null,
+    };
+    if (!req.session.shipping) req.session.shipping = {};
+    req.session.shipping.selectedRate = localPickupRate;
+    return { success: true, shipping: req.session.shipping };
+  }
+
   // Validate against session data — use server-side rate, not client-sent object
   if (!req.session.shipping || !req.session.shipping.rateData) {
     return { success: false, message: "No shipping rates in session. Calculate shipping first." };

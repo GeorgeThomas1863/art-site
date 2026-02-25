@@ -244,9 +244,14 @@ export const buildCheckoutShippingOption = async (rateData) => {
   const radioInput = document.createElement("input");
   radioInput.type = "radio";
   radioInput.name = "checkout-shipping-option";
-  radioInput.id = `checkout-shipping-${rateData.rateId}`;
   radioInput.className = "checkout-shipping-option-radio";
   radioInput.value = rateData.shipping_amount.amount;
+  if (rateData.carrier_friendly_name === "Pickup") {
+    radioInput.id = "checkout-shipping-local-pickup";
+    radioInput.setAttribute("data-is-local-pickup", "true");
+  } else {
+    radioInput.id = `checkout-shipping-${rateData.rateId}`;
+  }
 
   const contentDiv = document.createElement("div");
   contentDiv.className = "checkout-shipping-option-content";
@@ -258,9 +263,14 @@ export const buildCheckoutShippingOption = async (rateData) => {
 
   const nameSpan = document.createElement("span");
   nameSpan.className = "checkout-shipping-option-name";
-  let label = `${rateData.carrier_friendly_name} - ${rateData.service_type}`;
-  if (rateData.package_type && rateData.package_type !== "package") {
-    label += ` (${rateData.package_type.replace(/_/g, " ")})`;
+  let label;
+  if (rateData.carrier_friendly_name === "Pickup") {
+    label = rateData.service_type;
+  } else {
+    label = `${rateData.carrier_friendly_name} - ${rateData.service_type}`;
+    if (rateData.package_type && rateData.package_type !== "package") {
+      label += ` (${rateData.package_type.replace(/_/g, " ")})`;
+    }
   }
   nameSpan.textContent = label;
   nameSpan.setAttribute("data-label", "checkout-shipping-option-select");

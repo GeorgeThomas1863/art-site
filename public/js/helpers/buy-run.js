@@ -136,21 +136,15 @@ export const loadCheckoutShippingOptions = async () => {
   const shippingContainer = document.getElementById("checkout-shipping-container");
   if (!shippingContainer) return null;
 
-  // Clear existing content
   shippingContainer.innerHTML = "";
 
   const data = await sendToBack({ route: "/shipping/data" }, "GET");
-  // console.log("SHIPPING DATA");
-  // console.dir(data);
+  const shipping = data?.shipping ?? null;
+  const rateData = shipping?.rateData ?? null;
+  const selectedRate = shipping?.selectedRate ?? null;
+  const allPickup = shipping?.allPickup ?? false;
 
-  if (!data || !data.shipping) {
-    await displayPopup("Failed to get shipping data", "error");
-    return null;
-  }
-
-  const { rateData, selectedRate, allPickup } = data.shipping;
-
-  // All items are pickup only — show pickup message instead of rate options
+  // All items are pickup only — show message, no options needed
   if (allPickup) {
     const pickupMsg = document.createElement("div");
     pickupMsg.className = "checkout-pickup-message";
@@ -159,28 +153,44 @@ export const loadCheckoutShippingOptions = async () => {
     return true;
   }
 
+  // Always show local pickup as the first option
+  const localPickupRateObj = {
+    carrier_friendly_name: "Pickup",
+    service_type: "Local Pickup",
+    shipping_amount: { amount: 0, currency: "usd" },
+    delivery_days: null,
+    estimated_delivery_date: null,
+  };
+  const localPickupOption = await buildCheckoutShippingOption(localPickupRateObj);
+  const localPickupRadio = localPickupOption.querySelector("input[type='radio']");
+  if (localPickupRadio && selectedRate && selectedRate.carrier_friendly_name === "Pickup") {
+    localPickupRadio.checked = true;
+  }
+  shippingContainer.append(localPickupOption);
+
+  // No USPS rates yet — show placeholder below local pickup
   if (!rateData || !rateData.length) {
     const noShippingMsg = document.createElement("div");
     noShippingMsg.className = "checkout-no-shipping";
-    noShippingMsg.textContent = "Enter shipping address to calculate options";
+    noShippingMsg.textContent = "Enter ZIP code to see shipping options";
     shippingContainer.append(noShippingMsg);
     return null;
   }
 
-  // Sort by cost ascending (same as cart page)
+  // Sort USPS rates by cost ascending
   rateData.sort((a, b) => a.shipping_amount.amount - b.shipping_amount.amount);
 
-  // Display shipping options
+  // Display USPS options — pre-select saved selection or cheapest if nothing selected
+  const localPickupIsSelected = selectedRate && selectedRate.carrier_friendly_name === "Pickup";
   for (let i = 0; i < rateData.length; i++) {
     const rate = rateData[i];
     const optionElement = await buildCheckoutShippingOption(rate);
     shippingContainer.append(optionElement);
 
     const radio = optionElement.querySelector("input[type='radio']");
-    // Pre-select: either the saved selection OR the first (cheapest) option
     if (selectedRate && selectedRate.rateId === rate.rateId) {
       if (radio) radio.checked = true;
-    } else if (i === 0 && !selectedRate) {
+    } else if (i === 0 && !selectedRate && !localPickupIsSelected) {
       if (radio) radio.checked = true;
     }
   }
@@ -217,7 +227,7 @@ export const updateCheckoutSummary = async () => {
   if (shippingData && shippingData.shipping && shippingData.shipping.selectedRate) {
     shippingCost = shippingData.shipping.selectedRate.shipping_amount.amount;
     shippingElement.textContent = `$${shippingCost.toFixed(2)}`;
-    zipElement.value = shippingData.shipping.zip;
+    if (shippingData.shipping.zip) zipElement.value = shippingData.shipping.zip;
   } else {
     shippingElement.textContent = "[Input ZIP Code]";
   }
