@@ -32,10 +32,10 @@ const initCrossfadeLayer = (element) => {
   element.appendChild(layer);
 };
 
-const RATIO_MISMATCH_THRESHOLD = 1.35;
+const RATIO_MISMATCH_THRESHOLD = 1.25;
 
 // Preload an image, returns a Promise that resolves with the Image object
-const preloadImage = (url) =>
+export const preloadImage = (url) =>
   new Promise((resolve, reject) => {
     const img = new Image();
     img.onload = () => resolve(img);
@@ -43,7 +43,7 @@ const preloadImage = (url) =>
     img.src = url;
   });
 
-const needsContain = (img, element) => {
+export const needsContain = (img, element) => {
   if (!element.offsetWidth || !element.offsetHeight) return false;
   const imageRatio = img.naturalWidth / img.naturalHeight;
   const containerRatio = element.offsetWidth / element.offsetHeight;

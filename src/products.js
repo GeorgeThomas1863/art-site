@@ -4,8 +4,8 @@ import dbModel from "../models/db-model.js";
 export const storeProduct = async (inputParams) => {
   const { route: _, ...params } = inputParams;
 
-  console.log("PARAMS");
-  console.log(params);
+  // console.log("PARAMS");
+  // console.log(params);
 
   //store
   const storeModel = new dbModel(params, process.env.PRODUCTS_COLLECTION);

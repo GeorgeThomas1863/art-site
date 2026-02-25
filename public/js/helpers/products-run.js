@@ -1,4 +1,5 @@
 import { buildProductCard, buildCategoryDescription, buildProductDetailModal } from "../forms/products-form.js";
+import { preloadImage, needsContain } from "./rotate-pics.js";
 
 //store locally for filtering
 let productsArray = [];
@@ -137,6 +138,16 @@ export const openProductDetailModal = async (clickElement) => {
   const modal = await buildProductDetailModal(productData, startIndex);
   const productsElement = document.getElementById("products-element");
   productsElement.append(modal);
+
+  // Apply contain mode for single-image modal if aspect ratios mismatch
+  const imgEl = modal.querySelector(".product-detail-image");
+  if (imgEl) {
+    try {
+      const loaded = await preloadImage(imgEl.src);
+      const container = { offsetWidth: Math.min(window.innerWidth - 64, 700), offsetHeight: 500 };
+      if (needsContain(loaded, container)) imgEl.classList.add("contain-mode");
+    } catch { /* keep cover on error */ }
+  }
 
   // Trigger reflow then add visible class for animation
   requestAnimationFrame(() => modal.classList.add("visible"));

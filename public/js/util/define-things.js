@@ -90,6 +90,10 @@ Rich greens from the Rhododendrons, pine trees and moss. Sprinkle in wildflowers
 In each basket you will find the treasure of written words, strung together invoking a message of beauty and inspiration.
 `,
   },
+  gnomeHouses: {
+    title: "Gnome Houses",
+    details: "",
+  },
   other: {
     title: "Other",
     details: `If you don't see what you are looking for, please contact us and we will see if we can create something special for you.`,
