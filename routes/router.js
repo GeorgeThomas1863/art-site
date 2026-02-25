@@ -3,6 +3,7 @@ import express from "express";
 // import CONFIG from "../config/config.js";
 import requireAuth from "../middleware/auth-config.js";
 import { authController } from "../controllers/auth-controller.js";
+import { authRateLimit } from "../middleware/auth-rate-limit.js";
 import { upload } from "../src/upload-back.js";
 
 import {
@@ -40,7 +41,6 @@ import {
   getCartStatsControl,
   placeOrderControl,
   calculateShippingControl,
-  saveShippingControl,
   clearShippingControl,
   getShippingControl,
   updateSelectedRateControl,
@@ -54,7 +54,7 @@ import {
 const router = express.Router();
 
 // Login AUTH route
-router.post("/site-auth-route", authController);
+router.post("/site-auth-route", authRateLimit, authController);
 
 router.get("/401", display401);
 
@@ -102,8 +102,6 @@ router.post("/cart/clear", clearCartControl);
 router.get("/shipping/data", getShippingControl);
 
 router.post("/shipping/calculate", calculateShippingControl);
-
-router.post("/shipping/save", saveShippingControl);
 
 router.post("/shipping/clear", clearShippingControl);
 

@@ -6,7 +6,6 @@ import { buildCart, getCartStats, addCartItem, updateCartItem, removeCartItem } 
 import {
   fetchShippingRates,
   getShippingFromSession,
-  saveShippingToSession,
   clearShippingFromSession,
   updateSelectedRate,
 } from "../src/shipping.js";
@@ -234,19 +233,6 @@ export const calculateShippingControl = async (req, res) => {
 
   const data = await fetchShippingRates(req);
   if (!data || !data.success) return res.status(500).json({ error: data?.message || "Failed to calculate shipping" });
-
-  return res.json(data);
-};
-
-export const saveShippingControl = async (req, res) => {
-  if (!req || !req.body || !req.body.shippingData) {
-    return res.status(400).json({ error: "No shipping data provided" });
-  }
-
-  const data = await saveShippingToSession(req);
-  if (!data || !data.success) {
-    return res.status(500).json({ error: "Failed to save shipping data" });
-  }
 
   return res.json(data);
 };

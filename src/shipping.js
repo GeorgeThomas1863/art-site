@@ -203,21 +203,6 @@ export const getUSPS = async () => {
   return null;
 };
 
-//-------------------
-
-//SESSION FUNCTIONS
-export const saveShippingToSession = async (req) => {
-  const { shippingData } = req.body;
-
-  if (!shippingData) {
-    return { success: false, message: "No shipping data provided" };
-  }
-
-  req.session.shipping = shippingData;
-
-  return { success: true, shipping: req.session.shipping };
-};
-
 export const getShippingFromSession = async (req) => {
   if (!req.session.shipping) {
     return { success: false, message: "No shipping data in session" };
