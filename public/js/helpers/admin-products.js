@@ -12,11 +12,17 @@ export const runAddNewProduct = async () => {
     return null;
   }
 
+  // console.log("NEW PRODUCT PARAMS");
+  // console.dir(newProductParams);
+
   // check if at least one image uploaded
   const slotBtns = document.querySelectorAll(".pic-slots-container .upload-btn");
   let hasImage = false;
   for (let i = 0; i < slotBtns.length; i++) {
-    if (slotBtns[i].uploadData) { hasImage = true; break; }
+    if (slotBtns[i].uploadData) {
+      hasImage = true;
+      break;
+    }
   }
   if (!hasImage) {
     await displayPopup("Please upload at least one image of the product", "error");
@@ -85,6 +91,7 @@ export const runEditProduct = async () => {
 
   // Refresh the product data to reflect changes
   const productData = await sendToBack({ route: "/get-product-data-route" }, "GET");
+
   if (productData) {
     await populateAdminProductSelector(productData);
     await updateProductStats(productData);

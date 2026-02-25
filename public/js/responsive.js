@@ -38,10 +38,10 @@ export const clickHandler = async (e) => {
   const clickType = clickElement.getAttribute("data-label");
   // const tabType = clickElement.getAttribute("data-tab");
 
-  console.log("CLICK HANDLER");
-  console.log(clickId);
-  console.log("CLICK TYPE");
-  console.log(clickType);
+  // console.log("CLICK HANDLER");
+  // console.log(clickId);
+  // console.log("CLICK TYPE");
+  // console.log(clickType);
 
   if (clickType === "auth-submit") await runAuthSubmit();
   if (clickType === "pwToggle") await runPwToggle();

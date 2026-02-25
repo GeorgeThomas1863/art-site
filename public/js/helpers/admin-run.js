@@ -32,6 +32,8 @@ export const runModalTrigger = async (clickElement) => {
   // Load data for product edit
   if (mode === "edit" && entityType === "products") {
     const productData = await sendToBack({ route: "/get-product-data-route" }, "GET");
+    // console.log("PRODUCT DATA");
+    // console.dir(productData);
     if (productData && productData.length) {
       // console.log("PRODUCT DATA");
       // console.log(productData);

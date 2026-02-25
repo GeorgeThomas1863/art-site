@@ -73,6 +73,7 @@ export const addNewProductControl = async (req, res) => {
   if (!inputParams) return res.status(500).json({ error: "No input parameters" });
 
   const safeParams = whitelistFields(inputParams, [
+    "itemId",
     "name",
     "productType",
     "price",
@@ -97,6 +98,7 @@ export const editProductControl = async (req, res) => {
   if (!inputParams) return res.status(500).json({ error: "No input parameters" });
 
   const safeParams = whitelistFields(inputParams, [
+    "itemId",
     "name",
     "productType",
     "price",
