@@ -238,15 +238,25 @@ export const populateAdminProductSelector = async (inputArray) => {
     productSelector.append(defaultOption);
   }
 
-  // Sort by most recently added first
-  inputArray.sort((a, b) => new Date(b.dateCreated) - new Date(a.dateCreated));
+  // Sort: products with valid itemId first (desc by id), then without (alpha by name)
+  inputArray.sort((a, b) => {
+    const aHasId = a.itemId != null && String(a.itemId).trim() !== "";
+    const bHasId = b.itemId != null && String(b.itemId).trim() !== "";
+    if (aHasId && bHasId) return b.itemId - a.itemId;
+    if (aHasId) return -1;
+    if (bHasId) return 1;
+    return a.name.localeCompare(b.name);
+  });
 
   // Add all products as options
   for (let i = 0; i < inputArray.length; i++) {
     const product = inputArray[i];
     const option = document.createElement("option");
     option.value = product.productId;
-    option.textContent = `${product.name}`;
+    const hasId = product.itemId != null && String(product.itemId).trim() !== "";
+    option.textContent = hasId
+      ? `Item ID: ${product.itemId} | ${product.name}`
+      : product.name;
     option.productData = product; //stores product data to then display on select
     productSelector.append(option);
   }
