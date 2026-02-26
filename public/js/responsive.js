@@ -1,7 +1,7 @@
-import { runModalTrigger, runModalClose, runChangeStatusCard } from "./helpers/admin-run.js"; //prettier-ignore
+import { runModalTrigger, runModalClose, runChangeStatusCard, updateAdminStats } from "./helpers/admin-run.js"; //prettier-ignore
 import { runAddNewProduct, runEditProduct, runDeleteProduct, changeAdminProductSelector, runAddPicSlot, runRemovePicSlot } from "./helpers/admin-products.js";
 import { runAddNewEvent, runEditEvent, runDeleteEvent, changeAdminEventSelector } from "./helpers/admin-events.js";
-import { runSendNewsletter, runAddSubscriber, runRemoveSubscriber } from "./helpers/admin-newsletter.js";
+import { runSendNewsletter, runAddSubscriber, runRemoveSubscriber, runRefreshSubscriberList } from "./helpers/admin-newsletter.js";
 import { runUploadClick, runUploadPic, runDeleteUploadImage, runSlotUploadClick, runSlotUploadPic, runDeleteSlotImage } from "./helpers/upload-pic.js";
 import { changeProductsFilterButton, openProductDetailModal, closeProductDetailModal, runProductCarouselDot, runCarouselPrev, runCarouselNext, advanceCarousel } from "./helpers/products-run.js";
 import { runContactSubmit } from "./helpers/contact-run.js";
@@ -104,6 +104,8 @@ export const clickHandler = async (e) => {
   if (clickType === "send-newsletter-submit") await runSendNewsletter();
   if (clickType === "add-subscriber-email") await runAddSubscriber();
   if (clickType === "remove-subscriber") await runRemoveSubscriber(clickElement);
+  if (clickType === "refresh-subscriber-list") await runRefreshSubscriberList();
+  if (clickType === "refresh-admin-stats") await updateAdminStats();
 };
 
 export const keyHandler = async (e) => {

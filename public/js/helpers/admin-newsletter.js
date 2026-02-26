@@ -177,3 +177,11 @@ export const populateSubscriberList = async (subscriberArray) => {
 
   return true;
 };
+
+export const runRefreshSubscriberList = async () => {
+  const subscriberData = await sendToBack({ route: "/newsletter/data" }, "GET");
+  if (!subscriberData) return null;
+  await populateSubscriberList(subscriberData);
+  await updateSubscriberStats(subscriberData);
+  return true;
+};

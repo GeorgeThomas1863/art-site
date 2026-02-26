@@ -510,6 +510,11 @@
     gap: 0.25rem;
   }
 
+  .btn-admin-stats-refresh {
+    font-size: 0.85rem;
+    padding: 0.4rem 0.9rem;
+  }
+
   .stat-icon {
     font-size: 1.3rem;
     margin-bottom: 0.25rem;

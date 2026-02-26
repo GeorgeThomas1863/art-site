@@ -10,7 +10,22 @@ export const buildAdminForm = async () => {
   const newsletterSection = await buildNewsletterSection();
   const statsSection = await buildStatsSection();
 
-  adminFormWrapper.append(dashboardHeader, productsSection, eventsSection, newsletterSection, statsSection);
+  const statsWrapper = document.createElement("div");
+  statsWrapper.className = "stats-wrapper";
+
+  const statsControls = document.createElement("div");
+  statsControls.className = "stats-controls";
+
+  const statsRefreshButton = document.createElement("button");
+  statsRefreshButton.className = "btn-admin-stats-refresh";
+  statsRefreshButton.type = "button";
+  statsRefreshButton.textContent = "↺ Refresh Stats";
+  statsRefreshButton.setAttribute("data-label", "refresh-admin-stats");
+
+  statsControls.append(statsRefreshButton);
+  statsWrapper.append(statsControls, statsSection);
+
+  adminFormWrapper.append(dashboardHeader, productsSection, eventsSection, newsletterSection, statsWrapper);
 
   return adminFormWrapper;
 };
@@ -126,10 +141,10 @@ export const buildStatsSection = async () => {
   section.className = "stats-section";
 
   const stats = [
-    { icon: "📦", value: "0", label: "Total Products", id: "total-products-stat" },
+    { icon: "📦", value: "0", label: "Products", id: "total-products-stat" },
     { icon: "👁️", value: "0", label: "Displayed", id: "displayed-products-stat" },
     { icon: "✅", value: "0", label: "Sold", id: "sold-products-stat" },
-    { icon: "📅", value: "0", label: "Upcoming Events", id: "upcoming-events-stat" },
+    { icon: "📅", value: "0", label: "Events", id: "upcoming-events-stat" },
     { icon: "📧", value: "0", label: "Subscribers", id: "total-subscribers-stat" },
   ];
 
@@ -1080,10 +1095,21 @@ export const buildMailingListSection = async () => {
   addEmailRow.append(emailInput, addButton);
   addEmailSection.append(addEmailLabel, addEmailRow);
 
-  // Subscriber list
+  // Subscriber list header (label + refresh button)
+  const listHeader = document.createElement("div");
+  listHeader.className = "subscriber-list-header";
+
   const listLabel = document.createElement("label");
   listLabel.className = "form-label subscriber-list-label";
   listLabel.textContent = "Current Subscribers";
+
+  const refreshButton = document.createElement("button");
+  refreshButton.className = "btn-admin-refresh";
+  refreshButton.type = "button";
+  refreshButton.textContent = "↺ Refresh List";
+  refreshButton.setAttribute("data-label", "refresh-subscriber-list");
+
+  listHeader.append(listLabel, refreshButton);
 
   const subscriberList = document.createElement("div");
   subscriberList.className = "subscriber-list";
@@ -1095,7 +1121,10 @@ export const buildMailingListSection = async () => {
   emptyState.textContent = "No subscribers yet";
   subscriberList.append(emptyState);
 
-  section.append(addEmailSection, listLabel, subscriberList);
+  const subscriberContainer = document.createElement("div");
+  subscriberContainer.className = "subscriber-container";
+  subscriberContainer.append(listHeader, subscriberList);
+  section.append(addEmailSection, subscriberContainer);
 
   return section;
 };
