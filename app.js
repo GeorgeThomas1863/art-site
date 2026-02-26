@@ -1,7 +1,3 @@
-//deploy
-
-//email notification when someone signs up for hte newsletter
-
 //newsletter history
 
 //unfuck email used to send newsletter
