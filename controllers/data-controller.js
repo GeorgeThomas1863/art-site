@@ -1,7 +1,7 @@
 import { storeProduct, updateProduct, deleteProduct, getProductData, hideOrderedProducts } from "../src/products.js";
 import { storeEvent, updateEvent, deleteEvent, getEventData } from "../src/events.js";
 import { submitContact } from "../src/contact.js";
-import { storeSubscriber, getSubscribers, deleteSubscriber, dispatchNewsletter } from "../src/newsletter.js";
+import { storeSubscriber, getSubscribers, deleteSubscriber, dispatchNewsletter, notifyAdminOfSubscription } from "../src/newsletter.js";
 import { buildCart, getCartStats, addCartItem, updateCartItem, removeCartItem } from "../src/cart.js";
 import {
   fetchShippingRates,
@@ -313,6 +313,12 @@ export const addSubscriberControl = async (req, res) => {
 
   const data = await storeSubscriber(req.body.email);
   if (!data || !data.success) return res.status(500).json({ error: "Failed to add email to newsletter" });
+
+  if (!data.duplicate) {
+    notifyAdminOfSubscription(req.body.email).catch((e) =>
+      console.error("Admin newsletter notification failed:", e.message)
+    );
+  }
 
   return res.json(data);
 };

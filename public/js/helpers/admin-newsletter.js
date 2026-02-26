@@ -154,6 +154,16 @@ export const populateSubscriberList = async (subscriberArray) => {
     return true;
   }
 
+  subscriberArray.sort((a, b) => {
+    const aHasDate = a.date != null;
+    const bHasDate = b.date != null;
+
+    if (aHasDate && bHasDate) return new Date(b.date) - new Date(a.date); // newest first
+    if (aHasDate) return -1;  // dated entries float to top
+    if (bHasDate) return 1;
+    return a.email.localeCompare(b.email); // legacy: alphabetical by email
+  });
+
   for (let i = 0; i < subscriberArray.length; i++) {
     const subscriber = subscriberArray[i];
     const subscriberItem = document.createElement("div");

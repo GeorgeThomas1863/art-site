@@ -19,12 +19,25 @@ export const storeSubscriber = async (email) => {
   const checkData = await checkModel.getUniqueItem();
   if (checkData) return { success: true, duplicate: true, message: "Email already subscribed", email: email };
 
-  const subscriberModel = new dbModel({ email: email }, process.env.SUBSCRIBERS_COLLECTION);
+  const subscriberModel = new dbModel({ email: email, date: new Date() }, process.env.SUBSCRIBERS_COLLECTION);
   const subscriberData = await subscriberModel.storeAny();
   if (!subscriberData) return { success: false, message: "Failed to add email to newsletter" };
   subscriberData.success = true;
   subscriberData.message = "Email added to newsletter";
   return subscriberData;
+};
+
+export const notifyAdminOfSubscription = async (email) => {
+  const to = [process.env.EMAIL_RECIPIENT_1, process.env.EMAIL_RECIPIENT_2]
+    .filter(Boolean)
+    .join(", ");
+  if (!to) return;
+  await sendMail({
+    from: process.env.EMAIL_USER,
+    to,
+    subject: "New Newsletter Subscriber",
+    text: `A new user subscribed to the newsletter:\n\n${email}`,
+  });
 };
 
 export const deleteSubscriber = async (email) => {
