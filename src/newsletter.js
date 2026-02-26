@@ -66,11 +66,12 @@ export const dispatchNewsletter = async (inputParams) => {
   const emailList = subscriberArray.map((s) => s.email);
 
   const mailParams = {
-    from: process.env.EMAIL_USER,
+    from: process.env.NEWSLETTER_FROM || process.env.EMAIL_USER,
     to: process.env.EMAIL_USER,
     bcc: emailList,
     subject: cleanSubject,
     text: message,
+    replyTo: process.env.EMAIL_USER,
   };
 
   // console.log("MAIL PARAMS");
