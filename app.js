@@ -1,14 +1,10 @@
 //newsletter history
 
-//unfuck email used to send newsletter
-
-//local order
+//figure out how to receive email from mailgun through admin email
 
 // figure out the cloudflare problem and fix it
 
 //figure out how to get email to NOT go to spam
-
-//figure out how to receive email from mailgun through admin email
 
 //popup display of product category should be under add to cart?
 
