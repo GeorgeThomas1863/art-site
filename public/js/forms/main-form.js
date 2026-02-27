@@ -40,6 +40,7 @@ export const buildNavBar = async () => {
     { text: "Products", href: "/products" },
     { text: "About", href: "/about" },
     { text: "Events", href: "/events" },
+    { text: "Newsletter", href: "/newsletter" },
     { text: "Contact", href: "/contact" },
   ];
 

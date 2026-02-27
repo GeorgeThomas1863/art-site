@@ -11,14 +11,14 @@
 .newsletter-page-header {
   margin-bottom: 2.5rem;
   padding-bottom: 1.5rem;
-  border-bottom: 1px solid #333;
+  border-bottom: 1px solid #ddd;
 }
 
 .newsletter-page-title {
   font-size: 2.5rem;
   letter-spacing: 3px;
   text-transform: uppercase;
-  color: #fff;
+  color: #111;
   margin: 0;
   font-weight: normal;
 }
@@ -37,33 +37,33 @@
   font-size: 0.8rem;
   letter-spacing: 2px;
   text-transform: uppercase;
-  color: #aaa;
+  color: #555;
   white-space: nowrap;
 }
 
 .newsletter-select {
   flex: 1;
   min-width: 220px;
-  background: #1a1a1a;
-  color: #e0e0e0;
-  border: 1px solid #444;
+  background: #fff;
+  color: #111;
+  border: 1px solid #ccc;
   border-radius: 4px;
   padding: 0.6rem 2.5rem 0.6rem 1rem;
   font-size: 0.95rem;
   cursor: pointer;
   outline: none;
   appearance: none;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath fill='%23aaa' d='M0 0l5 6 5-6z'/%3E%3C/svg%3E");
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath fill='%23555' d='M0 0l5 6 5-6z'/%3E%3C/svg%3E");
   background-repeat: no-repeat;
   background-position: right 0.85rem center;
 }
 
 .newsletter-select:hover {
-  border-color: #666;
+  border-color: #999;
 }
 
 .newsletter-select:focus {
-  border-color: #888;
+  border-color: #555;
 }
 
 /* ---- Newsletter card ---- */
@@ -73,15 +73,15 @@
 }
 
 .newsletter-card {
-  background: #111;
-  border: 1px solid #2a2a2a;
+  background: #fff;
+  border: 1px solid #e0e0e0;
   border-radius: 6px;
   overflow: hidden;
 }
 
 .newsletter-card-header {
   padding: 1.5rem 2rem;
-  border-bottom: 1px solid #2a2a2a;
+  border-bottom: 1px solid #e0e0e0;
   display: flex;
   align-items: baseline;
   justify-content: space-between;
@@ -91,7 +91,7 @@
 
 .newsletter-card-subject {
   font-size: 1.4rem;
-  color: #fff;
+  color: #111;
   margin: 0;
   font-weight: normal;
   letter-spacing: 1px;
@@ -99,7 +99,7 @@
 
 .newsletter-card-date {
   font-size: 0.78rem;
-  color: #888;
+  color: #777;
   letter-spacing: 1.5px;
   text-transform: uppercase;
   white-space: nowrap;
@@ -112,7 +112,7 @@
 
 .newsletter-card-text {
   font-size: 1rem;
-  color: #ccc;
+  color: #333;
   line-height: 1.8;
   white-space: pre-wrap;
   margin: 0;
@@ -126,7 +126,7 @@
 }
 
 .newsletter-empty-message {
-  color: #666;
+  color: #888;
   font-size: 1rem;
   letter-spacing: 1px;
   margin: 0;
