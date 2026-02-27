@@ -23,6 +23,7 @@ const productsElement = document.getElementById("products-element");
 const aboutElement = document.getElementById("about-element");
 const eventsElement = document.getElementById("events-element");
 const contactElement = document.getElementById("contact-element");
+const newsletterElement = document.getElementById("newsletter-element");
 const cartElement = document.getElementById("cart-element");
 const checkoutElement = document.getElementById("checkout-element");
 const confirmElement = document.getElementById("confirm-element");
@@ -117,6 +118,15 @@ export const buildContactDisplay = async () => {
   return true;
 };
 
+export const buildNewsletterDisplay = async () => {
+  if (!newsletterElement) return null;
+
+  const navElement = await buildNavBar();
+  newsletterElement.append(navElement);
+
+  return true;
+};
+
 export const buildCartDisplay = async () => {
   if (!cartElement) return null;
 
@@ -160,6 +170,7 @@ if (adminElement) buildAdminDisplay();
 if (productsElement) buildProductsDisplay();
 if (aboutElement) buildAboutDisplay();
 if (eventsElement) buildEventsDisplay();
+if (newsletterElement) buildNewsletterDisplay();
 if (contactElement) buildContactDisplay();
 if (cartElement) buildCartDisplay();
 if (checkoutElement) buildCheckoutDisplay();
