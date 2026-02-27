@@ -13,6 +13,7 @@ import {
   aboutDisplay,
   eventsDisplay,
   contactDisplay,
+  newsletterDisplay,
   cartDisplay,
   checkoutDisplay,
   confirmOrderDisplay,
@@ -49,6 +50,7 @@ import {
   getSubscribersControl,
   sendNewsletterControl,
   removeSubscriberControl,
+  getNewsletterArchiveControl,
 } from "../controllers/data-controller.js";
 
 const router = express.Router();
@@ -120,6 +122,8 @@ router.post("/newsletter/send", requireAuth, sendNewsletterControl);
 
 router.post("/newsletter/remove", requireAuth, removeSubscriberControl);
 
+router.get("/newsletter/archive", getNewsletterArchiveControl);
+
 //ORDER ROUTES
 router.post("/checkout/place-order", placeOrderControl);
 
@@ -141,6 +145,8 @@ router.get("/contact", contactDisplay);
 router.get("/cart", cartDisplay);
 
 router.get("/events", eventsDisplay);
+
+router.get("/newsletter", newsletterDisplay);
 
 router.get("/about", aboutDisplay);
 

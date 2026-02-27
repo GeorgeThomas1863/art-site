@@ -10,6 +10,7 @@ import { runAddToCart, runIncreaseQuantity, runDecreaseQuantity, runRemoveFromCa
 import { runPlaceOrder } from "./helpers/buy-run.js";
 import { runCalculateShipping, runShippingOptionSelect, runCheckoutShippingOptionSelect, runCalculateShippingCheckout } from "./helpers/shipping-calc.js"; //prettier-ignore
 import { runToggleAudio } from "./helpers/about-run.js";
+import { runNewsletterSelect } from "./helpers/newsletter-run.js";
 import { runToggleMenu } from "./util/collapse.js";
 import { runAuthSubmit, runPwToggle } from "./auth.js";
 import { closePopup, closeConfirmDialog } from "./util/popup.js";
@@ -27,6 +28,7 @@ const adminElement = document.getElementById("admin-element");
 const productsElement = document.getElementById("products-element");
 const eventsElement = document.getElementById("events-element");
 const contactElement = document.getElementById("contact-element");
+const newsletterElement = document.getElementById("newsletter-element");
 const cartElement = document.getElementById("cart-element");
 const aboutElement = document.getElementById("about-element");
 const checkoutElement = document.getElementById("checkout-element");
@@ -172,6 +174,8 @@ export const changeHandler = async (e) => {
   if (changeId === "product-selector") await changeAdminProductSelector(changeElement);
 
   if (changeId === "event-selector") await changeAdminEventSelector(changeElement);
+
+  if (changeType === "newsletter-select") runNewsletterSelect(changeElement);
 };
 
 const debouncedCheckoutZipShipping = debounce(runCalculateShippingCheckout);
@@ -264,6 +268,10 @@ if (productsElement) {
 
 if (eventsElement) {
   eventsElement.addEventListener("click", clickHandler);
+}
+
+if (newsletterElement) {
+  newsletterElement.addEventListener("change", changeHandler);
 }
 
 if (contactElement) {

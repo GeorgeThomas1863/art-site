@@ -9,10 +9,12 @@ import { buildContactForm } from "./forms/contact-form.js";
 import { buildCartForm } from "./forms/cart-form.js";
 import { buildCheckoutForm } from "./forms/checkout-form.js";
 import { buildConfirmOrderForm } from "./forms/confirm-form.js";
+import { buildNewsletterForm } from "./forms/newsletter-form.js";
 
 import { updateAdminStats } from "./helpers/admin-run.js";
 import { populateProducts, updateCategoryDescription } from "./helpers/products-run.js";
 import { populateEvents } from "./helpers/events-run.js";
+import { populateNewsletter } from "./helpers/newsletter-run.js";
 import { populateCart, updateNavbarCart } from "./helpers/cart-run.js";
 import { populateCheckout, populateConfirmOrder } from "./helpers/buy-run.js";
 import { startMainPicRotation, startAboutPicRotation } from "./helpers/rotate-pics.js";
@@ -122,7 +124,12 @@ export const buildNewsletterDisplay = async () => {
   if (!newsletterElement) return null;
 
   const navElement = await buildNavBar();
-  newsletterElement.append(navElement);
+  const newsletterForm = buildNewsletterForm();
+  newsletterElement.append(navElement, newsletterForm);
+
+  await updateNavbarCart();
+  const newsletterData = await sendToBack({ route: "/newsletter/archive" }, "GET");
+  populateNewsletter(newsletterData);
 
   return true;
 };

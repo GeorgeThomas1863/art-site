@@ -51,6 +51,25 @@ export const deleteSubscriber = async (email) => {
   return removeData;
 };
 
+export const getNewsletters = async () => {
+  const dataModel = new dbModel("", process.env.NEWSLETTER_COLLECTION);
+  const all = await dataModel.getAll();
+  if (!all || !all.length) return [];
+
+  all.sort((a, b) => (b._id > a._id ? 1 : -1));
+
+  const result = [];
+  for (const n of all) {
+    result.push({
+      id: n._id.toString(),
+      subject: n.subject || "(No Subject)",
+      text: n.text || "",
+      sentAt: n._id.getTimestamp(),
+    });
+  }
+  return result;
+};
+
 export const dispatchNewsletter = async (inputParams) => {
   // console.log("DISPATCH NEWSLETTER");
   // console.dir(inputParams);

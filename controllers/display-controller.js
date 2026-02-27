@@ -41,6 +41,10 @@ export const confirmOrderDisplay = (req, res) => {
   res.sendFile(path.join(__dirname, "../html/confirm-order.html"));
 };
 
+export const newsletterDisplay = (req, res) => {
+  res.sendFile(path.join(__dirname, "../html/newsletter.html"));
+};
+
 //------------------
 
 export const display401 = (req, res) => {

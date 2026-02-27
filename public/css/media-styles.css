@@ -561,6 +561,19 @@
   .checkout-shipping-option {
     padding: 0.75rem;
   }
+
+  /* Newsletter */
+  .newsletter-container {
+    padding: 2rem 1.5rem;
+  }
+
+  .newsletter-card-header {
+    padding: 1.25rem 1.5rem;
+  }
+
+  .newsletter-card-body {
+    padding: 1.5rem;
+  }
 }
 
 /* ================================================ */
@@ -671,6 +684,35 @@
 
   .events-newsletter-email-input {
     max-width: 100%;
+  }
+
+  /* Newsletter */
+  .newsletter-container {
+    padding: 1.5rem 1rem;
+  }
+
+  .newsletter-page-title {
+    font-size: 2rem;
+  }
+
+  .newsletter-controls {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .newsletter-select {
+    min-width: 0;
+    width: 100%;
+  }
+
+  .newsletter-card-header {
+    flex-direction: column;
+    gap: 0.4rem;
+    padding: 1rem 1.25rem;
+  }
+
+  .newsletter-card-body {
+    padding: 1.25rem;
   }
 
   /* About */

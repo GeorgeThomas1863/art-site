@@ -1,7 +1,7 @@
 import { storeProduct, updateProduct, deleteProduct, getProductData, hideOrderedProducts } from "../src/products.js";
 import { storeEvent, updateEvent, deleteEvent, getEventData } from "../src/events.js";
 import { submitContact } from "../src/contact.js";
-import { storeSubscriber, getSubscribers, deleteSubscriber, dispatchNewsletter, notifyAdminOfSubscription } from "../src/newsletter.js";
+import { storeSubscriber, getSubscribers, deleteSubscriber, dispatchNewsletter, notifyAdminOfSubscription, getNewsletters } from "../src/newsletter.js";
 import { buildCart, getCartStats, addCartItem, updateCartItem, removeCartItem } from "../src/cart.js";
 import {
   fetchShippingRates,
@@ -347,5 +347,10 @@ export const removeSubscriberControl = async (req, res) => {
   const data = await deleteSubscriber(req.body.email);
   if (!data || !data.success) return res.status(500).json({ error: "Failed to remove subscriber" });
 
+  return res.json(data);
+};
+
+export const getNewsletterArchiveControl = async (req, res) => {
+  const data = await getNewsletters();
   return res.json(data);
 };
