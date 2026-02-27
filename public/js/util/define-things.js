@@ -46,11 +46,13 @@ Click on the categories to learn more.`,
 
   acorns: {
     title: "Acorns",
-    details: `The acorn ornaments are created using acorn caps from the Bur Oak tree. The Bur Oak produces the largest acorns in North America. These trees can be found in many states and are very adaptable to soil and weather conditions. They are very hardy and live for centuries.  Bur Oak trees provide food and shelter to many species of wildlife.
+    details: `The Acorn, from ancient times the acorn has represented strength, resilience, and endurance.
 
-We are always on the search for other types of acorn caps which we use for our smaller felted acorns, jewelry, and other creations.
-    
-We have wonderful customers, family and friends who also gather acorn caps for us, it does take a village and we are so grateful to be a part of it.
+A symbol of new beginnings, growth and hope.
+
+It is a talisman of good luck and renewal of life.
+
+An acorn is a special gift of endless potential, prosperity, and a token of good fortune.
 `,
   },
 
