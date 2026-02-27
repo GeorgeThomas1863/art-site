@@ -10,7 +10,7 @@ import { runAddToCart, runIncreaseQuantity, runDecreaseQuantity, runRemoveFromCa
 import { runPlaceOrder } from "./helpers/buy-run.js";
 import { runCalculateShipping, runShippingOptionSelect, runCheckoutShippingOptionSelect, runCalculateShippingCheckout } from "./helpers/shipping-calc.js"; //prettier-ignore
 import { runToggleAudio } from "./helpers/about-run.js";
-import { runNewsletterSelect } from "./helpers/newsletter-run.js";
+import { runNewsletterSelect, runNewsletterSignupToggle, runNewsletterSignupSubmit } from "./helpers/newsletter-run.js";
 import { runToggleMenu } from "./util/collapse.js";
 import { runAuthSubmit, runPwToggle } from "./auth.js";
 import { closePopup, closeConfirmDialog } from "./util/popup.js";
@@ -88,6 +88,9 @@ export const clickHandler = async (e) => {
 
   if (clickType === "events-newsletter-checkbox") await runEventsNewsletterToggle(clickElement);
   if (clickType === "events-newsletter-submit") await runEventsNewsletterSubmit();
+
+  if (clickType === "newsletter-signup-checkbox") await runNewsletterSignupToggle(clickElement);
+  if (clickType === "newsletter-signup-submit") await runNewsletterSignupSubmit();
 
   if (clickType === "toggle-audio") await runToggleAudio();
 
@@ -272,6 +275,7 @@ if (eventsElement) {
 
 if (newsletterElement) {
   newsletterElement.addEventListener("change", changeHandler);
+  newsletterElement.addEventListener("click", clickHandler);
 }
 
 if (contactElement) {

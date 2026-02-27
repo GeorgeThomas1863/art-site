@@ -1,3 +1,6 @@
+import { sendToBack } from "../util/api-front.js";
+import { displayPopup } from "../util/popup.js";
+
 let newsletterArchive = [];
 
 export const populateNewsletter = (data) => {
@@ -84,6 +87,56 @@ const formatOptionLabel = (newsletter) => {
       ? newsletter.subject.slice(0, 50) + "\u2026"
       : newsletter.subject;
   return `${subject} \u2014 ${formatDate(newsletter.sentAt)}`;
+};
+
+export const runNewsletterSignupToggle = (clickElement) => {
+  const emailWrapper = document.getElementById("newsletter-signup-email-wrapper");
+  if (!emailWrapper) return null;
+
+  if (clickElement.checked) {
+    emailWrapper.classList.remove("hidden");
+    return true;
+  }
+
+  emailWrapper.classList.add("hidden");
+  return true;
+};
+
+export const runNewsletterSignupSubmit = async () => {
+  const emailInput = document.getElementById("newsletter-signup-email");
+  if (!emailInput) return null;
+
+  const email = emailInput.value.trim();
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+  if (!email || !emailRegex.test(email)) {
+    await displayPopup("Please enter a valid email address", "error");
+    return null;
+  }
+
+  const params = { route: "/newsletter/add", email };
+  const data = await sendToBack(params);
+
+  if (!data || !data.success) {
+    await displayPopup("Failed to subscribe. Please try again.", "error");
+    return null;
+  }
+
+  if (data.duplicate) {
+    await displayPopup(`${data.email} is already subscribed to our newsletter!`, "error");
+    return null;
+  }
+
+  await displayPopup("Successfully subscribed to our newsletter!", "success");
+
+  emailInput.value = "";
+  const checkbox = document.getElementById("newsletter-signup-checkbox");
+  if (checkbox) checkbox.checked = false;
+
+  const emailWrapper = document.getElementById("newsletter-signup-email-wrapper");
+  if (emailWrapper) emailWrapper.classList.add("hidden");
+
+  return true;
 };
 
 const formatDate = (sentAt) => {

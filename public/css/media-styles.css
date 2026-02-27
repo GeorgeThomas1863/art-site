@@ -691,6 +691,18 @@
     padding: 1.5rem 1rem;
   }
 
+  .newsletter-signup-section {
+    padding: 1.5rem;
+  }
+
+  .newsletter-signup-email-wrapper {
+    flex-direction: column;
+  }
+
+  .newsletter-signup-email-input {
+    max-width: 100%;
+  }
+
   .newsletter-page-title {
     font-size: 2rem;
   }
