@@ -1,12 +1,10 @@
-//unfuck the fucking events drop down
+//ask about design of info on product popup, getting back in insta, advertising?
 
-//add shippin dimensions to product popup
-
-//previews / favicons 
-
-//figure out how to receive email from mailgun through admin email
+//previews / favicons
 
 // figure out the cloudflare problem and fix it
+
+//figure out how to receive email from mailgun through admin email
 
 //figure out how to get email to NOT go to spam
 
