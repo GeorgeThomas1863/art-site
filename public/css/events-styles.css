@@ -22,6 +22,7 @@
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
   gap: 2rem;
+  align-items: start;
 }
 
 .event-card {
@@ -76,11 +77,12 @@
 }
 
 .event-location {
+  margin-top: 1.5rem;
   color: #7f8c8d;
   display: flex;
   align-items: center;
   gap: 0.5rem;
-  margin-bottom: 1rem;
+  margin-bottom: 1.5rem;
   font-size: 1.25rem;
   font-weight: 700;
 }
@@ -212,6 +214,10 @@
 }
 
 /* Collapse overrides for event cards */
+.event-collapse {
+  border-radius: 0 0 8px 8px;
+}
+
 .event-card .collapse-content.hidden {
   padding: 0;
 }

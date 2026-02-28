@@ -345,14 +345,63 @@ export const buildProductDetailModal = async (productData, startIndex = 0) => {
   addToCartBtn.productId = productData.productId;
   addToCartBtn.setAttribute("data-label", "add-to-cart");
 
+  const { length, width, height, weight } = productData;
+  const specsData = [
+    { value: length, unit: "in",  label: "Length" },
+    { value: width,  unit: "in",  label: "Width"  },
+    { value: height, unit: "in",  label: "Height" },
+    { value: weight, unit: "lbs", label: "Weight" },
+  ];
+
+  let hasAnySpec = false;
+  for (let i = 0; i < specsData.length; i++) {
+    if (specsData[i].value) { hasAnySpec = true; break; }
+  }
+
+  // Footer: category left, specs right
+  const footer = document.createElement("div");
+  footer.className = "product-detail-footer";
+
+  const footerLeft = document.createElement("div");
+  footerLeft.className = "product-footer-left";
+  footerLeft.append(typeBadge);
+
   if (productData.canShip === "no") {
     const pickupBadge = document.createElement("span");
     pickupBadge.className = "pickup-badge";
     pickupBadge.textContent = "Pickup Only";
-    info.append(name, price, description, typeBadge, pickupBadge, addToCartBtn);
-  } else {
-    info.append(name, price, description, typeBadge, addToCartBtn);
+    footerLeft.append(pickupBadge);
   }
+
+  footer.append(footerLeft);
+
+  if (hasAnySpec) {
+    const specsPanel = document.createElement("div");
+    specsPanel.className = "product-footer-specs";
+
+    for (let i = 0; i < specsData.length; i++) {
+      const spec = specsData[i];
+      if (!spec.value) continue;
+
+      const col = document.createElement("div");
+      col.className = spec.label === "Weight" ? "footer-spec-col footer-spec-col-weight" : "footer-spec-col";
+
+      const val = document.createElement("span");
+      val.className = "footer-spec-value";
+      val.textContent = `${spec.value} ${spec.unit}`;
+
+      const lbl = document.createElement("span");
+      lbl.className = "footer-spec-label";
+      lbl.textContent = spec.label;
+
+      col.append(val, lbl);
+      specsPanel.append(col);
+    }
+
+    footer.append(specsPanel);
+  }
+
+  info.append(name, price, description, footer, addToCartBtn);
   body.append(info);
 
   wrapper.append(header, body);
