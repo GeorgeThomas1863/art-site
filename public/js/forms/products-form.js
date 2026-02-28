@@ -339,12 +339,6 @@ export const buildProductDetailModal = async (productData, startIndex = 0) => {
   typeBadge.className = "product-detail-type";
   typeBadge.textContent = typeText;
 
-  const addToCartBtn = document.createElement("button");
-  addToCartBtn.className = "add-to-cart-btn product-detail-cart-btn";
-  addToCartBtn.textContent = "Add to Cart";
-  addToCartBtn.productId = productData.productId;
-  addToCartBtn.setAttribute("data-label", "add-to-cart");
-
   const { length, width, height, weight } = productData;
   const specsData = [
     { value: length, unit: "in",  label: "Length" },
@@ -401,8 +395,17 @@ export const buildProductDetailModal = async (productData, startIndex = 0) => {
     footer.append(specsPanel);
   }
 
-  info.append(name, price, description, footer, addToCartBtn);
-  body.append(info);
+  const addToCartBtn = document.createElement("button");
+  addToCartBtn.className = "add-to-cart-btn product-detail-cart-btn";
+  addToCartBtn.textContent = "Add to Cart";
+  addToCartBtn.productId = productData.productId;
+  addToCartBtn.setAttribute("data-label", "add-to-cart");
+
+  const divider = document.createElement("hr");
+  divider.className = "product-detail-divider";
+
+  info.append(name, price, description, footer);
+  body.append(addToCartBtn, divider, info);
 
   wrapper.append(header, body);
   overlay.append(wrapper);

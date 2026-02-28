@@ -400,14 +400,13 @@
 
 .product-footer-specs {
   display: grid;
-  grid-template-columns: repeat(3, auto);
+  grid-template-columns: repeat(4, auto);
   column-gap: 1.5rem;
   row-gap: 0.4rem;
   align-items: start;
 }
 
 .footer-spec-col-weight {
-  grid-column: 3;
 }
 
 .footer-spec-col {
@@ -435,13 +434,16 @@
 }
 
 .product-detail-cart-btn {
-  display: block;
-  margin: 0 auto;
+  margin: 1.25rem auto 0;
   font-size: 1.1rem;
   font-weight: 600;
   padding: 0.75rem 2rem;
-  margin-top: -2rem; 
-  /* REMOVE MARGIN IF DESIGN CHANGES */
+}
+
+.product-detail-divider {
+  border: none;
+  border-top: 1px solid #e8e8e8;
+  margin: 1rem 2rem 0;
 }
 
 /* ++++++++++++++++++++++++++ */
