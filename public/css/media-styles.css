@@ -727,6 +727,14 @@
     padding: 1.25rem;
   }
 
+  .newsletter-card-text {
+    font-size: 1.1rem;
+  }
+
+  .newsletter-card-subject {
+    font-size: 1.6rem;
+  }
+
   /* About */
   .about-text {
     padding: 1.5rem 1rem;
