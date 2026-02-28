@@ -1,9 +1,10 @@
 import { sendToBack } from "../util/api-front.js";
 import { displayPopup } from "../util/popup.js";
+import { buildCollapseContainer } from "../util/collapse.js";
 
 let newsletterArchive = [];
 
-export const populateNewsletter = (data) => {
+export const populateNewsletter = async (data) => {
   newsletterArchive = data || [];
 
   const displayArea = document.getElementById("newsletter-display-area");
@@ -24,23 +25,23 @@ export const populateNewsletter = (data) => {
   }
 
   controls.classList.remove("hidden");
-  displayNewsletterItem(newsletterArchive[0]);
+  await displayNewsletterItem(newsletterArchive[0]);
 };
 
-export const runNewsletterSelect = (selectElement) => {
+export const runNewsletterSelect = async (selectElement) => {
   const idx = parseInt(selectElement.value, 10);
   if (isNaN(idx) || idx < 0 || idx >= newsletterArchive.length) return;
-  displayNewsletterItem(newsletterArchive[idx]);
+  await displayNewsletterItem(newsletterArchive[idx]);
 };
 
-const displayNewsletterItem = (newsletter) => {
+const displayNewsletterItem = async (newsletter) => {
   const displayArea = document.getElementById("newsletter-display-area");
   if (!displayArea) return;
   displayArea.innerHTML = "";
-  displayArea.append(buildNewsletterCard(newsletter));
+  displayArea.append(await buildNewsletterCard(newsletter));
 };
 
-const buildNewsletterCard = (newsletter) => {
+const buildNewsletterCard = async (newsletter) => {
   const card = document.createElement("div");
   card.className = "newsletter-card";
 
@@ -65,7 +66,14 @@ const buildNewsletterCard = (newsletter) => {
   text.textContent = newsletter.text;
 
   body.append(text);
-  card.append(cardHeader, body);
+
+  const collapseContainer = await buildCollapseContainer({
+    titleElement: cardHeader,
+    contentElement: body,
+    isExpanded: true,
+  });
+
+  card.append(collapseContainer);
   return card;
 };
 

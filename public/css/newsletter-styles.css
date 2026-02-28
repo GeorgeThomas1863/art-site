@@ -78,6 +78,18 @@
   overflow: hidden;
 }
 
+.newsletter-card .collapse-header {
+  padding: 1.5rem 2rem;
+  border-bottom: 1px solid #e0e0e0;
+}
+
+.newsletter-card .newsletter-card-header.collapse-title {
+  padding: 0;
+  flex: 1;
+  border-bottom: none;
+  text-transform: none;
+}
+
 .newsletter-card-header {
   padding: 1.5rem 2rem;
   border-bottom: 1px solid #e0e0e0;
