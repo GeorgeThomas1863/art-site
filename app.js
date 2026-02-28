@@ -1,4 +1,8 @@
-//newsletter history
+//unfuck the fucking events drop down
+
+//add shippin dimensions to product popup
+
+//previews / favicons 
 
 //figure out how to receive email from mailgun through admin email
 

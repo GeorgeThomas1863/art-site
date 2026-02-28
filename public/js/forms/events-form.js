@@ -1,3 +1,5 @@
+import { buildCollapseContainer } from "../util/collapse.js";
+
 // Build the events page
 export const buildEventsForm = async () => {
   const eventsContainer = document.createElement("div");
@@ -108,7 +110,20 @@ export const buildEventContent = async (eventData) => {
   eventDescriptionElement.className = "event-description";
   eventDescriptionElement.textContent = eventDescription;
 
-  eventContentContainer.append(eventDateElement, eventTitleElement, eventLocationElement, eventDescriptionElement);
+  // Wrap location + description as collapsible content under the title
+  const collapseContentDiv = document.createElement("div");
+  collapseContentDiv.className = "event-collapse-content";
+  collapseContentDiv.append(eventLocationElement, eventDescriptionElement);
+
+  const collapseContainer = await buildCollapseContainer({
+    titleElement: eventTitleElement,
+    contentElement: collapseContentDiv,
+    isExpanded: true,
+    className: "event-collapse",
+  });
+
+  // Date stays outside collapse (always visible); title triggers collapse below it
+  eventContentContainer.append(eventDateElement, collapseContainer);
 
   return eventContentContainer;
 };

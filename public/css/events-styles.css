@@ -53,7 +53,7 @@
 }
 
 .event-content {
-  padding: 1.5rem;
+  padding: 0;
 }
 
 .event-date {
@@ -64,12 +64,13 @@
   font-weight: bold;
   margin-bottom: 0.75rem;
   font-size: 1.35rem;
+  padding: 1.5rem 2rem 0 2rem;
 }
 
 .event-title {
   font-size: 1.8rem;
   color: #000000;
-  margin-bottom: 1rem;
+  /* margin-bottom: 1rem; */
   font-weight: bold;
   letter-spacing: 1px;
 }
@@ -208,4 +209,13 @@
 .events-newsletter-submit-btn:active {
   background-color: rgb(110, 160, 60);
   transform: translateY(1px);
+}
+
+/* Collapse overrides for event cards */
+.event-card .collapse-content.hidden {
+  padding: 0;
+}
+
+.event-title.collapse-title {
+  text-transform: none;
 }
