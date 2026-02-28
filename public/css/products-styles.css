@@ -383,6 +383,7 @@
 /* Product detail modal — footer row */
 .product-detail-footer {
   display: flex;
+  flex-wrap: wrap;
   align-items: flex-start;
   justify-content: space-between;
   gap: 1rem;
@@ -399,11 +400,11 @@
 }
 
 .product-footer-specs {
-  display: grid;
-  grid-template-columns: repeat(4, auto);
-  column-gap: 1.5rem;
-  row-gap: 0.4rem;
-  align-items: start;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem 1.5rem;
+  align-items: flex-start;
+  justify-content: flex-end;
 }
 
 /* .footer-spec-col-weight {
