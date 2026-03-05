@@ -13,10 +13,12 @@ const __dirname = dirname(__filename);
 // Define upload directory //CHANGE
 const uploadDir = path.join(__dirname, "../public/images");
 
-// Create directory if it doesn't exist
+// Create directories if they don't exist
 if (!fs.existsSync(uploadDir)) {
   fs.mkdirSync(uploadDir, { recursive: true });
 }
+
+fs.mkdirSync(path.join(uploadDir, "newsletter"), { recursive: true });
 
 // Configure storage
 const storage = multer.diskStorage({
@@ -26,6 +28,8 @@ const storage = multer.diskStorage({
       targetDir = path.join(uploadDir, "products");
     } else if (req.path === "/upload-event-pic-route") {
       targetDir = path.join(uploadDir, "events");
+    } else if (req.path === "/upload-newsletter-pic-route") {
+      targetDir = path.join(uploadDir, "newsletter");
     }
     cb(null, targetDir);
   },

@@ -63,6 +63,7 @@ export const getNewsletters = async () => {
     result.push({
       id: n._id.toString(),
       subject: n.subject || "(No Subject)",
+      html: n.html || "",
       text: n.text || "",
       sentAt: n._id.getTimestamp(),
     });
@@ -75,21 +76,26 @@ export const dispatchNewsletter = async (inputParams) => {
   // console.dir(inputParams);
 
   if (!inputParams) return { success: false, message: "No input parameters" };
-  const { subject, message } = inputParams;
-  if (!message) return { success: false, message: "No message provided" };
+  const { subject, html, message } = inputParams;
+  const content = html || message;
+  if (!content) return { success: false, message: "No message provided" };
   const cleanSubject = sanitizeEmailHeader(subject || "");
 
   const subscriberArray = await getSubscribers();
   if (!subscriberArray || !subscriberArray.length) return { success: false, message: "No subscribers found" };
 
-  const emailList = subscriberArray.map((s) => s.email);
+  const emailList = [];
+  for (let i = 0; i < subscriberArray.length; i++) {
+    emailList.push(subscriberArray[i].email);
+  }
 
   const mailParams = {
     from: process.env.NEWSLETTER_FROM || process.env.EMAIL_USER,
     to: process.env.EMAIL_USER,
     bcc: emailList,
     subject: cleanSubject,
-    text: message,
+    html: html || undefined,
+    text: message || "Please view this email in an HTML-capable client.",
     replyTo: process.env.EMAIL_USER,
   };
 

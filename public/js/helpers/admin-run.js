@@ -62,6 +62,10 @@ export const runModalTrigger = async (clickElement) => {
 
   modal.classList.add("visible");
 
+  if (mode === "write" && entityType === "newsletter") {
+    initQuill();
+  }
+
   return true;
 };
 
@@ -69,6 +73,7 @@ export const runModalTrigger = async (clickElement) => {
 export const runModalClose = async (clickElement) => {
   if (!clickElement) return null;
 
+  resetQuill();
   const modal = document.querySelector(".modal-overlay");
   if (modal) modal.remove();
   return true;
