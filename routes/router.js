@@ -66,8 +66,8 @@ router.get("/401", display401);
 router.get("/admin", requireAuth, adminDisplay);
 
 router.post("/upload-product-pic-route", requireAuth, upload.single("image"), uploadPicControl);
-
 router.post("/upload-event-pic-route", requireAuth, upload.single("image"), uploadPicControl);
+router.post("/upload-newsletter-pic-route", requireAuth, upload.single("image"), uploadPicControl);
 
 router.post("/delete-pic-route", requireAuth, deletePicControl);
 

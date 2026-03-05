@@ -1,14 +1,16 @@
 import { storeProduct, updateProduct, deleteProduct, getProductData, hideOrderedProducts } from "../src/products.js";
 import { storeEvent, updateEvent, deleteEvent, getEventData } from "../src/events.js";
 import { submitContact } from "../src/contact.js";
-import { storeSubscriber, getSubscribers, deleteSubscriber, dispatchNewsletter, notifyAdminOfSubscription, getNewsletters } from "../src/newsletter.js";
-import { buildCart, getCartStats, addCartItem, updateCartItem, removeCartItem } from "../src/cart.js";
 import {
-  fetchShippingRates,
-  getShippingFromSession,
-  clearShippingFromSession,
-  updateSelectedRate,
-} from "../src/shipping.js";
+  storeSubscriber,
+  getSubscribers,
+  deleteSubscriber,
+  dispatchNewsletter,
+  notifyAdminOfSubscription,
+  getNewsletters,
+} from "../src/newsletter.js";
+import { buildCart, getCartStats, addCartItem, updateCartItem, removeCartItem } from "../src/cart.js";
+import { fetchShippingRates, getShippingFromSession, clearShippingFromSession, updateSelectedRate } from "../src/shipping.js";
 import { placeNewOrder } from "../src/orders.js";
 import { deletePic } from "../src/upload-back.js";
 import {
@@ -315,9 +317,7 @@ export const addSubscriberControl = async (req, res) => {
   if (!data || !data.success) return res.status(500).json({ error: "Failed to add email to newsletter" });
 
   if (!data.duplicate) {
-    notifyAdminOfSubscription(req.body.email).catch((e) =>
-      console.error("Admin newsletter notification failed:", e.message)
-    );
+    notifyAdminOfSubscription(req.body.email).catch((e) => console.error("Admin newsletter notification failed:", e.message));
   }
 
   return res.json(data);
@@ -330,7 +330,7 @@ export const getSubscribersControl = async (req, res) => {
 
 export const sendNewsletterControl = async (req, res) => {
   if (!req || !req.body) return res.status(500).json({ error: "No input parameters" });
-  if (!req.body.message) return res.status(500).json({ error: "No message provided" });
+  if (!req.body.message && !req.body.html) return res.status(500).json({ error: "No message provided" });
 
   // console.log("SEND NEWSLETTER CONTROLLER");
   // console.log(req.body);

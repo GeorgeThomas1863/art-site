@@ -1,3 +1,4 @@
+import { initQuill, resetQuill } from "./admin-newsletter.js";
 import { populateAdminProductSelector } from "./admin-products.js";
 import { populateAdminEventSelector } from "./admin-events.js";
 import { populateSubscriberList } from "./admin-newsletter.js";
@@ -93,16 +94,14 @@ export const runChangeStatusCard = async (changeElement) => {
     const displayEl = document.getElementById(`${prefix}display`);
 
     // sold=yes + removeWhenSold=yes → display=no
-    if ((soldIds.includes(changeId) || removeIds.includes(changeId))
-        && soldEl?.value === "yes" && removeEl?.value === "yes" && displayEl) {
+    if ((soldIds.includes(changeId) || removeIds.includes(changeId)) && soldEl?.value === "yes" && removeEl?.value === "yes" && displayEl) {
       displayEl.value = "no";
       displayEl.classList.remove("status-yes", "status-no");
       displayEl.classList.add("status-no");
     }
 
     // display=yes + sold=yes → removeWhenSold=no
-    if (displayIds.includes(changeId) && changeElement.value === "yes"
-        && soldEl?.value === "yes" && removeEl) {
+    if (displayIds.includes(changeId) && changeElement.value === "yes" && soldEl?.value === "yes" && removeEl) {
       removeEl.value = "no";
       removeEl.classList.remove("status-yes", "status-no");
       removeEl.classList.add("status-no");
@@ -122,7 +121,7 @@ export const runChangeStatusCard = async (changeElement) => {
       input.value = "N/A";
       input.disabled = true;
     } else {
-      input.value = (!input.value || input.value === "N/A" || input.value === "0") ? "5" : input.value;
+      input.value = !input.value || input.value === "N/A" || input.value === "0" ? "5" : input.value;
       input.disabled = false;
     }
   }
@@ -246,7 +245,15 @@ export const clearAdminAddFields = async () => {
 };
 
 export const clearAdminEditFields = async () => {
-  const clearFieldsArray = ["edit-item-id", "edit-name", "edit-price", "edit-description", "edit-event-date", "edit-event-location", "edit-event-description"];
+  const clearFieldsArray = [
+    "edit-item-id",
+    "edit-name",
+    "edit-price",
+    "edit-description",
+    "edit-event-date",
+    "edit-event-location",
+    "edit-event-description",
+  ];
 
   for (let i = 0; i < clearFieldsArray.length; i++) {
     const field = document.getElementById(clearFieldsArray[i]);

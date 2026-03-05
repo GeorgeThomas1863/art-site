@@ -1043,6 +1043,26 @@ export const buildNewsletterSubject = async () => {
   return subjectWrapper;
 };
 
+// export const buildNewsletterMessage = async () => {
+//   const messageWrapper = document.createElement("div");
+//   messageWrapper.className = "form-field";
+
+//   const messageLabel = document.createElement("label");
+//   messageLabel.className = "form-label";
+//   messageLabel.textContent = "Message";
+//   messageLabel.setAttribute("for", "newsletter-message");
+
+//   const messageInput = document.createElement("textarea");
+//   messageInput.className = "form-textarea newsletter-textarea";
+//   messageInput.id = "newsletter-message";
+//   messageInput.name = "newsletter-message";
+//   messageInput.placeholder = "Write your newsletter message...";
+
+//   messageWrapper.append(messageLabel, messageInput);
+
+//   return messageWrapper;
+// };
+
 export const buildNewsletterMessage = async () => {
   const messageWrapper = document.createElement("div");
   messageWrapper.className = "form-field";
@@ -1050,15 +1070,21 @@ export const buildNewsletterMessage = async () => {
   const messageLabel = document.createElement("label");
   messageLabel.className = "form-label";
   messageLabel.textContent = "Message";
-  messageLabel.setAttribute("for", "newsletter-message");
 
-  const messageInput = document.createElement("textarea");
-  messageInput.className = "form-textarea newsletter-textarea";
-  messageInput.id = "newsletter-message";
-  messageInput.name = "newsletter-message";
-  messageInput.placeholder = "Write your newsletter message...";
+  // Quill mounts onto a plain div, not a textarea
+  const editorContainer = document.createElement("div");
+  editorContainer.id = "newsletter-quill-editor";
+  editorContainer.className = "newsletter-quill-editor";
 
-  messageWrapper.append(messageLabel, messageInput);
+  // Hidden file input — triggered programmatically by the Quill image handler
+  const imageFileInput = document.createElement("input");
+  imageFileInput.type = "file";
+  imageFileInput.id = "newsletter-image-file-input";
+  imageFileInput.accept = ".jpg,.jpeg,.png,.gif,.webp";
+  imageFileInput.style.display = "none";
+  // The change listener is attached in initQuill() after the modal is in the DOM
+
+  messageWrapper.append(messageLabel, editorContainer, imageFileInput);
 
   return messageWrapper;
 };
