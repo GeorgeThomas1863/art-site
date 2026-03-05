@@ -1037,8 +1037,6 @@
    The .newsletter-textarea rule can be removed — replaced by these.        */
 
 .newsletter-quill-editor {
-  border: 1px solid #333;
-  border-radius: 0 0 4px 4px;
   font-family: "Georgia", serif;
   font-size: 1rem;
   min-height: 350px;
@@ -1054,7 +1052,9 @@
 }
 
 .ql-container.ql-snow {
-  border: none; /* outer border already on .newsletter-quill-editor */
+  border: 1px solid #333;
+  border-top: none;
+  border-radius: 0 0 4px 4px;
   font-family: "Georgia", serif;
   font-size: 1rem;
 }

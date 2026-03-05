@@ -1,6 +1,4 @@
-//ask about design of info on product popup, getting back in insta, advertising?
-
-//previews / favicons
+//unfuck newsletter drafting display, figure out default font size, test IMAGES in newsletter email.
 
 // figure out the cloudflare problem and fix it
 
