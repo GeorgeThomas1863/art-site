@@ -213,15 +213,20 @@ export const initQuill = () => {
   const editorEl = document.getElementById("newsletter-quill-editor");
   if (!editorEl || typeof Quill === "undefined") return;
 
+  // Use style-based size attributor so sizes render as inline styles in email
+  // (email clients strip CSS classes but preserve inline style attributes)
+  const SizeStyle = Quill.import("attributors/style/size");
+  SizeStyle.whitelist = ["12px", "14px"];
+  Quill.register(SizeStyle, true);
+
   quillInstance = new Quill("#newsletter-quill-editor", {
     theme: "snow",
     placeholder: "Write your newsletter message...",
     modules: {
       toolbar: {
         container: [
-          [{ header: [1, 2, 3, false] }],
+          [{ size: ["12px", false, "14px"] }],
           ["bold", "italic", "underline"],
-          [{ color: [] }],
           [{ list: "ordered" }, { list: "bullet" }],
           ["link", "image"],
           ["clean"],
@@ -240,6 +245,28 @@ export const initQuill = () => {
   const fileInput = document.getElementById("newsletter-image-file-input");
   if (fileInput) {
     fileInput.addEventListener("change", () => runNewsletterImageUpload(fileInput));
+  }
+
+  // Add hover tooltips — Quill 2 does not set title attributes automatically
+  const toolbarEl = quillInstance.getModule("toolbar").container;
+  const buttonTitles = [
+    [".ql-bold", "Bold"],
+    [".ql-italic", "Italic"],
+    [".ql-underline", "Underline"],
+    [".ql-link", "Insert Link"],
+    [".ql-image", "Insert Image"],
+    [".ql-clean", "Remove Formatting"],
+    ['.ql-list[value="ordered"]', "Numbered List"],
+    ['.ql-list[value="bullet"]', "Bullet List"],
+  ];
+  for (let i = 0; i < buttonTitles.length; i++) {
+    const el = toolbarEl.querySelector(buttonTitles[i][0]);
+    if (el) el.title = buttonTitles[i][1];
+  }
+  const pickerLabels = toolbarEl.querySelectorAll(".ql-picker-label");
+  const pickerTitles = ["Font Size"];
+  for (let i = 0; i < pickerLabels.length; i++) {
+    if (pickerTitles[i]) pickerLabels[i].title = pickerTitles[i];
   }
 };
 
@@ -271,7 +298,7 @@ const runNewsletterImageUpload = async (fileInput) => {
     return;
   }
 
-  const imageUrl = `/images/newsletter/${data.filename}`;
+  const imageUrl = `${window.location.origin}/images/newsletter/${data.filename}`;
   const range = quillInstance.getSelection(true);
   quillInstance.insertEmbed(range.index, "image", imageUrl);
   quillInstance.setSelection(range.index + 1); // advance cursor past image

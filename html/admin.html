@@ -14,15 +14,14 @@
     <link rel="apple-touch-icon" href="/images/favicons/apple-touch-icon.png" />
     <link rel="manifest" href="/images/favicons/site.webmanifest" />
 
+    <!-- QUILL RICH TEXT EDITOR CDN — must load before custom CSS so our overrides win -->
+    <link href="https://cdn.jsdelivr.net/npm/quill@2/dist/quill.snow.css" rel="stylesheet" />
+    <script src="https://cdn.jsdelivr.net/npm/quill@2/dist/quill.js" defer></script>
+
     <link rel="stylesheet" href="/css/styles.css" />
     <link rel="stylesheet" href="/css/admin-styles.css" />
     <link rel="stylesheet" href="/css/media-styles.css" />
 
-    <!-- QUILL RICH TEXT EDITOR CDN -->
-    <link href="https://cdn.jsdelivr.net/npm/quill@2/dist/quill.snow.css" rel="stylesheet" />
-    <script src="https://cdn.jsdelivr.net/npm/quill@2/dist/quill.js" defer></script>
-
-    <!-- <script type="module" src="/js/admin.js" defer></script> -->
     <script type="module" src="/js/main.js" defer></script>
     <script type="module" src="/js/responsive.js" defer></script>
   </head>
