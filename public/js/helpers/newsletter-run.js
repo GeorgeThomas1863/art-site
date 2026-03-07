@@ -61,10 +61,7 @@ const buildNewsletterCard = async (newsletter) => {
   const body = document.createElement("div");
   body.className = "newsletter-card-body";
 
-  const scrollWrapper = document.createElement("div");
-  scrollWrapper.className = "newsletter-card-scroll";
-  scrollWrapper.innerHTML = newsletter.html || "";
-  body.append(scrollWrapper);
+  body.innerHTML = newsletter.html || "";
 
   const collapseContainer = await buildCollapseContainer({
     titleElement: cardHeader,

@@ -123,9 +123,6 @@
   font-size: 1.1rem;
   color: #111;
   line-height: 1.8;
-}
-
-.newsletter-card-scroll {
   max-height: 550px;
   overflow-y: auto;
 }
