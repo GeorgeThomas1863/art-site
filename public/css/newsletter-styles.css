@@ -127,6 +127,10 @@
   overflow-y: auto;
 }
 
+.newsletter-card .collapse-content {
+  padding: 0;
+}
+
 .newsletter-card-body img {
   max-width: 100%;
   height: auto;

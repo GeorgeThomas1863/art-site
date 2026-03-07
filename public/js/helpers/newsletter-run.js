@@ -58,14 +58,22 @@ const buildNewsletterCard = async (newsletter) => {
 
   cardHeader.append(subject, date);
 
+  const collapseWrapper = document.createElement("div");
+
   const body = document.createElement("div");
   body.className = "newsletter-card-body";
-
-  body.innerHTML = newsletter.html || "";
+  if (newsletter.html) {
+    body.innerHTML = newsletter.html;
+  } else if (newsletter.text) {
+    const textEl = document.createElement("p");
+    textEl.textContent = newsletter.text;
+    body.append(textEl);
+  }
+  collapseWrapper.append(body);
 
   const collapseContainer = await buildCollapseContainer({
     titleElement: cardHeader,
-    contentElement: body,
+    contentElement: collapseWrapper,
     isExpanded: true,
   });
 
