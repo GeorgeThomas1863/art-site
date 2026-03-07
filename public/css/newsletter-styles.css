@@ -120,14 +120,29 @@
 
 .newsletter-card-body {
   padding: 2rem;
-}
-
-.newsletter-card-text {
-  font-size: 1.25rem;
+  font-size: 1.1rem;
   color: #111;
   line-height: 1.8;
-  white-space: pre-wrap;
-  margin: 0;
+}
+
+.newsletter-card-scroll {
+  max-height: 550px;
+  overflow-y: auto;
+}
+
+.newsletter-card-body img {
+  max-width: 100%;
+  height: auto;
+  display: block;
+  margin: 1rem 0;
+}
+
+.newsletter-card-body p {
+  margin: 0 0 1rem 0;
+}
+
+.newsletter-card-body p:last-child {
+  margin-bottom: 0;
 }
 
 /* ---- Signup section ---- */
