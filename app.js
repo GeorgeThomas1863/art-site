@@ -1,5 +1,3 @@
-//unfuck newsletter drafting display, figure out default font size, test IMAGES in newsletter email.
-
 // figure out the cloudflare problem and fix it
 
 //figure out how to receive email from mailgun through admin email
