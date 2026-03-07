@@ -735,12 +735,12 @@
 
 .upload-btn {
   font-family: "Georgia", serif;
-  font-size: 0.9rem;
+  font-size: 1rem;
   letter-spacing: 1px;
   background: #000;
   color: #fff;
   border: none;
-  padding: 0.9rem 2.5rem;
+  padding: 1rem 2.8rem;
   cursor: pointer;
   border-radius: 4px;
   text-transform: uppercase;
@@ -801,13 +801,13 @@
 
 .btn-add-image {
   font-family: "Georgia", serif;
-  font-size: 0.9rem;
+  font-size: 1rem;
   letter-spacing: 1px;
   background: #555;
   color: #fff;
   border: 1px solid #555;
   border-radius: 4px;
-  padding: 0.6rem 1.2rem;
+  padding: 0.8rem 1.5rem;
   cursor: pointer;
   margin-top: 0.75rem;
   text-transform: uppercase;
@@ -916,10 +916,10 @@
 /* Button Styles */
 .btn {
   font-family: "Georgia", serif;
-  font-size: 0.9rem;
+  font-size: 1.1rem;
   font-weight: 400;
   letter-spacing: 2px;
-  padding: 1rem 2rem;
+  padding: 1.2rem 2.5rem;
   cursor: pointer;
   transition: all 0.3s;
   text-transform: uppercase;
@@ -933,13 +933,13 @@
   background-color: #000;
   color: #fff;
   border-color: #000;
-  padding: 1.2rem 2rem;
+  padding: 1.4rem 2.5rem;
 }
 
 .btn-admin-cancel {
   background-color: transparent;
   color: #333;
-  padding: 1.2rem 2rem;
+  padding: 1.4rem 2.5rem;
 }
 
 .btn-admin-cancel:hover {
@@ -1032,6 +1032,10 @@
 
 /* QUILL STYLES */
 
+.quill-editor-wrapper {
+  display: block;
+}
+
 /* ─── Add to admin.css ───────────────────────────────────────────────────────
    Quill snow theme overrides to match the existing admin aesthetic.
    The .newsletter-textarea rule can be removed — replaced by these.        */
@@ -1091,23 +1095,23 @@
 }
 
 .ql-toolbar.ql-snow .ql-formats button {
-  width: 36px;
-  height: 36px;
-  padding: 4px;
+  width: 42px;
+  height: 42px;
+  padding: 6px;
 }
 
 .ql-toolbar.ql-snow .ql-formats button svg {
-  width: 20px;
-  height: 20px;
+  width: 24px;
+  height: 24px;
 }
 
 .ql-toolbar.ql-snow .ql-picker {
-  height: 36px;
+  height: 42px;
 }
 
 .ql-toolbar.ql-snow .ql-picker-label {
   padding: 4px 8px;
-  line-height: 28px;
+  line-height: 34px;
 }
 
 /* Size picker: label shown in closed toolbar button */

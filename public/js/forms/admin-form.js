@@ -1084,7 +1084,11 @@ export const buildNewsletterMessage = async () => {
   imageFileInput.style.display = "none";
   // The change listener is attached in initQuill() after the modal is in the DOM
 
-  messageWrapper.append(messageLabel, editorContainer, imageFileInput);
+  const quillWrapper = document.createElement("div");
+  quillWrapper.className = "quill-editor-wrapper";
+  quillWrapper.append(editorContainer);
+
+  messageWrapper.append(messageLabel, quillWrapper, imageFileInput);
 
   return messageWrapper;
 };
