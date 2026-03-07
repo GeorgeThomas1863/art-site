@@ -216,7 +216,7 @@ export const initQuill = () => {
   // Use style-based size attributor so sizes render as inline styles in email
   // (email clients strip CSS classes but preserve inline style attributes)
   const SizeStyle = Quill.import("attributors/style/size");
-  SizeStyle.whitelist = ["12px", "14px"];
+  SizeStyle.whitelist = ["12px", "14px", "16px", "18px", "20px", "22px", "24px", "26px", "28px", "30px", "32px", "34px", "36px", "38px", "40px"];
   Quill.register(SizeStyle, true);
 
   quillInstance = new Quill("#newsletter-quill-editor", {
@@ -234,6 +234,21 @@ export const initQuill = () => {
           image: () => {
             // Trigger the hidden file input instead of Quill's default base64 behaviour
             document.getElementById("newsletter-image-file-input")?.click();
+          },
+        },
+      },
+      keyboard: {
+        bindings: {
+          enterPreserveSize: {
+            key: "Enter",
+            handler: function (range, context) {
+              const size = context.format.size;
+              const quill = this.quill;
+              setTimeout(() => {
+                if (size) quill.format("size", size);
+              }, 0);
+              return true; // propagate to Quill's default Enter handler
+            },
           },
         },
       },
@@ -299,8 +314,10 @@ const runNewsletterImageUpload = async (fileInput) => {
 
   const imageUrl = `${window.location.origin}/images/newsletter/${data.filename}`;
   const range = quillInstance.getSelection(true);
+  const sizeBefore = quillInstance.getFormat(range.index).size || null;
   quillInstance.insertEmbed(range.index, "image", imageUrl);
   quillInstance.setSelection(range.index + 1); // advance cursor past image
+  if (sizeBefore) quillInstance.format("size", sizeBefore);
 };
 
 // ─── Send newsletter ──────────────────────────────────────────────────────────

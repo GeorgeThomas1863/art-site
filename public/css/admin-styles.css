@@ -1095,14 +1095,14 @@
 }
 
 .ql-toolbar.ql-snow .ql-formats button {
-  width: 42px;
-  height: 42px;
+  width: 50px;
+  height: 50px;
   padding: 6px;
 }
 
 .ql-toolbar.ql-snow .ql-formats button svg {
-  width: 24px;
-  height: 24px;
+  width: 36px;
+  height: 36px;
 }
 
 .ql-toolbar.ql-snow .ql-picker {
@@ -1111,26 +1111,18 @@
 
 .ql-toolbar.ql-snow .ql-picker-label {
   padding: 4px 8px;
-  line-height: 34px;
+  line-height: 42px;
 }
 
 /* Size picker: label shown in closed toolbar button */
 .ql-snow .ql-picker.ql-size .ql-picker-label::before {
-  content: "Size";
+  content: "Normal";
 }
-.ql-snow .ql-picker.ql-size .ql-picker-label[data-value="12px"]::before {
-  content: "12px";
-}
-.ql-snow .ql-picker.ql-size .ql-picker-label[data-value="14px"]::before {
-  content: "14px";
+.ql-snow .ql-picker.ql-size .ql-picker-label[data-value]::before {
+  content: attr(data-value);
 }
 
 /* Size picker: items in open dropdown */
-.ql-snow .ql-picker.ql-size .ql-picker-item[data-value="12px"]::before {
-  content: "12px";
-  font-size: 12px;
-}
-.ql-snow .ql-picker.ql-size .ql-picker-item[data-value="14px"]::before {
-  content: "14px";
-  font-size: 14px;
+.ql-snow .ql-picker.ql-size .ql-picker-item[data-value]::before {
+  content: attr(data-value);
 }
