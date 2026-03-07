@@ -81,6 +81,15 @@ export const dispatchNewsletter = async (inputParams) => {
   if (!content) return { success: false, message: "No message provided" };
   const cleanSubject = sanitizeEmailHeader(subject || "");
 
+  const siteUrl = process.env.SITE_URL?.replace(/\/$/, "");
+  let resolvedHtml = html;
+  if (siteUrl && resolvedHtml) {
+    resolvedHtml = resolvedHtml.replace(
+      /(<img\b[^>]*\ssrc=["'])https?:\/\/[^/]+(\/images\/newsletter\/)/gi,
+      `$1${siteUrl}$2`
+    );
+  }
+
   const subscriberArray = await getSubscribers();
   if (!subscriberArray || !subscriberArray.length) return { success: false, message: "No subscribers found" };
 
@@ -94,7 +103,7 @@ export const dispatchNewsletter = async (inputParams) => {
     to: process.env.EMAIL_USER,
     bcc: emailList,
     subject: cleanSubject,
-    html: html || undefined,
+    html: resolvedHtml || undefined,
     text: message || "Please view this email in an HTML-capable client.",
     replyTo: process.env.EMAIL_USER,
   };

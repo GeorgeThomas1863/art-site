@@ -1043,26 +1043,6 @@ export const buildNewsletterSubject = async () => {
   return subjectWrapper;
 };
 
-// export const buildNewsletterMessage = async () => {
-//   const messageWrapper = document.createElement("div");
-//   messageWrapper.className = "form-field";
-
-//   const messageLabel = document.createElement("label");
-//   messageLabel.className = "form-label";
-//   messageLabel.textContent = "Message";
-//   messageLabel.setAttribute("for", "newsletter-message");
-
-//   const messageInput = document.createElement("textarea");
-//   messageInput.className = "form-textarea newsletter-textarea";
-//   messageInput.id = "newsletter-message";
-//   messageInput.name = "newsletter-message";
-//   messageInput.placeholder = "Write your newsletter message...";
-
-//   messageWrapper.append(messageLabel, messageInput);
-
-//   return messageWrapper;
-// };
-
 export const buildNewsletterMessage = async () => {
   const messageWrapper = document.createElement("div");
   messageWrapper.className = "form-field";

@@ -221,15 +221,14 @@ export const initQuill = () => {
 
   quillInstance = new Quill("#newsletter-quill-editor", {
     theme: "snow",
-    placeholder: "Write your newsletter message...",
+    placeholder: "Draft your newsletter message here...",
     modules: {
       toolbar: {
         container: [
-          [{ size: ["12px", false, "14px"] }],
+          [{ size: [false, "12px", "14px", "16px", "18px", "20px", "22px", "24px", "26px", "28px", "30px", "32px", "34px", "36px", "38px", "40px"] }],
           ["bold", "italic", "underline"],
           [{ list: "ordered" }, { list: "bullet" }],
           ["link", "image"],
-          ["clean"],
         ],
         handlers: {
           image: () => {

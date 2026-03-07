@@ -30,6 +30,9 @@ public/images/background/*
 public/images/events/*
 **/public/images/events/*
 
+public/images/newsletter/*
+**/public/images/newsletter/*
+
 # Diagnostic reports (https://nodejs.org/api/report.html)
 report.[0-9]*.[0-9]*.[0-9]*.[0-9]*.json
 
