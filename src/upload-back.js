@@ -84,7 +84,7 @@ export const deletePic = async (filename) => {
 
 export const resizeNewsletterImage = async (filePath) => {
   try {
-    console.log("[resize] filePath:", filePath, "| exists:", fs.existsSync(filePath));
+    //console.log("[resize] filePath:", filePath, "| exists:", fs.existsSync(filePath));
     const inputBuffer = await fs.promises.readFile(filePath);
     const outputBuffer = await sharp(inputBuffer)
       .resize({ width: 600, withoutEnlargement: true })
