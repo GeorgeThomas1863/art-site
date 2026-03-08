@@ -2,6 +2,7 @@ import path from "path";
 import fs from "fs";
 
 import multer from "multer";
+import sharp from "sharp";
 
 import { fileURLToPath } from "url";
 import { dirname } from "path";
@@ -79,6 +80,20 @@ export const deletePic = async (filename) => {
 
   fs.unlinkSync(resolvedPath);
   return { success: true, message: "File deleted successfully" };
+};
+
+export const resizeNewsletterImage = async (filePath) => {
+  try {
+    console.log("[resize] filePath:", filePath, "| exists:", fs.existsSync(filePath));
+    const inputBuffer = await fs.promises.readFile(filePath);
+    const outputBuffer = await sharp(inputBuffer)
+      .resize({ width: 600, withoutEnlargement: true })
+      .toBuffer();
+    await fs.promises.writeFile(filePath, outputBuffer);
+  } catch (err) {
+    console.error("Newsletter image resize failed:", err.message);
+    // Non-fatal: original file still usable if resize fails
+  }
 };
 
 export { uploadDir };

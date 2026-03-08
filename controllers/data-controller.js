@@ -12,7 +12,7 @@ import {
 import { buildCart, getCartStats, addCartItem, updateCartItem, removeCartItem } from "../src/cart.js";
 import { fetchShippingRates, getShippingFromSession, clearShippingFromSession, updateSelectedRate } from "../src/shipping.js";
 import { placeNewOrder } from "../src/orders.js";
-import { deletePic } from "../src/upload-back.js";
+import { deletePic, resizeNewsletterImage } from "../src/upload-back.js";
 import {
   validateEmail,
   validateZip,
@@ -37,6 +37,10 @@ export const getEventDataControl = async (req, res) => {
 export const uploadPicControl = async (req, res) => {
   if (!req.file) {
     return res.status(400).json({ error: "No file uploaded" });
+  }
+
+  if (req.path === "/upload-newsletter-pic-route") {
+    await resizeNewsletterImage(req.file.path);
   }
 
   const data = {

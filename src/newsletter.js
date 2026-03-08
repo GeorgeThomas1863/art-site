@@ -89,6 +89,12 @@ export const dispatchNewsletter = async (inputParams) => {
       `$1${siteUrl}$2`
     );
   }
+  if (resolvedHtml) {
+    resolvedHtml = resolvedHtml.replace(
+      /<img\b(?![^>]*\bstyle=)/gi,
+      '<img style="max-width: 100%; height: auto; display: block;" width="600"'
+    );
+  }
 
   const subscriberArray = await getSubscribers();
   if (!subscriberArray || !subscriberArray.length) return { success: false, message: "No subscribers found" };
