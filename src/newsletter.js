@@ -28,9 +28,7 @@ export const storeSubscriber = async (email) => {
 };
 
 export const notifyAdminOfSubscription = async (email) => {
-  const to = [process.env.EMAIL_RECIPIENT_1, process.env.EMAIL_RECIPIENT_2]
-    .filter(Boolean)
-    .join(", ");
+  const to = [process.env.EMAIL_RECIPIENT_1, process.env.EMAIL_RECIPIENT_2].filter(Boolean).join(", ");
   if (!to) return;
   await sendMail({
     from: process.env.EMAIL_USER,
@@ -84,22 +82,13 @@ export const dispatchNewsletter = async (inputParams) => {
   const siteUrl = process.env.SITE_URL?.replace(/\/$/, "");
   let resolvedHtml = html;
   if (siteUrl && resolvedHtml) {
-    resolvedHtml = resolvedHtml.replace(
-      /(<img\b[^>]*\ssrc=["'])https?:\/\/[^/]+(\/images\/newsletter\/)/gi,
-      `$1${siteUrl}$2`
-    );
+    resolvedHtml = resolvedHtml.replace(/(<img\b[^>]*\ssrc=["'])https?:\/\/[^/]+(\/images\/newsletter\/)/gi, `$1${siteUrl}$2`);
   }
   if (resolvedHtml) {
-    resolvedHtml = resolvedHtml.replace(
-      /<img\b(?![^>]*\bstyle=)/gi,
-      '<img style="max-width: 100%; height: auto; display: block;" width="600"'
-    );
+    resolvedHtml = resolvedHtml.replace(/<img\b(?![^>]*\bstyle=)/gi, '<img style="max-width: 100%; height: auto; display: block;" width="600"');
   }
   if (resolvedHtml) {
-    resolvedHtml = resolvedHtml.replace(
-      /<p\b(?![^>]*\bstyle=)/gi,
-      '<p style="margin: 0 0 1em 0;"'
-    );
+    resolvedHtml = resolvedHtml.replace(/<p\b(?![^>]*\bstyle=)/gi, '<p style="margin: 0 0 1em 0;"');
   }
 
   const subscriberArray = await getSubscribers();
@@ -112,8 +101,8 @@ export const dispatchNewsletter = async (inputParams) => {
 
   const mailParams = {
     from: process.env.NEWSLETTER_FROM || process.env.EMAIL_USER,
-    to: process.env.EMAIL_USER,
-    bcc: emailList,
+    to: process.env.NEWSLETTER_FROM || process.env.EMAIL_USER,
+    bcc: [emailList, process.env.EMAIL_RECIPIENT_1, process.env.EMAIL_RECIPIENT_2].filter(Boolean).join(", "),
     subject: cleanSubject,
     html: resolvedHtml || undefined,
     text: message || "Please view this email in an HTML-capable client.",
