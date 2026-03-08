@@ -102,7 +102,7 @@ export const dispatchNewsletter = async (inputParams) => {
   const mailParams = {
     from: process.env.NEWSLETTER_FROM || process.env.EMAIL_USER,
     to: process.env.NEWSLETTER_FROM || process.env.EMAIL_USER,
-    bcc: [emailList, process.env.EMAIL_RECIPIENT_1, process.env.EMAIL_RECIPIENT_2].filter(Boolean).join(", "),
+    bcc: [...emailList, process.env.EMAIL_RECIPIENT_1, process.env.EMAIL_RECIPIENT_2].filter(Boolean).join(", "),
     subject: cleanSubject,
     html: resolvedHtml || undefined,
     text: message || "Please view this email in an HTML-capable client.",
