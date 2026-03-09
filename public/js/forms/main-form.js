@@ -1,4 +1,4 @@
-import { FACEBOOK_ICON_SVG, INSTAGRAM_ICON_SVG } from "../util/define-things.js";
+import { FACEBOOK_ICON_SVG, INSTAGRAM_ICON_SVG, TIKTOK_ICON_SVG } from "../util/define-things.js";
 // import { initMobileMenu } from "../util/collapse.js";
 
 // Main function to build and render the photography site
@@ -57,6 +57,14 @@ export const buildNavBar = async () => {
   const mobileSocialLi = document.createElement("li");
   mobileSocialLi.className = "mobile-social-row";
 
+  const mobileTiktokLink = document.createElement("a");
+  mobileTiktokLink.href = "https://www.tiktok.com/@twosistersfiberart";
+  mobileTiktokLink.target = "_blank";
+  mobileTiktokLink.rel = "noopener noreferrer";
+  mobileTiktokLink.className = "social-icon";
+  mobileTiktokLink.setAttribute("aria-label", "Visit our TikTok page");
+  mobileTiktokLink.innerHTML = TIKTOK_ICON_SVG;
+
   const mobileFbLink = document.createElement("a");
   mobileFbLink.href = "https://www.facebook.com/people/Two-Sisters-Fiber-Art/100087889424782";
   mobileFbLink.target = "_blank";
@@ -73,7 +81,7 @@ export const buildNavBar = async () => {
   mobileIgLink.setAttribute("aria-label", "Visit our Instagram page");
   mobileIgLink.innerHTML = INSTAGRAM_ICON_SVG;
 
-  mobileSocialLi.append(mobileFbLink, mobileIgLink);
+  mobileSocialLi.append(mobileTiktokLink, mobileFbLink, mobileIgLink);
   ul.appendChild(mobileSocialLi);
 
   const rightContainer = document.createElement("div");
@@ -104,9 +112,18 @@ export const buildNavBar = async () => {
   const socialContainer = document.createElement("div");
   socialContainer.className = "social-icons";
 
+  // TikTok icon
+  const tiktokLink = document.createElement("a");
+  tiktokLink.href = "https://www.tiktok.com/@twosistersfiberart";
+  tiktokLink.target = "_blank";
+  tiktokLink.rel = "noopener noreferrer";
+  tiktokLink.className = "social-icon";
+  tiktokLink.setAttribute("aria-label", "Visit our TikTok page");
+  tiktokLink.innerHTML = TIKTOK_ICON_SVG;
+
   // Facebook icon
   const facebookLink = document.createElement("a");
-  facebookLink.href = "https://www.facebook.com/people/Two-Sisters-Fiber-Art/100087889424782"; // Replace with actual URL
+  facebookLink.href = "https://www.facebook.com/people/Two-Sisters-Fiber-Art/100087889424782";
   facebookLink.target = "_blank";
   facebookLink.rel = "noopener noreferrer";
   facebookLink.className = "social-icon";
@@ -115,14 +132,14 @@ export const buildNavBar = async () => {
 
   // Instagram icon
   const instagramLink = document.createElement("a");
-  instagramLink.href = "https://www.instagram.com/twosistersfiberart"; // Replace with actual URL
+  instagramLink.href = "https://www.instagram.com/twosistersfiberart";
   instagramLink.target = "_blank";
   instagramLink.rel = "noopener noreferrer";
   instagramLink.className = "social-icon";
   instagramLink.setAttribute("aria-label", "Visit our Instagram page");
   instagramLink.innerHTML = INSTAGRAM_ICON_SVG;
 
-  socialContainer.append(facebookLink, instagramLink);
+  socialContainer.append(tiktokLink, facebookLink, instagramLink);
   rightContainer.append(cartLi, socialContainer);
 
   const hamburgerBtn = document.createElement("button");
