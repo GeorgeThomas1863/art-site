@@ -47,6 +47,8 @@ export const newsletterDisplay = (req, res) => {
   res.sendFile(path.join(__dirname, "../html/newsletter.html"));
 };
 
+let cachedProductsHtml = null;
+
 export const displayProductBySlug = async (req, res) => {
   const { slug } = req.params;
 
@@ -59,8 +61,10 @@ export const displayProductBySlug = async (req, res) => {
       return res.redirect("/products");
     }
 
-    const htmlPath = path.join(__dirname, "../html/products.html");
-    const htmlString = await fs.promises.readFile(htmlPath, "utf8");
+    if (!cachedProductsHtml) {
+      cachedProductsHtml = await fs.promises.readFile(path.join(__dirname, "../html/products.html"), "utf8");
+    }
+    const htmlString = cachedProductsHtml;
 
     const escapeHtml = (str) => String(str || "").replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
 
@@ -81,6 +85,14 @@ export const displayProductBySlug = async (req, res) => {
     }
 
     const modifiedHtml = htmlString.replace("</head>", ogTags + "\n</head>");
+
+    const etag = `"${slug}"`;
+    res.setHeader("Cache-Control", "public, max-age=0, must-revalidate");
+    res.setHeader("ETag", etag);
+
+    if (req.headers["if-none-match"] === etag) {
+      return res.status(304).end();
+    }
 
     return res.send(modifiedHtml);
   } catch (error) {

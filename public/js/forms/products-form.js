@@ -137,10 +137,10 @@ const buildCarouselElement = (pics, altText, isCard, startIndex = 0) => {
     const slide = document.createElement("img");
     slide.className = "carousel-slide";
     if (isCard) slide.setAttribute("data-label", "product-card-click");
+    if (isCard) slide.setAttribute("loading", "lazy");
     slide.src = `/images/products/${pics[i].filename}`;
     slide.alt = altText;
     slide.draggable = false;
-    if (isCard) slide.setAttribute("loading", "lazy");
     track.append(slide);
   }
 
@@ -184,8 +184,8 @@ export const buildProductImage = async (productData) => {
     productImage.className = "product-image";
     productImage.setAttribute("data-label", "product-card-click");
     productImage.alt = productData.name;
-    productImage.src = `/images/products/${pics[0].filename}`;
     productImage.setAttribute("loading", "lazy");
+    productImage.src = `/images/products/${pics[0].filename}`;
     return productImage;
   }
 
