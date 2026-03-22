@@ -94,6 +94,7 @@ export const clickHandler = async (e) => {
 
   if (clickType === "checkout-btn") window.location.href = "/checkout";
   if (clickType === "view-products-btn") window.location.href = "/products";
+  if (clickType === "view-newsletters-btn") window.location.href = "/newsletter";
   if (clickType === "place-order") await runPlaceOrder();
 
   if (clickType === "events-newsletter-checkbox") await runEventsNewsletterToggle(clickElement);

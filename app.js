@@ -1,12 +1,12 @@
+//way to edit / delete newsletters for admin
+
 // figure out the cloudflare problem and fix it
 
 //figure out how to receive email from mailgun through admin email
 
-//figure out how to get email to NOT go to spam
 
 //popup display of product category should be under add to cart?
 
-//RUN ANOTHER SECURITY AUDIT, specifically on USER INPUTS
 
 //-----------------
 

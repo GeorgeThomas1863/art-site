@@ -47,7 +47,16 @@ export const buildDashboardHeader = async () => {
   viewBtn.textContent = "View Products";
   viewBtn.setAttribute("data-label", "view-products-btn");
 
-  header.append(title, subtitle, viewBtn);
+  const viewNewslettersBtn = document.createElement("button");
+  viewNewslettersBtn.className = "btn";
+  viewNewslettersBtn.textContent = "View Newsletters";
+  viewNewslettersBtn.setAttribute("data-label", "view-newsletters-btn");
+
+  const headerActions = document.createElement("div");
+  headerActions.className = "header-actions";
+  headerActions.append(viewBtn, viewNewslettersBtn);
+
+  header.append(title, subtitle, headerActions);
 
   return header;
 };
