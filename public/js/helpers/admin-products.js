@@ -238,11 +238,19 @@ export const populateAdminProductSelector = async (inputArray) => {
     productSelector.append(defaultOption);
   }
 
-  // Sort: products with valid itemId first (alpha-numeric asc), then without (alpha by name)
+  // Sort: letter-prefix itemIds first (A→Z), then numeric-only itemIds (low→high), then no itemId (alpha by name)
   inputArray.sort((a, b) => {
     const aHasId = a.itemId != null && String(a.itemId).trim() !== "";
     const bHasId = b.itemId != null && String(b.itemId).trim() !== "";
-    if (aHasId && bHasId) return String(a.itemId).localeCompare(String(b.itemId), undefined, { numeric: true, sensitivity: 'base' });
+    if (aHasId && bHasId) {
+      const aStr = String(a.itemId);
+      const bStr = String(b.itemId);
+      const aIsAlpha = /^[a-zA-Z]/.test(aStr);
+      const bIsAlpha = /^[a-zA-Z]/.test(bStr);
+      if (aIsAlpha && !bIsAlpha) return -1;
+      if (!aIsAlpha && bIsAlpha) return 1;
+      return aStr.localeCompare(bStr, undefined, { numeric: true, sensitivity: 'base' });
+    }
     if (aHasId) return -1;
     if (bHasId) return 1;
     return a.name.localeCompare(b.name);
