@@ -1,5 +1,5 @@
 import { buildProductCard, buildCategoryDescription, buildProductDetailModal } from "../forms/products-form.js";
-import { preloadImage, needsContain } from "./rotate-pics.js";
+import { needsContain } from "./rotate-pics.js";
 
 //store locally for filtering
 let productsArray = [];
@@ -20,11 +20,14 @@ export const populateProducts = async (inputArray) => {
   // Clear existing products
   productsGrid.innerHTML = "";
 
-  // Build and append each product card
+  // Build all product cards in parallel
+  const cardPromises = [];
   for (let i = 0; i < inputArray.length; i++) {
-    const product = inputArray[i];
-    const productCard = await buildProductCard(product);
-    productsGrid.append(productCard);
+    cardPromises.push(buildProductCard(inputArray[i]));
+  }
+  const cards = await Promise.all(cardPromises);
+  for (let i = 0; i < cards.length; i++) {
+    productsGrid.append(cards[i]);
   }
 };
 
@@ -96,11 +99,14 @@ export const changeProductsFilterButton = async (clickElement) => {
 
   productsGrid.innerHTML = "";
 
-  // Build and append each filtered product card
+  // Build all filtered product cards in parallel
+  const cardPromises = [];
   for (let i = 0; i < filteredArray.length; i++) {
-    const product = filteredArray[i];
-    const productCard = await buildProductCard(product);
-    productsGrid.append(productCard);
+    cardPromises.push(buildProductCard(filteredArray[i]));
+  }
+  const cards = await Promise.all(cardPromises);
+  for (let i = 0; i < cards.length; i++) {
+    productsGrid.append(cards[i]);
   }
 
   await updateCategoryDescription(categoryFilter);
@@ -129,14 +135,13 @@ const openModalForProduct = async (productData, startIndex = 0) => {
   const productsElement = document.getElementById("products-element");
   productsElement.append(modal);
 
-  // Apply contain mode for single-image modal if aspect ratios mismatch
+  // Apply contain mode after image loads naturally — non-blocking
   const imgEl = modal.querySelector(".product-detail-image");
   if (imgEl) {
-    try {
-      const loaded = await preloadImage(imgEl.src);
+    imgEl.addEventListener('load', () => {
       const container = { offsetWidth: Math.min(window.innerWidth - 64, 700), offsetHeight: 500 };
-      if (needsContain(loaded, container)) imgEl.classList.add("contain-mode");
-    } catch { /* keep cover on error */ }
+      if (needsContain(imgEl, container)) imgEl.classList.add("contain-mode");
+    }, { once: true });
   }
 
   // Trigger reflow then add visible class for animation

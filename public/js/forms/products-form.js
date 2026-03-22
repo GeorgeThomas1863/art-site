@@ -137,7 +137,7 @@ const buildCarouselElement = (pics, altText, isCard, startIndex = 0) => {
     const slide = document.createElement("img");
     slide.className = "carousel-slide";
     if (isCard) slide.setAttribute("data-label", "product-card-click");
-    if (isCard) slide.setAttribute("loading", "lazy");
+    if (isCard || i !== startIndex) slide.setAttribute("loading", "lazy");
     slide.src = `/images/products/${pics[i].filename}`;
     slide.alt = altText;
     slide.draggable = false;
