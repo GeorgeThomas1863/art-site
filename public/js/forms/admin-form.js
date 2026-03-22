@@ -418,8 +418,8 @@ export const buildProductDetailsSection = async (mode) => {
     nameRow.querySelector('input').setAttribute('data-label', 'admin-product-name-input');
   }
 
-  // URL Slug Row
-  const slugRow = await buildInfoRow(mode, "url-name", "URL Slug");
+  // URL Ending Row
+  const slugRow = await buildInfoRow(mode, "url-name", "URL Ending");
 
   // Type Row
   const typeRow = await buildInfoRowSelect(mode, "product-type", "Type", [
@@ -438,7 +438,7 @@ export const buildProductDetailsSection = async (mode) => {
   // Description Row
   const descRow = await buildInfoRowTextarea(mode, "description", "Description");
 
-  section.append(header, itemIdRow, nameRow, slugRow, typeRow, priceRow, descRow);
+  section.append(header, itemIdRow, nameRow, typeRow, priceRow, descRow, slugRow);
 
   return section;
 };
