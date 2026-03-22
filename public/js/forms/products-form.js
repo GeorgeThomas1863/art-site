@@ -140,6 +140,7 @@ const buildCarouselElement = (pics, altText, isCard, startIndex = 0) => {
     slide.src = `/images/products/${pics[i].filename}`;
     slide.alt = altText;
     slide.draggable = false;
+    if (isCard) slide.setAttribute("loading", "lazy");
     track.append(slide);
   }
 
@@ -184,6 +185,7 @@ export const buildProductImage = async (productData) => {
     productImage.setAttribute("data-label", "product-card-click");
     productImage.alt = productData.name;
     productImage.src = `/images/products/${pics[0].filename}`;
+    productImage.setAttribute("loading", "lazy");
     return productImage;
   }
 
