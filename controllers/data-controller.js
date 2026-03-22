@@ -80,6 +80,7 @@ export const addNewProductControl = async (req, res) => {
   const safeParams = whitelistFields(inputParams, [
     "itemId",
     "name",
+    "urlName",
     "productType",
     "price",
     "canShip",
@@ -105,6 +106,7 @@ export const editProductControl = async (req, res) => {
   const safeParams = whitelistFields(inputParams, [
     "itemId",
     "name",
+    "urlName",
     "productType",
     "price",
     "canShip",

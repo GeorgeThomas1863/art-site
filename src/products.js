@@ -1,6 +1,17 @@
 // import CONFIG from "../config/config.js";
 import dbModel from "../models/db-model.js";
 
+const generateSlug = (name, productId = '') => {
+  const slug = (name || '')
+    .toLowerCase()
+    .replace(/[^a-z0-9\s-]/g, '')
+    .trim()
+    .replace(/\s+/g, '-')
+    .replace(/-+/g, '-')
+    .replace(/^-|-$/g, '');
+  return slug || `product-${productId}`;
+};
+
 export const storeProduct = async (inputParams) => {
   const { route: _, ...params } = inputParams;
 
@@ -20,6 +31,19 @@ export const storeProduct = async (inputParams) => {
   // console.log(newProductId);
 
   params.productId = newProductId;
+
+  // generate unique slug
+  let slug = generateSlug(params.name, newProductId);
+  let suffix = 2;
+  while (true) {
+    const slugCheckParams = { keyToLookup: 'urlName', itemValue: slug };
+    const slugCheckModel = new dbModel(slugCheckParams, process.env.PRODUCTS_COLLECTION);
+    const slugExists = await slugCheckModel.getUniqueItem();
+    if (!slugExists) break;
+    slug = generateSlug(params.name, newProductId) + '-' + suffix;
+    suffix++;
+  }
+  params.urlName = slug;
 
   const updateParams = {
     keyToLookup: "_id",
@@ -52,6 +76,19 @@ export const updateProduct = async (inputParams) => {
   if (!checkData) return { success: false, message: "Product not found" };
   // console.log("CHECK DATA");
   // console.log(checkData);
+
+  // check slug uniqueness if urlName is being updated
+  if ('urlName' in params) {
+    if (!params.urlName) {
+      return { success: false, message: "URL Slug cannot be empty." };
+    }
+    const slugConflictParams = { keyToLookup: 'urlName', itemValue: params.urlName };
+    const slugConflictModel = new dbModel(slugConflictParams, process.env.PRODUCTS_COLLECTION);
+    const slugConflict = await slugConflictModel.getUniqueItem();
+    if (slugConflict && slugConflict.productId !== params.productId) {
+      return { success: false, message: "URL slug already taken. Please choose a different one." };
+    }
+  }
 
   //otherwise update
   const editParams = {

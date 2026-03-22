@@ -12,7 +12,7 @@ import { buildConfirmOrderForm } from "./forms/confirm-form.js";
 import { buildNewsletterForm } from "./forms/newsletter-form.js";
 
 import { updateAdminStats } from "./helpers/admin-run.js";
-import { populateProducts, updateCategoryDescription } from "./helpers/products-run.js";
+import { populateProducts, updateCategoryDescription, openProductDetailModalBySlug } from "./helpers/products-run.js";
 import { populateEvents } from "./helpers/events-run.js";
 import { populateNewsletter } from "./helpers/newsletter-run.js";
 import { populateCart, updateNavbarCart } from "./helpers/cart-run.js";
@@ -71,6 +71,11 @@ export const buildProductsDisplay = async () => {
   await updateNavbarCart();
   const displayedProducts = productData ? productData.filter((p) => p.display !== "no") : [];
   await populateProducts(displayedProducts);
+
+  const pathParts = window.location.pathname.split('/').filter(Boolean);
+  if (pathParts.length === 2 && pathParts[0] === 'products' && pathParts[1]) {
+    await openProductDetailModalBySlug(pathParts[1]);
+  }
 
   await updateCategoryDescription("all");
 

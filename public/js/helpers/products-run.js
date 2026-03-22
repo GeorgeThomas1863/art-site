@@ -123,18 +123,8 @@ export const updateCategoryDescription = async (category) => {
   return true;
 };
 
-// Open product detail modal
-export const openProductDetailModal = async (clickElement) => {
-  const card = clickElement.closest(".product-card");
-  if (!card) return null;
-
-  const productId = card.getAttribute("data-product-id");
-  const productData = productsArray.find((p) => String(p.productId) === String(productId));
-  if (!productData) return null;
-
-  const cardCarousel = card.querySelector(".product-carousel");
-  const startIndex = cardCarousel ? getActiveIndex(cardCarousel) : 0;
-
+// Internal: build and show modal for a given product object
+const openModalForProduct = async (productData, startIndex = 0) => {
   const modal = await buildProductDetailModal(productData, startIndex);
   const productsElement = document.getElementById("products-element");
   productsElement.append(modal);
@@ -150,13 +140,45 @@ export const openProductDetailModal = async (clickElement) => {
   }
 
   // Trigger reflow then add visible class for animation
-  requestAnimationFrame(() => modal.classList.add("visible"));
+  requestAnimationFrame(() => {
+    modal.classList.add("visible");
+    if (productData.urlName) history.pushState(null, '', '/products/' + productData.urlName);
+  });
+};
+
+// Open product detail modal
+export const openProductDetailModal = async (clickElement) => {
+  const card = clickElement.closest(".product-card");
+  if (!card) return null;
+
+  const productId = card.getAttribute("data-product-id");
+  const productData = productsArray.find((p) => String(p.productId) === String(productId));
+  if (!productData) return null;
+
+  const cardCarousel = card.querySelector(".product-carousel");
+  const startIndex = cardCarousel ? getActiveIndex(cardCarousel) : 0;
+
+  await openModalForProduct(productData, startIndex);
+};
+
+// Open product detail modal by URL slug (for deep-link support)
+export const openProductDetailModalBySlug = async (slug) => {
+  let product = null;
+  for (let i = 0; i < productsArray.length; i++) {
+    if (productsArray[i].urlName === slug) {
+      product = productsArray[i];
+      break;
+    }
+  }
+  if (!product) return;
+  await openModalForProduct(product, 0);
 };
 
 // Close product detail modal
-export const closeProductDetailModal = async () => {
+export const closeProductDetailModal = async (updateHistory = true) => {
   const modal = document.querySelector(".product-detail-overlay");
   if (modal) modal.remove();
+  if (updateHistory) history.replaceState(null, '', '/products');
 };
 
 const goToSlide = (carousel, index) => {

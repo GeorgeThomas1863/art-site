@@ -20,6 +20,7 @@ import {
   display404,
   display500,
   display401,
+  displayProductBySlug,
 } from "../controllers/display-controller.js";
 
 import {
@@ -151,6 +152,8 @@ router.get("/newsletter", newsletterDisplay);
 router.get("/about", aboutDisplay);
 
 router.get("/products", productsDisplay);
+
+router.get("/products/:slug", displayProductBySlug);
 
 router.get("/", mainDisplay);
 

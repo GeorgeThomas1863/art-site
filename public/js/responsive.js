@@ -16,6 +16,16 @@ import { runAuthSubmit, runPwToggle } from "./auth.js";
 import { closePopup, closeConfirmDialog } from "./util/popup.js";
 import debounce from "./util/debounce.js";
 
+const generateSlug = (name) => {
+  return (name || '')
+    .toLowerCase()
+    .replace(/[^a-z0-9\s-]/g, '')
+    .trim()
+    .replace(/\s+/g, '-')
+    .replace(/-+/g, '-')
+    .replace(/^-|-$/g, '');
+};
+
 let touchStartX = null;
 let swipeHandled = false;
 let mouseStartX = null;
@@ -187,6 +197,7 @@ const debouncedCartZipShipping = debounce(runCalculateShipping);
 export const inputHandler = async (e) => {
   const inputElement = e.target;
   const inputId = inputElement.id;
+  const label = inputElement.getAttribute('data-label');
 
   // console.log("INPUT HANDLER");
   // console.log(inputId);
@@ -199,6 +210,12 @@ export const inputHandler = async (e) => {
   // Debounced shipping calculation when typing in cart zip field
   if (inputId === "cart-shipping-zip-input") {
     await debouncedCartZipShipping();
+  }
+
+  // Auto-generate URL slug from admin product name field
+  if (label === 'admin-product-name-input') {
+    const slugInput = document.getElementById('url-name');
+    if (slugInput) slugInput.value = generateSlug(e.target.value);
   }
 };
 
@@ -216,6 +233,7 @@ if (adminElement) {
   adminElement.addEventListener("click", clickHandler);
   adminElement.addEventListener("keydown", keyHandler);
   adminElement.addEventListener("change", changeHandler);
+  adminElement.addEventListener("input", inputHandler);
   // adminElement.addEventListener("click", overlayClickHandler);
 }
 
@@ -297,3 +315,8 @@ if (checkoutElement) {
   checkoutElement.addEventListener("click", clickHandler);
   checkoutElement.addEventListener("input", inputHandler);
 }
+
+window.addEventListener('popstate', async () => {
+  const modal = document.querySelector('.product-detail-overlay');
+  if (modal) await closeProductDetailModal(false);
+});

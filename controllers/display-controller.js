@@ -1,5 +1,7 @@
 import path from "path";
+import fs from "fs";
 import { fileURLToPath } from "url";
+import dbModel from "../models/db-model.js";
 
 // Get __dirname equivalent for ES modules
 const __filename = fileURLToPath(import.meta.url);
@@ -43,6 +45,48 @@ export const confirmOrderDisplay = (req, res) => {
 
 export const newsletterDisplay = (req, res) => {
   res.sendFile(path.join(__dirname, "../html/newsletter.html"));
+};
+
+export const displayProductBySlug = async (req, res) => {
+  const { slug } = req.params;
+
+  try {
+    const lookupParams = { keyToLookup: "urlName", itemValue: slug };
+    const productModel = new dbModel(lookupParams, process.env.PRODUCTS_COLLECTION);
+    const product = await productModel.getUniqueItem();
+
+    if (!product || product.display === "no") {
+      return res.redirect("/products");
+    }
+
+    const htmlPath = path.join(__dirname, "../html/products.html");
+    const htmlString = await fs.promises.readFile(htmlPath, "utf8");
+
+    const escapeHtml = (str) => String(str || "").replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
+
+    const description = (product.description || "").substring(0, 155);
+
+    const firstPic = Array.isArray(product.picData)
+      ? product.picData[0]?.filename
+      : product.picData?.filename;
+
+    let ogTags = `
+  <meta property="og:title" content="${escapeHtml(product.name)}" />
+  <meta property="og:description" content="${escapeHtml(description)}" />
+  <meta property="og:url" content="https://twosistersfiberart.com/products/${escapeHtml(slug)}" />
+  <meta property="og:type" content="website" />`;
+
+    if (firstPic) {
+      ogTags += `\n  <meta property="og:image" content="https://twosistersfiberart.com/images/products/${escapeHtml(firstPic)}" />`;
+    }
+
+    const modifiedHtml = htmlString.replace("</head>", ogTags + "\n</head>");
+
+    return res.send(modifiedHtml);
+  } catch (error) {
+    console.error("Error in displayProductBySlug:", error);
+    return res.redirect("/products");
+  }
 };
 
 //------------------
