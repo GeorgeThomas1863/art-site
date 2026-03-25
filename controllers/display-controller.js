@@ -78,7 +78,8 @@ export const displayProductBySlug = async (req, res) => {
   <meta property="og:title" content="${escapeHtml(product.name)}" />
   <meta property="og:description" content="${escapeHtml(description)}" />
   <meta property="og:url" content="https://twosistersfiberart.com/products/${escapeHtml(slug)}" />
-  <meta property="og:type" content="website" />`;
+  <meta property="og:type" content="website" />
+  <meta name="twitter:card" content="summary_large_image" />`;
 
     if (firstPic) {
       ogTags += `\n  <meta property="og:image" content="https://twosistersfiberart.com/images/products/${escapeHtml(firstPic)}" />`;
