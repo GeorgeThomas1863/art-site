@@ -364,6 +364,9 @@ export const populateEditFormProducts = async (inputObj) => {
     if (slotPlaceholder) slotPlaceholder.classList.add("hidden");
     if (slotDeleteBtn) slotDeleteBtn.classList.remove("hidden");
 
+    const slotEditBtn = slot.querySelector(".edit-image-btn");
+    if (slotEditBtn) slotEditBtn.classList.remove("hidden");
+
     slotsContainer.append(slot);
   }
   if (pics.length === 0) {

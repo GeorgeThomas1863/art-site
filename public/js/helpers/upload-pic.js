@@ -1,4 +1,5 @@
 import { sendToBack, sendToBackFile } from "../util/api-front.js";
+import { openImageEditor } from './image-editor.js';
 
 // SLOT-BASED UPLOAD FUNCTIONS (for multi-image products)
 
@@ -58,6 +59,9 @@ export const runSlotUploadPic = async (fileInput) => {
     if (deleteImageBtn) deleteImageBtn.classList.remove("hidden");
   }
 
+  const editBtn = slot.querySelector('.edit-image-btn');
+  if (editBtn) editBtn.classList.remove('hidden');
+
   return data;
 };
 
@@ -97,6 +101,70 @@ export const runDeleteSlotImage = async (deleteBtn) => {
   if (imagePlaceholder) imagePlaceholder.classList.remove("hidden");
   deleteBtn.classList.add("hidden");
   if (fileInput) fileInput.value = "";
+};
+
+export const runEditSlotImage = async (editBtn) => {
+  if (!editBtn) return null;
+  const slot = editBtn.closest('.pic-slot');
+  if (!slot) return null;
+  const uploadBtn = slot.querySelector('.upload-btn');
+  const previewImg = slot.querySelector('.current-image');
+  if (!uploadBtn || !previewImg) return null;
+  const src = previewImg.src;
+  if (!src || !uploadBtn.uploadData) return;
+  const oldFilename = uploadBtn.uploadData?.filename;
+
+  openImageEditor({
+    src,
+    onApply: async (blob) => {
+      const formData = new FormData();
+      formData.append('image', blob, 'edited-image.png');
+
+      const data = await sendToBackFile({ route: '/upload-product-pic-route', formData: formData });
+
+      if (!data || data === 'FAIL') throw new Error('Upload failed');
+
+      if (oldFilename) {
+        await sendToBack({ route: '/delete-pic-route', filename: oldFilename });
+      }
+
+      uploadBtn.uploadData = data;
+      previewImg.src = '/images/products/' + data.filename;
+    }
+  });
+};
+
+export const runEditUploadImage = async (editBtn) => {
+  if (!editBtn) return null;
+  const area = editBtn.closest('.image-upload-area');
+  if (!area) return null;
+  const uploadBtn = area.querySelector('.upload-btn');
+  const previewImg = area.querySelector('.current-image');
+  if (!uploadBtn || !previewImg) return null;
+  const src = previewImg.src;
+  if (!src || !uploadBtn.uploadData) return;
+  const oldFilename = uploadBtn.uploadData?.filename;
+  const entityType = uploadBtn.entityType;
+
+  openImageEditor({
+    src,
+    onApply: async (blob) => {
+      const route = entityType === 'products' ? '/upload-product-pic-route' : '/upload-event-pic-route';
+      const formData = new FormData();
+      formData.append('image', blob, 'edited-image.png');
+
+      const data = await sendToBackFile({ route: route, formData: formData });
+
+      if (!data || data === 'FAIL') throw new Error('Upload failed');
+
+      if (oldFilename) {
+        await sendToBack({ route: '/delete-pic-route', filename: oldFilename });
+      }
+
+      uploadBtn.uploadData = data;
+      previewImg.src = '/images/' + entityType + '/' + data.filename;
+    }
+  });
 };
 
 //PIC
@@ -154,6 +222,9 @@ export const runUploadPic = async (pic, mode = "add", entityType = "products") =
   uploadButton.textContent = "Change Image";
   uploadButton.disabled = false;
   uploadButton.uploadData = data;
+
+  const editBtn = uploadButton.parentElement.querySelector('.edit-image-btn');
+  if (editBtn) editBtn.classList.remove('hidden');
 
   // Show the image preview
   const currentImage = document.getElementById(currentImageId);

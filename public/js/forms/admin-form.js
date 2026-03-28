@@ -27,6 +27,8 @@ export const buildAdminForm = async () => {
 
   adminFormWrapper.append(dashboardHeader, productsSection, eventsSection, newsletterSection, statsWrapper);
 
+  document.body.appendChild(buildImageEditorModal());
+
   return adminFormWrapper;
 };
 
@@ -237,6 +239,82 @@ export const buildActionCard = async (mode, entityType) => {
 
   return card;
 };
+
+function buildImageEditorModal() {
+  const overlay = document.createElement('div');
+  overlay.className = 'modal-overlay';
+  overlay.id = 'image-editor-overlay';
+
+  const wrapper = document.createElement('div');
+  wrapper.className = 'modal-wrapper';
+
+  const header = document.createElement('div');
+  header.className = 'modal-header';
+  const title = document.createElement('h3');
+  title.className = 'modal-title';
+  title.textContent = 'Edit Image';
+  const closeBtn = document.createElement('button');
+  closeBtn.className = 'modal-close';
+  closeBtn.textContent = '×';
+  closeBtn.setAttribute('data-label', 'image-editor-cancel');
+  header.appendChild(title);
+  header.appendChild(closeBtn);
+
+  const canvasArea = document.createElement('div');
+  canvasArea.className = 'image-editor-canvas-area';
+  const img = document.createElement('img');
+  img.id = 'image-editor-img';
+  img.alt = 'Image to edit';
+  canvasArea.appendChild(img);
+
+  const toolbar = document.createElement('div');
+  toolbar.className = 'image-editor-toolbar';
+
+  const toolbarButtons = [
+    { label: 'image-editor-zoom-in',      text: '🔍+' },
+    { label: 'image-editor-zoom-out',     text: '🔍−' },
+    { label: 'image-editor-rotate-left',  text: '↺' },
+    { label: 'image-editor-rotate-right', text: '↻' },
+    { label: 'image-editor-flip-h',       text: '⇔' },
+    { label: 'image-editor-flip-v',       text: '↕' },
+  ];
+
+  for (let i = 0; i < toolbarButtons.length; i++) {
+    const btn = toolbarButtons[i];
+    const b = document.createElement('button');
+    b.type = 'button';
+    b.className = 'image-editor-btn';
+    b.setAttribute('data-label', btn.label);
+    b.textContent = btn.text;
+    toolbar.appendChild(b);
+  }
+
+  const actions = document.createElement('div');
+  actions.className = 'modal-actions';
+  const cancelBtn = document.createElement('button');
+  cancelBtn.type = 'button';
+  cancelBtn.className = 'btn-admin-cancel';
+  cancelBtn.setAttribute('data-label', 'image-editor-cancel');
+  cancelBtn.textContent = 'Cancel';
+  const applyBtn = document.createElement('button');
+  applyBtn.type = 'button';
+  applyBtn.className = 'btn-admin-submit';
+  applyBtn.setAttribute('data-label', 'image-editor-apply');
+  applyBtn.textContent = 'Apply';
+  actions.appendChild(cancelBtn);
+  actions.appendChild(applyBtn);
+
+  const content = document.createElement('div');
+  content.className = 'modal-content';
+  content.appendChild(canvasArea);
+  content.appendChild(toolbar);
+  content.appendChild(actions);
+
+  wrapper.appendChild(header);
+  wrapper.appendChild(content);
+  overlay.appendChild(wrapper);
+  return overlay;
+}
 
 //+++++++++++++++++++++++++++++++++++++
 
@@ -668,7 +746,13 @@ export const buildPicSlot = (index) => {
   removeSlotBtn.setAttribute("data-label", "remove-pic-slot");
   if (index === 0) removeSlotBtn.classList.add("hidden");
 
-  slot.append(imageDisplay, picInput, uploadBtn, uploadStatus, removeSlotBtn);
+  const editBtn = document.createElement('button');
+  editBtn.type = 'button';
+  editBtn.className = 'edit-image-btn hidden';
+  editBtn.setAttribute('data-label', 'edit-slot-image');
+  editBtn.textContent = 'Edit Image';
+
+  slot.append(imageDisplay, picInput, uploadBtn, uploadStatus, editBtn, removeSlotBtn);
 
   return slot;
 };
@@ -1113,7 +1197,13 @@ export const buildAdminUpload = async (mode, entityType = "products") => {
   uploadStatus.className = "upload-status";
   uploadStatus.style.display = "none";
 
-  uploadSection.append(imageDisplay, picInput, uploadButton, uploadStatus);
+  const editImageBtn = document.createElement('button');
+  editImageBtn.type = 'button';
+  editImageBtn.className = 'edit-image-btn hidden';
+  editImageBtn.setAttribute('data-label', 'edit-upload-image');
+  editImageBtn.textContent = 'Edit Image';
+
+  uploadSection.append(imageDisplay, picInput, uploadButton, uploadStatus, editImageBtn);
 
   return uploadSection;
 };

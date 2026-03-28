@@ -1,8 +1,9 @@
 import { runModalTrigger, runModalClose, runChangeStatusCard, updateAdminStats } from "./helpers/admin-run.js"; //prettier-ignore
 import { runAddNewProduct, runEditProduct, runDeleteProduct, changeAdminProductSelector, runAddPicSlot, runRemovePicSlot } from "./helpers/admin-products.js";
 import { runAddNewEvent, runEditEvent, runDeleteEvent, changeAdminEventSelector } from "./helpers/admin-events.js";
-import { runSendNewsletter, runSendTestNewsletter, runAddSubscriber, runRemoveSubscriber, runRefreshSubscriberList, changeAdminNewsletterSelector, runDeleteNewsletter, runUpdateNewsletter } from "./helpers/admin-newsletter.js";
-import { runUploadClick, runUploadPic, runDeleteUploadImage, runSlotUploadClick, runSlotUploadPic, runDeleteSlotImage } from "./helpers/upload-pic.js";
+import { runSendNewsletter, runSendTestNewsletter, runAddSubscriber, runRemoveSubscriber, runRefreshSubscriberList, changeAdminNewsletterSelector, runDeleteNewsletter, runUpdateNewsletter, handleQuillImageClick } from "./helpers/admin-newsletter.js";
+import { runUploadClick, runUploadPic, runDeleteUploadImage, runSlotUploadClick, runSlotUploadPic, runDeleteSlotImage, runEditSlotImage, runEditUploadImage } from "./helpers/upload-pic.js";
+import { closeImageEditor, applyImageEditor, zoomIn, zoomOut, rotateLeft, rotateRight, flipH, flipV } from "./helpers/image-editor.js";
 import { changeProductsFilterButton, openProductDetailModal, closeProductDetailModal, runProductCarouselDot, runCarouselPrev, runCarouselNext, advanceCarousel } from "./helpers/products-run.js";
 import { runContactSubmit } from "./helpers/contact-run.js";
 import { runEventsNewsletterToggle, runEventsNewsletterSubmit } from "./helpers/events-run.js";
@@ -55,6 +56,8 @@ export const clickHandler = async (e) => {
   // console.log("CLICK TYPE");
   // console.log(clickType);
 
+  if (e.target.tagName === 'IMG' && e.target.closest('.ql-editor')) { handleQuillImageClick(e.target); return; }
+
   if (clickType === "auth-submit") await runAuthSubmit();
   if (clickType === "pwToggle") await runPwToggle();
 
@@ -70,7 +73,18 @@ export const clickHandler = async (e) => {
 
   if (clickType === "slot-upload-click") await runSlotUploadClick(clickElement);
   if (clickType === "delete-slot-image") await runDeleteSlotImage(clickElement);
+  if (clickType === "edit-slot-image") await runEditSlotImage(clickElement);
+  if (clickType === "edit-upload-image") await runEditUploadImage(clickElement);
   if (clickType === "remove-pic-slot") await runRemovePicSlot(clickElement);
+
+  if (clickType === 'image-editor-cancel')       closeImageEditor();
+  if (clickType === 'image-editor-apply')        applyImageEditor();
+  if (clickType === 'image-editor-zoom-in')      zoomIn();
+  if (clickType === 'image-editor-zoom-out')     zoomOut();
+  if (clickType === 'image-editor-rotate-left')  rotateLeft();
+  if (clickType === 'image-editor-rotate-right') rotateRight();
+  if (clickType === 'image-editor-flip-h')       flipH();
+  if (clickType === 'image-editor-flip-v')       flipV();
   if (clickType === "add-pic-slot") await runAddPicSlot();
   if (clickType === "product-carousel-dot") await runProductCarouselDot(clickElement);
   if (clickType === "carousel-prev") await runCarouselPrev(clickElement);
@@ -129,6 +143,10 @@ export const clickHandler = async (e) => {
 
 export const keyHandler = async (e) => {
   if (e.key === "Escape") {
+    if (document.getElementById('image-editor-overlay')?.classList.contains('visible')) {
+      closeImageEditor();
+      return;
+    }
     await closeProductDetailModal();
     return;
   }

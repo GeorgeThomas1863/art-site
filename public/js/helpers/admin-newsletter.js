@@ -201,6 +201,7 @@
 import { sendToBack, sendToBackFile } from "../util/api-front.js";
 import { displayPopup, displayConfirmDialog } from "../util/popup.js";
 import { updateSubscriberStats } from "./admin-run.js";
+import { openImageEditor } from "./image-editor.js";
 
 // ─── Quill instance — module-scoped so runSendNewsletter can read it ──────────
 let quillInstance = null;
@@ -300,24 +301,50 @@ const runNewsletterImageUpload = async (fileInput) => {
   const formData = new FormData();
   formData.append("image", file);
 
-  const data = await sendToBackFile({
+  const result = await sendToBackFile({
     route: "/upload-newsletter-pic-route",
     formData,
   });
 
   fileInput.value = ""; // reset so same file can be re-selected if needed
 
-  if (!data || data === "FAIL" || !data.filename) {
+  if (!result || result === "FAIL" || !result.filename) {
     await displayPopup("Image upload failed", "error");
     return;
   }
 
-  const imageUrl = `${window.location.origin}/images/newsletter/${data.filename}`;
-  const range = quillInstance.getSelection(true);
-  const sizeBefore = quillInstance.getFormat(range.index).size || null;
-  quillInstance.insertEmbed(range.index, "image", imageUrl);
-  quillInstance.setSelection(range.index + 1); // advance cursor past image
-  if (sizeBefore) quillInstance.format("size", sizeBefore);
+  // Save cursor position before opening Cropper
+  const cursorIndex = quillInstance.getSelection()?.index ?? 0;
+
+  openImageEditor({
+    src: `/images/newsletter/${result.filename}`,
+    onApply: async (blob) => {
+      const insertIndex = quillInstance?.getSelection()?.index ?? cursorIndex;
+      if (!quillInstance) return;
+      // Upload the cropped blob
+      const cropFormData = new FormData();
+      cropFormData.append("image", blob);
+
+      const newResult = await sendToBackFile({
+        route: "/upload-newsletter-pic-route",
+        formData: cropFormData,
+      });
+
+      if (!newResult || newResult === "FAIL" || !newResult.filename) {
+        await displayPopup("Image upload failed", "error");
+        return;
+      }
+
+      // Delete the original uploaded file
+      await sendToBack({ route: "/delete-pic-route", filename: result.filename });
+
+      // Insert the cropped image into Quill
+      const sizeBefore = quillInstance.getFormat(insertIndex).size || null;
+      quillInstance.insertEmbed(insertIndex, "image", `/images/newsletter/${newResult.filename}`);
+      quillInstance.setSelection(insertIndex + 1);
+      if (sizeBefore) quillInstance.format("size", sizeBefore);
+    },
+  });
 };
 
 // ─── Send newsletter ──────────────────────────────────────────────────────────
@@ -630,6 +657,39 @@ export const runUpdateNewsletter = async () => {
 
   return data;
 };
+
+// ─── Click-to-edit existing Quill image ──────────────────────────────────────
+
+export async function handleQuillImageClick(imgElement) {
+  if (!quillInstance) return;
+  const src = imgElement.src;
+  const filename = src.split("/").pop();
+
+  openImageEditor({
+    src,
+    onApply: async (blob) => {
+      // Upload the cropped blob
+      const cropFormData = new FormData();
+      cropFormData.append("image", blob);
+
+      const newResult = await sendToBackFile({
+        route: "/upload-newsletter-pic-route",
+        formData: cropFormData,
+      });
+
+      if (!newResult || newResult === "FAIL" || !newResult.filename) {
+        await displayPopup("Image upload failed", "error");
+        return;
+      }
+
+      // Delete the original file
+      await sendToBack({ route: "/delete-pic-route", filename });
+
+      // Update the image element in place
+      imgElement.src = `/images/newsletter/${newResult.filename}`;
+    },
+  });
+}
 
 // ─── Init Quill for edit mode ─────────────────────────────────────────────────
 

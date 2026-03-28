@@ -216,6 +216,12 @@ export const populateEditFormEvents = async (inputObj) => {
   const deleteImageBtn = document.getElementById("edit-delete-image-btn");
   if (deleteImageBtn) deleteImageBtn.style.display = "block";
 
+  const uploadArea = editUploadButton.closest('.image-upload-area');
+  if (uploadArea) {
+    const editBtn = uploadArea.querySelector('.edit-image-btn');
+    if (editBtn) editBtn.classList.remove('hidden');
+  }
+
   const placeholder = currentImagePreview.querySelector(".image-placeholder");
   if (placeholder) placeholder.style.display = "none";
 
