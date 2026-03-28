@@ -129,9 +129,13 @@ export const buildNewsletterSection = async () => {
   actionCards.className = "action-cards";
 
   const writeCard = await buildActionCard("write", "newsletter");
-  const editCard = await buildActionCard("edit", "newsletter");
+  const manageCard = await buildActionCard("edit", "newsletter");
+  const mailingListCard = await buildActionCard("edit", "mailinglist");
 
-  actionCards.append(writeCard, editCard);
+  writeCard.classList.add("action-card-tall");
+  manageCard.classList.add("action-card-compact");
+  mailingListCard.classList.add("action-card-compact");
+  actionCards.append(writeCard, manageCard, mailingListCard);
 
   const collapseContainer = await buildCollapseContainer({
     titleElement: title,
@@ -191,7 +195,9 @@ export const buildActionCard = async (mode, entityType) => {
   icon.className = "action-icon";
 
   if (entityType === "newsletter") {
-    icon.textContent = mode === "write" ? "✍️" : "📝";
+    icon.textContent = mode === "write" ? "✍️" : "🗂️";
+  } else if (entityType === "mailinglist") {
+    icon.textContent = "📝";
   } else {
     icon.textContent = mode === "add" ? "➕" : "✏️";
   }
@@ -205,8 +211,11 @@ export const buildActionCard = async (mode, entityType) => {
   let descText;
 
   if (entityType === "newsletter") {
-    titleText = mode === "write" ? "Write Newsletter" : "Edit Mailing List";
-    descText = mode === "write" ? "Compose and send a newsletter to all subscribers" : "Add or remove email addresses from your mailing list";
+    titleText = mode === "write" ? "Write Newsletter" : "Edit Newsletter";
+    descText = mode === "write" ? "Compose and send a newsletter to all subscribers" : "View, edit, or delete previously sent newsletters";
+  } else if (entityType === "mailinglist") {
+    titleText = "Edit Mailing List";
+    descText = "Add or remove email addresses from your mailing list";
   } else {
     entityName = entityType === "products" ? "Product" : "Event";
     titleText = mode === "add" ? `Add New ${entityName}` : `Edit ${entityName}`;
@@ -265,7 +274,9 @@ export const buildModalHeader = async (mode, entityType) => {
 
   let titleText;
   if (entityType === "newsletter") {
-    titleText = mode === "write" ? "WRITE NEWSLETTER" : "EDIT MAILING LIST";
+    titleText = mode === "write" ? "WRITE NEWSLETTER" : "EDIT NEWSLETTER";
+  } else if (entityType === "mailinglist") {
+    titleText = "EDIT MAILING LIST";
   } else {
     const entityName = entityType === "products" ? "PRODUCT" : "EVENT";
     titleText = mode === "add" ? `ADD NEW ${entityName}` : `EDIT ${entityName}`;
@@ -290,22 +301,29 @@ export const buildModalBody = async (mode, entityType) => {
   body.className = "modal-body";
 
   // Add selector for edit mode
-  if (mode === "edit" && entityType !== "newsletter") {
+  if (mode === "edit" && (entityType === "products" || entityType === "events")) {
     const selector = entityType === "products" ? await buildAdminProductSelector() : await buildAdminEventSelector();
     body.append(selector);
   }
 
-  if (entityType === "newsletter") {
-    if (mode === "write") {
-      const subjectField = await buildNewsletterSubject();
-      const messageField = await buildNewsletterMessage();
-      body.append(subjectField, messageField);
-      return body;
-    } else if (mode === "edit") {
-      const mailingListSection = await buildMailingListSection();
-      body.append(mailingListSection);
-      return body;
-    }
+  if (entityType === "newsletter" && mode === "write") {
+    const subjectField = await buildNewsletterSubject();
+    const messageField = await buildNewsletterMessage();
+    body.append(subjectField, messageField);
+    return body;
+  }
+
+  if (entityType === "newsletter" && mode === "edit") {
+    const selector = await buildAdminNewsletterSelector();
+    const editorSection = await buildEditNewsletterSection();
+    body.append(selector, editorSection);
+    return body;
+  }
+
+  if (entityType === "mailinglist") {
+    const mailingListSection = await buildMailingListSection();
+    body.append(mailingListSection);
+    return body;
   }
 
   // Build form fields based on entity type - NEW SECTIONED LAYOUT
@@ -340,14 +358,22 @@ export const buildModalActions = async (mode, entityType) => {
   actions.className = "modal-actions";
 
   // Delete button for edit mode
-  if (mode === "edit" && entityType !== "newsletter") {
+  if (mode === "edit" && (entityType === "products" || entityType === "events" || entityType === "newsletter")) {
     const deleteButton = document.createElement("button");
     deleteButton.className = "btn btn-admin-delete";
     deleteButton.type = "button";
-    deleteButton.id = entityType === "products" ? "delete-product-button" : "delete-event-button";
+    if (entityType === "products") {
+      deleteButton.id = "delete-product-button";
+      deleteButton.setAttribute("data-label", "delete-product-submit");
+    } else if (entityType === "events") {
+      deleteButton.id = "delete-event-button";
+      deleteButton.setAttribute("data-label", "delete-event-submit");
+    } else {
+      deleteButton.id = "delete-newsletter-button";
+      deleteButton.setAttribute("data-label", "delete-newsletter-submit");
+    }
     deleteButton.textContent = "Delete";
     deleteButton.disabled = true;
-    deleteButton.setAttribute("data-label", entityType === "products" ? "delete-product-submit" : "delete-event-submit");
     actions.append(deleteButton);
   }
 
@@ -355,7 +381,7 @@ export const buildModalActions = async (mode, entityType) => {
   const cancelButton = document.createElement("button");
   cancelButton.className = "btn btn-admin-cancel";
   cancelButton.type = "button";
-  cancelButton.textContent = entityType === "newsletter" && mode === "edit" ? "Done" : "Cancel";
+  cancelButton.textContent = entityType === "mailinglist" ? "Done" : "Cancel";
   cancelButton.setAttribute("data-label", `close-modal-${mode}-${entityType}`);
 
   // Submit button
@@ -367,10 +393,18 @@ export const buildModalActions = async (mode, entityType) => {
   let submitLabel;
   let submitText;
 
-  if (entityType === "newsletter") {
-    submitId = mode === "write" ? "send-newsletter-button" : "save-mailing-list-button";
-    submitLabel = mode === "write" ? "send-newsletter-submit" : "save-mailing-list-submit";
-    submitText = mode === "write" ? "Send Newsletter" : "Save Changes";
+  if (entityType === "newsletter" && mode === "write") {
+    submitId = "send-newsletter-button";
+    submitLabel = "send-newsletter-submit";
+    submitText = "Send Newsletter";
+  } else if (entityType === "newsletter" && mode === "edit") {
+    submitId = "edit-newsletter-submit-button";
+    submitLabel = "edit-newsletter-submit";
+    submitText = "Update";
+  } else if (entityType === "mailinglist") {
+    submitId = "save-mailing-list-button";
+    submitLabel = "save-mailing-list-submit";
+    submitText = "Save Changes";
   } else if (entityType === "products") {
     submitId = mode === "add" ? "submit-button" : "edit-submit-button";
     submitLabel = mode === "add" ? "new-product-submit" : "edit-product-submit";
@@ -384,11 +418,11 @@ export const buildModalActions = async (mode, entityType) => {
   submitButton.textContent = submitText;
   submitButton.setAttribute("data-label", submitLabel);
 
-  if (mode === "edit" && entityType !== "newsletter") {
+  if (mode === "edit" && (entityType === "products" || entityType === "events" || entityType === "newsletter")) {
     submitButton.disabled = true;
   }
 
-  if (entityType === "newsletter" && mode === "edit") {
+  if (entityType === "mailinglist") {
     actions.append(cancelButton);
   } else {
     actions.append(cancelButton, submitButton);
@@ -962,6 +996,45 @@ export const buildAdminEventSelector = async () => {
   selectorWrapper.append(selectorLabel, eventSelect);
 
   return selectorWrapper;
+};
+
+export const buildAdminNewsletterSelector = async () => {
+  const selectorWrapper = document.createElement("li");
+  selectorWrapper.className = "form-field product-selector-field";
+
+  const newsletterSelect = document.createElement("select");
+  newsletterSelect.className = "form-select";
+  newsletterSelect.id = "newsletter-archive-selector";
+  newsletterSelect.name = "newsletter-archive-selector";
+
+  const defaultOption = document.createElement("option");
+  defaultOption.value = "";
+  defaultOption.textContent = "-- Select a newsletter --";
+  defaultOption.selected = true;
+  defaultOption.disabled = true;
+  newsletterSelect.append(defaultOption);
+
+  selectorWrapper.append(newsletterSelect);
+
+  return selectorWrapper;
+};
+
+export const buildEditNewsletterSection = async () => {
+  const section = document.createElement("div");
+  section.className = "newsletter-message-field";
+
+  const editorContainer = document.createElement("div");
+  editorContainer.id = "edit-newsletter-quill-editor";
+
+  const fileInput = document.createElement("input");
+  fileInput.type = "file";
+  fileInput.id = "edit-newsletter-image-file-input";
+  fileInput.accept = "image/*";
+  fileInput.className = "hidden";
+
+  section.append(editorContainer, fileInput);
+
+  return section;
 };
 
 //+++++++++++++++++++

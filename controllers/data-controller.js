@@ -8,6 +8,8 @@ import {
   dispatchNewsletter,
   notifyAdminOfSubscription,
   getNewsletters,
+  deleteNewsletter,
+  updateNewsletter,
 } from "../src/newsletter.js";
 import { buildCart, getCartStats, addCartItem, updateCartItem, removeCartItem } from "../src/cart.js";
 import { fetchShippingRates, getShippingFromSession, clearShippingFromSession, updateSelectedRate } from "../src/shipping.js";
@@ -358,5 +360,25 @@ export const removeSubscriberControl = async (req, res) => {
 
 export const getNewsletterArchiveControl = async (req, res) => {
   const data = await getNewsletters();
+  return res.json(data);
+};
+
+export const deleteNewsletterControl = async (req, res) => {
+  if (!req || !req.body) return res.status(400).json({ error: "No input parameters" });
+  const { id } = req.body;
+  if (!id || typeof id !== "string") return res.status(400).json({ error: "Invalid newsletter ID" });
+  const data = await deleteNewsletter(id);
+  if (!data || !data.success) return res.status(500).json({ error: data?.message || "Failed to delete newsletter" });
+  return res.json(data);
+};
+
+export const updateNewsletterControl = async (req, res) => {
+  if (!req || !req.body) return res.status(400).json({ error: "No input parameters" });
+  const { id, html } = req.body;
+  if (!id || typeof id !== "string") return res.status(400).json({ error: "Invalid newsletter ID" });
+  const safeHtml = validateString(html, 200000);
+  if (!safeHtml) return res.status(400).json({ error: "No content provided" });
+  const data = await updateNewsletter(id, safeHtml);
+  if (!data || !data.success) return res.status(500).json({ error: data?.message || "Failed to update newsletter" });
   return res.json(data);
 };

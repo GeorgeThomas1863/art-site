@@ -1,7 +1,6 @@
-import { initQuill, resetQuill } from "./admin-newsletter.js";
+import { initQuill, resetQuill, populateAdminNewsletterSelector, initEditQuill, populateSubscriberList } from "./admin-newsletter.js";
 import { populateAdminProductSelector } from "./admin-products.js";
 import { populateAdminEventSelector } from "./admin-events.js";
-import { populateSubscriberList } from "./admin-newsletter.js";
 // import { ADMIN_EDIT_DEFAULT_ARRAY } from "../util/define-things.js";
 import { sendToBack } from "../util/api-front.js";
 import { buildModal } from "../forms/admin-form.js";
@@ -52,7 +51,7 @@ export const runModalTrigger = async (clickElement) => {
     }
   }
 
-  if (mode === "edit" && entityType === "newsletter") {
+  if (mode === "edit" && entityType === "mailinglist") {
     const subscriberData = await sendToBack({ route: "/newsletter/data" }, "GET");
     if (subscriberData) {
       await populateSubscriberList(subscriberData);
@@ -60,10 +59,21 @@ export const runModalTrigger = async (clickElement) => {
     }
   }
 
+  if (mode === "edit" && entityType === "newsletter") {
+    const newsletterData = await sendToBack({ route: "/newsletter/archive" }, "GET");
+    if (newsletterData && newsletterData.length) {
+      await populateAdminNewsletterSelector(newsletterData);
+    }
+  }
+
   modal.classList.add("visible");
 
   if (mode === "write" && entityType === "newsletter") {
     initQuill();
+  }
+
+  if (mode === "edit" && entityType === "newsletter") {
+    initEditQuill();
   }
 
   return true;

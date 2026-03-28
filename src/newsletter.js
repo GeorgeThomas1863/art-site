@@ -1,3 +1,5 @@
+import { ObjectId } from "mongodb";
+import { dbGet } from "../middleware/db-config.js";
 import { sendMail } from "./mailer.js";
 import { sanitizeEmailHeader } from "./sanitize.js";
 import dbModel from "../models/db-model.js";
@@ -124,5 +126,31 @@ export const dispatchNewsletter = async (inputParams) => {
   } catch (e) {
     console.error("EMAIL ERROR:", e.data?.message || e.message || "Unknown error");
     return { success: false, message: "Failed to send newsletter" };
+  }
+};
+
+export const deleteNewsletter = async (id) => {
+  if (!id || typeof id !== "string") return { success: false, message: "No ID provided" };
+  try {
+    const result = await dbGet().collection(process.env.NEWSLETTER_COLLECTION).deleteOne({ _id: new ObjectId(id) });
+    if (!result || result.deletedCount === 0) return { success: false, message: "Newsletter not found" };
+    return { success: true, message: "Newsletter deleted successfully" };
+  } catch (e) {
+    return { success: false, message: "Invalid newsletter ID" };
+  }
+};
+
+export const updateNewsletter = async (id, html) => {
+  if (!id || typeof id !== "string") return { success: false, message: "No ID provided" };
+  if (!html || typeof html !== "string") return { success: false, message: "No content provided" };
+  try {
+    const result = await dbGet().collection(process.env.NEWSLETTER_COLLECTION).updateOne(
+      { _id: new ObjectId(id) },
+      { $set: { html } }
+    );
+    if (!result || result.matchedCount === 0) return { success: false, message: "Newsletter not found" };
+    return { success: true, message: "Newsletter updated successfully" };
+  } catch (e) {
+    return { success: false, message: "Invalid newsletter ID" };
   }
 };

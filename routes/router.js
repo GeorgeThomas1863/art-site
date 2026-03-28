@@ -52,6 +52,8 @@ import {
   sendNewsletterControl,
   removeSubscriberControl,
   getNewsletterArchiveControl,
+  deleteNewsletterControl,
+  updateNewsletterControl,
 } from "../controllers/data-controller.js";
 
 const router = express.Router();
@@ -124,6 +126,8 @@ router.post("/newsletter/send", requireAuth, sendNewsletterControl);
 router.post("/newsletter/remove", requireAuth, removeSubscriberControl);
 
 router.get("/newsletter/archive", getNewsletterArchiveControl);
+router.post("/newsletter/delete", requireAuth, deleteNewsletterControl);
+router.post("/newsletter/update", requireAuth, updateNewsletterControl);
 
 //ORDER ROUTES
 router.post("/checkout/place-order", placeOrderControl);

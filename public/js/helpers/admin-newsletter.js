@@ -478,3 +478,191 @@ export const runRefreshSubscriberList = async () => {
   await updateSubscriberStats(subscriberData);
   return true;
 };
+
+// ─── Newsletter archive selector ──────────────────────────────────────────────
+
+export const populateAdminNewsletterSelector = async (newsletters) => {
+  const selector = document.getElementById("newsletter-archive-selector");
+  if (!selector) return null;
+
+  // Remove all options except the default first one
+  while (selector.options.length > 1) {
+    selector.remove(1);
+  }
+
+  for (let i = 0; i < newsletters.length; i++) {
+    const newsletter = newsletters[i];
+    const option = document.createElement("option");
+    option.value = newsletter.id;
+
+    const subject = newsletter.subject && newsletter.subject.length > 50
+      ? newsletter.subject.slice(0, 50) + "\u2026"
+      : newsletter.subject || "(No Subject)";
+    const sentDate = newsletter.sentAt ? new Date(newsletter.sentAt).toLocaleDateString("en-US", { year: "numeric", month: "short", day: "numeric" }) : "";
+    option.textContent = sentDate ? `${subject} \u2014 ${sentDate}` : subject;
+
+    option.newsletterData = newsletter;
+    selector.append(option);
+  }
+
+  return true;
+};
+
+// ─── Newsletter selector change ───────────────────────────────────────────────
+
+export const changeAdminNewsletterSelector = async (changeElement) => {
+  if (!changeElement) return null;
+
+  const selectedOption = changeElement.options[changeElement.selectedIndex];
+  if (!selectedOption || !selectedOption.newsletterData) return null;
+
+  const newsletter = selectedOption.newsletterData;
+
+  if (quillInstance) {
+    quillInstance.clipboard.dangerouslyPasteHTML(newsletter.html || "");
+  }
+
+  changeElement.newsletterId = newsletter.id;
+  changeElement.originalHtml = newsletter.html || "";
+
+  const deleteButton = document.getElementById("delete-newsletter-button");
+  const updateButton = document.getElementById("edit-newsletter-submit-button");
+  if (deleteButton) deleteButton.disabled = false;
+  if (updateButton) updateButton.disabled = false;
+
+  return true;
+};
+
+// ─── Delete newsletter ────────────────────────────────────────────────────────
+
+export const runDeleteNewsletter = async () => {
+  const selector = document.getElementById("newsletter-archive-selector");
+  const id = selector ? selector.newsletterId : null;
+  if (!id) {
+    await displayPopup("No newsletter selected", "error");
+    return null;
+  }
+
+  const confirmed = await displayConfirmDialog("Delete this newsletter from the archive?");
+  if (!confirmed) return null;
+
+  const data = await sendToBack({ route: "/newsletter/delete", id });
+  if (!data || !data.success) {
+    await displayPopup("Failed to delete newsletter", "error");
+    return null;
+  }
+
+  await displayPopup("Newsletter deleted", "success");
+  const modal = document.querySelector(".modal-overlay");
+  if (modal) modal.remove();
+
+  return data;
+};
+
+// ─── Update newsletter ────────────────────────────────────────────────────────
+
+export const runUpdateNewsletter = async () => {
+  const selector = document.getElementById("newsletter-archive-selector");
+  const id = selector ? selector.newsletterId : null;
+  if (!id) {
+    await displayPopup("No newsletter selected", "error");
+    return null;
+  }
+
+  if (!quillInstance) {
+    await displayPopup("Editor not ready", "error");
+    return null;
+  }
+
+  const html = quillInstance.root.innerHTML;
+  if (!html || quillInstance.getText().trim().length === 0) {
+    await displayPopup("Please enter content", "error");
+    return null;
+  }
+
+  if (html === selector.originalHtml) return null;
+
+  const data = await sendToBack({ route: "/newsletter/update", id, html });
+  if (!data || !data.success) {
+    await displayPopup("Failed to update newsletter", "error");
+    return null;
+  }
+
+  await displayPopup("Newsletter updated", "success");
+  const modal = document.querySelector(".modal-overlay");
+  if (modal) modal.remove();
+
+  return data;
+};
+
+// ─── Init Quill for edit mode ─────────────────────────────────────────────────
+
+export const initEditQuill = () => {
+  const editorEl = document.getElementById("edit-newsletter-quill-editor");
+  if (!editorEl || typeof Quill === "undefined") return;
+
+  const SizeStyle = Quill.import("attributors/style/size");
+  SizeStyle.whitelist = ["12px", "14px", "16px", "18px", "20px", "22px", "24px", "26px", "28px", "30px", "32px", "34px", "36px", "38px", "40px"];
+  Quill.register(SizeStyle, true);
+
+  quillInstance = new Quill("#edit-newsletter-quill-editor", {
+    theme: "snow",
+    placeholder: "Newsletter content will appear here after selecting a newsletter...",
+    modules: {
+      toolbar: {
+        container: [
+          [{ size: [false, "12px", "14px", "16px", "18px", "20px", "22px", "24px", "26px", "28px", "30px", "32px", "34px", "36px", "38px", "40px"] }],
+          ["bold", "italic", "underline"],
+          [{ list: "ordered" }, { list: "bullet" }],
+          ["link", "image"],
+        ],
+        handlers: {
+          image: () => {
+            document.getElementById("edit-newsletter-image-file-input")?.click();
+          },
+        },
+      },
+      keyboard: {
+        bindings: {
+          enterPreserveSize: {
+            key: "Enter",
+            handler: function (range, context) {
+              const size = context.format.size;
+              const quill = this.quill;
+              setTimeout(() => {
+                if (size) quill.format("size", size);
+              }, 0);
+              return true;
+            },
+          },
+        },
+      },
+    },
+  });
+
+  const fileInput = document.getElementById("edit-newsletter-image-file-input");
+  if (fileInput) {
+    fileInput.addEventListener("change", () => runNewsletterImageUpload(fileInput));
+  }
+
+  const toolbarEl = quillInstance.getModule("toolbar").container;
+  const buttonTitles = [
+    [".ql-bold", "Bold"],
+    [".ql-italic", "Italic"],
+    [".ql-underline", "Underline"],
+    [".ql-link", "Insert Link"],
+    [".ql-image", "Insert Image"],
+    [".ql-clean", "Remove Formatting"],
+    ['.ql-list[value="ordered"]', "Numbered List"],
+    ['.ql-list[value="bullet"]', "Bullet List"],
+  ];
+  for (let i = 0; i < buttonTitles.length; i++) {
+    const el = toolbarEl.querySelector(buttonTitles[i][0]);
+    if (el) el.title = buttonTitles[i][1];
+  }
+  const pickerLabels = toolbarEl.querySelectorAll(".ql-picker-label");
+  const pickerTitles = ["Font Size"];
+  for (let i = 0; i < pickerLabels.length; i++) {
+    if (pickerTitles[i]) pickerLabels[i].title = pickerTitles[i];
+  }
+};
