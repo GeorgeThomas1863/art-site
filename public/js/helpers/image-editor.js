@@ -33,10 +33,10 @@ export function openImageEditor({ src, onApply }) {
     });
   }
 
+  img.onload = null;
+  img.src = '';
   img.onload = initCropper;
   img.src = src;
-  // If the browser cached the image, onload won't fire — trigger manually
-  if (img.complete && img.naturalWidth > 0) initCropper();
 
   overlay.classList.add('visible');
 }
