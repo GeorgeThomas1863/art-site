@@ -6,6 +6,7 @@ import {
   getSubscribers,
   deleteSubscriber,
   dispatchNewsletter,
+  sendTestNewsletter,
   notifyAdminOfSubscription,
   getNewsletters,
   deleteNewsletter,
@@ -346,6 +347,14 @@ export const sendNewsletterControl = async (req, res) => {
   const data = await dispatchNewsletter(req.body);
   if (!data || !data.success) return res.status(500).json({ error: "Failed to send newsletter" });
 
+  return res.json(data);
+};
+
+export const sendTestNewsletterControl = async (req, res) => {
+  if (!req || !req.body) return res.status(500).json({ error: "No input parameters" });
+  if (!req.body.message && !req.body.html) return res.status(500).json({ error: "No message provided" });
+  const data = await sendTestNewsletter(req.body);
+  if (!data || !data.success) return res.status(500).json({ error: data?.message || "Failed to send test newsletter" });
   return res.json(data);
 };
 

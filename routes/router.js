@@ -50,6 +50,7 @@ import {
   addSubscriberControl,
   getSubscribersControl,
   sendNewsletterControl,
+  sendTestNewsletterControl,
   removeSubscriberControl,
   getNewsletterArchiveControl,
   deleteNewsletterControl,
@@ -122,6 +123,7 @@ router.post("/newsletter/add", addSubscriberControl);
 router.get("/newsletter/data", requireAuth, getSubscribersControl);
 
 router.post("/newsletter/send", requireAuth, sendNewsletterControl);
+router.post("/newsletter/send-test", requireAuth, sendTestNewsletterControl);
 
 router.post("/newsletter/remove", requireAuth, removeSubscriberControl);
 

@@ -359,6 +359,36 @@ export const runSendNewsletter = async () => {
   return data;
 };
 
+// ─── Send test newsletter ─────────────────────────────────────────────────────
+
+export const runSendTestNewsletter = async () => {
+  const subject = document.getElementById("newsletter-subject");
+
+  if (!quillInstance || quillInstance.getText().trim().length === 0) {
+    await displayPopup("Please enter a message", "error");
+    return null;
+  }
+
+  const htmlContent = quillInstance.root.innerHTML;
+
+  const confirmed = await displayConfirmDialog("Send a test to the admin email addresses?");
+  if (!confirmed) return null;
+
+  const data = await sendToBack({
+    route: "/newsletter/send-test",
+    subject: subject ? subject.value.trim() : "",
+    html: htmlContent,
+  });
+
+  if (!data || !data.success) {
+    await displayPopup("Failed to send test newsletter", "error");
+    return null;
+  }
+
+  await displayPopup("Test newsletter sent", "success");
+  return data;
+};
+
 // ─── Add subscriber ───────────────────────────────────────────────────────────
 
 export const runAddSubscriber = async () => {

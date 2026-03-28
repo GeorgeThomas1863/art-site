@@ -129,6 +129,48 @@ export const dispatchNewsletter = async (inputParams) => {
   }
 };
 
+export const sendTestNewsletter = async (inputParams) => {
+  if (!inputParams) return { success: false, message: "No input parameters" };
+  const { subject, html, message } = inputParams;
+  const content = html || message;
+  if (!content) return { success: false, message: "No message provided" };
+
+  const to = [process.env.EMAIL_RECIPIENT_1, process.env.EMAIL_RECIPIENT_2].filter(Boolean).join(", ");
+  if (!to) return { success: false, message: "No recipient addresses configured" };
+
+  const cleanSubject = sanitizeEmailHeader(subject || "");
+
+  const siteUrl = process.env.SITE_URL?.replace(/\/$/, "");
+  let resolvedHtml = html;
+  if (siteUrl && resolvedHtml) {
+    resolvedHtml = resolvedHtml.replace(/(<img\b[^>]*\ssrc=["'])https?:\/\/[^/]+(\/images\/newsletter\/)/gi, `$1${siteUrl}$2`);
+  }
+  if (resolvedHtml) {
+    resolvedHtml = resolvedHtml.replace(/<img\b(?![^>]*\bstyle=)/gi, '<img style="max-width: 100%; height: auto; display: block;" width="600"');
+  }
+  if (resolvedHtml) {
+    resolvedHtml = resolvedHtml.replace(/<p\b(?![^>]*\bstyle=)/gi, '<p style="margin: 0 0 1em 0;"');
+  }
+
+  const mailParams = {
+    from: process.env.NEWSLETTER_FROM || process.env.EMAIL_USER,
+    to,
+    subject: `[TEST] ${cleanSubject}`,
+    html: resolvedHtml || undefined,
+    text: message || "Please view this email in an HTML-capable client.",
+    replyTo: process.env.EMAIL_USER,
+  };
+
+  try {
+    const data = await sendMail(mailParams);
+    if (!data) return { success: false, message: "Failed to send test newsletter" };
+    return { success: true, message: "Test newsletter sent successfully", messageId: data.messageId };
+  } catch (e) {
+    console.error("TEST EMAIL ERROR:", e.data?.message || e.message || "Unknown error");
+    return { success: false, message: "Failed to send test newsletter" };
+  }
+};
+
 export const deleteNewsletter = async (id) => {
   if (!id || typeof id !== "string") return { success: false, message: "No ID provided" };
   try {

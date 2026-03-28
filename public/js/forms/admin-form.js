@@ -422,8 +422,20 @@ export const buildModalActions = async (mode, entityType) => {
     submitButton.disabled = true;
   }
 
+  let testButton = null;
+  if (entityType === "newsletter" && mode === "write") {
+    testButton = document.createElement("button");
+    testButton.className = "btn btn-admin-test";
+    testButton.type = "button";
+    testButton.id = "send-test-newsletter-button";
+    testButton.textContent = "Send Test Newsletter";
+    testButton.setAttribute("data-label", "send-test-newsletter-submit");
+  }
+
   if (entityType === "mailinglist") {
     actions.append(cancelButton);
+  } else if (testButton) {
+    actions.append(cancelButton, testButton, submitButton);
   } else {
     actions.append(cancelButton, submitButton);
   }

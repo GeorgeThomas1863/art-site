@@ -967,6 +967,21 @@
   transform: translateY(-2px);
 }
 
+.btn-admin-test {
+  background-color: transparent;
+  color: #b45309;
+  border-color: #b45309;
+  padding: 1.4rem 2rem;
+  font-size: 0.85rem;
+}
+
+.btn-admin-test:hover {
+  background-color: #b45309;
+  color: #fff;
+  border-color: #b45309;
+  transform: translateY(-2px);
+}
+
 .btn-admin-submit:hover:not(:disabled) {
   background: linear-gradient(135deg, #3573b8 0%, #2563a8 100%);
   transform: translateY(-2px);
