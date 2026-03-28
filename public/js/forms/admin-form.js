@@ -27,7 +27,7 @@ export const buildAdminForm = async () => {
 
   adminFormWrapper.append(dashboardHeader, productsSection, eventsSection, newsletterSection, statsWrapper);
 
-  document.body.appendChild(buildImageEditorModal());
+  adminFormWrapper.appendChild(buildImageEditorModal());
 
   return adminFormWrapper;
 };

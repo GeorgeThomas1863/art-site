@@ -1,4 +1,6 @@
-//way to edit / delete newsletters for admin / unfuck
+//image editing, add storage of original, so can revert if needed.
+
+//when i cancel that prevents a new image from being edited
 
 //figure out if worth redoing newsletter imiage upload
 

@@ -323,7 +323,7 @@ const runNewsletterImageUpload = async (fileInput) => {
       if (!quillInstance) return;
       // Upload the cropped blob
       const cropFormData = new FormData();
-      cropFormData.append("image", blob);
+      cropFormData.append("image", blob, "cropped.jpg");
 
       const newResult = await sendToBackFile({
         route: "/upload-newsletter-pic-route",
@@ -670,7 +670,7 @@ export async function handleQuillImageClick(imgElement) {
     onApply: async (blob) => {
       // Upload the cropped blob
       const cropFormData = new FormData();
-      cropFormData.append("image", blob);
+      cropFormData.append("image", blob, "cropped.jpg");
 
       const newResult = await sendToBackFile({
         route: "/upload-newsletter-pic-route",
