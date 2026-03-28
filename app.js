@@ -1,5 +1,7 @@
 //way to edit / delete newsletters for admin / unfuck
 
+//figure out if worth redoing newsletter imiage upload
+
 // figure out the cloudflare problem and fix it
 
 //figure out how to receive email from mailgun through admin email
