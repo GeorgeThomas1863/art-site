@@ -519,11 +519,17 @@ export const changeAdminNewsletterSelector = async (changeElement) => {
   const newsletter = selectedOption.newsletterData;
 
   if (quillInstance) {
-    quillInstance.clipboard.dangerouslyPasteHTML(newsletter.html || "");
+    if (newsletter.html) {
+      quillInstance.clipboard.dangerouslyPasteHTML(newsletter.html);
+    } else if (newsletter.text) {
+      quillInstance.setText(newsletter.text);
+    } else {
+      quillInstance.setContents([]);
+    }
   }
 
   changeElement.newsletterId = newsletter.id;
-  changeElement.originalHtml = newsletter.html || "";
+  changeElement.originalHtml = quillInstance ? quillInstance.root.innerHTML : (newsletter.html || "");
 
   const deleteButton = document.getElementById("delete-newsletter-button");
   const updateButton = document.getElementById("edit-newsletter-submit-button");
