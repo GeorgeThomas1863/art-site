@@ -1,4 +1,4 @@
-//image changes
+//way to edit / delete newsletters for admin / unfuck
 
 // figure out the cloudflare problem and fix it
 
