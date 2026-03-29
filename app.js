@@ -1,16 +1,10 @@
 //image editing, add storage of original, so can revert if needed.
 
-//when i cancel that prevents a new image from being edited
-
-//figure out if worth redoing newsletter imiage upload
-
-// figure out the cloudflare problem and fix it
+// figure out the cloudflare problem and fix it (have claude investigate based on cloudflare docs)
 
 //figure out how to receive email from mailgun through admin email
 
-
 //popup display of product category should be under add to cart?
-
 
 //-----------------
 
