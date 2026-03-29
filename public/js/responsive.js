@@ -1,7 +1,7 @@
 import { runModalTrigger, runModalClose, runChangeStatusCard, updateAdminStats } from "./helpers/admin-run.js"; //prettier-ignore
 import { runAddNewProduct, runEditProduct, runDeleteProduct, changeAdminProductSelector, runAddPicSlot, runRemovePicSlot } from "./helpers/admin-products.js";
 import { runAddNewEvent, runEditEvent, runDeleteEvent, changeAdminEventSelector } from "./helpers/admin-events.js";
-import { runSendNewsletter, runSendTestNewsletter, runAddSubscriber, runRemoveSubscriber, runRefreshSubscriberList, changeAdminNewsletterSelector, runDeleteNewsletter, runUpdateNewsletter, handleQuillImageClick } from "./helpers/admin-newsletter.js";
+import { runSendNewsletter, runSendTestNewsletter, runAddSubscriber, runRemoveSubscriber, runRefreshSubscriberList, changeAdminNewsletterSelector, runDeleteNewsletter, runUpdateNewsletter, handleQuillImageClick, runNewsletterImageUpload } from "./helpers/admin-newsletter.js";
 import { runUploadClick, runUploadPic, runDeleteUploadImage, runSlotUploadClick, runSlotUploadPic, runDeleteSlotImage, runEditSlotImage, runEditUploadImage } from "./helpers/upload-pic.js";
 import { closeImageEditor, applyImageEditor, zoomIn, zoomOut, rotateLeft, rotateRight, flipH, flipV } from "./helpers/image-editor.js";
 import { changeProductsFilterButton, openProductDetailModal, closeProductDetailModal, runProductCarouselDot, runCarouselPrev, runCarouselNext, advanceCarousel } from "./helpers/products-run.js";
@@ -180,6 +180,12 @@ export const changeHandler = async (e) => {
   // console.log("CHANGE TYPE");
   // console.log(changeType);
 
+  // Newsletter image file input
+  if (changeId === "newsletter-image-file-input" || changeId === "edit-newsletter-image-file-input") {
+    await runNewsletterImageUpload(changeElement);
+    return true;
+  }
+
   //Upload / Edit pic (legacy single-image for events)
   if (changeId === "upload-pic-input" || changeId === "edit-upload-pic-input") {
     const pic = e.target.files[0];
@@ -312,6 +318,9 @@ if (productsElement) {
 
 if (eventsElement) {
   eventsElement.addEventListener("click", clickHandler);
+  eventsElement.addEventListener("touchstart", touchStartHandler, { passive: true });
+  eventsElement.addEventListener("touchend", touchEndHandler);
+  eventsElement.addEventListener("mousedown", mouseDownHandler);
 }
 
 if (newsletterElement) {

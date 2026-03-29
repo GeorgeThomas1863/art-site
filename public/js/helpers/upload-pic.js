@@ -28,6 +28,9 @@ export const runSlotUploadPic = async (fileInput) => {
 
   if (!uploadBtn || !uploadStatus) return null;
 
+  const entityType = uploadBtn.entityType || "products";
+  const uploadRoute = entityType === "events" ? "/upload-event-pic-route" : "/upload-product-pic-route";
+
   uploadBtn.uploadData = null;
   uploadStatus.textContent = "Uploading...";
   uploadStatus.classList.remove("hidden");
@@ -36,7 +39,7 @@ export const runSlotUploadPic = async (fileInput) => {
   const formData = new FormData();
   formData.append("image", pic);
 
-  const data = await sendToBackFile({ route: "/upload-product-pic-route", formData: formData });
+  const data = await sendToBackFile({ route: uploadRoute, formData: formData });
 
   if (data === "FAIL") {
     uploadStatus.textContent = "✗ Upload failed";
@@ -53,7 +56,7 @@ export const runSlotUploadPic = async (fileInput) => {
   uploadBtn.uploadData = data;
 
   if (currentImage && data && data.filename) {
-    currentImage.src = `/images/products/${data.filename}`;
+    currentImage.src = `/images/${entityType}/${data.filename}`;
     currentImage.classList.remove("hidden");
     if (imagePlaceholder) imagePlaceholder.classList.add("hidden");
     if (deleteImageBtn) deleteImageBtn.classList.remove("hidden");
@@ -113,6 +116,8 @@ export const runEditSlotImage = async (editBtn) => {
   const src = previewImg.src;
   if (!src || !uploadBtn.uploadData) return;
   const oldFilename = uploadBtn.uploadData?.filename;
+  const entityType = uploadBtn.entityType || "products";
+  const uploadRoute = entityType === "events" ? "/upload-event-pic-route" : "/upload-product-pic-route";
 
   openImageEditor({
     src,
@@ -120,7 +125,7 @@ export const runEditSlotImage = async (editBtn) => {
       const formData = new FormData();
       formData.append('image', blob, 'edited-image.png');
 
-      const data = await sendToBackFile({ route: '/upload-product-pic-route', formData: formData });
+      const data = await sendToBackFile({ route: uploadRoute, formData: formData });
 
       if (!data || data === 'FAIL') throw new Error('Upload failed');
 
@@ -129,7 +134,7 @@ export const runEditSlotImage = async (editBtn) => {
       }
 
       uploadBtn.uploadData = data;
-      previewImg.src = '/images/products/' + data.filename;
+      previewImg.src = '/images/' + entityType + '/' + data.filename;
     }
   });
 };

@@ -1,4 +1,5 @@
 import { buildCollapseContainer } from "../util/collapse.js";
+import { buildCarouselElement } from "./products-form.js";
 
 // Build the events page
 export const buildEventsForm = async () => {
@@ -56,18 +57,18 @@ export const buildEventCard = async (eventData) => {
 
 export const buildEventImage = async (eventData) => {
   if (!eventData || !eventData.picData) return null;
-  const { filename } = eventData.picData;
+  const pics = Array.isArray(eventData.picData) ? eventData.picData : [eventData.picData];
+  if (pics.length === 0) return null;
 
-  const eventImage = document.createElement("img");
-  eventImage.className = "event-image";
-  eventImage.alt = "No image available";
+  if (pics.length === 1) {
+    const eventImage = document.createElement("img");
+    eventImage.className = "event-image";
+    eventImage.alt = eventData.name || "Event image";
+    eventImage.src = `/images/events/${pics[0].filename}`;
+    return eventImage;
+  }
 
-  const picPath = `/images/events/${filename}`;
-  if (!picPath) return null;
-
-  eventImage.src = picPath;
-
-  return eventImage;
+  return buildCarouselElement(pics, eventData.name || "Event", true);
 };
 
 export const buildEventContent = async (eventData) => {

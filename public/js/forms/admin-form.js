@@ -27,8 +27,6 @@ export const buildAdminForm = async () => {
 
   adminFormWrapper.append(dashboardHeader, productsSection, eventsSection, newsletterSection, statsWrapper);
 
-  adminFormWrapper.appendChild(buildImageEditorModal());
-
   return adminFormWrapper;
 };
 
@@ -239,82 +237,6 @@ export const buildActionCard = async (mode, entityType) => {
 
   return card;
 };
-
-function buildImageEditorModal() {
-  const overlay = document.createElement('div');
-  overlay.className = 'modal-overlay';
-  overlay.id = 'image-editor-overlay';
-
-  const wrapper = document.createElement('div');
-  wrapper.className = 'modal-wrapper';
-
-  const header = document.createElement('div');
-  header.className = 'modal-header';
-  const title = document.createElement('h3');
-  title.className = 'modal-title';
-  title.textContent = 'Edit Image';
-  const closeBtn = document.createElement('button');
-  closeBtn.className = 'modal-close';
-  closeBtn.textContent = '×';
-  closeBtn.setAttribute('data-label', 'image-editor-cancel');
-  header.appendChild(title);
-  header.appendChild(closeBtn);
-
-  const canvasArea = document.createElement('div');
-  canvasArea.className = 'image-editor-canvas-area';
-  const img = document.createElement('img');
-  img.id = 'image-editor-img';
-  img.alt = 'Image to edit';
-  canvasArea.appendChild(img);
-
-  const toolbar = document.createElement('div');
-  toolbar.className = 'image-editor-toolbar';
-
-  const toolbarButtons = [
-    { label: 'image-editor-zoom-in',      text: '🔍+' },
-    { label: 'image-editor-zoom-out',     text: '🔍−' },
-    { label: 'image-editor-rotate-left',  text: '↺' },
-    { label: 'image-editor-rotate-right', text: '↻' },
-    { label: 'image-editor-flip-h',       text: '⇔' },
-    { label: 'image-editor-flip-v',       text: '↕' },
-  ];
-
-  for (let i = 0; i < toolbarButtons.length; i++) {
-    const btn = toolbarButtons[i];
-    const b = document.createElement('button');
-    b.type = 'button';
-    b.className = 'image-editor-btn';
-    b.setAttribute('data-label', btn.label);
-    b.textContent = btn.text;
-    toolbar.appendChild(b);
-  }
-
-  const actions = document.createElement('div');
-  actions.className = 'modal-actions';
-  const cancelBtn = document.createElement('button');
-  cancelBtn.type = 'button';
-  cancelBtn.className = 'btn-admin-cancel';
-  cancelBtn.setAttribute('data-label', 'image-editor-cancel');
-  cancelBtn.textContent = 'Cancel';
-  const applyBtn = document.createElement('button');
-  applyBtn.type = 'button';
-  applyBtn.className = 'btn-admin-submit';
-  applyBtn.setAttribute('data-label', 'image-editor-apply');
-  applyBtn.textContent = 'Apply';
-  actions.appendChild(cancelBtn);
-  actions.appendChild(applyBtn);
-
-  const content = document.createElement('div');
-  content.className = 'modal-content';
-  content.appendChild(canvasArea);
-  content.appendChild(toolbar);
-  content.appendChild(actions);
-
-  wrapper.appendChild(header);
-  wrapper.appendChild(content);
-  overlay.appendChild(wrapper);
-  return overlay;
-}
 
 //+++++++++++++++++++++++++++++++++++++
 
@@ -700,7 +622,7 @@ export const buildProductImageSection = async (mode) => {
   return section;
 };
 
-export const buildPicSlot = (index) => {
+export const buildPicSlot = (index, entityType = "products") => {
   const slot = document.createElement("div");
   slot.className = "pic-slot";
   slot.setAttribute("data-slot-index", String(index));
@@ -735,6 +657,7 @@ export const buildPicSlot = (index) => {
   uploadBtn.className = "upload-btn";
   uploadBtn.textContent = "Choose Image";
   uploadBtn.setAttribute("data-label", "slot-upload-click");
+  uploadBtn.entityType = entityType;
 
   const uploadStatus = document.createElement("span");
   uploadStatus.className = "upload-status hidden";
@@ -1030,13 +953,30 @@ export const buildEventImageSection = async (mode) => {
 
   const title = document.createElement("h4");
   title.className = "section-title";
-  title.textContent = "Event Image";
+  title.textContent = "Event Images";
 
   header.append(icon, title);
 
-  const uploadSection = await buildAdminUpload(mode, "events");
+  const slotsContainer = document.createElement("div");
+  slotsContainer.className = "pic-slots-container";
 
-  section.append(header, uploadSection);
+  const initialSlot = buildPicSlot(0, "events");
+  if (mode === "edit") {
+    const slotUploadBtn = initialSlot.querySelector(".upload-btn");
+    const slotFileInput = initialSlot.querySelector(".pic-file-input");
+    if (slotUploadBtn) slotUploadBtn.disabled = true;
+    if (slotFileInput) slotFileInput.disabled = true;
+  }
+  slotsContainer.append(initialSlot);
+
+  const addBtn = document.createElement("button");
+  addBtn.type = "button";
+  addBtn.className = "btn-add-image";
+  addBtn.textContent = "+ Add Image";
+  addBtn.setAttribute("data-label", "add-pic-slot");
+  if (mode === "edit") addBtn.disabled = true;
+
+  section.append(header, slotsContainer, addBtn);
 
   return section;
 };

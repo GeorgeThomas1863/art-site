@@ -57,25 +57,37 @@ export const getEditProductParams = async () => {
 };
 
 export const buildNewEventParams = async () => {
+  const slotBtns = document.querySelectorAll(".pic-slots-container .upload-btn");
+  const picData = [];
+  for (let i = 0; i < slotBtns.length; i++) {
+    if (slotBtns[i].uploadData) picData.push(slotBtns[i].uploadData);
+  }
+
   const params = {
     route: "/add-new-event-route",
     name: document.getElementById("name").value,
     eventDate: document.getElementById("event-date").value,
     eventLocation: document.getElementById("event-location").value,
     eventDescription: document.getElementById("event-description").value,
-    picData: document.getElementById("upload-button").uploadData,
+    picData: picData,
     dateCreated: new Date().toISOString(),
   };
   return params;
 };
 
 export const getEditEventParams = async () => {
+  const slotBtns = document.querySelectorAll(".pic-slots-container .upload-btn");
+  const picData = [];
+  for (let i = 0; i < slotBtns.length; i++) {
+    if (slotBtns[i].uploadData) picData.push(slotBtns[i].uploadData);
+  }
+
   const params = {
     name: document.getElementById("edit-name").value,
     eventDate: document.getElementById("edit-event-date").value,
     eventLocation: document.getElementById("edit-event-location").value,
     eventDescription: document.getElementById("edit-event-description").value,
-    picData: document.getElementById("edit-upload-button").uploadData,
+    picData: picData,
   };
 
   return params;

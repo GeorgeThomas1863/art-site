@@ -256,12 +256,6 @@ export const initQuill = () => {
     },
   });
 
-  // Wire the file input — attaching here guarantees the element is in the DOM
-  const fileInput = document.getElementById("newsletter-image-file-input");
-  if (fileInput) {
-    fileInput.addEventListener("change", () => runNewsletterImageUpload(fileInput));
-  }
-
   // Add hover tooltips — Quill 2 does not set title attributes automatically
   const toolbarEl = quillInstance.getModule("toolbar").container;
   const buttonTitles = [
@@ -294,7 +288,7 @@ export const resetQuill = () => {
 
 // ─── Image upload ─────────────────────────────────────────────────────────────
 
-const runNewsletterImageUpload = async (fileInput) => {
+export const runNewsletterImageUpload = async (fileInput) => {
   const file = fileInput.files[0];
   if (!file || !quillInstance) return;
 
@@ -735,11 +729,6 @@ export const initEditQuill = () => {
       },
     },
   });
-
-  const fileInput = document.getElementById("edit-newsletter-image-file-input");
-  if (fileInput) {
-    fileInput.addEventListener("change", () => runNewsletterImageUpload(fileInput));
-  }
 
   const toolbarEl = quillInstance.getModule("toolbar").container;
   const buttonTitles = [

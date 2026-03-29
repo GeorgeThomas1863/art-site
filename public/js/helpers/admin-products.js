@@ -161,8 +161,11 @@ export const runAddPicSlot = async () => {
   const lastSlot = existingSlots[existingSlots.length - 1];
   const lastHasImage = !!(lastSlot && lastSlot.querySelector(".upload-btn")?.uploadData);
 
+  const existingUploadBtn = container.querySelector(".upload-btn");
+  const entityType = existingUploadBtn?.entityType || "products";
+
   const index = container.children.length;
-  const slot = buildPicSlot(index);
+  const slot = buildPicSlot(index, entityType);
   container.append(slot);
 
   if (lastHasImage) {

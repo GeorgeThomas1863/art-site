@@ -2,12 +2,23 @@ import { clearAdminEditFields, disableAdminEditFields, enableAdminEditFields, up
 import { sendToBack } from "../util/api-front.js";
 import { buildNewEventParams, getEditEventParams } from "../util/params.js";
 import { displayPopup, displayConfirmDialog } from "../util/popup.js";
+import { buildPicSlot } from "../forms/admin-form.js";
 
 //Add event
 export const runAddNewEvent = async () => {
   const newEventParams = await buildNewEventParams();
   if (!newEventParams || !newEventParams.name || !newEventParams.eventDate) {
     await displayPopup("Please fill in all event fields before submitting", "error");
+    return null;
+  }
+
+  const slotBtns = document.querySelectorAll(".pic-slots-container .upload-btn");
+  let hasImage = false;
+  for (let i = 0; i < slotBtns.length; i++) {
+    if (slotBtns[i].uploadData) { hasImage = true; break; }
+  }
+  if (!hasImage) {
+    await displayPopup("Please upload at least one image of the event", "error");
     return null;
   }
 
@@ -124,6 +135,20 @@ export const runDeleteEvent = async () => {
 export const changeAdminEventSelector = async (changeElement) => {
   if (!changeElement) return null;
 
+  // Reset event image slots
+  const container = document.querySelector(".pic-slots-container");
+  if (container) {
+    while (container.firstChild) container.removeChild(container.firstChild);
+    const emptySlot = buildPicSlot(0, "events");
+    const slotUploadBtn = emptySlot.querySelector(".upload-btn");
+    const slotFileInput = emptySlot.querySelector(".pic-file-input");
+    if (slotUploadBtn) slotUploadBtn.disabled = true;
+    if (slotFileInput) slotFileInput.disabled = true;
+    container.append(emptySlot);
+  }
+  const addBtn = document.querySelector("[data-label='add-pic-slot']");
+  if (addBtn) addBtn.disabled = true;
+
   const selectedOption = changeElement.options[changeElement.selectedIndex];
   // console.log("SELECTED OPTION");
   // console.log(selectedOption);
@@ -200,30 +225,37 @@ export const populateEditFormEvents = async (inputObj) => {
     deleteButton.disabled = false;
   }
 
-  if (!picData || !picData.filename) return null;
-
-  const currentImage = document.getElementById("edit-current-image");
-  const currentImagePreview = document.getElementById("edit-current-image-preview");
-  const editUploadButton = document.getElementById("edit-upload-button");
-  if (!currentImage || !currentImagePreview || !editUploadButton) return null;
-
-  //set pic data to upload button (to get correct pic when submitting edit)
-  editUploadButton.uploadData = picData;
-  currentImage.src = `/images/events/${picData.filename}`;
-  currentImage.style.display = "block";
-  currentImagePreview.style.display = "flex";
-
-  const deleteImageBtn = document.getElementById("edit-delete-image-btn");
-  if (deleteImageBtn) deleteImageBtn.style.display = "block";
-
-  const uploadArea = editUploadButton.closest('.image-upload-area');
-  if (uploadArea) {
-    const editBtn = uploadArea.querySelector('.edit-image-btn');
-    if (editBtn) editBtn.classList.remove('hidden');
+  const pics = picData ? (Array.isArray(picData) ? picData : [picData]) : [];
+  const slotsContainer = document.querySelector(".pic-slots-container");
+  if (slotsContainer) {
+    // Clear existing slots safely
+    while (slotsContainer.firstChild) slotsContainer.removeChild(slotsContainer.firstChild);
+    for (let i = 0; i < pics.length; i++) {
+      const slot = buildPicSlot(i, "events");
+      const slotUploadBtn = slot.querySelector(".upload-btn");
+      const slotCurrentImage = slot.querySelector(".current-image");
+      const slotPlaceholder = slot.querySelector(".image-placeholder");
+      const slotDeleteBtn = slot.querySelector(".delete-image-btn");
+      const slotEditBtn = slot.querySelector(".edit-image-btn");
+      if (slotUploadBtn) {
+        slotUploadBtn.uploadData = pics[i];
+        slotUploadBtn.textContent = "Change Image";
+      }
+      if (slotCurrentImage) {
+        slotCurrentImage.src = `/images/events/${pics[i].filename}`;
+        slotCurrentImage.classList.remove("hidden");
+      }
+      if (slotPlaceholder) slotPlaceholder.classList.add("hidden");
+      if (slotDeleteBtn) slotDeleteBtn.classList.remove("hidden");
+      if (slotEditBtn) slotEditBtn.classList.remove("hidden");
+      slotsContainer.append(slot);
+    }
+    if (pics.length === 0) {
+      slotsContainer.append(buildPicSlot(0, "events"));
+    }
   }
-
-  const placeholder = currentImagePreview.querySelector(".image-placeholder");
-  if (placeholder) placeholder.style.display = "none";
+  const addBtn = document.querySelector("[data-label='add-pic-slot']");
+  if (addBtn) addBtn.disabled = false;
 
   return true;
 };

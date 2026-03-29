@@ -125,7 +125,7 @@ export const buildProductCard = async (productData) => {
 };
 
 // Internal helper — builds a carousel element for grid cards or the detail modal
-const buildCarouselElement = (pics, altText, isCard, startIndex = 0) => {
+export const buildCarouselElement = (pics, altText, isCard, startIndex = 0) => {
   const carousel = document.createElement("div");
   carousel.className = "product-carousel";
   if (isCard) carousel.setAttribute("data-label", "product-card-click");
