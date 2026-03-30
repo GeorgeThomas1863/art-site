@@ -61,19 +61,23 @@ export const upload = multer({
 
 //-------------------
 
-export const deletePic = async (filename) => {
+export const deletePic = async (filename, entityType) => {
+  const allowedTypes = ["products", "events", "newsletter"];
+  if (!entityType || !allowedTypes.includes(entityType)) {
+    return { success: false, message: "Invalid entity type" };
+  }
+
   const safeName = sanitizeFilename(filename);
   if (!safeName) return { success: false, message: "Invalid filename" };
 
-  const filePath = path.join(uploadDir, safeName);
+  const filePath = path.join(uploadDir, entityType, safeName);
   const resolvedPath = path.resolve(filePath);
+  const allowedBase = path.resolve(path.join(uploadDir, entityType));
 
-  // Verify the resolved path is within the upload directory
-  if (!resolvedPath.startsWith(path.resolve(uploadDir))) {
+  if (!resolvedPath.startsWith(allowedBase + path.sep)) {
     return { success: false, message: "Invalid file path" };
   }
 
-  // Check if file exists
   if (!fs.existsSync(resolvedPath)) {
     return { success: false, message: "File not found" };
   }

@@ -1224,3 +1224,21 @@
 .edit-image-btn:hover {
   background: #555;
 }
+
+.revert-image-btn {
+  background: none;
+  color: #666;
+  border: 1px solid #bbb;
+  padding: 0.35rem 0.75rem;
+  font-size: 0.8rem;
+  font-family: "Georgia", serif;
+  letter-spacing: 0.5px;
+  cursor: pointer;
+  transition: all 0.2s;
+  margin-top: 0.4rem;
+}
+
+.revert-image-btn:hover {
+  color: #333;
+  border-color: #333;
+}

@@ -329,14 +329,20 @@ export const runNewsletterImageUpload = async (fileInput) => {
         return;
       }
 
-      // Delete the original uploaded file
-      await sendToBack({ route: "/delete-pic-route", filename: result.filename });
-
       // Insert the cropped image into Quill
       const sizeBefore = quillInstance.getFormat(insertIndex).size || null;
       quillInstance.insertEmbed(insertIndex, "image", `/images/newsletter/${newResult.filename}`);
       quillInstance.setSelection(insertIndex + 1);
       if (sizeBefore) quillInstance.format("size", sizeBefore);
+
+      // Set data-original-src on the inserted image DOM node
+      const imgs = quillInstance.root.querySelectorAll("img");
+      for (let i = 0; i < imgs.length; i++) {
+        if (imgs[i].getAttribute("src") === `/images/newsletter/${newResult.filename}`) {
+          imgs[i].setAttribute("data-original-src", `/images/newsletter/${result.filename}`);
+          break;
+        }
+      }
     },
   });
 };
@@ -572,6 +578,23 @@ export const changeAdminNewsletterSelector = async (changeElement) => {
   if (quillInstance) {
     if (newsletter.html) {
       quillInstance.clipboard.dangerouslyPasteHTML(newsletter.html);
+      // Restore data-original-src attributes Quill may have stripped during Delta conversion
+      const parser = new DOMParser();
+      const doc = parser.parseFromString(newsletter.html, "text/html");
+      const originalImgs = doc.querySelectorAll("img[data-original-src]");
+      if (originalImgs.length) {
+        const quillImgs = quillInstance.root.querySelectorAll("img");
+        for (let i = 0; i < originalImgs.length; i++) {
+          const storedFilename = originalImgs[i].getAttribute("src").split("/").pop();
+          const storedOriginalSrc = originalImgs[i].getAttribute("data-original-src");
+          for (let j = 0; j < quillImgs.length; j++) {
+            if (quillImgs[j].src.split("/").pop() === storedFilename) {
+              quillImgs[j].setAttribute("data-original-src", storedOriginalSrc);
+              break;
+            }
+          }
+        }
+      }
     } else if (newsletter.text) {
       quillInstance.setText(newsletter.text);
     } else {
@@ -656,13 +679,27 @@ export const runUpdateNewsletter = async () => {
 
 export async function handleQuillImageClick(imgElement) {
   if (!quillInstance) return;
-  const src = imgElement.src;
+  const src = imgElement.src;  // absolute URL — used for Cropper.js loading only
   const filename = src.split("/").pop();
+  // Use the src *attribute* (relative path) as fallback so data-original-src is always stored relative
+  const srcAttr = imgElement.getAttribute("src") || src;
+  const originalSrc = imgElement.getAttribute("data-original-src") || srcAttr;
+  const originalFilename = originalSrc.split("/").pop();
+  const hasOriginal = imgElement.hasAttribute("data-original-src");
+
+  if (hasOriginal) {
+    const shouldRevert = await displayConfirmDialog("Revert this image to its original version?");
+    if (shouldRevert) {
+      await sendToBack({ route: "/delete-pic-route", filename, entityType: "newsletter" });
+      imgElement.src = originalSrc;
+      imgElement.removeAttribute("data-original-src");
+      return;
+    }
+  }
 
   openImageEditor({
     src,
     onApply: async (blob) => {
-      // Upload the cropped blob
       const cropFormData = new FormData();
       cropFormData.append("image", blob, "cropped.jpg");
 
@@ -672,15 +709,18 @@ export async function handleQuillImageClick(imgElement) {
       });
 
       if (!newResult || newResult === "FAIL" || !newResult.filename) {
-        await displayPopup("Image upload failed", "error");
+        displayPopup("Image upload failed", "error");
         return;
       }
 
-      // Delete the original file
-      await sendToBack({ route: "/delete-pic-route", filename });
+      // Only delete if the current file is not the original
+      if (filename !== originalFilename) {
+        await sendToBack({ route: "/delete-pic-route", filename, entityType: "newsletter" });
+      }
 
-      // Update the image element in place
       imgElement.src = `/images/newsletter/${newResult.filename}`;
+      // Preserve original — data-original-src always points to first-ever version
+      imgElement.setAttribute("data-original-src", originalSrc);
     },
   });
 }

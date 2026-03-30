@@ -53,6 +53,7 @@ export const runSlotUploadPic = async (fileInput) => {
   uploadStatus.style.color = "green";
   uploadBtn.textContent = "Change Image";
   uploadBtn.disabled = false;
+  data.originalFilename = data.filename;
   uploadBtn.uploadData = data;
 
   if (currentImage && data && data.filename) {
@@ -80,13 +81,15 @@ export const runDeleteSlotImage = async (deleteBtn) => {
   const imagePlaceholder = slot.querySelector(".image-placeholder");
   const fileInput = slot.querySelector(".pic-file-input");
 
+  const entityType = uploadBtn?.entityType || "products";
   const filename = uploadBtn?.uploadData?.filename;
+  const originalFilename = uploadBtn?.uploadData?.originalFilename;
 
   if (filename) {
-    const result = await sendToBack({ route: "/delete-pic-route", filename: filename });
-    if (result === "FAIL") {
-      console.error("Failed to delete image from server");
-    }
+    await sendToBack({ route: "/delete-pic-route", filename, entityType });
+  }
+  if (originalFilename && originalFilename !== filename) {
+    await sendToBack({ route: "/delete-pic-route", filename: originalFilename, entityType });
   }
 
   if (uploadBtn) {
@@ -104,6 +107,12 @@ export const runDeleteSlotImage = async (deleteBtn) => {
   if (imagePlaceholder) imagePlaceholder.classList.remove("hidden");
   deleteBtn.classList.add("hidden");
   if (fileInput) fileInput.value = "";
+
+  const editBtn = slot.querySelector(".edit-image-btn");
+  if (editBtn) editBtn.classList.add("hidden");
+
+  const revertBtn = slot.querySelector(".revert-image-btn");
+  if (revertBtn) revertBtn.classList.add("hidden");
 };
 
 export const runEditSlotImage = async (editBtn) => {
@@ -115,7 +124,8 @@ export const runEditSlotImage = async (editBtn) => {
   if (!uploadBtn || !previewImg) return null;
   const src = previewImg.src;
   if (!src || !uploadBtn.uploadData) return;
-  const oldFilename = uploadBtn.uploadData?.filename;
+  const oldFilename = uploadBtn.uploadData.filename;
+  const originalFilename = uploadBtn.uploadData.originalFilename || oldFilename;
   const entityType = uploadBtn.entityType || "products";
   const uploadRoute = entityType === "events" ? "/upload-event-pic-route" : "/upload-product-pic-route";
 
@@ -129,12 +139,16 @@ export const runEditSlotImage = async (editBtn) => {
 
       if (!data || data === 'FAIL') throw new Error('Upload failed');
 
-      if (oldFilename) {
-        await sendToBack({ route: '/delete-pic-route', filename: oldFilename });
+      // Only delete if oldFilename is not the original (never delete the original)
+      if (oldFilename && oldFilename !== originalFilename) {
+        await sendToBack({ route: '/delete-pic-route', filename: oldFilename, entityType });
       }
 
-      uploadBtn.uploadData = data;
+      uploadBtn.uploadData = { ...data, originalFilename };
       previewImg.src = '/images/' + entityType + '/' + data.filename;
+
+      const revertBtn = slot.querySelector('.revert-image-btn');
+      if (revertBtn) revertBtn.classList.remove('hidden');
     }
   });
 };
@@ -148,7 +162,8 @@ export const runEditUploadImage = async (editBtn) => {
   if (!uploadBtn || !previewImg) return null;
   const src = previewImg.src;
   if (!src || !uploadBtn.uploadData) return;
-  const oldFilename = uploadBtn.uploadData?.filename;
+  const oldFilename = uploadBtn.uploadData.filename;
+  const originalFilename = uploadBtn.uploadData.originalFilename || oldFilename;
   const entityType = uploadBtn.entityType;
 
   openImageEditor({
@@ -162,11 +177,11 @@ export const runEditUploadImage = async (editBtn) => {
 
       if (!data || data === 'FAIL') throw new Error('Upload failed');
 
-      if (oldFilename) {
-        await sendToBack({ route: '/delete-pic-route', filename: oldFilename });
+      if (oldFilename && oldFilename !== originalFilename) {
+        await sendToBack({ route: '/delete-pic-route', filename: oldFilename, entityType });
       }
 
-      uploadBtn.uploadData = data;
+      uploadBtn.uploadData = { ...data, originalFilename };
       previewImg.src = '/images/' + entityType + '/' + data.filename;
     }
   });
@@ -226,6 +241,7 @@ export const runUploadPic = async (pic, mode = "add", entityType = "products") =
   uploadStatus.style.color = "green";
   uploadButton.textContent = "Change Image";
   uploadButton.disabled = false;
+  data.originalFilename = data.filename;
   uploadButton.uploadData = data;
 
   const editBtn = uploadButton.parentElement.querySelector('.edit-image-btn');
@@ -277,23 +293,17 @@ export const runDeleteUploadImage = async (clickedElement) => {
 
   if (!uploadStatus || !uploadButton || !currentImage || !currentImagePreview || !picInput) return null;
 
-  // Get filename from uploadData if it exists
+  const entityType = uploadButton.entityType || "products";
   const filename = uploadButton.uploadData?.filename;
+  const originalFilename = uploadButton.uploadData?.originalFilename;
 
-  // If we have a filename, delete it from the server
   if (filename) {
-    const result = await sendToBack({
-      route: "/delete-pic-route",
-      filename: filename,
-    });
-
-    if (result === "FAIL") {
-      console.error("Failed to delete image from server");
-      // Continue with frontend cleanup anyway
-    }
+    await sendToBack({ route: "/delete-pic-route", filename, entityType });
+  }
+  if (originalFilename && originalFilename !== filename) {
+    await sendToBack({ route: "/delete-pic-route", filename: originalFilename, entityType });
   }
 
-  // Reset all upload-related UI elements
   uploadButton.uploadData = null;
   uploadButton.textContent = mode === "add" ? "Choose Image" : "Change Image";
   uploadStatus.textContent = "";
@@ -301,14 +311,36 @@ export const runDeleteUploadImage = async (clickedElement) => {
   currentImage.src = "";
   currentImage.style.display = "none";
   currentImagePreview.style.display = "none";
-  picInput.value = ""; // Clear the file input
+  picInput.value = "";
 
-  // Show placeholder and hide delete button
   const placeholder = currentImagePreview.querySelector(".image-placeholder");
   if (placeholder) placeholder.style.display = "flex";
 
   const deleteBtn = currentImagePreview.querySelector(".delete-image-btn");
   if (deleteBtn) deleteBtn.style.display = "none";
+};
 
-  // console.log("Image deleted");
+export const runRevertSlotImage = async (revertBtn) => {
+  if (!revertBtn) return null;
+  const slot = revertBtn.closest(".pic-slot");
+  if (!slot) return null;
+  const uploadBtn = slot.querySelector(".upload-btn");
+  const previewImg = slot.querySelector(".current-image");
+  if (!uploadBtn || !previewImg || !uploadBtn.uploadData) return null;
+
+  const currentFilename = uploadBtn.uploadData.filename;
+  const originalFilename = uploadBtn.uploadData.originalFilename;
+
+  if (!originalFilename || currentFilename === originalFilename) return null;
+
+  const entityType = uploadBtn.entityType || "products";
+
+  await sendToBack({ route: "/delete-pic-route", filename: currentFilename, entityType });
+
+  uploadBtn.uploadData = { ...uploadBtn.uploadData, filename: originalFilename };
+  previewImg.src = `/images/${entityType}/${originalFilename}`;
+
+  revertBtn.classList.add("hidden");
+
+  return true;
 };

@@ -248,6 +248,12 @@ export const populateEditFormEvents = async (inputObj) => {
       if (slotPlaceholder) slotPlaceholder.classList.add("hidden");
       if (slotDeleteBtn) slotDeleteBtn.classList.remove("hidden");
       if (slotEditBtn) slotEditBtn.classList.remove("hidden");
+
+        const slotRevertBtn = slot.querySelector(".revert-image-btn");
+        if (slotRevertBtn && pics[i].originalFilename && pics[i].filename !== pics[i].originalFilename) {
+          slotRevertBtn.classList.remove("hidden");
+        }
+
       slotsContainer.append(slot);
     }
     if (pics.length === 0) {
@@ -258,4 +264,24 @@ export const populateEditFormEvents = async (inputObj) => {
   if (addBtn) addBtn.disabled = false;
 
   return true;
+};
+
+export const runRemovePicSlot = async (removeBtn) => {
+  if (!removeBtn) return null;
+  const slot = removeBtn.closest(".pic-slot");
+  if (!slot) return null;
+
+  const uploadBtn = slot.querySelector(".upload-btn");
+  const entityType = uploadBtn?.entityType || "events";
+  const filename = uploadBtn?.uploadData?.filename;
+  const originalFilename = uploadBtn?.uploadData?.originalFilename;
+
+  if (filename) {
+    await sendToBack({ route: "/delete-pic-route", filename, entityType });
+  }
+  if (originalFilename && originalFilename !== filename) {
+    await sendToBack({ route: "/delete-pic-route", filename: originalFilename, entityType });
+  }
+
+  slot.remove();
 };

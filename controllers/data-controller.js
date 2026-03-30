@@ -58,17 +58,20 @@ export const uploadPicControl = async (req, res) => {
 };
 
 export const deletePicControl = async (req, res) => {
-  const filename = req.body.filename;
+  const { filename, entityType } = req.body;
   if (!filename) return res.status(400).json({ error: "No filename provided" });
 
-  // Validate filename contains no path separators or traversal
+  const allowedTypes = ["products", "events", "newsletter"];
+  if (!entityType || !allowedTypes.includes(entityType)) {
+    return res.status(400).json({ error: "Invalid entity type" });
+  }
+
   const safeName = sanitizeFilename(filename);
   if (!safeName || safeName !== filename) return res.status(400).json({ error: "Invalid filename" });
 
   try {
-    const data = await deletePic(safeName);
+    const data = await deletePic(safeName, entityType);
     if (!data || !data.success) return res.status(500).json({ error: data.message });
-
     return res.json(data);
   } catch (error) {
     console.error("Error deleting file:", error);

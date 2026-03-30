@@ -179,10 +179,15 @@ export const runRemovePicSlot = async (removeBtn) => {
   if (!slot) return null;
 
   const uploadBtn = slot.querySelector(".upload-btn");
+  const entityType = uploadBtn?.entityType || "products";
   const filename = uploadBtn?.uploadData?.filename;
+  const originalFilename = uploadBtn?.uploadData?.originalFilename;
 
   if (filename) {
-    await sendToBack({ route: "/delete-pic-route", filename: filename });
+    await sendToBack({ route: "/delete-pic-route", filename, entityType });
+  }
+  if (originalFilename && originalFilename !== filename) {
+    await sendToBack({ route: "/delete-pic-route", filename: originalFilename, entityType });
   }
 
   slot.remove();
@@ -369,6 +374,11 @@ export const populateEditFormProducts = async (inputObj) => {
 
     const slotEditBtn = slot.querySelector(".edit-image-btn");
     if (slotEditBtn) slotEditBtn.classList.remove("hidden");
+
+        const slotRevertBtn = slot.querySelector(".revert-image-btn");
+        if (slotRevertBtn && pics[i].originalFilename && pics[i].filename !== pics[i].originalFilename) {
+          slotRevertBtn.classList.remove("hidden");
+        }
 
     slotsContainer.append(slot);
   }
