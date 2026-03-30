@@ -107,8 +107,8 @@ function buildEditorOverlay() {
 
   const content = document.createElement('div');
   content.className = 'modal-content';
-  content.appendChild(canvasArea);
   content.appendChild(toolbar);
+  content.appendChild(canvasArea);
   content.appendChild(actions);
 
   wrapper.appendChild(header);

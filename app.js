@@ -1,5 +1,7 @@
 //image editing, add storage of original, so can revert if needed.
 
+//MAKE SURE IMAGE EDTING WORKS ON MOBILE
+
 // figure out the cloudflare problem and fix it (have claude investigate based on cloudflare docs)
 
 //figure out how to receive email from mailgun through admin email
