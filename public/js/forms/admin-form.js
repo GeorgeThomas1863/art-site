@@ -675,13 +675,7 @@ export const buildPicSlot = (index, entityType = "products") => {
   editBtn.setAttribute('data-label', 'edit-slot-image');
   editBtn.textContent = 'Edit Image';
 
-  const revertBtn = document.createElement('button');
-  revertBtn.type = 'button';
-  revertBtn.className = 'revert-image-btn hidden';
-  revertBtn.setAttribute('data-label', 'revert-slot-image');
-  revertBtn.textContent = 'Revert to Original';
-
-  slot.append(imageDisplay, picInput, uploadBtn, uploadStatus, editBtn, revertBtn, removeSlotBtn);
+  slot.append(imageDisplay, picInput, uploadBtn, uploadStatus, editBtn, removeSlotBtn);
 
   return slot;
 };

@@ -1209,6 +1209,14 @@
   background: #e8e8e8;
 }
 
+.image-editor-toolbar-divider {
+  width: 1px;
+  height: 1.4em;
+  background: #ccc;
+  align-self: center;
+  margin: 0 0.2rem;
+}
+
 .edit-image-btn {
   background: #333;
   color: #fff;
@@ -1235,7 +1243,6 @@
   letter-spacing: 0.5px;
   cursor: pointer;
   transition: all 0.2s;
-  margin-top: 0.4rem;
 }
 
 .revert-image-btn:hover {

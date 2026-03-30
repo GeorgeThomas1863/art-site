@@ -110,9 +110,6 @@ export const runDeleteSlotImage = async (deleteBtn) => {
 
   const editBtn = slot.querySelector(".edit-image-btn");
   if (editBtn) editBtn.classList.add("hidden");
-
-  const revertBtn = slot.querySelector(".revert-image-btn");
-  if (revertBtn) revertBtn.classList.add("hidden");
 };
 
 export const runEditSlotImage = async (editBtn) => {
@@ -129,9 +126,12 @@ export const runEditSlotImage = async (editBtn) => {
   const entityType = uploadBtn.entityType || "products";
   const uploadRoute = entityType === "events" ? "/upload-event-pic-route" : "/upload-product-pic-route";
 
+  const hasEdits = originalFilename !== oldFilename;
+
   openImageEditor({
     src,
     onApply: async (blob) => {
+      const currentFilename = uploadBtn.uploadData.filename;
       const formData = new FormData();
       formData.append('image', blob, 'edited-image.png');
 
@@ -139,17 +139,20 @@ export const runEditSlotImage = async (editBtn) => {
 
       if (!data || data === 'FAIL') throw new Error('Upload failed');
 
-      // Only delete if oldFilename is not the original (never delete the original)
-      if (oldFilename && oldFilename !== originalFilename) {
-        await sendToBack({ route: '/delete-pic-route', filename: oldFilename, entityType });
+      // Only delete if current file is not the original (never delete the original)
+      if (currentFilename && currentFilename !== originalFilename) {
+        await sendToBack({ route: '/delete-pic-route', filename: currentFilename, entityType });
       }
 
       uploadBtn.uploadData = { ...data, originalFilename };
       previewImg.src = '/images/' + entityType + '/' + data.filename;
-
-      const revertBtn = slot.querySelector('.revert-image-btn');
-      if (revertBtn) revertBtn.classList.remove('hidden');
-    }
+    },
+    originalSrc: hasEdits ? `/images/${entityType}/${originalFilename}` : undefined,
+    onRevert: hasEdits ? async () => {
+      await sendToBack({ route: '/delete-pic-route', filename: oldFilename, entityType });
+      uploadBtn.uploadData = { ...uploadBtn.uploadData, filename: originalFilename };
+      previewImg.src = `/images/${entityType}/${originalFilename}`;
+    } : undefined,
   });
 };
 
@@ -166,9 +169,12 @@ export const runEditUploadImage = async (editBtn) => {
   const originalFilename = uploadBtn.uploadData.originalFilename || oldFilename;
   const entityType = uploadBtn.entityType;
 
+  const hasEdits = originalFilename !== oldFilename;
+
   openImageEditor({
     src,
     onApply: async (blob) => {
+      const currentFilename = uploadBtn.uploadData.filename;
       const route = entityType === 'products' ? '/upload-product-pic-route' : '/upload-event-pic-route';
       const formData = new FormData();
       formData.append('image', blob, 'edited-image.png');
@@ -177,13 +183,20 @@ export const runEditUploadImage = async (editBtn) => {
 
       if (!data || data === 'FAIL') throw new Error('Upload failed');
 
-      if (oldFilename && oldFilename !== originalFilename) {
-        await sendToBack({ route: '/delete-pic-route', filename: oldFilename, entityType });
+      // Only delete if current file is not the original (never delete the original)
+      if (currentFilename && currentFilename !== originalFilename) {
+        await sendToBack({ route: '/delete-pic-route', filename: currentFilename, entityType });
       }
 
       uploadBtn.uploadData = { ...data, originalFilename };
       previewImg.src = '/images/' + entityType + '/' + data.filename;
-    }
+    },
+    originalSrc: hasEdits ? `/images/${entityType}/${originalFilename}` : undefined,
+    onRevert: hasEdits ? async () => {
+      await sendToBack({ route: '/delete-pic-route', filename: oldFilename, entityType });
+      uploadBtn.uploadData = { ...uploadBtn.uploadData, filename: originalFilename };
+      previewImg.src = `/images/${entityType}/${originalFilename}`;
+    } : undefined,
   });
 };
 
@@ -320,27 +333,3 @@ export const runDeleteUploadImage = async (clickedElement) => {
   if (deleteBtn) deleteBtn.style.display = "none";
 };
 
-export const runRevertSlotImage = async (revertBtn) => {
-  if (!revertBtn) return null;
-  const slot = revertBtn.closest(".pic-slot");
-  if (!slot) return null;
-  const uploadBtn = slot.querySelector(".upload-btn");
-  const previewImg = slot.querySelector(".current-image");
-  if (!uploadBtn || !previewImg || !uploadBtn.uploadData) return null;
-
-  const currentFilename = uploadBtn.uploadData.filename;
-  const originalFilename = uploadBtn.uploadData.originalFilename;
-
-  if (!originalFilename || currentFilename === originalFilename) return null;
-
-  const entityType = uploadBtn.entityType || "products";
-
-  await sendToBack({ route: "/delete-pic-route", filename: currentFilename, entityType });
-
-  uploadBtn.uploadData = { ...uploadBtn.uploadData, filename: originalFilename };
-  previewImg.src = `/images/${entityType}/${originalFilename}`;
-
-  revertBtn.classList.add("hidden");
-
-  return true;
-};

@@ -3,8 +3,31 @@ import { displayPopup } from '../util/popup.js';
 
 let cropperInstance = null;
 let currentOnApply = null;
+let currentOnRevert = null;
+let currentOriginalSrc = null;
 let flipHState = 1;
 let flipVState = 1;
+
+function initCropper() {
+  if (typeof Cropper === 'undefined') {
+    displayPopup('Image editor unavailable. Please refresh and try again.', 'error');
+    const overlay = document.getElementById('image-editor-overlay');
+    if (overlay) overlay.classList.remove('visible');
+    return;
+  }
+  if (cropperInstance) {
+    cropperInstance.destroy();
+    cropperInstance = null;
+  }
+  const img = document.getElementById('image-editor-img');
+  cropperInstance = new Cropper(img, {
+    viewMode: 1,
+    autoCropArea: 1,
+    aspectRatio: NaN,
+    responsive: true,
+    background: false,
+  });
+}
 
 function buildEditorOverlay() {
   const overlay = document.createElement('div');
@@ -55,6 +78,18 @@ function buildEditorOverlay() {
     toolbar.appendChild(b);
   }
 
+  const divider = document.createElement('span');
+  divider.className = 'image-editor-toolbar-divider';
+
+  const revertBtn = document.createElement('button');
+  revertBtn.type = 'button';
+  revertBtn.className = 'revert-image-btn hidden';
+  revertBtn.setAttribute('data-label', 'image-editor-revert');
+  revertBtn.textContent = '↩ Revert To Original';
+
+  toolbar.appendChild(divider);
+  toolbar.appendChild(revertBtn);
+
   const actions = document.createElement('div');
   actions.className = 'modal-actions';
   const cancelBtn = document.createElement('button');
@@ -82,8 +117,10 @@ function buildEditorOverlay() {
   return overlay;
 }
 
-export function openImageEditor({ src, onApply }) {
+export function openImageEditor({ src, onApply, originalSrc, onRevert }) {
   currentOnApply = onApply;
+  currentOnRevert = onRevert || null;
+  currentOriginalSrc = originalSrc || null;
   flipHState = 1;
   flipVState = 1;
 
@@ -99,23 +136,13 @@ export function openImageEditor({ src, onApply }) {
 
   const img = document.getElementById('image-editor-img');
 
-  function initCropper() {
-    if (typeof Cropper === 'undefined') {
-      displayPopup('Image editor unavailable. Please refresh and try again.', 'error');
-      overlay.classList.remove('visible');
-      return;
+  const revertBtn = overlay.querySelector('.revert-image-btn');
+  if (revertBtn) {
+    if (originalSrc && originalSrc !== src) {
+      revertBtn.classList.remove('hidden');
+    } else {
+      revertBtn.classList.add('hidden');
     }
-    if (cropperInstance) {
-      cropperInstance.destroy();
-      cropperInstance = null;
-    }
-    cropperInstance = new Cropper(img, {
-      viewMode: 1,
-      autoCropArea: 1,
-      aspectRatio: NaN,
-      responsive: true,
-      background: false,
-    });
   }
 
   img.onload = null;
@@ -132,8 +159,50 @@ export function closeImageEditor() {
     cropperInstance = null;
   }
   currentOnApply = null;
+  currentOnRevert = null;
+  currentOriginalSrc = null;
   const overlay = document.getElementById('image-editor-overlay');
   if (overlay) overlay.remove();
+}
+
+export async function revertImageEditor() {
+  if (!currentOnRevert || !currentOriginalSrc) return;
+
+  const editorContent = document.querySelector('#image-editor-overlay .modal-content');
+  showLoadStatus(editorContent, 'Reverting...');
+
+  try {
+    await currentOnRevert();
+  } catch (err) {
+    displayPopup('Failed to revert image. Please try again.', 'error');
+    hideLoadStatus();
+    return;
+  }
+
+  flipHState = 1;
+  flipVState = 1;
+
+  const img = document.getElementById('image-editor-img');
+  img.onload = null;
+  img.onerror = null;
+  img.src = '';
+  img.onload = () => {
+    img.onerror = null;
+    initCropper();
+    hideLoadStatus();
+  };
+  img.onerror = () => {
+    img.onerror = null;
+    displayPopup('Failed to load original image. Please try again.', 'error');
+    hideLoadStatus();
+  };
+  img.src = currentOriginalSrc;
+
+  const revertBtn = document.querySelector('#image-editor-overlay .revert-image-btn');
+  if (revertBtn) revertBtn.classList.add('hidden');
+
+  currentOnRevert = null;
+  currentOriginalSrc = null;
 }
 
 export async function applyImageEditor() {

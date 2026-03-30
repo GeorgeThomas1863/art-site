@@ -687,19 +687,19 @@ export async function handleQuillImageClick(imgElement) {
   const originalFilename = originalSrc.split("/").pop();
   const hasOriginal = imgElement.hasAttribute("data-original-src");
 
-  if (hasOriginal) {
-    const shouldRevert = await displayConfirmDialog("Revert this image to its original version?");
-    if (shouldRevert) {
-      await sendToBack({ route: "/delete-pic-route", filename, entityType: "newsletter" });
-      imgElement.src = originalSrc;
-      imgElement.removeAttribute("data-original-src");
-      return;
-    }
-  }
-
   openImageEditor({
     src,
+    originalSrc: hasOriginal ? originalSrc : undefined,
+    onRevert: hasOriginal ? async () => {
+      if (filename !== originalFilename) {
+        await sendToBack({ route: "/delete-pic-route", filename, entityType: "newsletter" });
+      }
+      imgElement.src = originalSrc;
+      imgElement.removeAttribute("data-original-src");
+    } : undefined,
     onApply: async (blob) => {
+      const currentSrc = imgElement.src;  // read dynamically — may differ from open-time if user reverted
+      const currentFilename = currentSrc.split("/").pop();
       const cropFormData = new FormData();
       cropFormData.append("image", blob, "cropped.jpg");
 
@@ -714,8 +714,8 @@ export async function handleQuillImageClick(imgElement) {
       }
 
       // Only delete if the current file is not the original
-      if (filename !== originalFilename) {
-        await sendToBack({ route: "/delete-pic-route", filename, entityType: "newsletter" });
+      if (currentFilename !== originalFilename) {
+        await sendToBack({ route: "/delete-pic-route", filename: currentFilename, entityType: "newsletter" });
       }
 
       imgElement.src = `/images/newsletter/${newResult.filename}`;

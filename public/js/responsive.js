@@ -2,8 +2,8 @@ import { runModalTrigger, runModalClose, runChangeStatusCard, updateAdminStats }
 import { runAddNewProduct, runEditProduct, runDeleteProduct, changeAdminProductSelector, runAddPicSlot, runRemovePicSlot } from "./helpers/admin-products.js";
 import { runAddNewEvent, runEditEvent, runDeleteEvent, changeAdminEventSelector } from "./helpers/admin-events.js";
 import { runSendNewsletter, runSendTestNewsletter, runAddSubscriber, runRemoveSubscriber, runRefreshSubscriberList, changeAdminNewsletterSelector, runDeleteNewsletter, runUpdateNewsletter, handleQuillImageClick, runNewsletterImageUpload } from "./helpers/admin-newsletter.js";
-import { runUploadClick, runUploadPic, runDeleteUploadImage, runSlotUploadClick, runSlotUploadPic, runDeleteSlotImage, runEditSlotImage, runEditUploadImage, runRevertSlotImage } from "./helpers/upload-pic.js";
-import { closeImageEditor, applyImageEditor, zoomIn, zoomOut, rotateLeft, rotateRight, flipH, flipV } from "./helpers/image-editor.js";
+import { runUploadClick, runUploadPic, runDeleteUploadImage, runSlotUploadClick, runSlotUploadPic, runDeleteSlotImage, runEditSlotImage, runEditUploadImage } from "./helpers/upload-pic.js";
+import { closeImageEditor, applyImageEditor, revertImageEditor, zoomIn, zoomOut, rotateLeft, rotateRight, flipH, flipV } from "./helpers/image-editor.js";
 import { changeProductsFilterButton, openProductDetailModal, closeProductDetailModal, runProductCarouselDot, runCarouselPrev, runCarouselNext, advanceCarousel } from "./helpers/products-run.js";
 import { runContactSubmit } from "./helpers/contact-run.js";
 import { runEventsNewsletterToggle, runEventsNewsletterSubmit } from "./helpers/events-run.js";
@@ -74,12 +74,12 @@ export const clickHandler = async (e) => {
   if (clickType === "slot-upload-click") await runSlotUploadClick(clickElement);
   if (clickType === "delete-slot-image") await runDeleteSlotImage(clickElement);
   if (clickType === "edit-slot-image") await runEditSlotImage(clickElement);
-    if (clickType === "revert-slot-image") await runRevertSlotImage(clickElement);
   if (clickType === "edit-upload-image") await runEditUploadImage(clickElement);
   if (clickType === "remove-pic-slot") await runRemovePicSlot(clickElement);
 
   if (clickType === 'image-editor-cancel')       closeImageEditor();
   if (clickType === 'image-editor-apply')        applyImageEditor();
+  if (clickType === 'image-editor-revert')       revertImageEditor();
   if (clickType === 'image-editor-zoom-in')      zoomIn();
   if (clickType === 'image-editor-zoom-out')     zoomOut();
   if (clickType === 'image-editor-rotate-left')  rotateLeft();
