@@ -91,7 +91,7 @@ export const resizeNewsletterImage = async (filePath) => {
     //console.log("[resize] filePath:", filePath, "| exists:", fs.existsSync(filePath));
     const inputBuffer = await fs.promises.readFile(filePath);
     const outputBuffer = await sharp(inputBuffer)
-      .resize({ width: 600, withoutEnlargement: true })
+      .resize({ width: 600 })
       .toBuffer();
     await fs.promises.writeFile(filePath, outputBuffer);
   } catch (err) {
