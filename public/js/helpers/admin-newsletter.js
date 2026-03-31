@@ -694,8 +694,27 @@ export async function handleQuillImageClick(imgElement) {
       if (filename !== originalFilename) {
         await sendToBack({ route: "/delete-pic-route", filename, entityType: "newsletter" });
       }
-      imgElement.src = originalSrc;
-      imgElement.removeAttribute("data-original-src");
+      // Update Quill delta so re-renders show the reverted image
+      const delta = quillInstance.getContents();
+      let charIndex = 0;
+      let foundIndex = -1;
+      for (let i = 0; i < delta.ops.length; i++) {
+        const op = delta.ops[i];
+        if (op.insert && typeof op.insert === 'object' && op.insert.image === srcAttr) {
+          foundIndex = charIndex;
+          break;
+        }
+        charIndex += (typeof op.insert === 'string') ? op.insert.length : 1;
+      }
+      if (foundIndex !== -1) {
+        quillInstance.deleteText(foundIndex, 1, 'api');
+        quillInstance.insertEmbed(foundIndex, 'image', originalSrc, 'api');
+        // No data-original-src on reverted image — it's back to the original
+      } else {
+        // Fallback: direct DOM manipulation if not found in delta
+        imgElement.src = originalSrc;
+        imgElement.removeAttribute("data-original-src");
+      }
     } : undefined,
     onApply: async (blob) => {
       const currentSrc = imgElement.src;  // read dynamically — may differ from open-time if user reverted
@@ -718,9 +737,35 @@ export async function handleQuillImageClick(imgElement) {
         await sendToBack({ route: "/delete-pic-route", filename: currentFilename, entityType: "newsletter" });
       }
 
-      imgElement.src = `/images/newsletter/${newResult.filename}`;
-      // Preserve original — data-original-src always points to first-ever version
-      imgElement.setAttribute("data-original-src", originalSrc);
+      const newRelativeSrc = `/images/newsletter/${newResult.filename}`;
+      // Update Quill delta so re-renders show the edited image
+      const applyDelta = quillInstance.getContents();
+      let applyCharIndex = 0;
+      let applyFoundIndex = -1;
+      for (let i = 0; i < applyDelta.ops.length; i++) {
+        const op = applyDelta.ops[i];
+        if (op.insert && typeof op.insert === 'object' && op.insert.image === srcAttr) {
+          applyFoundIndex = applyCharIndex;
+          break;
+        }
+        applyCharIndex += (typeof op.insert === 'string') ? op.insert.length : 1;
+      }
+      if (applyFoundIndex !== -1) {
+        quillInstance.deleteText(applyFoundIndex, 1, 'api');
+        quillInstance.insertEmbed(applyFoundIndex, 'image', newRelativeSrc, 'api');
+        // Set data-original-src on the newly rendered img element
+        const allImgs = quillInstance.root.querySelectorAll('img');
+        for (let j = 0; j < allImgs.length; j++) {
+          if (allImgs[j].getAttribute('src') === newRelativeSrc) {
+            allImgs[j].setAttribute('data-original-src', originalSrc);
+            break;
+          }
+        }
+      } else {
+        // Fallback: direct DOM if not found in delta
+        imgElement.src = newRelativeSrc;
+        imgElement.setAttribute('data-original-src', originalSrc);
+      }
     },
   });
 }
