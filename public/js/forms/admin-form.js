@@ -675,7 +675,11 @@ export const buildPicSlot = (index, entityType = "products") => {
   editBtn.setAttribute('data-label', 'edit-slot-image');
   editBtn.textContent = 'Edit Image';
 
-  slot.append(imageDisplay, picInput, uploadBtn, uploadStatus, editBtn, removeSlotBtn);
+  const actionsRow = document.createElement('div');
+  actionsRow.className = 'slot-image-actions';
+  actionsRow.append(uploadBtn, editBtn);
+
+  slot.append(imageDisplay, picInput, actionsRow, uploadStatus, removeSlotBtn);
 
   return slot;
 };

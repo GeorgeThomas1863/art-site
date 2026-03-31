@@ -1,4 +1,4 @@
-//image editing, add storage of original, so can revert if needed.
+
 
 //MAKE SURE IMAGE EDTING WORKS ON MOBILE
 

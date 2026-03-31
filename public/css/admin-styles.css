@@ -1233,6 +1233,39 @@
   background: #555;
 }
 
+/* Image action button row — Change Image + Edit Image side by side */
+.slot-image-actions {
+  display: flex;
+  flex-direction: row;
+  gap: 0.5rem;
+  width: 100%;
+}
+
+.slot-image-actions .upload-btn {
+  flex: 1;
+  padding: 0.75rem 1rem;
+}
+
+.slot-image-actions .edit-image-btn {
+  flex: 1;
+  padding: 0.75rem 1rem;
+  font-family: "Georgia", serif;
+  font-size: 1rem;
+  letter-spacing: 1px;
+  background: #fff;
+  color: #000;
+  border: 2px solid #000;
+  border-radius: 4px;
+  text-transform: uppercase;
+  margin-top: 0;
+  transition: all 0.3s;
+}
+
+.slot-image-actions .edit-image-btn:hover {
+  background: #000;
+  color: #fff;
+}
+
 .revert-image-btn {
   background: none;
   color: #666;
