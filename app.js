@@ -1,6 +1,6 @@
+//RUN ANOTHER FULL CODE REVIEW AND SECURITY REVIEW OF SITE
 
-
-//MAKE SURE IMAGE EDTING WORKS ON MOBILE
+//MAKE SURE IMAGE EDTING WORKS ON MOBILE, keep testing image editing
 
 // figure out the cloudflare problem and fix it (have claude investigate based on cloudflare docs)
 

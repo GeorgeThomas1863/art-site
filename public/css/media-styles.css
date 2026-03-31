@@ -283,6 +283,11 @@
     height: auto;
     background: transparent;
   }
+
+  /* Image Editor */
+  .image-editor-canvas-area {
+    height: 400px;
+  }
 }
 
 /* ================================================ */
@@ -574,6 +579,16 @@
   .newsletter-card-body {
     padding: 1.5rem;
   }
+
+  /* Image Editor */
+  .image-editor-canvas-area {
+    height: 320px;
+  }
+
+  .image-editor-btn {
+    min-height: 44px;
+    min-width: 44px;
+  }
 }
 
 /* ================================================ */
@@ -826,6 +841,17 @@
     flex-direction: column;
   }
 
+  .modal-actions .btn-admin-submit {
+    margin-left: 0;
+    width: 100%;
+    text-align: center;
+  }
+
+  .modal-actions .btn-admin-cancel {
+    width: 100%;
+    text-align: center;
+  }
+
   .modal-actions .btn {
     width: 100%;
     text-align: center;
@@ -844,6 +870,15 @@
   /* Global */
   h3 {
     font-size: 2rem;
+  }
+
+  /* Image Editor */
+  .image-editor-canvas-area {
+    height: 250px;
+  }
+
+  .slot-image-actions {
+    flex-direction: column;
   }
 }
 
@@ -909,5 +944,10 @@
   .confirm-item-image {
     width: 50px;
     height: 50px;
+  }
+
+  /* Image Editor */
+  .image-editor-canvas-area {
+    height: 200px;
   }
 }

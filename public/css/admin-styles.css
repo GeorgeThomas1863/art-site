@@ -1171,6 +1171,15 @@
   max-width: 900px;
 }
 
+/* Equal-width Cancel / Apply buttons — override the global width:100% on btn-admin-submit */
+#image-editor-overlay .modal-actions .btn-admin-cancel,
+#image-editor-overlay .modal-actions .btn-admin-submit {
+  flex: 1;
+  width: auto;
+  margin-left: 0;
+  text-align: center;
+}
+
 .image-editor-canvas-area {
   width: 100%;
   height: 500px;
