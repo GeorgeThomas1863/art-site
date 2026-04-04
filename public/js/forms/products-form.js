@@ -116,6 +116,13 @@ export const buildProductCard = async (productData) => {
   productCard.setAttribute("data-product-id", productData.productId);
   productCard.setAttribute("data-product-type", productData.productType);
 
+  if (productData.sold === "yes") {
+    const soldRibbon = document.createElement("div");
+    soldRibbon.className = "sold-ribbon";
+    soldRibbon.textContent = "SOLD";
+    productCard.append(soldRibbon);
+  }
+
   const productImage = await buildProductImage(productData);
   const productInfo = await buildProductInfo(productData);
 
@@ -388,6 +395,13 @@ export const buildProductDetailModal = async (productData, startIndex = 0) => {
     pickupBadge.className = "pickup-badge";
     pickupBadge.textContent = "Pickup Only";
     footerLeft.append(pickupBadge);
+  }
+
+  if (productData.sold === "yes") {
+    const soldBadge = document.createElement("span");
+    soldBadge.className = "sold-badge";
+    soldBadge.textContent = "SOLD";
+    footerLeft.append(soldBadge);
   }
 
   footer.append(footerLeft);
