@@ -153,7 +153,6 @@ export const hideOrderedProducts = async (cartItems) => {
     if (!product) continue;
 
     const updateObj = { sold: "yes" };
-    if (product.removeWhenSold === "yes") updateObj.display = "no";
 
     const updateParams = {
       keyToLookup: "productId",

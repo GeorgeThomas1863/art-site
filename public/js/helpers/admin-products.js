@@ -319,17 +319,6 @@ export const populateEditFormProducts = async (inputObj) => {
     }
   }
 
-  // Enforce cross-flag invariant on legacy data
-  const soldEl = document.getElementById("edit-sold");
-  const removeEl = document.getElementById("edit-remove-when-sold");
-  const displayEl = document.getElementById("edit-display");
-
-  if (soldEl?.value === "yes" && removeEl?.value === "yes" && displayEl) {
-    displayEl.value = "no";
-    displayEl.classList.remove("status-yes", "status-no");
-    displayEl.classList.add("status-no");
-  }
-
   // Show N/A in shipping fields when can-ship is "no"
   const canShipEl = document.getElementById("edit-can-ship");
   if (canShipEl?.value === "no") {
