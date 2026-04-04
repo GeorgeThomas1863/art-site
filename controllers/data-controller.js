@@ -15,7 +15,8 @@ import {
 import { buildCart, getCartStats, addCartItem, updateCartItem, removeCartItem } from "../src/cart.js";
 import { fetchShippingRates, getShippingFromSession, clearShippingFromSession, updateSelectedRate } from "../src/shipping.js";
 import { placeNewOrder } from "../src/orders.js";
-import { deletePic, resizeNewsletterImage } from "../src/upload-back.js";
+import path from "path";
+import { deletePic, resizeNewsletterImage, uploadDir } from "../src/upload-back.js";
 import {
   validateEmail,
   validateZip,
@@ -48,12 +49,15 @@ export const uploadPicControl = async (req, res) => {
 
   const mediaType = req.file.mimetype.startsWith("video/") ? "video" : "image";
 
+  // Compute URL-relative path (e.g. /images/products/filename.jpg) so it works on any deployment
+  const publicDir = path.join(uploadDir, "..");
+  const relativePath = "/" + path.relative(publicDir, req.file.path).replace(/\\/g, "/");
+
   const data = {
     message: "Picture uploaded successfully",
     filename: req.file.filename,
     originalName: req.file.originalname,
-    path: req.file.path,
-    size: req.file.size,
+    path: relativePath,
     mediaType: mediaType,
   };
 

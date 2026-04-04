@@ -34,11 +34,7 @@ export const sendToBackFile = async (inputParams) => {
       body: formData,
     });
 
-    if (res.error) {
-      // console.log("UPLOAD ERROR");
-      // console.log(res.error);
-      return "FAIL";
-    }
+    if (!res.ok) return "FAIL";
 
     const data = await res.json();
     return data;
