@@ -61,6 +61,13 @@ export const buildEventImage = async (eventData) => {
   if (pics.length === 0) return null;
 
   if (pics.length === 1) {
+    if (pics[0].mediaType === "video") {
+      const eventVideo = document.createElement("video");
+      eventVideo.className = "event-image";
+      eventVideo.controls = true;
+      eventVideo.src = `/images/events/${pics[0].filename}`;
+      return eventVideo;
+    }
     const eventImage = document.createElement("img");
     eventImage.className = "event-image";
     eventImage.alt = eventData.name || "Event image";
@@ -68,7 +75,7 @@ export const buildEventImage = async (eventData) => {
     return eventImage;
   }
 
-  return buildCarouselElement(pics, eventData.name || "Event", true);
+  return buildCarouselElement(pics, eventData.name || "Event", true, 0, "events");
 };
 
 export const buildEventContent = async (eventData) => {

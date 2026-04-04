@@ -18,7 +18,7 @@ export const runAddNewEvent = async () => {
     if (slotBtns[i].uploadData) { hasImage = true; break; }
   }
   if (!hasImage) {
-    await displayPopup("Please upload at least one image of the event", "error");
+    await displayPopup("Please upload at least one image or video of the event", "error");
     return null;
   }
 
@@ -239,15 +239,25 @@ export const populateEditFormEvents = async (inputObj) => {
       const slotEditBtn = slot.querySelector(".edit-image-btn");
       if (slotUploadBtn) {
         slotUploadBtn.uploadData = pics[i];
-        slotUploadBtn.textContent = "Change Image";
+        slotUploadBtn.textContent = "Change File";
       }
-      if (slotCurrentImage) {
-        slotCurrentImage.src = `/images/events/${pics[i].filename}`;
-        slotCurrentImage.classList.remove("hidden");
+      const slotCurrentVideo = slot.querySelector(".current-video");
+      if (pics[i].mediaType === "video") {
+        if (slotCurrentVideo) {
+          slotCurrentVideo.src = `/images/events/${pics[i].filename}`;
+          slotCurrentVideo.classList.remove("hidden");
+        }
+        if (slotCurrentImage) slotCurrentImage.classList.add("hidden");
+      } else {
+        if (slotCurrentImage) {
+          slotCurrentImage.src = `/images/events/${pics[i].filename}`;
+          slotCurrentImage.classList.remove("hidden");
+        }
+        if (slotCurrentVideo) slotCurrentVideo.classList.add("hidden");
+        if (slotEditBtn) slotEditBtn.classList.remove("hidden");
       }
       if (slotPlaceholder) slotPlaceholder.classList.add("hidden");
       if (slotDeleteBtn) slotDeleteBtn.classList.remove("hidden");
-      if (slotEditBtn) slotEditBtn.classList.remove("hidden");
 
         const slotRevertBtn = slot.querySelector(".revert-image-btn");
         if (slotRevertBtn && pics[i].originalFilename && pics[i].filename !== pics[i].originalFilename) {

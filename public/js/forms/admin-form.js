@@ -638,24 +638,28 @@ export const buildPicSlot = (index, entityType = "products") => {
   currentImage.className = "current-image hidden";
   currentImage.alt = "Product image";
 
+  const currentVideo = document.createElement("video");
+  currentVideo.className = "current-video hidden";
+  currentVideo.controls = true;
+
   const deleteImageBtn = document.createElement("button");
   deleteImageBtn.type = "button";
   deleteImageBtn.className = "delete-image-btn hidden";
   deleteImageBtn.innerHTML = "×";
-  deleteImageBtn.title = "Delete image";
+  deleteImageBtn.title = "Delete file";
   deleteImageBtn.setAttribute("data-label", "delete-slot-image");
 
-  imageDisplay.append(imagePlaceholder, currentImage, deleteImageBtn);
+  imageDisplay.append(imagePlaceholder, currentImage, currentVideo, deleteImageBtn);
 
   const picInput = document.createElement("input");
   picInput.type = "file";
   picInput.className = "pic-file-input hidden";
-  picInput.accept = ".jpg,.jpeg,.png,.gif,.webp";
+  picInput.accept = ".jpg,.jpeg,.png,.gif,.webp,.mp4,.webm,.mov";
 
   const uploadBtn = document.createElement("button");
   uploadBtn.type = "button";
   uploadBtn.className = "upload-btn";
-  uploadBtn.textContent = "Choose Image";
+  uploadBtn.textContent = "Choose File";
   uploadBtn.setAttribute("data-label", "slot-upload-click");
   uploadBtn.entityType = entityType;
 
@@ -1077,82 +1081,6 @@ export const buildEditNewsletterSection = async () => {
   return section;
 };
 
-//+++++++++++++++++++
-
-//ADMIN UPLOAD
-
-export const buildAdminUpload = async (mode, entityType = "products") => {
-  const uploadSection = document.createElement("div");
-  uploadSection.className = "image-upload-area";
-
-  // Image display container
-  const imageDisplay = document.createElement("div");
-  imageDisplay.className = "image-display";
-  imageDisplay.id = mode === "add" ? "current-image-preview" : "edit-current-image-preview";
-
-  const imagePlaceholder = document.createElement("div");
-  imagePlaceholder.className = "image-placeholder";
-  imagePlaceholder.textContent = "🖼️";
-
-  const currentImage = document.createElement("img");
-  currentImage.id = mode === "add" ? "current-image" : "edit-current-image";
-  currentImage.className = "current-image";
-  currentImage.alt = mode === "add" ? "Selected product image" : "Current product image";
-  currentImage.style.display = "none";
-
-  // Delete button for the image
-  const deleteImageBtn = document.createElement("button");
-  deleteImageBtn.type = "button";
-  deleteImageBtn.className = "delete-image-btn";
-  deleteImageBtn.id = mode === "add" ? "delete-image-btn" : "edit-delete-image-btn";
-  deleteImageBtn.innerHTML = "×";
-  deleteImageBtn.title = "Delete image";
-  deleteImageBtn.setAttribute("data-label", mode === "add" ? "delete-upload-image" : "edit-delete-upload-image");
-  deleteImageBtn.entityType = entityType;
-  deleteImageBtn.style.display = "none";
-
-  imageDisplay.append(imagePlaceholder, currentImage, deleteImageBtn);
-
-  // Hidden file input
-  const picInput = document.createElement("input");
-  picInput.type = "file";
-  picInput.id = mode === "add" ? "upload-pic-input" : "edit-upload-pic-input";
-  picInput.accept = ".jpg,.jpeg,.png,.gif,.webp";
-  picInput.style.display = "none";
-
-  if (mode === "edit") {
-    picInput.disabled = true;
-  }
-
-  const uploadButton = document.createElement("button");
-  uploadButton.type = "button";
-  uploadButton.id = mode === "add" ? "upload-button" : "edit-upload-button";
-  uploadButton.className = "upload-btn";
-  uploadButton.textContent = mode === "add" ? "Choose Image" : "Change Image";
-  uploadButton.setAttribute("data-label", mode === "add" ? "upload-click" : "edit-upload-click");
-  uploadButton.entityType = entityType;
-
-  if (mode === "edit") {
-    uploadButton.disabled = true;
-  }
-
-  const uploadStatus = document.createElement("span");
-  uploadStatus.id = mode === "add" ? "upload-status" : "edit-upload-status";
-  uploadStatus.className = "upload-status";
-  uploadStatus.style.display = "none";
-
-  const editImageBtn = document.createElement('button');
-  editImageBtn.type = 'button';
-  editImageBtn.className = 'edit-image-btn hidden';
-  editImageBtn.setAttribute('data-label', 'edit-upload-image');
-  editImageBtn.textContent = 'Edit Image';
-
-  uploadSection.append(imageDisplay, picInput, uploadButton, uploadStatus, editImageBtn);
-
-  return uploadSection;
-};
-
-//+++++++++++
 
 //NEWSLETTER FORM FIELDS
 

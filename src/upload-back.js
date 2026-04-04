@@ -11,7 +11,7 @@ import { sanitizeFilename } from "./sanitize.js";
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
-// Define upload directory //CHANGE
+// Define upload directory
 const uploadDir = path.join(__dirname, "../public/images");
 
 // Create directories if they don't exist
@@ -41,14 +41,18 @@ const storage = multer.diskStorage({
 
 // File filter
 const fileFilter = (req, file, cb) => {
-  const allowedTypes = /jpg|jpeg|png|gif|webp/;
-  const extname = allowedTypes.test(path.extname(file.originalname).toLowerCase());
-  const mimetype = allowedTypes.test(file.mimetype);
+  const ext = path.extname(file.originalname).toLowerCase();
+  const mime = file.mimetype;
 
-  if (extname && mimetype) {
+  const validImage = ['.jpg', '.jpeg', '.png', '.gif', '.webp'].includes(ext) &&
+    /^image\/(jpeg|png|gif|webp)$/.test(mime);
+  const validVideo = ['.mp4', '.webm', '.mov'].includes(ext) &&
+    /^video\/(mp4|webm|quicktime)$/.test(mime);
+
+  if (validImage || validVideo) {
     cb(null, true);
   } else {
-    cb(new Error("Only image files are allowed"));
+    cb(new Error("Only image and video files are allowed"));
   }
 };
 
@@ -56,7 +60,7 @@ const fileFilter = (req, file, cb) => {
 export const upload = multer({
   storage: storage,
   fileFilter: fileFilter,
-  limits: { fileSize: 10 * 1024 * 1024 }, // 10MB limit
+  limits: { fileSize: 100 * 1024 * 1024 }, // 100MB limit
 });
 
 //-------------------
@@ -88,6 +92,8 @@ export const deletePic = async (filename, entityType) => {
 
 export const resizeNewsletterImage = async (filePath) => {
   try {
+    const ext = path.extname(filePath).toLowerCase();
+    if (['.mp4', '.webm', '.mov'].includes(ext)) return;
     //console.log("[resize] filePath:", filePath, "| exists:", fs.existsSync(filePath));
     const inputBuffer = await fs.promises.readFile(filePath);
     const outputBuffer = await sharp(inputBuffer)

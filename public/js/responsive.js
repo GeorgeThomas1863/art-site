@@ -2,7 +2,7 @@ import { runModalTrigger, runModalClose, runChangeStatusCard, updateAdminStats }
 import { runAddNewProduct, runEditProduct, runDeleteProduct, changeAdminProductSelector, runAddPicSlot, runRemovePicSlot } from "./helpers/admin-products.js";
 import { runAddNewEvent, runEditEvent, runDeleteEvent, changeAdminEventSelector } from "./helpers/admin-events.js";
 import { runSendNewsletter, runSendTestNewsletter, runAddSubscriber, runRemoveSubscriber, runRefreshSubscriberList, changeAdminNewsletterSelector, runDeleteNewsletter, runUpdateNewsletter, handleQuillImageClick, runNewsletterImageUpload } from "./helpers/admin-newsletter.js";
-import { runUploadClick, runUploadPic, runDeleteUploadImage, runSlotUploadClick, runSlotUploadPic, runDeleteSlotImage, runEditSlotImage, runEditUploadImage } from "./helpers/upload-pic.js";
+import { runSlotUploadClick, runSlotUploadPic, runDeleteSlotImage, runEditSlotImage } from "./helpers/upload-pic.js";
 import { closeImageEditor, applyImageEditor, revertImageEditor, zoomIn, zoomOut, rotateLeft, rotateRight, flipH, flipV } from "./helpers/image-editor.js";
 import { changeProductsFilterButton, openProductDetailModal, closeProductDetailModal, runProductCarouselDot, runCarouselPrev, runCarouselNext, advanceCarousel } from "./helpers/products-run.js";
 import { runContactSubmit } from "./helpers/contact-run.js";
@@ -68,13 +68,9 @@ export const clickHandler = async (e) => {
   if (clickType?.includes("open-modal-")) await runModalTrigger(clickElement);
   if (clickType?.includes("close-modal-")) await runModalClose(clickElement);
 
-  if (clickType === "upload-click" || clickType === "edit-upload-click") await runUploadClick(clickElement);
-  if (clickType === "delete-upload-image" || clickType === "edit-delete-upload-image") await runDeleteUploadImage(clickElement);
-
   if (clickType === "slot-upload-click") await runSlotUploadClick(clickElement);
   if (clickType === "delete-slot-image") await runDeleteSlotImage(clickElement);
   if (clickType === "edit-slot-image") await runEditSlotImage(clickElement);
-  if (clickType === "edit-upload-image") await runEditUploadImage(clickElement);
   if (clickType === "remove-pic-slot") await runRemovePicSlot(clickElement);
 
   if (clickType === 'image-editor-cancel')       closeImageEditor();
@@ -184,17 +180,6 @@ export const changeHandler = async (e) => {
   // Newsletter image file input
   if (changeId === "newsletter-image-file-input" || changeId === "edit-newsletter-image-file-input") {
     await runNewsletterImageUpload(changeElement);
-    return true;
-  }
-
-  //Upload / Edit pic (legacy single-image for events)
-  if (changeId === "upload-pic-input" || changeId === "edit-upload-pic-input") {
-    const pic = e.target.files[0];
-    if (!pic) return null;
-
-    const mode = changeId.includes("edit") ? "edit" : "add";
-    const entityType = changeElement.entityType;
-    await runUploadPic(pic, mode, entityType);
     return true;
   }
 

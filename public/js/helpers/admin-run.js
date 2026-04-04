@@ -161,8 +161,6 @@ export const enableAdminEditFields = async () => {
     "edit-width",
     "edit-height",
     "edit-weight",
-    "edit-upload-pic-input",
-    "edit-upload-button",
     "edit-submit-button",
     "edit-event-date",
     "edit-event-location",
@@ -194,8 +192,6 @@ export const disableAdminEditFields = async () => {
     "edit-width",
     "edit-height",
     "edit-weight",
-    "edit-upload-pic-input",
-    "edit-upload-button",
     "edit-submit-button",
     "edit-event-date",
     "edit-event-location",
@@ -212,52 +208,6 @@ export const disableAdminEditFields = async () => {
   return true;
 };
 
-export const clearAdminAddFields = async () => {
-  const clearFieldsArray = ["item-id", "name", "price", "description", "event-date", "event-location", "event-description"];
-
-  for (let i = 0; i < clearFieldsArray.length; i++) {
-    const field = document.getElementById(clearFieldsArray[i]);
-    if (field) {
-      field.value = "";
-    }
-  }
-
-  // Reset select dropdowns to defaults
-  const productTypeSelect = document.getElementById("product-type");
-  if (productTypeSelect) productTypeSelect.selectedIndex = 0; // Reset to first option (Acorns)
-
-  const displaySelect = document.getElementById("display");
-  if (displaySelect) displaySelect.value = "yes"; // Reset to default
-
-  const soldSelect = document.getElementById("sold");
-  if (soldSelect) soldSelect.value = "no"; // Reset to default
-
-  const removeWhenSoldSelect = document.getElementById("remove-when-sold");
-  if (removeWhenSoldSelect) removeWhenSoldSelect.value = "yes"; // Reset to default
-
-  // Clear image preview
-  const currentImagePreview = document.getElementById("current-image-preview");
-  if (currentImagePreview) currentImagePreview.style.display = "none";
-
-  // Reset upload button and status
-  const uploadButton = document.getElementById("upload-button");
-  const uploadStatus = document.getElementById("upload-status");
-  const uploadInput = document.getElementById("upload-pic-input");
-
-  if (uploadButton) {
-    uploadButton.uploadData = null;
-    uploadButton.textContent = "Choose Image";
-  }
-
-  if (uploadStatus) {
-    uploadStatus.textContent = "";
-    uploadStatus.style.display = "none";
-  }
-
-  if (uploadInput) uploadInput.value = ""; // Clear the file input
-
-  return true;
-};
 
 export const clearAdminEditFields = async () => {
   const clearFieldsArray = [
@@ -276,26 +226,6 @@ export const clearAdminEditFields = async () => {
       field.value = "";
     }
   }
-
-  const currentImagePreview = document.getElementById("edit-current-image-preview");
-  if (currentImagePreview) currentImagePreview.style.display = "none";
-
-  // Clear upload data
-  const uploadButton = document.getElementById("edit-upload-button");
-  const uploadStatus = document.getElementById("edit-upload-status");
-  const uploadInput = document.getElementById("edit-upload-pic-input");
-
-  if (uploadButton) {
-    uploadButton.uploadData = null;
-    uploadButton.textContent = "Change Image";
-  }
-
-  if (uploadStatus) {
-    uploadStatus.textContent = "";
-    uploadStatus.style.display = "none";
-  }
-
-  if (uploadInput) uploadInput.value = "";
 
   // const deleteButton = document.getElementById("delete-product-button");
   // if (deleteButton) deleteButton.style.display = "none";

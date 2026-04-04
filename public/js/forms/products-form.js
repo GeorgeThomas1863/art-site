@@ -125,7 +125,7 @@ export const buildProductCard = async (productData) => {
 };
 
 // Internal helper — builds a carousel element for grid cards or the detail modal
-export const buildCarouselElement = (pics, altText, isCard, startIndex = 0) => {
+export const buildCarouselElement = (pics, altText, isCard, startIndex = 0, entityType = "products") => {
   const carousel = document.createElement("div");
   carousel.className = "product-carousel";
   if (isCard) carousel.setAttribute("data-label", "product-card-click");
@@ -134,13 +134,19 @@ export const buildCarouselElement = (pics, altText, isCard, startIndex = 0) => {
   track.className = "carousel-track";
 
   for (let i = 0; i < pics.length; i++) {
-    const slide = document.createElement("img");
+    let slide;
+    if (pics[i].mediaType === "video") {
+      slide = document.createElement("video");
+      slide.controls = true;
+    } else {
+      slide = document.createElement("img");
+      slide.alt = altText;
+      if (isCard || i !== startIndex) slide.setAttribute("loading", "lazy");
+    }
     slide.className = "carousel-slide";
-    if (isCard) slide.setAttribute("data-label", "product-card-click");
-    if (isCard || i !== startIndex) slide.setAttribute("loading", "lazy");
-    slide.src = `/images/products/${pics[i].filename}`;
-    slide.alt = altText;
+    if (isCard && pics[i].mediaType !== "video") slide.setAttribute("data-label", "product-card-click");
     slide.draggable = false;
+    slide.src = `/images/${entityType}/${pics[i].filename}`;
     track.append(slide);
   }
 
@@ -180,6 +186,13 @@ export const buildProductImage = async (productData) => {
   if (pics.length === 0) return null;
 
   if (pics.length === 1) {
+    if (pics[0].mediaType === "video") {
+      const productVideo = document.createElement("video");
+      productVideo.className = "product-image";
+      productVideo.controls = true;
+      productVideo.src = `/images/products/${pics[0].filename}`;
+      return productVideo;
+    }
     const productImage = document.createElement("img");
     productImage.className = "product-image";
     productImage.setAttribute("data-label", "product-card-click");
@@ -310,11 +323,19 @@ export const buildProductDetailModal = async (productData, startIndex = 0) => {
   // Images
   const pics = productData.picData ? (Array.isArray(productData.picData) ? productData.picData : [productData.picData]) : [];
   if (pics.length === 1) {
-    const img = document.createElement("img");
-    img.className = "product-detail-image";
-    img.src = `/images/products/${pics[0].filename}`;
-    img.alt = productData.name;
-    body.append(img);
+    if (pics[0].mediaType === "video") {
+      const videoEl = document.createElement("video");
+      videoEl.className = "product-detail-image";
+      videoEl.controls = true;
+      videoEl.src = `/images/products/${pics[0].filename}`;
+      body.append(videoEl);
+    } else {
+      const img = document.createElement("img");
+      img.className = "product-detail-image";
+      img.src = `/images/products/${pics[0].filename}`;
+      img.alt = productData.name;
+      body.append(img);
+    }
   } else if (pics.length > 1) {
     const carousel = buildCarouselElement(pics, productData.name, false, startIndex);
     body.append(carousel);

@@ -46,12 +46,15 @@ export const uploadPicControl = async (req, res) => {
     await resizeNewsletterImage(req.file.path);
   }
 
+  const mediaType = req.file.mimetype.startsWith("video/") ? "video" : "image";
+
   const data = {
     message: "Picture uploaded successfully",
     filename: req.file.filename,
     originalName: req.file.originalname,
     path: req.file.path,
     size: req.file.size,
+    mediaType: mediaType,
   };
 
   return res.json(data);

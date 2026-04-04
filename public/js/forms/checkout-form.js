@@ -350,7 +350,12 @@ export const buildCheckoutItem = async (itemData) => {
 
   const itemImage = document.createElement("img");
   itemImage.className = "checkout-item-image";
-  const pic = Array.isArray(itemData.picData) ? itemData.picData[0] : itemData.picData;
+  const picsArr = Array.isArray(itemData.picData) ? itemData.picData : (itemData.picData ? [itemData.picData] : []);
+  let pic = null;
+  for (let i = 0; i < picsArr.length; i++) {
+    if (picsArr[i].mediaType !== "video") { pic = picsArr[i]; break; }
+  }
+  if (!pic) pic = picsArr[0];
   itemImage.src = `/images/products/${pic?.filename || ""}`;
   itemImage.alt = itemData.name;
 
