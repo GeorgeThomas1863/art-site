@@ -70,6 +70,7 @@ export const buildProductsDisplay = async () => {
 
   await updateNavbarCart();
   const displayedProducts = productData ? productData.filter((p) => p.display !== "no") : [];
+  displayedProducts.sort((a, b) => new Date(b.dateCreated) - new Date(a.dateCreated));
   await populateProducts(displayedProducts);
 
   const pathParts = window.location.pathname.split('/').filter(Boolean);
