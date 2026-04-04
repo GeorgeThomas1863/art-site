@@ -20,7 +20,6 @@ export const buildNewProductParams = async () => {
     description: document.getElementById("description").value,
     display: document.getElementById("display").value,
     sold: document.getElementById("sold").value,
-    removeWhenSold: document.getElementById("remove-when-sold").value,
     picData: picData,
     dateCreated: new Date().toISOString(),
   };
@@ -49,7 +48,6 @@ export const getEditProductParams = async () => {
     description: document.getElementById("edit-description").value,
     display: document.getElementById("edit-display").value,
     sold: document.getElementById("edit-sold").value,
-    removeWhenSold: document.getElementById("edit-remove-when-sold").value,
     picData: picData,
   };
 

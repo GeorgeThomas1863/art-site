@@ -100,7 +100,6 @@ export const addNewProductControl = async (req, res) => {
     "description",
     "display",
     "sold",
-    "removeWhenSold",
     "picData",
     "dateCreated",
   ]);
@@ -126,7 +125,6 @@ export const editProductControl = async (req, res) => {
     "description",
     "display",
     "sold",
-    "removeWhenSold",
     "picData",
     "productId",
   ]);
@@ -294,7 +292,7 @@ export const placeOrderControl = async (req, res) => {
     storeSubscriber(req.body.email).catch((e) => console.error("NEWSLETTER SUBSCRIBE ERROR:", e));
   }
 
-  // After successful order, hide products flagged with removeWhenSold
+  // After successful order, mark ordered products as sold
   if (data.success && data.data && data.data.cartData) {
     hideOrderedProducts(data.data.cartData).catch((e) => console.error("HIDE PRODUCTS ERROR:", e));
   }

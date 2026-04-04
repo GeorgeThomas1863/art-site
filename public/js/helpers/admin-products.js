@@ -283,7 +283,7 @@ export const populateAdminProductSelector = async (inputArray) => {
 export const populateEditFormProducts = async (inputObj) => {
   if (!inputObj) return null;
 
-  const { itemId, name, urlName, productType, price, description, display, sold, removeWhenSold, picData, canShip, length, width, height, weight } = inputObj;
+  const { itemId, name, urlName, productType, price, description, display, sold, picData, canShip, length, width, height, weight } = inputObj;
 
   const adminEditMapArray = [
     { id: "edit-item-id", value: itemId },
@@ -299,7 +299,6 @@ export const populateEditFormProducts = async (inputObj) => {
     { id: "edit-description", value: description },
     { id: "edit-display", value: display },
     { id: "edit-sold", value: sold },
-    { id: "edit-remove-when-sold", value: removeWhenSold || "yes" },
   ];
 
   for (let i = 0; i < adminEditMapArray.length; i++) {
@@ -310,7 +309,7 @@ export const populateEditFormProducts = async (inputObj) => {
   }
 
   // Sync CSS classes on status selects to match their values
-  const statusIds = ["edit-display", "edit-sold", "edit-can-ship", "edit-remove-when-sold"];
+  const statusIds = ["edit-display", "edit-sold", "edit-can-ship"];
   for (const id of statusIds) {
     const el = document.getElementById(id);
     if (el) {

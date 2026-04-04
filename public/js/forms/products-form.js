@@ -397,13 +397,6 @@ export const buildProductDetailModal = async (productData, startIndex = 0) => {
     footerLeft.append(pickupBadge);
   }
 
-  if (productData.sold === "yes") {
-    const soldBadge = document.createElement("span");
-    soldBadge.className = "sold-badge";
-    soldBadge.textContent = "SOLD";
-    footerLeft.append(soldBadge);
-  }
-
   footer.append(footerLeft);
 
   if (hasAnySpec) {
@@ -443,6 +436,13 @@ export const buildProductDetailModal = async (productData, startIndex = 0) => {
 
   info.append(name, price, description, footer);
   body.append(addToCartBtn, divider, info);
+
+  if (productData.sold === "yes") {
+    const soldRibbon = document.createElement("div");
+    soldRibbon.className = "sold-ribbon";
+    soldRibbon.textContent = "SOLD";
+    wrapper.append(soldRibbon);
+  }
 
   wrapper.append(header, body);
   overlay.append(wrapper);
