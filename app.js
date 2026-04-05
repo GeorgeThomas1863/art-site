@@ -1,4 +1,4 @@
-//test display / sold items, vid updloads 
+//write tests?
 
 //RUN ANOTHER FULL CODE REVIEW AND SECURITY REVIEW OF SITE
 

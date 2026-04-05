@@ -5,6 +5,7 @@ let cropperInstance = null;
 let currentOnApply = null;
 let currentOnRevert = null;
 let currentOriginalSrc = null;
+let currentMimeType = 'image/jpeg';
 let flipHState = 1;
 let flipVState = 1;
 
@@ -117,10 +118,11 @@ function buildEditorOverlay() {
   return overlay;
 }
 
-export function openImageEditor({ src, onApply, originalSrc, onRevert }) {
+export function openImageEditor({ src, onApply, originalSrc, onRevert, mimeType }) {
   currentOnApply = onApply;
   currentOnRevert = onRevert || null;
   currentOriginalSrc = originalSrc || null;
+  currentMimeType = mimeType || 'image/jpeg';
   flipHState = 1;
   flipVState = 1;
 
@@ -161,6 +163,7 @@ export function closeImageEditor() {
   currentOnApply = null;
   currentOnRevert = null;
   currentOriginalSrc = null;
+  currentMimeType = 'image/jpeg';
   const overlay = document.getElementById('image-editor-overlay');
   if (overlay) overlay.remove();
 }
@@ -232,7 +235,7 @@ export async function applyImageEditor() {
       hideLoadStatus();
       closeImageEditor();
     }
-  }, 'image/jpeg', 0.92);
+  }, currentMimeType, 0.92);
 }
 
 export function zoomIn()      { if (cropperInstance) cropperInstance.zoom(0.1); }

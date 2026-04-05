@@ -37,7 +37,7 @@ export const getEditProductParams = async () => {
   const params = {
     itemId: document.getElementById("edit-item-id").value,
     name: document.getElementById("edit-name").value,
-    urlName: document.getElementById("edit-url-name")?.value?.trim() || '',
+    urlName: document.getElementById("edit-url-name")?.value?.trim() || undefined,
     productType: document.getElementById("edit-product-type").value,
     price: document.getElementById("edit-price").value,
     canShip: document.getElementById("edit-can-ship").value,

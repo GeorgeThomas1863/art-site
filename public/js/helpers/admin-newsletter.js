@@ -310,14 +310,19 @@ export const runNewsletterImageUpload = async (fileInput) => {
   // Save cursor position before opening Cropper
   const cursorIndex = quillInstance.getSelection()?.index ?? 0;
 
+  const uploadExt = (result.filename.split('.').pop() || 'jpg').toLowerCase();
+  const uploadMime = { jpg: 'image/jpeg', jpeg: 'image/jpeg', png: 'image/png', webp: 'image/webp' }[uploadExt] || 'image/jpeg';
+  const uploadBlobExt = uploadMime === 'image/png' ? 'png' : uploadMime === 'image/webp' ? 'webp' : 'jpg';
+
   openImageEditor({
     src: `/images/newsletter/${result.filename}`,
+    mimeType: uploadMime,
     onApply: async (blob) => {
       const insertIndex = quillInstance?.getSelection()?.index ?? cursorIndex;
       if (!quillInstance) return;
       // Upload the cropped blob
       const cropFormData = new FormData();
-      cropFormData.append("image", blob, "cropped.jpg");
+      cropFormData.append("image", blob, `cropped.${uploadBlobExt}`);
 
       const newResult = await sendToBackFile({
         route: "/upload-newsletter-pic-route",
@@ -687,8 +692,13 @@ export async function handleQuillImageClick(imgElement) {
   const originalFilename = originalSrc.split("/").pop();
   const hasOriginal = imgElement.hasAttribute("data-original-src");
 
+  const nlExt = (filename.split('.').pop() || 'jpg').toLowerCase();
+  const nlMime = { jpg: 'image/jpeg', jpeg: 'image/jpeg', png: 'image/png', webp: 'image/webp' }[nlExt] || 'image/jpeg';
+  const nlBlobExt = nlMime === 'image/png' ? 'png' : nlMime === 'image/webp' ? 'webp' : 'jpg';
+
   openImageEditor({
     src,
+    mimeType: nlMime,
     originalSrc: hasOriginal ? originalSrc : undefined,
     onRevert: hasOriginal ? async () => {
       if (filename !== originalFilename) {
@@ -720,7 +730,7 @@ export async function handleQuillImageClick(imgElement) {
       const currentSrc = imgElement.src;  // read dynamically — may differ from open-time if user reverted
       const currentFilename = currentSrc.split("/").pop();
       const cropFormData = new FormData();
-      cropFormData.append("image", blob, "cropped.jpg");
+      cropFormData.append("image", blob, `cropped.${nlBlobExt}`);
 
       const newResult = await sendToBackFile({
         route: "/upload-newsletter-pic-route",

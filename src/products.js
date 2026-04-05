@@ -77,6 +77,22 @@ export const updateProduct = async (inputParams) => {
   // console.log("CHECK DATA");
   // console.log(checkData);
 
+  // Generate slug for legacy products that don't have one yet
+  if (!('urlName' in params) && !checkData.urlName) {
+    const baseName = params.name || checkData.name;
+    let slug = generateSlug(baseName, params.productId);
+    let suffix = 2;
+    while (true) {
+      const slugCheckParams = { keyToLookup: 'urlName', itemValue: slug };
+      const slugCheckModel = new dbModel(slugCheckParams, process.env.PRODUCTS_COLLECTION);
+      const slugExists = await slugCheckModel.getUniqueItem();
+      if (!slugExists) break;
+      slug = generateSlug(baseName, params.productId) + '-' + suffix;
+      suffix++;
+    }
+    params.urlName = slug;
+  }
+
   // check slug uniqueness if urlName is being updated
   if ('urlName' in params) {
     if (!params.urlName) {

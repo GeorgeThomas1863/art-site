@@ -144,12 +144,17 @@ export const runEditSlotImage = async (editBtn) => {
 
   const hasEdits = originalFilename !== oldFilename;
 
+  const rawExt = (oldFilename.split('.').pop() || 'jpg').toLowerCase();
+  const mimeType = { jpg: 'image/jpeg', jpeg: 'image/jpeg', png: 'image/png', webp: 'image/webp' }[rawExt] || 'image/jpeg';
+  const blobExt = mimeType === 'image/png' ? 'png' : mimeType === 'image/webp' ? 'webp' : 'jpg';
+
   openImageEditor({
     src,
+    mimeType,
     onApply: async (blob) => {
       const currentFilename = uploadBtn.uploadData.filename;
       const formData = new FormData();
-      formData.append('image', blob, 'edited-image.png');
+      formData.append('image', blob, `edited-image.${blobExt}`);
 
       const data = await sendToBackFile({ route: uploadRoute, formData: formData });
 
