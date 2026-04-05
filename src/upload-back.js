@@ -1,3 +1,7 @@
+import dotenv from "dotenv";
+dotenv.config({ path: ".env" });
+dotenv.config({ path: ".env.local", override: true });
+
 import path from "path";
 import fs from "fs";
 
@@ -57,10 +61,11 @@ const fileFilter = (req, file, cb) => {
 };
 
 // Configure multer
+const fileSizeLimitBytes = parseInt(process.env.UPLOAD_SIZE_LIMIT_MB, 10) * 1024 * 1024;
 export const upload = multer({
   storage: storage,
   fileFilter: fileFilter,
-  limits: { fileSize: parseInt(process.env.UPLOAD_SIZE_LIMIT_MB) * 1024 * 1024 },
+  limits: { fileSize: fileSizeLimitBytes },
 });
 
 //-------------------
