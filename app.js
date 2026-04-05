@@ -1,3 +1,5 @@
+//test image / vid uploads and editing on multiple displays
+
 //write tests?
 
 //RUN ANOTHER FULL CODE REVIEW AND SECURITY REVIEW OF SITE
