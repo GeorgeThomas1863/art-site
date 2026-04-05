@@ -1,5 +1,7 @@
 //way to remove / hide events from display
 
+//videos in newsletters
+
 //test image / vid uploads and editing on multiple displays
 
 //write tests?
