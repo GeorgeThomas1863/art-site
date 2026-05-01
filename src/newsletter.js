@@ -84,7 +84,7 @@ export const dispatchNewsletter = async (inputParams) => {
   const siteUrl = process.env.SITE_URL?.replace(/\/$/, "");
   let resolvedHtml = html;
   if (siteUrl && resolvedHtml) {
-    resolvedHtml = resolvedHtml.replace(/(<img\b[^>]*\ssrc=["'])https?:\/\/[^/]+(\/images\/newsletter\/)/gi, `$1${siteUrl}$2`);
+    resolvedHtml = resolvedHtml.replace(/(<img\b[^>]*\ssrc=["'])(?:https?:\/\/[^/]+)?(\/images\/newsletter\/)/gi, `$1${siteUrl}$2`);
   }
   if (resolvedHtml) {
     resolvedHtml = resolvedHtml.replace(/<img\b(?![^>]*\bstyle=)/gi, '<img style="max-width: 100%; height: auto; display: block;" width="600"');
@@ -143,7 +143,7 @@ export const sendTestNewsletter = async (inputParams) => {
   const siteUrl = process.env.SITE_URL?.replace(/\/$/, "");
   let resolvedHtml = html;
   if (siteUrl && resolvedHtml) {
-    resolvedHtml = resolvedHtml.replace(/(<img\b[^>]*\ssrc=["'])https?:\/\/[^/]+(\/images\/newsletter\/)/gi, `$1${siteUrl}$2`);
+    resolvedHtml = resolvedHtml.replace(/(<img\b[^>]*\ssrc=["'])(?:https?:\/\/[^/]+)?(\/images\/newsletter\/)/gi, `$1${siteUrl}$2`);
   }
   if (resolvedHtml) {
     resolvedHtml = resolvedHtml.replace(/<img\b(?![^>]*\bstyle=)/gi, '<img style="max-width: 100%; height: auto; display: block;" width="600"');
