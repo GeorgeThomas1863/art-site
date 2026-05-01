@@ -184,6 +184,8 @@ export async function revertImageEditor() {
   } catch (err) {
     displayPopup('Failed to revert image. Please try again.', 'error');
     hideLoadStatus();
+    const applyBtn = document.querySelector('#image-editor-overlay [data-label="image-editor-apply"]');
+    if (applyBtn) applyBtn.disabled = false;
     return;
   }
 
