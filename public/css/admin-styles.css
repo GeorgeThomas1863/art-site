@@ -1297,3 +1297,34 @@
   color: #333;
   border-color: #333;
 }
+
+/* ── Cropper.js resize handle overrides — large, accessible ── */
+#image-editor-overlay .cropper-point {
+  width: 22px;
+  height: 22px;
+  background-color: #fff;
+  border: 2px solid #1a1a1a;
+  border-radius: 3px;
+  opacity: 1;
+}
+
+/* Expanded invisible hit area — larger clickable zone per handle */
+#image-editor-overlay .cropper-point::before {
+  content: '';
+  position: absolute;
+  inset: -10px;
+}
+
+/* Top/bottom handles: wide horizontal bars */
+#image-editor-overlay .cropper-point.point-n { width: 56px; height: 22px; margin-left: -28px; top: -11px; }
+#image-editor-overlay .cropper-point.point-s { width: 56px; height: 22px; margin-left: -28px; bottom: -11px; }
+
+/* Left/right handles: tall vertical bars */
+#image-editor-overlay .cropper-point.point-e { width: 22px; height: 56px; margin-top: -28px; right: -11px; }
+#image-editor-overlay .cropper-point.point-w { width: 22px; height: 56px; margin-top: -28px; left: -11px; }
+
+/* Corner handles (22x22, half = 11px) */
+#image-editor-overlay .cropper-point.point-ne { top: -11px; right: -11px; }
+#image-editor-overlay .cropper-point.point-nw { top: -11px; left: -11px; }
+#image-editor-overlay .cropper-point.point-se { bottom: -11px; right: -11px; }
+#image-editor-overlay .cropper-point.point-sw { bottom: -11px; left: -11px; }
