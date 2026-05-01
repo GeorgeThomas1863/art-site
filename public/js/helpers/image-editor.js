@@ -27,6 +27,10 @@ function initCropper() {
     aspectRatio: NaN,
     responsive: true,
     background: false,
+    ready() {
+      const btn = document.querySelector('#image-editor-overlay [data-label="image-editor-apply"]');
+      if (btn) btn.disabled = false;
+    },
   });
 }
 
@@ -101,6 +105,7 @@ function buildEditorOverlay() {
   const applyBtn = document.createElement('button');
   applyBtn.type = 'button';
   applyBtn.className = 'btn-admin-submit';
+  applyBtn.disabled = true;
   applyBtn.setAttribute('data-label', 'image-editor-apply');
   applyBtn.textContent = 'Apply';
   actions.appendChild(cancelBtn);
@@ -185,6 +190,8 @@ export async function revertImageEditor() {
   flipHState = 1;
   flipVState = 1;
 
+  const applyBtn = document.querySelector('#image-editor-overlay [data-label="image-editor-apply"]');
+  if (applyBtn) applyBtn.disabled = true;
   const img = document.getElementById('image-editor-img');
   img.onload = null;
   img.onerror = null;
@@ -210,6 +217,8 @@ export async function revertImageEditor() {
 
 export async function applyImageEditor() {
   if (!cropperInstance || !currentOnApply) return;
+  const applyBtn = document.querySelector('#image-editor-overlay [data-label="image-editor-apply"]');
+  if (applyBtn) applyBtn.disabled = true;
 
   const editorContent = document.querySelector('#image-editor-overlay .modal-content');
   showLoadStatus(editorContent, 'Applying...');
