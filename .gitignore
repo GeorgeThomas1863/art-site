@@ -9,6 +9,7 @@ config/
 .local.env
 
 .claude
+.remember
 
 .claude/screenshots/*
 .superpowers
@@ -43,8 +44,6 @@ build/Release
 
 # Dependency directories
 node_modules/
-package-lock.json
-
 
 # Optional npm cache directory
 .npm
@@ -69,5 +68,3 @@ package-lock.json
 .vscode-test
 .vscode/
 
-#ignore readme
-*.md
