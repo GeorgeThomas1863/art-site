@@ -92,7 +92,7 @@ export const updateCartItem = async (req) => {
   }
 
   if (!item) {
-    return res.json({ success: true, cart: req.session.cart });
+    return { success: true, cart: req.session.cart };
   }
 
   if (quantity <= 0) {

@@ -11,6 +11,7 @@ Put all pictures / screenshots you take wiht hte mcp plugin in the "pics" subfol
 ## Commands
 
 - `npm start` — NOT NEEDED, the dev server is already running on port 1991. The user will handle testing and validation for now.
+- `npm test` — runs the Vitest suite in `tests/`. All external boundaries (MongoDB, Square, Mailgun/axios, fs) are mocked — tests never touch real services and never require `.env`. Never modify app code to accommodate tests; mock at the boundary instead (`vi.mock` on `models/db-model.js` or `middleware/db-config.js`).
 
 ## Architecture
 
