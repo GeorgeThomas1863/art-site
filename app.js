@@ -42,4 +42,4 @@ app.use(express.json());
 //routes
 app.use(routes);
 
-app.listen(process.env.PORT);
+app.listen(process.env.PORT, "127.0.0.1")
