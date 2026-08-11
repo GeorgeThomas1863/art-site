@@ -1,10 +1,26 @@
-//way to remove / hide events from display
+// fix breaking change in sharp (several CVEs)
+
+// make backup of all pics
+
+// report on number of unique visitors, by page?
+
+// better sending email account for newsletter (display name, pic etc)
+
+// way to email out new products, so a button in admin, in product creation panel
+
+// in admin sort IDs by product type / IDs more logical
+
+// buttons / videos in the news letter
+
+//w ay to remove / hide old events from display
 
 //videos in newsletters
 
 //test image / vid uploads and editing on multiple displays
 
 //write tests?
+
+//++++++++++++++++++
 
 //RUN ANOTHER FULL CODE REVIEW AND SECURITY REVIEW OF SITE
 
