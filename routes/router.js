@@ -35,6 +35,7 @@ import {
   deleteEventControl,
   getProductDataControl,
   getEventDataControl,
+  getSquareConfigControl,
   getCartDataControl,
   addToCartControl,
   updateCartItemControl,
@@ -140,6 +141,8 @@ router.post("/checkout/place-order", placeOrderControl);
 router.get("/get-product-data-route", getProductDataControl);
 
 router.get("/get-event-data-route", getEventDataControl);
+
+router.get("/api/square-config", getSquareConfigControl);
 
 // router.get("/get-background-pics", getBackgroundPicsControl);
 

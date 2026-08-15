@@ -38,6 +38,26 @@ export const getEventDataControl = async (req, res) => {
   return res.json(data);
 };
 
+// Public, non-secret Square identifiers — lets the frontend pick sandbox vs production
+// CDN/app config without hardcoding it into shipped JS.
+export const getSquareConfigControl = async (req, res) => {
+  const squareEnv = process.env.SQUARE_ENV || "production";
+
+  // Never pair a sandbox env with the production fallback IDs below — the sandbox SDK
+  // rejects non-sandbox app/location IDs, so a missing sandbox ID must fail loud, not
+  // silently serve prod values.
+  if (squareEnv === "sandbox" && (!process.env.SQUARE_APP_ID || !process.env.SQUARE_LOCATION_ID)) {
+    return res.status(500).json({ error: "SQUARE_ENV=sandbox requires SQUARE_APP_ID and SQUARE_LOCATION_ID in .env.local" });
+  }
+
+  const data = {
+    appId: process.env.SQUARE_APP_ID || "sq0idp-o7NHeVqwyzt-7c5suUVt9Q",
+    locationId: process.env.SQUARE_LOCATION_ID || "0BVFD28S2J9AF",
+    squareEnv,
+  };
+  return res.json(data);
+};
+
 export const uploadPicControl = async (req, res) => {
   if (!req.file) {
     return res.status(400).json({ error: "No file uploaded" });

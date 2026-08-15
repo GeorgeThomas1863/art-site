@@ -1,6 +1,12 @@
 import axios from "axios";
 
 export const sendMail = async ({ from, to, bcc, subject, html, text, replyTo }) => {
+  if (process.env.MAIL_MODE === "log") {
+    const bccCount = Array.isArray(bcc) ? bcc.length : bcc ? 1 : 0;
+    console.log("[mailer] log mode — to:", to || null, "| bcc count:", bccCount, "| subject:", subject);
+    return { messageId: "log-mode" };
+  }
+
   const params = new URLSearchParams();
 
   params.append("from", from);

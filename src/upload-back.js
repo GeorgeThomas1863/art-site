@@ -1,7 +1,3 @@
-import dotenv from "dotenv";
-dotenv.config({ path: ".env" });
-dotenv.config({ path: ".env.local", override: true });
-
 import path from "path";
 import fs from "fs";
 

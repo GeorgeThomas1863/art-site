@@ -34,16 +34,14 @@
 
 //-----------------
 
-import dotenv from "dotenv";
-
-dotenv.config({ path: ".env" });
-dotenv.config({ path: ".env.local", override: true });
+import "./middleware/env-config.js";
 
 import express from "express";
 import session from "express-session";
 import routes from "./routes/router.js";
 
 import { buildSessionConfig } from "./middleware/session-config.js";
+import { dbConnect } from "./middleware/db-config.js";
 
 const app = express();
 
@@ -58,4 +56,5 @@ app.use(express.json());
 //routes
 app.use(routes);
 
-app.listen(process.env.PORT, "127.0.0.1")
+await dbConnect();
+app.listen(process.env.PORT, "127.0.0.1");

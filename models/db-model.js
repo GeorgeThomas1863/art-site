@@ -1,10 +1,7 @@
 //import mongo
-import { dbConnect, dbGet } from "../middleware/db-config.js";
+import { dbGet } from "../middleware/db-config.js";
 // import { ObjectId } from "mongodb";
 import { sanitizeMongoValue } from "../src/sanitize.js";
-
-//connect to db AGAIN here just to be safe
-await dbConnect();
 
 class dbModel {
   constructor(dataObject, collection) {

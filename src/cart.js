@@ -33,11 +33,6 @@ export const addCartItem = async (req) => {
     break;
   }
 
-  let itemCount = 0;
-  for (let i = 0; i < req.session.cart.length; i++) {
-    itemCount += req.session.cart[i].quantity;
-  }
-
   // Update quantity if already exists
   if (existingItem) {
     existingItem.quantity += safeQuantity;
@@ -58,6 +53,11 @@ export const addCartItem = async (req) => {
       height: productData.height,
     };
     req.session.cart.push(cartItem);
+  }
+
+  let itemCount = 0;
+  for (let i = 0; i < req.session.cart.length; i++) {
+    itemCount += req.session.cart[i].quantity;
   }
 
   return { success: true, cart: req.session.cart, itemCount: itemCount };
@@ -83,29 +83,35 @@ export const updateCartItem = async (req) => {
   const { quantity, productId } = req.body;
   await buildCart(req);
 
+  const safeProductId = sanitizeMongoValue(productId);
+  const safeQuantity = parseInt(quantity, 10);
+  if (!safeProductId || isNaN(safeQuantity)) {
+    return { success: false, message: "Invalid product ID or quantity" };
+  }
+
   let item = null;
   for (let i = 0; i < req.session.cart.length; i++) {
-    if (req.session.cart[i].productId !== productId) continue;
+    if (req.session.cart[i].productId !== safeProductId) continue;
 
     item = req.session.cart[i];
     break;
   }
 
   if (!item) {
-    return res.json({ success: true, cart: req.session.cart });
+    return { success: true, cart: req.session.cart };
   }
 
-  if (quantity <= 0) {
+  if (safeQuantity <= 0) {
     // Remove item if quantity is 0 or less
     let newCart = [];
     for (let i = 0; i < req.session.cart.length; i++) {
-      if (req.session.cart[i].productId !== productId) {
+      if (req.session.cart[i].productId !== safeProductId) {
         newCart.push(req.session.cart[i]);
       }
     }
     req.session.cart = newCart;
   } else {
-    item.quantity = quantity;
+    item.quantity = safeQuantity;
   }
 
   return { success: true, cart: req.session.cart };

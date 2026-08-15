@@ -1,16 +1,54 @@
 // square-payment.js
 
+import { sendToBack } from "../util/api-front.js";
+
+const PRODUCTION_SDK_URL = "https://web.squarecdn.com/v1/square.js";
+const SANDBOX_SDK_URL = "https://sandbox.web.squarecdn.com/v1/square.js";
+const SQUARE_SDK_MARKER = "data-square-sdk";
+
 let card;
 let payments;
 
-export const buildSquarePayment = async () => {
-  // console.log("BUILD SQUARE PAYMENT");
-  if (!window.Square) {
-    throw new Error("Square.js failed to load properly");
+// Injects the Square SDK script for the given environment and resolves once it has loaded.
+// Guards against double-injection if a previous call already added the tag.
+const loadSquareSdk = async (squareEnv) => {
+  if (window.Square) return true;
+
+  const existingScript = document.querySelector(`script[${SQUARE_SDK_MARKER}]`);
+  if (existingScript) {
+    return new Promise((resolve, reject) => {
+      existingScript.addEventListener("load", () => resolve(true));
+      existingScript.addEventListener("error", () => reject(new Error("Square.js failed to load")));
+    });
   }
 
+  const sdkUrl = squareEnv === "sandbox" ? SANDBOX_SDK_URL : PRODUCTION_SDK_URL;
+
+  return new Promise((resolve, reject) => {
+    const script = document.createElement("script");
+    script.src = sdkUrl;
+    script.setAttribute(SQUARE_SDK_MARKER, "true");
+    script.onload = () => resolve(true);
+    script.onerror = () => reject(new Error("Square.js failed to load"));
+    document.head.appendChild(script);
+  });
+};
+
+export const buildSquarePayment = async () => {
+  // console.log("BUILD SQUARE PAYMENT");
   try {
-    payments = window.Square.payments("sq0idp-o7NHeVqwyzt-7c5suUVt9Q", "0BVFD28S2J9AF");
+    const config = await sendToBack({ route: "/api/square-config" }, "GET");
+    if (!config || !config.appId || !config.locationId) {
+      throw new Error("Failed to load Square configuration");
+    }
+
+    await loadSquareSdk(config.squareEnv);
+
+    if (!window.Square) {
+      throw new Error("Square.js failed to load properly");
+    }
+
+    payments = window.Square.payments(config.appId, config.locationId);
 
     card = await payments.card();
     await card.attach("#card-container");

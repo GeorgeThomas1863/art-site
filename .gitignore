@@ -1,39 +1,39 @@
-# Stuff
-config/
-/config*
-/config/*
+# secrets / env files (env-config.js loads .env first, then .env.local overrides)
 .env
-.env.local
 .env.*
-.env.*.local
 .local.env
 
+# local config repo (cloned by setup script, never committed)
+config/
+/config*
+
+# agent / tool dirs
 .claude
-
-.claude/screenshots/*
 .superpowers
-.superpowers/*
-
+.codex/
 .playwright-mcp
 
+# scratch
 bugs.txt
 
 # logs
 logs
 *.log
 
-# avoid storing images in repo
-public/images/products/*
+# vitest coverage output
+coverage/
+
+# uploaded images stay out of the repo
 **/public/images/products/*
-
-public/images/background/*
 **/public/images/background/*
-
-public/images/events/*
 **/public/images/events/*
-
-public/images/newsletter/*
 **/public/images/newsletter/*
+
+# Dependency directories
+node_modules/
+
+# Optional npm cache directory
+.npm
 
 # Diagnostic reports (https://nodejs.org/api/report.html)
 report.[0-9]*.[0-9]*.[0-9]*.[0-9]*.json
@@ -41,32 +41,19 @@ report.[0-9]*.[0-9]*.[0-9]*.[0-9]*.json
 # Compiled binary addons (https://nodejs.org/api/addons.html)
 build/Release
 
-# Dependency directories
-node_modules/
-
-
-# Optional npm cache directory
-.npm
-
-
-# dotenv environment variable files
-.env
-.env.development.local
-.env.test.local
-.env.production.local
-.env.local
-.env.*
-
-
-# vitepress build output
+# vitepress build output / cache
 **/.vitepress/dist
-
-# vitepress cache directory
 **/.vitepress/cache
 
-# Stores VSCode versions used for testing VSCode extensions
-.vscode-test
+# IDE
 .vscode/
+.vscode-test
 
-#ignore readme
+# Windows junk
+Thumbs.db
+desktop.ini
+
+# ignore markdown (deliberate), with explicit exceptions
 *.md
+!.env.example
+!tests/README.md
