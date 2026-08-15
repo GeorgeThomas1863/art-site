@@ -1,4 +1,6 @@
 // forms/cart-form.js
+import { isPickupOnly } from "../util/define-things.js";
+
 export const buildCartForm = async () => {
   const cartContainer = document.createElement("div");
   cartContainer.className = "cart-container";
@@ -182,7 +184,7 @@ export const buildCartItemDetails = async (itemData) => {
 
   details.append(itemTotal, name);
 
-  if (itemData.canShip === "no") {
+  if (isPickupOnly(itemData)) {
     const badge = document.createElement("span");
     badge.className = "pickup-badge";
     badge.textContent = "Pickup Only";

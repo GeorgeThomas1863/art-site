@@ -1,6 +1,6 @@
 import { formatProductType, formatPrice } from "../helpers/products-run.js";
 import { buildCollapseContainer } from "../util/collapse.js";
-import { categoryDescriptions, CAROUSEL_PREV_SVG, CAROUSEL_NEXT_SVG } from "../util/define-things.js";
+import { categoryDescriptions, CAROUSEL_PREV_SVG, CAROUSEL_NEXT_SVG, isPickupOnly } from "../util/define-things.js";
 
 // Build the entire products page
 export const buildProductsForm = async () => {
@@ -226,7 +226,7 @@ export const buildProductInfo = async (productData) => {
   const badgesRow = document.createElement("div");
   badgesRow.className = "product-card-badges";
   badgesRow.append(productType);
-  if (productData.canShip === "no") {
+  if (isPickupOnly(productData)) {
     const pickupBadge = document.createElement("span");
     pickupBadge.className = "pickup-badge";
     pickupBadge.textContent = "Pickup Only";
@@ -390,7 +390,7 @@ export const buildProductDetailModal = async (productData, startIndex = 0) => {
   footerLeft.className = "product-footer-left";
   footerLeft.append(typeBadge);
 
-  if (productData.canShip === "no") {
+  if (isPickupOnly(productData)) {
     const pickupBadge = document.createElement("span");
     pickupBadge.className = "pickup-badge";
     pickupBadge.textContent = "Pickup Only";

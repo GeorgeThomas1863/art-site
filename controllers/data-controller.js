@@ -202,7 +202,7 @@ export const getCartDataControl = async (req, res) => {
 };
 
 export const getCartStatsControl = async (req, res) => {
-  if (!req || !req.session || !req.session.cart) return res.status(500).json({ error: "No cart data" });
+  if (!req || !req.session) return res.status(500).json({ error: "No cart data" });
 
   const data = await getCartStats(req);
   if (!data || !data.success) return res.status(500).json({ error: "Failed to get cart stats" });

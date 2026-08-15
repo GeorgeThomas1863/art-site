@@ -9,7 +9,7 @@ vi.mock("axios", () => {
 });
 
 import axios from "axios";
-import { getSquareConfigControl, addSubscriberControl } from "../controllers/data-controller.js";
+import { getSquareConfigControl, addSubscriberControl, getCartStatsControl } from "../controllers/data-controller.js";
 import { buildReq } from "./helpers/mock-req.js";
 import { seedCollection, readCollection } from "./helpers/fake-db.js";
 
@@ -75,5 +75,27 @@ describe("addSubscriberControl", () => {
     await addSubscriberControl(buildReq({ body: { email: "dupe@example.test" } }), res);
     expect(res.json).toHaveBeenCalledWith(expect.objectContaining({ duplicate: true }));
     expect(readCollection(SUBSCRIBERS)).toHaveLength(1);
+  });
+});
+
+describe("getCartStatsControl", () => {
+  it("returns empty stats (not a 500) for a fresh session with no cart yet", async () => {
+    const res = buildRes();
+    await getCartStatsControl(buildReq({ session: {} }), res);
+    expect(res.status).not.toHaveBeenCalled();
+    expect(res.json).toHaveBeenCalledWith({ itemCount: 0, total: 0, success: true });
+  });
+
+  it("sums quantity and price across cart items", async () => {
+    const session = { cart: [{ price: 60, quantity: 1 }, { price: 25, quantity: 2 }] };
+    const res = buildRes();
+    await getCartStatsControl(buildReq({ session }), res);
+    expect(res.json).toHaveBeenCalledWith({ itemCount: 3, total: 110, success: true });
+  });
+
+  it("responds 500 when the request has no session at all", async () => {
+    const res = buildRes();
+    await getCartStatsControl({ body: {} }, res);
+    expect(res.status).toHaveBeenCalledWith(500);
   });
 });

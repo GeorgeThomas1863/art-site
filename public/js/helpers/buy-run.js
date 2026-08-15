@@ -2,6 +2,7 @@ import { sendToBack } from "../util/api-front.js";
 import { buildCheckoutItem, buildCheckoutShippingOption } from "../forms/checkout-form.js";
 import { buildSquarePayment, tokenizePaymentMethod } from "./square-payment.js";
 import { getCustomerParams } from "../util/params.js";
+import { isPickupOnly } from "../util/define-things.js";
 import { buildConfirmItem } from "../forms/confirm-form.js";
 import { displayPopup } from "../util/popup.js";
 import { showLoadStatus, hideLoadStatus } from "../util/loading.js";
@@ -56,7 +57,7 @@ export const runPlaceOrder = async () => {
       const errorContainer = document.getElementById("payment-error");
       if (!errorContainer) return null;
 
-      errorContainer.textContent = data.message || "Order processing failed";
+      errorContainer.textContent = orderData?.message || "Order processing failed";
       errorContainer.style.display = "block";
       placeOrderBtn.disabled = false;
       placeOrderBtn.textContent = "Place Order";
@@ -362,7 +363,7 @@ export const displayOrderItems = async (inputData) => {
     const item = cartData[i];
     const confirmItem = await buildConfirmItem(item);
     itemsContainer.append(confirmItem);
-    if (item.canShip === "no") hasPickupItems = true;
+    if (isPickupOnly(item)) hasPickupItems = true;
   }
 
   // Show pickup note if any items are pickup-only

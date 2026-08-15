@@ -1,4 +1,4 @@
-import { STATES_ARRAY } from "../util/define-things.js";
+import { STATES_ARRAY, isPickupOnly } from "../util/define-things.js";
 
 export const buildCheckoutForm = async () => {
   const checkoutContainer = document.createElement("div");
@@ -377,7 +377,7 @@ export const buildCheckoutItem = async (itemData) => {
 
   itemDetails.append(itemName, itemQuantity);
 
-  if (itemData.canShip === "no") {
+  if (isPickupOnly(itemData)) {
     const badge = document.createElement("span");
     badge.className = "pickup-badge";
     badge.textContent = "Pickup Only";

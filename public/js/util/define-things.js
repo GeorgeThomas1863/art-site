@@ -119,6 +119,7 @@ export const STATES_ARRAY = [
   { value: "CO", text: "Colorado" },
   { value: "CT", text: "Connecticut" },
   { value: "DE", text: "Delaware" },
+  { value: "DC", text: "District of Columbia" },
   { value: "FL", text: "Florida" },
   { value: "GA", text: "Georgia" },
   { value: "HI", text: "Hawaii" },
@@ -162,3 +163,11 @@ export const STATES_ARRAY = [
   { value: "WI", text: "Wisconsin" },
   { value: "WY", text: "Wyoming" },
 ];
+
+// The backend can only quote shipping for items with at least one physical
+// measurement — anything else falls back to pickup, so the badge must match.
+export const isPickupOnly = (itemData) => {
+  if (!itemData) return true;
+  if (itemData.canShip === "no") return true;
+  return !(itemData.weight || itemData.length || itemData.width || itemData.height);
+};
