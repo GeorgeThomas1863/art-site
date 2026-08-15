@@ -1,5 +1,3 @@
-// fix breaking change in sharp (several CVEs)
-
 // make backup of all pics
 
 // report on number of unique visitors, by page?
