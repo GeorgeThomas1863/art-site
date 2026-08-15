@@ -7,14 +7,18 @@
 config/
 /config*
 
-# agent / tool dirs
-.claude
+# local agent working dirs (same convention as boxes-store)
+.claude/pics/
+.claude/.pics/
+.claude/.tmp/
+.claude/screenshots/
+.claude/settings.local.json
+.remember/
+.agents/
 .superpowers
 .codex/
 .playwright-mcp
-
-# scratch
-bugs.txt
+docs/
 
 # logs
 logs
@@ -23,11 +27,15 @@ logs
 # vitest coverage output
 coverage/
 
-# uploaded images stay out of the repo
+# uploaded images stay out of the repo (contents only — .gitkeep keeps the dirs)
 **/public/images/products/*
+!**/public/images/products/.gitkeep
 **/public/images/background/*
+!**/public/images/background/.gitkeep
 **/public/images/events/*
+!**/public/images/events/.gitkeep
 **/public/images/newsletter/*
+!**/public/images/newsletter/.gitkeep
 
 # Dependency directories
 node_modules/
@@ -49,11 +57,10 @@ build/Release
 .vscode/
 .vscode-test
 
-# Windows junk
+# OS junk
 Thumbs.db
 desktop.ini
+.DS_Store
 
-# ignore markdown (deliberate), with explicit exceptions
-*.md
 !.env.example
-!tests/README.md
+
