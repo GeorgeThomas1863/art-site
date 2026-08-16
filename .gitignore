@@ -27,6 +27,10 @@ logs
 # vitest coverage output
 coverage/
 
+# local backups (mongodump archives + volume tars — never commit)
+backups/
+*.archive
+
 # uploaded images stay out of the repo (contents only — .gitkeep keeps the dirs)
 **/public/images/products/*
 !**/public/images/products/.gitkeep

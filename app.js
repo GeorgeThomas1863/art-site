@@ -55,4 +55,4 @@ app.use(express.json());
 app.use(routes);
 
 await dbConnect();
-app.listen(process.env.PORT, "127.0.0.1");
+app.listen(process.env.PORT, process.env.HOST || "127.0.0.1");
