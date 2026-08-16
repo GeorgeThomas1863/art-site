@@ -41,6 +41,8 @@ backups/
 **/public/images/newsletter/*
 !**/public/images/newsletter/.gitkeep
 
+todo.txt
+
 # Dependency directories
 node_modules/
 
