@@ -5,6 +5,7 @@ import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import { authController } from "../controllers/auth-controller.js";
 import { authRateLimit, recordFailedAttempt, clearAttempts } from "../middleware/auth-rate-limit.js";
 import requireAuth from "../middleware/auth-config.js";
+import { buildSessionConfig } from "../middleware/session-config.js";
 import { buildReq } from "./helpers/mock-req.js";
 
 const buildRes = () => {
@@ -160,5 +161,23 @@ describe("requireAuth", () => {
     const res = buildGateRes();
     requireAuth(buildReq({ session: {} }), res, vi.fn());
     expect(res.setHeader).toHaveBeenCalledWith("Cache-Control", "no-store");
+  });
+});
+
+describe("buildSessionConfig", () => {
+  afterEach(() => {
+    delete process.env.COOKIE_SECURE;
+  });
+
+  it("leaves the session cookie non-secure when COOKIE_SECURE is unset", () => {
+    delete process.env.COOKIE_SECURE;
+    expect(buildSessionConfig().cookie.secure).toBe(false);
+  });
+
+  it("marks the session cookie secure only when COOKIE_SECURE is the string true", () => {
+    process.env.COOKIE_SECURE = "true";
+    expect(buildSessionConfig().cookie.secure).toBe(true);
+    process.env.COOKIE_SECURE = "false";
+    expect(buildSessionConfig().cookie.secure).toBe(false);
   });
 });

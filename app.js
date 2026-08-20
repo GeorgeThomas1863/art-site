@@ -43,6 +43,9 @@ import { dbConnect } from "./middleware/db-config.js";
 
 const app = express();
 
+//trust the first proxy hop (nginx) so secure cookies work once COOKIE_SECURE=true in prod
+app.set("trust proxy", 1);
+
 app.use(session(buildSessionConfig()));
 
 //standard public path
