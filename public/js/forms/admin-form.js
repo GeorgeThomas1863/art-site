@@ -309,7 +309,8 @@ export const buildModalBody = async (mode, entityType) => {
   if (entityType === "newsletter" && mode === "write") {
     const subjectField = await buildNewsletterSubject();
     const messageField = await buildNewsletterMessage();
-    body.append(subjectField, messageField);
+    const buttonFields = await buildNewsletterButtonFields();
+    body.append(subjectField, messageField, buttonFields);
     return body;
   }
 
@@ -331,6 +332,8 @@ export const buildModalBody = async (mode, entityType) => {
     // Section 1: Product Details
     const detailsSection = await buildProductDetailsSection(mode);
 
+    const subscriberSection = mode === "add" ? await buildProductSubscriberSection() : null;
+
     // Section 2: Product Status
     const statusSection = await buildProductStatusSection(mode);
 
@@ -340,7 +343,9 @@ export const buildModalBody = async (mode, entityType) => {
     // Section 4: Product Image
     const imageSection = await buildProductImageSection(mode);
 
-    body.append(detailsSection, statusSection, shippingSection, imageSection);
+    body.append(detailsSection);
+    if (subscriberSection) body.append(subscriberSection);
+    body.append(statusSection, shippingSection, imageSection);
     return body;
   }
 
@@ -1130,6 +1135,76 @@ export const buildNewsletterMessage = async () => {
   messageWrapper.append(messageLabel, quillWrapper, imageFileInput);
 
   return messageWrapper;
+};
+
+export const buildProductSubscriberSection = async () => {
+  const section = document.createElement("div");
+  section.className = "product-section product-subscriber-section";
+
+  const checkboxWrapper = document.createElement("div");
+  checkboxWrapper.className = "checkbox-wrapper";
+
+  const checkbox = document.createElement("input");
+  checkbox.type = "checkbox";
+  checkbox.id = "notify-subscribers";
+  checkbox.setAttribute("data-label", "notify-subscribers");
+
+  const label = document.createElement("label");
+  label.setAttribute("for", "notify-subscribers");
+  label.textContent = "Email newsletter subscribers about this product";
+
+  const fields = document.createElement("div");
+  fields.className = "product-email-fields";
+  fields.hidden = true;
+
+  const hint = document.createElement("p");
+  hint.className = "product-email-hint";
+  hint.textContent = "Subscribers get the product image, name, price, description and a button.";
+
+  const buttonText = buildNewsletterButtonInput("product-email-button-text", "text", "View Product", "Button Text (optional)");
+  const buttonUrl = buildNewsletterButtonInput("product-email-button-url", "url", "Leave blank to link to the product page", "Button Link (optional)");
+
+  checkbox.addEventListener("change", () => {
+    fields.hidden = !checkbox.checked;
+  });
+
+  checkboxWrapper.append(checkbox, label);
+  fields.append(hint, buttonText, buttonUrl);
+  section.append(checkboxWrapper, fields);
+  return section;
+};
+
+export const buildNewsletterButtonFields = async () => {
+  const wrapper = document.createElement("div");
+  wrapper.className = "newsletter-button-fields";
+
+  const title = document.createElement("h4");
+  title.className = "form-label";
+  title.textContent = "Button (optional)";
+
+  const textField = buildNewsletterButtonInput("newsletter-button-text", "text", "Button text, e.g. Shop Now", "Button Text");
+  const urlField = buildNewsletterButtonInput("newsletter-button-url", "url", "https://...", "Button Link");
+  wrapper.append(title, textField, urlField);
+  return wrapper;
+};
+
+const buildNewsletterButtonInput = (id, type, placeholder, labelText) => {
+  const field = document.createElement("div");
+  field.className = "form-field";
+
+  const label = document.createElement("label");
+  label.className = "form-label";
+  label.textContent = labelText;
+  label.setAttribute("for", id);
+
+  const input = document.createElement("input");
+  input.className = "form-input";
+  input.type = type;
+  input.id = id;
+  input.placeholder = placeholder;
+  input.setAttribute("data-label", id);
+  field.append(label, input);
+  return field;
 };
 
 export const buildMailingListSection = async () => {

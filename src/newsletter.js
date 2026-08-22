@@ -1,7 +1,7 @@
 import { ObjectId } from "mongodb";
 import { dbGet } from "../middleware/db-config.js";
 import { sendMail } from "./mailer.js";
-import { sanitizeEmailHeader } from "./sanitize.js";
+import { escapeHtml, sanitizeEmailHeader } from "./sanitize.js";
 import dbModel from "../models/db-model.js";
 
 export const getSubscribers = async () => {
@@ -72,91 +72,43 @@ export const getNewsletters = async () => {
 };
 
 export const dispatchNewsletter = async (inputParams) => {
-  // console.log("DISPATCH NEWSLETTER");
-  // console.dir(inputParams);
-
   if (!inputParams) return { success: false, message: "No input parameters" };
-  const { subject, html, message } = inputParams;
+  const { subject, html, message, buttonText, buttonUrl } = inputParams;
   const content = html || message;
   if (!content) return { success: false, message: "No message provided" };
-  const cleanSubject = sanitizeEmailHeader(subject || "");
+  const validation = validateButton(buttonText, buttonUrl);
+  if (!validation.success) return validation;
 
-  const siteUrl = process.env.SITE_URL?.replace(/\/$/, "");
-  let resolvedHtml = html;
-  if (siteUrl && resolvedHtml) {
-    resolvedHtml = resolvedHtml.replace(/(<img\b[^>]*\ssrc=["'])(?:https?:\/\/[^/]+)?(\/images\/newsletter\/)/gi, `$1${siteUrl}$2`);
-  }
-  if (resolvedHtml) {
-    resolvedHtml = resolvedHtml.replace(/<img\b(?![^>]*\bstyle=)/gi, '<img style="max-width: 100%; height: auto; display: block;" width="600"');
-  }
-  if (resolvedHtml) {
-    resolvedHtml = resolvedHtml.replace(/<p\b(?![^>]*\bstyle=)/gi, '<p style="margin: 0 0 1em 0;"');
-  }
-
-  const subscriberArray = await getSubscribers();
-  if (!subscriberArray || !subscriberArray.length) return { success: false, message: "No subscribers found" };
-
-  const emailList = [];
-  for (let i = 0; i < subscriberArray.length; i++) {
-    emailList.push(subscriberArray[i].email);
-  }
-
-  const mailParams = {
-    from: process.env.NEWSLETTER_FROM || process.env.EMAIL_USER,
-    to: process.env.NEWSLETTER_FROM || process.env.EMAIL_USER,
-    bcc: [...emailList, process.env.EMAIL_RECIPIENT_1, process.env.EMAIL_RECIPIENT_2].filter(Boolean).join(", "),
-    subject: cleanSubject,
-    html: resolvedHtml || undefined,
+  const buttonHtml = buildButtonHtml(buttonText, buttonUrl);
+  const baseHtml = html || (buttonHtml ? escapeHtml(message || "").replace(/\r?\n/g, "<br>") : "");
+  const finalHtml = `${prepareNewsletterHtml(baseHtml) || ""}${buttonHtml}` || undefined;
+  return sendPreparedNewsletter({
+    subject: sanitizeEmailHeader(subject || ""),
+    html: finalHtml,
     text: message || "Please view this email in an HTML-capable client.",
-    replyTo: process.env.EMAIL_USER,
-  };
-
-  // console.log("MAIL PARAMS");
-  // console.dir(mailParams);
-
-  try {
-    const data = await sendMail(mailParams);
-    if (!data) return { success: false, message: "Failed to send newsletter" };
-
-    const storeParams = { ...mailParams, emailData: data, messageId: data.messageId };
-    const storeModel = new dbModel(storeParams, process.env.NEWSLETTER_COLLECTION);
-    await storeModel.storeAny();
-
-    return { success: true, message: "Newsletter sent successfully", messageId: data.messageId };
-  } catch (e) {
-    console.error("EMAIL ERROR:", e.data?.message || e.message || "Unknown error");
-    return { success: false, message: "Failed to send newsletter" };
-  }
+  });
 };
 
 export const sendTestNewsletter = async (inputParams) => {
   if (!inputParams) return { success: false, message: "No input parameters" };
-  const { subject, html, message } = inputParams;
+  const { subject, html, message, buttonText, buttonUrl } = inputParams;
   const content = html || message;
   if (!content) return { success: false, message: "No message provided" };
+  const validation = validateButton(buttonText, buttonUrl);
+  if (!validation.success) return validation;
 
   const to = [process.env.EMAIL_RECIPIENT_1, process.env.EMAIL_RECIPIENT_2].filter(Boolean).join(", ");
   if (!to) return { success: false, message: "No recipient addresses configured" };
-
   const cleanSubject = sanitizeEmailHeader(subject || "");
-
-  const siteUrl = process.env.SITE_URL?.replace(/\/$/, "");
-  let resolvedHtml = html;
-  if (siteUrl && resolvedHtml) {
-    resolvedHtml = resolvedHtml.replace(/(<img\b[^>]*\ssrc=["'])(?:https?:\/\/[^/]+)?(\/images\/newsletter\/)/gi, `$1${siteUrl}$2`);
-  }
-  if (resolvedHtml) {
-    resolvedHtml = resolvedHtml.replace(/<img\b(?![^>]*\bstyle=)/gi, '<img style="max-width: 100%; height: auto; display: block;" width="600"');
-  }
-  if (resolvedHtml) {
-    resolvedHtml = resolvedHtml.replace(/<p\b(?![^>]*\bstyle=)/gi, '<p style="margin: 0 0 1em 0;"');
-  }
+  const buttonHtml = buildButtonHtml(buttonText, buttonUrl);
+  const baseHtml = html || (buttonHtml ? escapeHtml(message || "").replace(/\r?\n/g, "<br>") : "");
+  const finalHtml = `${prepareNewsletterHtml(baseHtml) || ""}${buttonHtml}` || undefined;
 
   const mailParams = {
     from: process.env.NEWSLETTER_FROM || process.env.EMAIL_USER,
     to,
     subject: `[TEST] ${cleanSubject}`,
-    html: resolvedHtml || undefined,
+    html: finalHtml,
     text: message || "Please view this email in an HTML-capable client.",
     replyTo: process.env.EMAIL_USER,
   };
@@ -169,6 +121,131 @@ export const sendTestNewsletter = async (inputParams) => {
     console.error("TEST EMAIL ERROR:", e.data?.message || e.message || "Unknown error");
     return { success: false, message: "Failed to send test newsletter" };
   }
+};
+
+export const announceProduct = async (product, options = {}) => {
+  if (!product) return { success: false, message: "No product provided", subscriberCount: 0 };
+  const { buttonText, buttonUrl } = resolveProductButton(product, options);
+  const validation = validateButton(buttonText, buttonUrl);
+  if (!validation.success) return { ...validation, subscriberCount: 0 };
+
+  const mailParams = buildProductMailParams(product, buttonText, buttonUrl);
+  return sendPreparedNewsletter(mailParams, true);
+};
+
+const sendPreparedNewsletter = async (inputParams, includeSubscriberCount = false) => {
+  const subscriberArray = await getSubscribers();
+  if (!subscriberArray || !subscriberArray.length) {
+    const result = { success: false, message: "No subscribers found" };
+    if (includeSubscriberCount) result.subscriberCount = 0;
+    return result;
+  }
+
+  const mailParams = buildSubscriberMailParams(inputParams, subscriberArray);
+  const data = await sendSubscriberMail(mailParams);
+  if (!data) return buildSendFailure(includeSubscriberCount, subscriberArray.length);
+
+  const archiveData = await storeSentNewsletter(mailParams, data);
+  const result = { success: true, message: archiveData.success ? "Newsletter sent successfully" : archiveData.message, messageId: data.messageId };
+  if (includeSubscriberCount) result.subscriberCount = subscriberArray.length;
+  return result;
+};
+
+const buildSubscriberMailParams = (inputParams, subscriberArray) => {
+  const emailList = [];
+  for (const subscriber of subscriberArray) emailList.push(subscriber.email);
+  if (process.env.EMAIL_RECIPIENT_1) emailList.push(process.env.EMAIL_RECIPIENT_1);
+  if (process.env.EMAIL_RECIPIENT_2) emailList.push(process.env.EMAIL_RECIPIENT_2);
+  return {
+    from: process.env.NEWSLETTER_FROM || process.env.EMAIL_USER,
+    to: process.env.NEWSLETTER_FROM || process.env.EMAIL_USER,
+    bcc: emailList.join(", "),
+    subject: inputParams.subject,
+    html: inputParams.html,
+    text: inputParams.text,
+    replyTo: process.env.EMAIL_USER,
+  };
+};
+
+const sendSubscriberMail = async (mailParams) => {
+  try {
+    const data = await sendMail(mailParams);
+    return data || null;
+  } catch (e) {
+    console.error("NEWSLETTER EMAIL ERROR:", e.data?.message || e.message || "Unknown error");
+    return null;
+  }
+};
+
+const storeSentNewsletter = async (mailParams, data) => {
+  const storeParams = { ...mailParams, emailData: data, messageId: data.messageId };
+  try {
+    const storeModel = new dbModel(storeParams, process.env.NEWSLETTER_COLLECTION);
+    await storeModel.storeAny();
+    return { success: true, message: "Newsletter archived" };
+  } catch (e) {
+    console.error(`NEWSLETTER ARCHIVE ERROR for ${data.messageId}:`, e.message || e);
+    return { success: false, message: "Newsletter sent, but archiving a copy failed" };
+  }
+};
+
+const buildSendFailure = (includeSubscriberCount, subscriberCount) => {
+  const result = { success: false, message: "Failed to send newsletter" };
+  if (includeSubscriberCount) result.subscriberCount = subscriberCount;
+  return result;
+};
+
+const prepareNewsletterHtml = (html) => {
+  if (!html) return html;
+  const siteUrl = process.env.SITE_URL?.replace(/\/$/, "");
+  let resolvedHtml = html;
+  if (siteUrl) resolvedHtml = resolvedHtml.replace(/(<img\b[^>]*\ssrc=["'])(?:https?:\/\/[^/]+)?(\/images\/newsletter\/)/gi, `$1${siteUrl}$2`);
+  resolvedHtml = resolvedHtml.replace(/<img\b(?![^>]*\bstyle=)/gi, '<img style="max-width: 100%; height: auto; display: block;" width="600"');
+  return resolvedHtml.replace(/<p\b(?![^>]*\bstyle=)/gi, '<p style="margin: 0 0 1em 0;"');
+};
+
+export const validateButton = (text, url) => {
+  const cleanText = typeof text === "string" ? text.trim() : "";
+  const cleanUrl = typeof url === "string" ? url.trim() : "";
+  if (!cleanText && !cleanUrl) return { success: true, message: "" };
+  if (!cleanText || !cleanUrl) return { success: false, message: "Button text and link are both required" };
+  if (!/^https?:\/\//i.test(cleanUrl)) return { success: false, message: "Button link must start with http:// or https://" };
+  return { success: true, message: "" };
+};
+
+export const buildButtonHtml = (text, url) => {
+  const validation = validateButton(text, url);
+  if (!validation.success || !text?.trim() || !url?.trim()) return "";
+  const safeText = escapeHtml(text.trim());
+  const safeUrl = escapeHtml(url.trim());
+  return `<table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="margin-top:24px;"><tr><td align="center"><a href="${safeUrl}" target="_blank" style="display:inline-block; padding:12px 28px; background:#333333; color:#ffffff; text-decoration:none; border-radius:4px; font-weight:bold;">${safeText}</a></td></tr></table>`;
+};
+
+const resolveProductButton = (product, options) => {
+  const siteUrl = process.env.SITE_URL?.replace(/\/$/, "") || "";
+  const defaultUrl = `${siteUrl}/products/${product.urlName || ""}`;
+  const buttonText = typeof options.buttonText === "string" && options.buttonText.trim() ? options.buttonText.trim() : "View Product";
+  const buttonUrl = typeof options.buttonUrl === "string" && options.buttonUrl.trim() ? options.buttonUrl.trim() : defaultUrl;
+  return { buttonText, buttonUrl };
+};
+
+const buildProductMailParams = (product, buttonText, buttonUrl) => {
+  const name = escapeHtml(String(product.name || ""));
+  const description = escapeHtml(String(product.description || "")).replace(/\r?\n/g, "<br>");
+  const price = Number(product.price);
+  const priceText = Number.isFinite(price) ? `$${price.toFixed(2)}` : "$0.00";
+  const imageHtml = buildProductImageHtml(product.picData);
+  const html = `<div style="max-width:600px; margin:0 auto;"><h1>${name}</h1>${imageHtml}<p style="margin:0 0 1em 0;">${escapeHtml(priceText)}</p><p style="margin:0 0 1em 0;">${description}</p>${buildButtonHtml(buttonText, buttonUrl)}</div>`;
+  const text = `${product.name || ""}\n${priceText}\n${product.description || ""}\n${buttonUrl}`;
+  return { subject: sanitizeEmailHeader(`New Product: ${product.name || ""}`), html, text };
+};
+
+const buildProductImageHtml = (picData) => {
+  const filename = picData?.[0]?.filename;
+  if (!filename || /\.(mp4|webm|mov)$/i.test(filename)) return "";
+  const siteUrl = process.env.SITE_URL?.replace(/\/$/, "") || "";
+  const safeSrc = escapeHtml(`${siteUrl}/images/products/${filename}`);
+  return `<img src="${safeSrc}" style="max-width: 100%; height: auto; display: block;" width="600">`;
 };
 
 export const deleteNewsletter = async (id) => {

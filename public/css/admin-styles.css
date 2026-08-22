@@ -926,6 +926,42 @@
   cursor: not-allowed;
 }
 
+.newsletter-button-fields,
+.product-subscriber-section {
+  padding: 1rem;
+  border: 1px solid #e0e0e0;
+  border-radius: 6px;
+  background: #fafafa;
+}
+
+.checkbox-wrapper {
+  display: flex;
+  align-items: center;
+}
+
+.checkbox-wrapper input[type="checkbox"] {
+  width: 22px;
+  height: 22px;
+  margin-right: 12px;
+  cursor: pointer;
+  accent-color: rgb(150, 200, 100);
+}
+
+.checkbox-wrapper label {
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.product-email-fields {
+  margin-top: 1rem;
+}
+
+.product-email-hint {
+  margin-bottom: 1rem;
+  color: #555;
+}
+
 /* Modal Actions */
 .modal-actions {
   display: flex;

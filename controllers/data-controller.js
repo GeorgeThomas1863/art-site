@@ -11,6 +11,8 @@ import {
   getNewsletters,
   deleteNewsletter,
   updateNewsletter,
+  announceProduct,
+  validateButton,
 } from "../src/newsletter.js";
 import { buildCart, getCartStats, addCartItem, updateCartItem, removeCartItem } from "../src/cart.js";
 import { fetchShippingRates, getShippingFromSession, clearShippingFromSession, updateSelectedRate } from "../src/shipping.js";
@@ -109,6 +111,8 @@ export const deletePicControl = async (req, res) => {
 export const addNewProductControl = async (req, res) => {
   const inputParams = req.body;
   if (!inputParams) return res.status(500).json({ error: "No input parameters" });
+  const shouldNotify = inputParams.notifySubscribers === true || inputParams.notifySubscribers === "true";
+  const emailOptions = { buttonText: inputParams.emailButtonText, buttonUrl: inputParams.emailButtonUrl };
 
   const safeParams = whitelistFields(inputParams, [
     "itemId",
@@ -128,7 +132,22 @@ export const addNewProductControl = async (req, res) => {
     "dateCreated",
   ]);
   const data = await storeProduct(safeParams);
+  if (!shouldNotify || !data?.success) return res.json(data);
+
+  const emailData = await announceStoredProduct(data, emailOptions);
+  data.emailSent = emailData.success;
+  data.emailMessage = emailData.message;
+  data.subscriberCount = emailData.subscriberCount ?? 0;
   return res.json(data);
+};
+
+const announceStoredProduct = async (product, options) => {
+  try {
+    return await announceProduct(product, options);
+  } catch (e) {
+    console.error(`PRODUCT ANNOUNCEMENT ERROR for ${product.productId || product.name || "unknown product"}:`, e.message || e);
+    return { success: false, message: "Failed to send newsletter", subscriberCount: 0 };
+  }
 };
 
 export const editProductControl = async (req, res) => {
@@ -368,6 +387,8 @@ export const getSubscribersControl = async (req, res) => {
 export const sendNewsletterControl = async (req, res) => {
   if (!req || !req.body) return res.status(500).json({ error: "No input parameters" });
   if (!req.body.message && !req.body.html) return res.status(500).json({ error: "No message provided" });
+  const buttonValidation = validateButton(req.body.buttonText, req.body.buttonUrl);
+  if (!buttonValidation.success) return res.status(400).json({ error: buttonValidation.message });
 
   // console.log("SEND NEWSLETTER CONTROLLER");
   // console.log(req.body);
@@ -381,6 +402,8 @@ export const sendNewsletterControl = async (req, res) => {
 export const sendTestNewsletterControl = async (req, res) => {
   if (!req || !req.body) return res.status(500).json({ error: "No input parameters" });
   if (!req.body.message && !req.body.html) return res.status(500).json({ error: "No message provided" });
+  const buttonValidation = validateButton(req.body.buttonText, req.body.buttonUrl);
+  if (!buttonValidation.success) return res.status(400).json({ error: buttonValidation.message });
   const data = await sendTestNewsletter(req.body);
   if (!data || !data.success) return res.status(500).json({ error: data?.message || "Failed to send test newsletter" });
   return res.json(data);

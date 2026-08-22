@@ -51,10 +51,11 @@ import {
   getNewsletters,
   dispatchNewsletter,
   sendTestNewsletter,
+  announceProduct,
   deleteNewsletter,
   updateNewsletter,
 } from "../src/newsletter.js";
-import { seedCollection, readCollection } from "./helpers/fake-db.js";
+import { FakeDbModel, seedCollection, readCollection } from "./helpers/fake-db.js";
 
 const SUBSCRIBERS = process.env.SUBSCRIBERS_COLLECTION;
 const NEWSLETTERS = process.env.NEWSLETTER_COLLECTION;
@@ -208,6 +209,25 @@ describe("getNewsletters", () => {
 });
 
 describe("dispatchNewsletter", () => {
+  it("appends an escaped button and archives the final html", async () => {
+    seedCollection(SUBSCRIBERS, [{ email: "sub@example.test" }]);
+    axios.post.mockResolvedValue(okMailResponse);
+    await dispatchNewsletter({ subject: "News", html: "<p>Body</p>", buttonText: "View <Now>", buttonUrl: 'https://example.test/a?x=1&y="2"' });
+    const html = lastPostCall().params.get("html");
+    expect(html).toContain("View &lt;Now&gt;");
+    expect(html).toContain('href="https://example.test/a?x=1&amp;y=&quot;2&quot;"');
+    expect(html).toContain('<table role="presentation"');
+    expect(readCollection(NEWSLETTERS)[0].html).toBe(html);
+  });
+
+  it("omits blank buttons and rejects incomplete or non-http buttons", async () => {
+    seedCollection(SUBSCRIBERS, [{ email: "sub@example.test" }]);
+    axios.post.mockResolvedValue(okMailResponse);
+    await dispatchNewsletter({ subject: "News", html: "<p>Body</p>", buttonText: " ", buttonUrl: "" });
+    expect(lastPostCall().params.get("html")).not.toContain('<table role="presentation"');
+    expect(await dispatchNewsletter({ subject: "News", html: "x", buttonText: "View" })).toEqual({ success: false, message: "Button text and link are both required" });
+    expect(await dispatchNewsletter({ subject: "News", html: "x", buttonText: "View", buttonUrl: "/local" })).toEqual({ success: false, message: "Button link must start with http:// or https://" });
+  });
   it("rejects missing input", async () => {
     expect(await dispatchNewsletter()).toEqual({ success: false, message: "No input parameters" });
   });
@@ -291,9 +311,50 @@ describe("dispatchNewsletter", () => {
     expect(result).toEqual({ success: false, message: "Failed to send newsletter" });
     expect(readCollection(NEWSLETTERS)).toEqual([]);
   });
+
+  it("still reports success when the archive write fails after the mail went out", async () => {
+    seedCollection(SUBSCRIBERS, [{ email: "sub1@example.test" }]);
+    axios.post.mockResolvedValue(okMailResponse);
+    const storeSpy = vi.spyOn(FakeDbModel.prototype, "storeAny").mockRejectedValueOnce(new Error("insert failed"));
+
+    const result = await dispatchNewsletter({ subject: "News", message: "Hi" });
+    storeSpy.mockRestore();
+
+    expect(axios.post).toHaveBeenCalledTimes(1);
+    expect(result).toEqual({ success: true, message: "Newsletter sent, but archiving a copy failed", messageId: "<msg-1@mg.example.test>" });
+    expect(readCollection(NEWSLETTERS)).toEqual([]);
+  });
 });
 
 describe("sendTestNewsletter", () => {
+  it("omits button markup when both button fields are blank or absent", async () => {
+    axios.post.mockResolvedValue(okMailResponse);
+    const inputs = [
+      { buttonText: "", buttonUrl: "" },
+      { buttonText: "   ", buttonUrl: "\t" },
+      {},
+    ];
+
+    for (const input of inputs) {
+      const callsBefore = axios.post.mock.calls.length;
+      const result = await sendTestNewsletter({ subject: "News", html: "Message content", ...input });
+      expect(result.success).toBe(true);
+      expect(axios.post.mock.calls.length).toBe(callsBefore + 1);
+
+      const html = lastPostCall().params.get("html");
+      expect(html).toContain("Message content");
+      expect(html).not.toContain('role="presentation"');
+      expect(html).not.toContain("<a ");
+    }
+  });
+
+  it("supports escaped buttons and validates button pairs", async () => {
+    axios.post.mockResolvedValue(okMailResponse);
+    await sendTestNewsletter({ subject: "News", html: "Body", buttonText: "Go & See", buttonUrl: "https://example.test/?a=1&b=2" });
+    expect(lastPostCall().params.get("html")).toContain("Go &amp; See");
+    expect(await sendTestNewsletter({ subject: "News", html: "Body", buttonUrl: "https://example.test" })).toEqual({ success: false, message: "Button text and link are both required" });
+    expect(await sendTestNewsletter({ subject: "News", html: "Body", buttonText: "Go", buttonUrl: "javascript:alert(1)" })).toEqual({ success: false, message: "Button link must start with http:// or https://" });
+  });
   it("rejects missing input", async () => {
     expect(await sendTestNewsletter()).toEqual({ success: false, message: "No input parameters" });
   });
@@ -336,6 +397,36 @@ describe("sendTestNewsletter", () => {
     const result = await sendTestNewsletter({ subject: "News", message: "Body" });
 
     expect(result).toEqual({ success: false, message: "Failed to send test newsletter" });
+  });
+});
+
+describe("announceProduct", () => {
+  it("sends and archives a complete product announcement with defaults", async () => {
+    seedCollection(SUBSCRIBERS, [{ email: "one@example.test" }, { email: "two@example.test" }]);
+    axios.post.mockResolvedValue(okMailResponse);
+    const result = await announceProduct({ name: "Art <One>", price: "12.5", description: "Line 1\nLine 2", urlName: "art-one", picData: [{ filename: "art.jpg" }] }, {});
+    expect(result).toMatchObject({ success: true, subscriberCount: 2, messageId: "<msg-1@mg.example.test>" });
+    const { params } = lastPostCall();
+    expect(params.get("subject")).toBe("New Product: Art <One>");
+    expect(params.get("html")).toContain("http://localhost:0/images/products/art.jpg");
+    expect(params.get("html")).toContain("$12.50");
+    expect(params.get("html")).toContain('href="http://localhost:0/products/art-one"');
+    expect(params.getAll("bcc")[0]).toContain("one@example.test, two@example.test");
+    expect(readCollection(NEWSLETTERS)).toHaveLength(1);
+  });
+
+  it("respects button overrides and omits video images", async () => {
+    seedCollection(SUBSCRIBERS, [{ email: "one@example.test" }]);
+    axios.post.mockResolvedValue(okMailResponse);
+    await announceProduct({ name: "Video", price: 3, description: "Desc", urlName: "video", picData: [{ filename: "clip.mp4" }] }, { buttonText: "Buy", buttonUrl: "https://shop.test/item" });
+    const html = lastPostCall().params.get("html");
+    expect(html).toContain("Buy");
+    expect(html).toContain('href="https://shop.test/item"');
+    expect(html).not.toContain("clip.mp4");
+  });
+
+  it("returns the subscriber count when none exist", async () => {
+    expect(await announceProduct({ name: "Art", urlName: "art" }, {})).toEqual({ success: false, message: "No subscribers found", subscriberCount: 0 });
   });
 });
 

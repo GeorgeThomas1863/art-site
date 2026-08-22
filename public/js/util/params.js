@@ -5,6 +5,8 @@ export const buildNewProductParams = async () => {
     if (slotBtns[i].uploadData) picData.push(slotBtns[i].uploadData);
   }
 
+  const notifySubscribers = document.getElementById("notify-subscribers")?.checked || false;
+
   const params = {
     route: "/add-new-product-route",
     itemId: document.getElementById("item-id").value,
@@ -22,6 +24,9 @@ export const buildNewProductParams = async () => {
     sold: document.getElementById("sold").value,
     picData: picData,
     dateCreated: new Date().toISOString(),
+    notifySubscribers,
+    emailButtonText: document.getElementById("product-email-button-text")?.value.trim() || "",
+    emailButtonUrl: document.getElementById("product-email-button-url")?.value.trim() || "",
   };
   return params;
 };

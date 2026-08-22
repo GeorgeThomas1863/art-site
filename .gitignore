@@ -70,3 +70,12 @@ desktop.ini
 
 !.env.example
 
+
+# IDE / editor
+.idea/
+*.swp
+*~
+
+# playwright runner output
+test-results/
+playwright-report/

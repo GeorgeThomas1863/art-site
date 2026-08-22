@@ -29,6 +29,20 @@ export const runAddNewProduct = async () => {
     return null;
   }
 
+  if (newProductParams.notifySubscribers && newProductParams.emailButtonUrl && !/^https?:\/\//i.test(newProductParams.emailButtonUrl)) {
+    await displayPopup("Button link must start with http:// or https://", "error");
+    return null;
+  }
+
+  if (newProductParams.notifySubscribers) {
+    const subscriberData = await sendToBack({ route: "/newsletter/data" }, "GET");
+    const subscriberCount = subscriberData ? subscriberData.length : 0;
+    const confirmed = await displayConfirmDialog(
+      `Add this product and email it to ${subscriberCount} subscriber${subscriberCount !== 1 ? "s" : ""}?`
+    );
+    if (!confirmed) return null;
+  }
+
   const data = await sendToBack(newProductParams);
   if (!data || !data.success) {
     await displayPopup("Failed to add new product", "error");
@@ -38,8 +52,13 @@ export const runAddNewProduct = async () => {
   // console.log("DATA");
   // console.dir(data);
 
-  const popupText = `Product "${data.name}" added successfully`;
-  await displayPopup(popupText, "success");
+  if (newProductParams.notifySubscribers && data.emailSent) {
+    await displayPopup(`Product "${data.name}" added and emailed to ${data.subscriberCount} subscribers`, "success");
+  } else if (newProductParams.notifySubscribers) {
+    await displayPopup(`Product "${data.name}" added, but the subscriber email failed: ${data.emailMessage}`, "error");
+  } else {
+    await displayPopup(`Product "${data.name}" added successfully`, "success");
+  }
 
   // Remove modal
   const modal = document.querySelector(".modal-overlay");

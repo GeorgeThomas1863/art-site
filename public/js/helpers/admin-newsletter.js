@@ -362,6 +362,9 @@ export const runSendNewsletter = async () => {
     return null;
   }
 
+  const buttonParams = await readNewsletterButtonParams();
+  if (!buttonParams) return null;
+
   const htmlContent = quillInstance.root.innerHTML;
 
   const subscriberData = await sendToBack({ route: "/newsletter/data" }, "GET");
@@ -375,6 +378,7 @@ export const runSendNewsletter = async () => {
     route: "/newsletter/send",
     subject: subject ? subject.value.trim() : "",
     html: htmlContent,
+    ...buttonParams,
   });
 
   if (!data || !data.success) {
@@ -401,6 +405,9 @@ export const runSendTestNewsletter = async () => {
     return null;
   }
 
+  const buttonParams = await readNewsletterButtonParams();
+  if (!buttonParams) return null;
+
   const htmlContent = quillInstance.root.innerHTML;
 
   const confirmed = await displayConfirmDialog("Send a test to the admin email addresses?");
@@ -410,6 +417,7 @@ export const runSendTestNewsletter = async () => {
     route: "/newsletter/send-test",
     subject: subject ? subject.value.trim() : "",
     html: htmlContent,
+    ...buttonParams,
   });
 
   if (!data || !data.success) {
@@ -419,6 +427,21 @@ export const runSendTestNewsletter = async () => {
 
   await displayPopup("Test newsletter sent", "success");
   return data;
+};
+
+const readNewsletterButtonParams = async () => {
+  const buttonText = document.getElementById("newsletter-button-text")?.value.trim() || "";
+  const buttonUrl = document.getElementById("newsletter-button-url")?.value.trim() || "";
+
+  if (Boolean(buttonText) !== Boolean(buttonUrl)) {
+    await displayPopup("Enter both button text and link, or leave both blank", "error");
+    return null;
+  }
+  if (buttonUrl && !/^https?:\/\//i.test(buttonUrl)) {
+    await displayPopup("Button link must start with http:// or https://", "error");
+    return null;
+  }
+  return { buttonText, buttonUrl };
 };
 
 // ─── Add subscriber ───────────────────────────────────────────────────────────
