@@ -20,6 +20,7 @@ const TEST_ENV = {
   MONGO_URI: "mongodb://fake",
   DB_NAME: "fake-db",
   PRODUCTS_COLLECTION: "products",
+  CATEGORIES_COLLECTION: "categories",
   EVENTS_COLLECTION: "events",
   ORDERS_COLLECTION: "orders",
   CUSTOMERS_COLLECTION: "customers",

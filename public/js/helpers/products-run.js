@@ -1,8 +1,13 @@
 import { buildProductCard, buildCategoryDescription, buildProductDetailModal } from "../forms/products-form.js";
 import { needsContain } from "./rotate-pics.js";
+import { sendToBack } from "../util/api-front.js";
+import { categoryDescriptions } from "../util/define-things.js";
 
 //store locally for filtering
 let productsArray = [];
+
+//store locally for the category filter bar / description fallback
+let fetchedCategories = [];
 
 // Populate the products grid with product cards
 export const populateProducts = async (inputArray) => {
@@ -72,6 +77,31 @@ export const formatProductType = async (productType) => {
   return productType.charAt(0).toUpperCase() + productType.slice(1);
 };
 
+// Fetch live categories for the public filter bar; returns the array or null on
+// any failure (unreachable route, "FAIL", non-array, empty array) so callers can
+// fall back to their own hardcoded list.
+export const loadPublicCategories = async () => {
+  const data = await sendToBack({ route: "/get-categories-route" }, "GET");
+  if (!data || data === "FAIL" || !Array.isArray(data) || data.length === 0) return null;
+
+  fetchedCategories = data;
+  return data;
+};
+
+// Look up a fetched category by key when categoryDescriptions has no hardcoded
+// entry for it, so a brand-new admin-created category still shows its title.
+const buildFallbackDescriptor = (category) => {
+  if (categoryDescriptions[category]) return null;
+
+  for (let i = 0; i < fetchedCategories.length; i++) {
+    if (fetchedCategories[i].key === category) {
+      return { title: fetchedCategories[i].title, details: "" };
+    }
+  }
+
+  return null;
+};
+
 //----------------------------
 
 export const changeProductsFilterButton = async (clickElement) => {
@@ -119,8 +149,10 @@ export const updateCategoryDescription = async (category) => {
   const existingDescription = document.querySelector(".category-description-container");
   if (existingDescription) existingDescription.remove();
 
-  // Build new description for this category
-  const newDescription = await buildCategoryDescription(category);
+  // Build new description for this category, falling back to the fetched
+  // category's title when categoryDescriptions has no entry for it
+  const fallbackDescriptor = buildFallbackDescriptor(category);
+  const newDescription = await buildCategoryDescription(category, fallbackDescriptor);
   if (!newDescription) return null;
 
   const filterBar = document.querySelector(".products-filter-bar");

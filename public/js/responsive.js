@@ -1,5 +1,6 @@
 import { runModalTrigger, runModalClose, runChangeStatusCard, updateAdminStats } from "./helpers/admin-run.js"; //prettier-ignore
 import { runAddNewProduct, runEditProduct, runDeleteProduct, changeAdminProductSelector, runAddPicSlot, runRemovePicSlot } from "./helpers/admin-products.js";
+import { runAddCategory, runDeleteCategory, loadCategories, prefillNextItemId } from "./helpers/admin-categories.js";
 import { runAddNewEvent, runEditEvent, runDeleteEvent, changeAdminEventSelector } from "./helpers/admin-events.js";
 import { runSendNewsletter, runSendTestNewsletter, runAddSubscriber, runRemoveSubscriber, runRefreshSubscriberList, changeAdminNewsletterSelector, runDeleteNewsletter, runUpdateNewsletter, handleQuillImageClick, runNewsletterImageUpload } from "./helpers/admin-newsletter.js";
 import { runSlotUploadClick, runSlotUploadPic, runDeleteSlotImage, runEditSlotImage } from "./helpers/upload-pic.js";
@@ -124,6 +125,10 @@ export const clickHandler = async (e) => {
   if (clickType === "edit-product-submit") await runEditProduct();
   if (clickType === "delete-product-submit") await runDeleteProduct();
 
+  if (clickType === "add-category") await runAddCategory();
+  if (clickType === "remove-category") await runDeleteCategory(clickElement);
+  if (clickType === "refresh-category-list") await loadCategories();
+
   if (clickType === "new-event-submit") await runAddNewEvent();
   if (clickType === "edit-event-submit") await runEditEvent();
   if (clickType === "delete-event-submit") await runDeleteEvent();
@@ -199,6 +204,10 @@ export const changeHandler = async (e) => {
 
   //Product selector
   if (changeId === "product-selector") await changeAdminProductSelector(changeElement);
+
+  //Product type -> auto-fill next item id
+  if (changeId === "product-type") await prefillNextItemId("add");
+  if (changeId === "edit-product-type") await prefillNextItemId("edit");
 
   if (changeId === "event-selector") await changeAdminEventSelector(changeElement);
   if (changeId === "newsletter-archive-selector") await changeAdminNewsletterSelector(changeElement);

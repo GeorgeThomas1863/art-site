@@ -16,13 +16,21 @@ import {
   addNewProductControl,
   sendNewsletterControl,
   sendTestNewsletterControl,
+  getSiteUrlControl,
+  getCategoriesControl,
+  addCategoryControl,
+  deleteCategoryControl,
+  nextItemIdControl,
+  checkItemIdControl,
 } from "../controllers/data-controller.js";
-import { buildReq } from "./helpers/mock-req.js";
+import { buildReq, buildProductDoc } from "./helpers/mock-req.js";
 import { FakeDbModel, seedCollection, readCollection } from "./helpers/fake-db.js";
+import { DEFAULT_CATEGORIES } from "../src/categories.js";
 
 const SUBSCRIBERS = process.env.SUBSCRIBERS_COLLECTION;
 const PRODUCTS = process.env.PRODUCTS_COLLECTION;
 const NEWSLETTERS = process.env.NEWSLETTER_COLLECTION;
+const CATEGORIES = process.env.CATEGORIES_COLLECTION;
 
 const buildRes = () => {
   return { status: vi.fn().mockReturnThis(), json: vi.fn() };
@@ -124,6 +132,21 @@ describe("newsletter send controls", () => {
   });
 });
 
+describe("getSiteUrlControl", () => {
+  it("returns the site URL from env", async () => {
+    const res = buildRes();
+    await getSiteUrlControl(buildReq(), res);
+    expect(res.json).toHaveBeenCalledWith({ siteUrl: "http://localhost:0" });
+  });
+
+  it("strips a trailing slash", async () => {
+    vi.stubEnv("SITE_URL", "https://example.test/");
+    const res = buildRes();
+    await getSiteUrlControl(buildReq(), res);
+    expect(res.json).toHaveBeenCalledWith({ siteUrl: "https://example.test" });
+  });
+});
+
 describe("addNewProductControl", () => {
   const productBody = { name: "New Art", price: "20", description: "Description", picData: [{ filename: "art.jpg" }] };
 
@@ -188,5 +211,136 @@ describe("addNewProductControl", () => {
     expect(res.json).toHaveBeenCalledWith(expect.objectContaining({ success: true, emailSent: false, emailMessage: "Button link must start with http:// or https://" }));
     expect(readCollection(PRODUCTS)).toHaveLength(1);
     expect(axios.post).not.toHaveBeenCalled();
+  });
+});
+
+describe("getCategoriesControl", () => {
+  it("returns the category list with product counts", async () => {
+    seedCollection(CATEGORIES, [{ key: "acorns", title: "Acorns", letter: "A", dateCreated: new Date().toISOString() }]);
+    seedCollection(PRODUCTS, [
+      buildProductDoc({ productId: "p1", productType: "acorns" }),
+      buildProductDoc({ productId: "p2", productType: "acorns" }),
+    ]);
+    const res = buildRes();
+    await getCategoriesControl(buildReq(), res);
+    expect(res.json).toHaveBeenCalledWith([{ key: "acorns", title: "Acorns", letter: "A", productCount: 2 }]);
+  });
+
+  it("returns an empty array instead of null when categories fail to load", async () => {
+    const getAllSpy = vi.spyOn(FakeDbModel.prototype, "getAll").mockImplementation(function () {
+      if (this.collection === CATEGORIES) throw new Error("read failed");
+      return [];
+    });
+
+    const res = buildRes();
+    await getCategoriesControl(buildReq(), res);
+    getAllSpy.mockRestore();
+
+    expect(res.json).toHaveBeenCalledWith([]);
+  });
+});
+
+describe("addCategoryControl", () => {
+  it("adds a new category and returns success", async () => {
+    const res = buildRes();
+    await addCategoryControl(buildReq({ body: { title: "Gems", letter: "Z" } }), res);
+    expect(res.json).toHaveBeenCalledWith(expect.objectContaining({
+      success: true,
+      category: expect.objectContaining({ key: "gems", title: "Gems", letter: "Z" }),
+    }));
+    expect(readCollection(CATEGORIES)).toHaveLength(DEFAULT_CATEGORIES.length + 1);
+  });
+
+  it("rejects a letter that is already used by another category", async () => {
+    const res = buildRes();
+    await addCategoryControl(buildReq({ body: { title: "Geckos", letter: "G" } }), res);
+    expect(res.json).toHaveBeenCalledWith({ success: false, message: "Letter G is already used by Geodes" });
+    expect(readCollection(CATEGORIES)).toHaveLength(DEFAULT_CATEGORIES.length);
+  });
+
+  it("responds 500 when no input parameters are provided", async () => {
+    const res = buildRes();
+    await addCategoryControl({}, res);
+    expect(res.status).toHaveBeenCalledWith(500);
+    expect(res.json).toHaveBeenCalledWith({ error: "No input parameters" });
+    expect(readCollection(CATEGORIES)).toHaveLength(0);
+  });
+});
+
+describe("deleteCategoryControl", () => {
+  it("deletes an existing category", async () => {
+    seedCollection(CATEGORIES, [{ key: "acorns", title: "Acorns", letter: "A", dateCreated: new Date().toISOString() }]);
+    const res = buildRes();
+    await deleteCategoryControl(buildReq({ body: { key: "acorns" } }), res);
+    expect(res.json).toHaveBeenCalledWith({ success: true, message: "Category deleted successfully" });
+    expect(readCollection(CATEGORIES)).toHaveLength(0);
+  });
+
+  it("reports category not found for an unknown key", async () => {
+    const res = buildRes();
+    await deleteCategoryControl(buildReq({ body: { key: "nope" } }), res);
+    expect(res.json).toHaveBeenCalledWith({ success: false, message: "Category not found" });
+  });
+
+  it("responds 500 when no input parameters are provided", async () => {
+    const res = buildRes();
+    await deleteCategoryControl({}, res);
+    expect(res.status).toHaveBeenCalledWith(500);
+    expect(res.json).toHaveBeenCalledWith({ error: "No input parameters" });
+  });
+});
+
+describe("nextItemIdControl", () => {
+  it("returns the next sequential item ID for a category", async () => {
+    seedCollection(CATEGORIES, [{ key: "acorns", title: "Acorns", letter: "A", dateCreated: new Date().toISOString() }]);
+    seedCollection(PRODUCTS, [
+      buildProductDoc({ productId: "p1", itemId: "A001" }),
+      buildProductDoc({ productId: "p2", itemId: "A007" }),
+    ]);
+    const res = buildRes();
+    await nextItemIdControl(buildReq({ body: { productType: "acorns" } }), res);
+    expect(res.json).toHaveBeenCalledWith({ itemId: "A008" });
+  });
+
+  it("returns null for an unknown category", async () => {
+    const res = buildRes();
+    await nextItemIdControl(buildReq({ body: { productType: "unknown" } }), res);
+    expect(res.json).toHaveBeenCalledWith({ itemId: null });
+  });
+
+  it("responds 500 when no input parameters are provided", async () => {
+    const res = buildRes();
+    await nextItemIdControl({}, res);
+    expect(res.status).toHaveBeenCalledWith(500);
+    expect(res.json).toHaveBeenCalledWith({ error: "No input parameters" });
+  });
+});
+
+describe("checkItemIdControl", () => {
+  it("reports an existing owner when the item ID is already used", async () => {
+    seedCollection(PRODUCTS, [buildProductDoc({ productId: "p1", itemId: "A001", name: "Acorn Necklace" })]);
+    const res = buildRes();
+    await checkItemIdControl(buildReq({ body: { itemId: "a001" } }), res);
+    expect(res.json).toHaveBeenCalledWith({ exists: true, name: "Acorn Necklace" });
+  });
+
+  it("excludes the product being edited via productId", async () => {
+    seedCollection(PRODUCTS, [buildProductDoc({ productId: "p1", itemId: "A001", name: "Acorn Necklace" })]);
+    const res = buildRes();
+    await checkItemIdControl(buildReq({ body: { itemId: "A001", productId: "p1" } }), res);
+    expect(res.json).toHaveBeenCalledWith({ exists: false, name: null });
+  });
+
+  it("reports no match for a blank item ID", async () => {
+    const res = buildRes();
+    await checkItemIdControl(buildReq({ body: { itemId: "" } }), res);
+    expect(res.json).toHaveBeenCalledWith({ exists: false, name: null });
+  });
+
+  it("responds 500 when no input parameters are provided", async () => {
+    const res = buildRes();
+    await checkItemIdControl({}, res);
+    expect(res.status).toHaveBeenCalledWith(500);
+    expect(res.json).toHaveBeenCalledWith({ error: "No input parameters" });
   });
 });

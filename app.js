@@ -4,19 +4,13 @@
 
 // better sending email account for newsletter (display name, pic etc)
 
-// way to email out new products, so a button in admin, in product creation panel
-
 // in admin sort IDs by product type / IDs more logical
-
-// buttons / videos in the news letter
 
 //w ay to remove / hide old events from display
 
 //videos in newsletters
 
 //test image / vid uploads and editing on multiple displays
-
-//write tests?
 
 //++++++++++++++++++
 
@@ -27,8 +21,6 @@
 // figure out the cloudflare problem and fix it (have claude investigate based on cloudflare docs)
 
 //figure out how to receive email from mailgun through admin email
-
-//popup display of product category should be under add to cart?
 
 //-----------------
 

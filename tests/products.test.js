@@ -9,6 +9,7 @@ import { seedCollection, readCollection } from "./helpers/fake-db.js";
 import { buildProductDoc, buildCartItem } from "./helpers/mock-req.js";
 
 const PRODUCTS = process.env.PRODUCTS_COLLECTION;
+const CATEGORIES = process.env.CATEGORIES_COLLECTION;
 
 //---------- read ----------
 
@@ -73,6 +74,29 @@ describe("storeProduct", () => {
     const result = await storeProduct({ name: "Acorn Necklace" });
     expect(result.urlName).toBe("acorn-necklace-3");
   });
+
+  it("auto-assigns the next itemId when itemId is blank", async () => {
+    seedCollection(CATEGORIES, [{ key: "acorns", title: "Acorns", letter: "A" }]);
+    const result = await storeProduct({ name: "Acorn Necklace", productType: "acorns" });
+    expect(result.itemId).toBe("A001");
+  });
+
+  it("continues the sequence when auto-assigning against existing itemIds", async () => {
+    seedCollection(CATEGORIES, [{ key: "acorns", title: "Acorns", letter: "A" }]);
+    seedCollection(PRODUCTS, [buildProductDoc({ productId: "prod-1", itemId: "A004" })]);
+    const result = await storeProduct({ name: "Acorn Necklace", productType: "acorns" });
+    expect(result.itemId).toBe("A005");
+  });
+
+  it("leaves itemId blank when the productType's category is unknown", async () => {
+    const result = await storeProduct({ name: "Mystery Item", productType: "nope" });
+    expect(result.itemId).toBe("");
+  });
+
+  it("uppercases and trims a supplied itemId instead of generating one", async () => {
+    const result = await storeProduct({ name: "Acorn Necklace", itemId: "  a1  " });
+    expect(result.itemId).toBe("A1");
+  });
 });
 
 //---------- edit ----------
@@ -124,6 +148,26 @@ describe("updateProduct", () => {
     seedCollection(PRODUCTS, [buildProductDoc({ productId: "prod-1", urlName: "acorn-necklace" })]);
     const result = await updateProduct({ productId: "prod-1", urlName: "acorn-necklace" });
     expect(result.success).toBe(true);
+  });
+
+  it("uppercases and trims a supplied itemId on update", async () => {
+    seedCollection(PRODUCTS, [buildProductDoc({ productId: "prod-1" })]);
+    const result = await updateProduct({ productId: "prod-1", itemId: "  b2  " });
+    expect(result.itemId).toBe("B2");
+    expect(readCollection(PRODUCTS)[0].itemId).toBe("B2");
+  });
+
+  it("never auto-generates an itemId on update, even when it normalizes to blank", async () => {
+    seedCollection(PRODUCTS, [buildProductDoc({ productId: "prod-1", itemId: "A001" })]);
+    const result = await updateProduct({ productId: "prod-1", itemId: "   " });
+    expect(result.itemId).toBe("");
+    expect(readCollection(PRODUCTS)[0].itemId).toBe("");
+  });
+
+  it("leaves itemId untouched when the caller omits it entirely", async () => {
+    seedCollection(PRODUCTS, [buildProductDoc({ productId: "prod-1", itemId: "A001" })]);
+    await updateProduct({ productId: "prod-1", price: 30 });
+    expect(readCollection(PRODUCTS)[0].itemId).toBe("A001");
   });
 });
 

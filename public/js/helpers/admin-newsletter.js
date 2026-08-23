@@ -202,9 +202,27 @@ import { sendToBack, sendToBackFile } from "../util/api-front.js";
 import { displayPopup, displayConfirmDialog } from "../util/popup.js";
 import { updateSubscriberStats } from "./admin-run.js";
 import { openImageEditor } from "./image-editor.js";
+import { buildCtaButtonDialog } from "../forms/admin-form.js";
 
 // ─── Quill instance — module-scoped so runSendNewsletter can read it ──────────
 let quillInstance = null;
+
+// ─── CTA button dialog state — module-scoped so dialog handlers can share it ──
+let activeCtaNode = null; // DOM node of the CTA blot being edited, or null when inserting new
+let cachedSiteUrl = null;
+let ctaResizeStart = null; // { x, y, padX, padY } while dragging the resize handle, else null
+
+// ─── CTA button size limits ────────────────────────────────────────────────────
+const CTA_DEFAULT_PAD = { x: 28, y: 12 };
+const CTA_PAD_X_MIN = 8;
+const CTA_PAD_X_MAX = 120;
+const CTA_PAD_Y_MIN = 4;
+const CTA_PAD_Y_MAX = 60;
+
+// ─── CTA button blot ────────────────────────────────────────────────────────────
+// Registered once (guarded) so initQuill can run multiple times across modal opens.
+let ctaBlotRegistered = false;
+let CtaButtonBlot = null;
 
 // ─── initQuill ────────────────────────────────────────────────────────────────
 // Called by runModalTrigger (admin-run.js) after the write-newsletter modal
@@ -220,6 +238,8 @@ export const initQuill = () => {
   SizeStyle.whitelist = ["12px", "14px", "16px", "18px", "20px", "22px", "24px", "26px", "28px", "30px", "32px", "34px", "36px", "38px", "40px"];
   Quill.register(SizeStyle, true);
 
+  registerCtaButtonBlot();
+
   quillInstance = new Quill("#newsletter-quill-editor", {
     theme: "snow",
     placeholder: "Draft your newsletter message here...",
@@ -229,13 +249,14 @@ export const initQuill = () => {
           [{ size: [false, "12px", "14px", "16px", "18px", "20px", "22px", "24px", "26px", "28px", "30px", "32px", "34px", "36px", "38px", "40px"] }],
           ["bold", "italic", "underline"],
           [{ list: "ordered" }, { list: "bullet" }],
-          ["link", "image"],
+          ["link", "image", "ctaButton"],
         ],
         handlers: {
           image: () => {
             // Trigger the hidden file input instead of Quill's default base64 behaviour
             document.getElementById("newsletter-image-file-input")?.click();
           },
+          ctaButton: () => openCtaDialog(null),
         },
       },
       keyboard: {
@@ -258,6 +279,8 @@ export const initQuill = () => {
 
   // Add hover tooltips — Quill 2 does not set title attributes automatically
   const toolbarEl = quillInstance.getModule("toolbar").container;
+  attachCtaToolbarButton(quillInstance);
+
   const buttonTitles = [
     [".ql-bold", "Bold"],
     [".ql-italic", "Italic"],
@@ -277,6 +300,410 @@ export const initQuill = () => {
   for (let i = 0; i < pickerLabels.length; i++) {
     if (pickerTitles[i]) pickerLabels[i].title = pickerTitles[i];
   }
+};
+
+// ─── registerCtaButtonBlot ────────────────────────────────────────────────────
+
+const registerCtaButtonBlot = () => {
+  if (ctaBlotRegistered) return;
+
+  const BlockEmbed = Quill.import("blots/block/embed");
+
+  class Blot extends BlockEmbed {
+    static create(value) {
+      const node = super.create();
+      const align = normalizeCtaAlign(value.align);
+      node.setAttribute("style", `text-align:${align}; margin:24px 0;`);
+      node.setAttribute("contenteditable", "false");
+
+      const padX = normalizeCtaPad(value.padX, "x");
+      const padY = normalizeCtaPad(value.padY, "y");
+
+      const anchor = document.createElement("a");
+      anchor.setAttribute("href", value.url);
+      anchor.setAttribute("target", "_blank");
+      anchor.setAttribute(
+        "style",
+        `display:inline-block; padding:${padY}px ${padX}px; background:${value.bgColor}; color:${value.textColor}; text-decoration:none; border-radius:4px; font-weight:bold;`
+      );
+      anchor.textContent = value.text;
+
+      node.append(anchor);
+      return node;
+    }
+
+    static value(node) {
+      const anchor = node.querySelector("a");
+      if (!anchor) return null;
+      return {
+        text: anchor.textContent,
+        url: anchor.getAttribute("href") || "",
+        bgColor: toHexColor(anchor.style.backgroundColor),
+        textColor: toHexColor(anchor.style.color),
+        align: normalizeCtaAlign(node.style.textAlign),
+        padX: normalizeCtaPad(parseInt(anchor.style.paddingLeft, 10), "x"),
+        padY: normalizeCtaPad(parseInt(anchor.style.paddingTop, 10), "y"),
+      };
+    }
+  }
+  Blot.blotName = "ctaButton";
+  Blot.tagName = "div";
+  Blot.className = "newsletter-cta";
+
+  Quill.register(Blot);
+  CtaButtonBlot = Blot;
+  ctaBlotRegistered = true;
+};
+
+// ─── normalizeCtaAlign ─────────────────────────────────────────────────────────
+
+const normalizeCtaAlign = (value) => {
+  if (value === "left" || value === "right" || value === "center") return value;
+  return "center";
+};
+
+// ─── normalizeCtaPad ────────────────────────────────────────────────────────────
+
+const normalizeCtaPad = (value, axis) => {
+  const fallback = axis === "x" ? CTA_DEFAULT_PAD.x : CTA_DEFAULT_PAD.y;
+  const min = axis === "x" ? CTA_PAD_X_MIN : CTA_PAD_Y_MIN;
+  const max = axis === "x" ? CTA_PAD_X_MAX : CTA_PAD_Y_MAX;
+
+  const num = Number(value);
+  if (!Number.isFinite(num)) return fallback;
+
+  return Math.min(max, Math.max(min, Math.round(num)));
+};
+
+// ─── toHexColor ──────────────────────────────────────────────────────────────
+
+const toHexColor = (colorValue) => {
+  if (!colorValue) return "";
+  if (/^#[0-9a-f]{6}$/i.test(colorValue)) return colorValue.toLowerCase();
+  if (/^#[0-9a-f]{3}$/i.test(colorValue)) {
+    const hex3 = colorValue.slice(1);
+    let expanded = "#";
+    for (let i = 0; i < hex3.length; i++) {
+      expanded += hex3[i] + hex3[i];
+    }
+    return expanded.toLowerCase();
+  }
+
+  const rgbMatch = colorValue.match(/rgba?\((\d+),\s*(\d+),\s*(\d+)/i);
+  if (!rgbMatch) return "";
+
+  const toHex = (channel) => Number(channel).toString(16).padStart(2, "0");
+  return `#${toHex(rgbMatch[1])}${toHex(rgbMatch[2])}${toHex(rgbMatch[3])}`;
+};
+
+// ─── CTA click-to-edit ────────────────────────────────────────────────────────
+
+const handleQuillCtaClick = (event) => {
+  const ctaNode = event.target.closest(".newsletter-cta");
+  if (!ctaNode) return;
+  event.preventDefault();
+  openCtaDialog(ctaNode);
+};
+
+// ─── CTA toolbar wiring — shared by initQuill and initEditQuill ──────────────
+// Injects the button icon/tooltip and wires click-to-edit on whichever Quill
+// instance (write or edit modal) is being constructed.
+
+const attachCtaToolbarButton = (quill) => {
+  const toolbarEl = quill.getModule("toolbar").container;
+  const ctaButtonEl = toolbarEl.querySelector(".ql-ctaButton");
+  if (ctaButtonEl) {
+    ctaButtonEl.textContent = "Add Button";
+    ctaButtonEl.title = "Add Button";
+  }
+  quill.root.addEventListener("click", handleQuillCtaClick);
+};
+
+// ─── CTA dialog ───────────────────────────────────────────────────────────────
+
+const openCtaDialog = async (existingNode) => {
+  const dialog = await buildCtaButtonDialog();
+  if (!dialog) return;
+
+  activeCtaNode = existingNode || null;
+  dialog.dataset.padX = String(CTA_DEFAULT_PAD.x);
+  dialog.dataset.padY = String(CTA_DEFAULT_PAD.y);
+  document.body.append(dialog);
+  dialog.classList.add("visible");
+
+  if (existingNode) {
+    prefillCtaDialog(dialog, existingNode);
+  } else {
+    const urlInput = dialog.querySelector("#cta-url");
+    if (urlInput && !urlInput.value) {
+      urlInput.value = await getSiteUrl();
+      urlInput.classList.add("cta-default");
+    }
+  }
+  wireCtaDialog(dialog);
+
+  const textInput = dialog.querySelector("#cta-text");
+  if (textInput) textInput.focus();
+};
+
+const getSiteUrl = async () => {
+  if (cachedSiteUrl !== null) return cachedSiteUrl;
+
+  const data = await sendToBack({ route: "/newsletter/site-url" }, "GET");
+  if (data && typeof data.siteUrl === "string" && data.siteUrl) {
+    cachedSiteUrl = data.siteUrl;
+  } else {
+    cachedSiteUrl = window.location.origin;
+  }
+  return cachedSiteUrl;
+};
+
+const prefillCtaDialog = (dialog, existingNode) => {
+  const value = CtaButtonBlot ? CtaButtonBlot.value(existingNode) : null;
+  if (!value) return;
+
+  const textInput = dialog.querySelector("#cta-text");
+  const urlInput = dialog.querySelector("#cta-url");
+  const bgInput = dialog.querySelector("#cta-bg-color");
+  const textColorInput = dialog.querySelector("#cta-text-color");
+  const insertButton = dialog.querySelector("#cta-insert");
+  const removeButton = dialog.querySelector("#cta-remove");
+
+  if (textInput) textInput.value = value.text;
+  if (urlInput) urlInput.value = value.url;
+  if (bgInput) bgInput.value = value.bgColor;
+  if (textColorInput) textColorInput.value = value.textColor;
+  if (insertButton) insertButton.textContent = "Update";
+  if (removeButton) removeButton.classList.remove("hidden");
+
+  dialog.dataset.padX = String(normalizeCtaPad(value.padX, "x"));
+  dialog.dataset.padY = String(normalizeCtaPad(value.padY, "y"));
+
+  const prefillAlignButtons = dialog.querySelectorAll(".cta-align");
+  for (let i = 0; i < prefillAlignButtons.length; i++) {
+    if (prefillAlignButtons[i].getAttribute("data-align") === value.align) {
+      prefillAlignButtons[i].classList.add("selected");
+    } else {
+      prefillAlignButtons[i].classList.remove("selected");
+    }
+  }
+
+  updateCtaPreview(dialog);
+};
+
+const wireCtaDialog = (dialog) => {
+  updateCtaPreview(dialog);
+
+  const swatches = dialog.querySelectorAll(".cta-swatch");
+  for (let i = 0; i < swatches.length; i++) {
+    swatches[i].addEventListener("click", () => selectCtaSwatch(dialog, swatches[i]));
+  }
+
+  const alignButtons = dialog.querySelectorAll(".cta-align");
+  for (let i = 0; i < alignButtons.length; i++) {
+    alignButtons[i].addEventListener("click", () => selectCtaAlign(dialog, alignButtons[i]));
+  }
+
+  const inputs = dialog.querySelectorAll("#cta-text, #cta-url, #cta-bg-color, #cta-text-color");
+  for (let i = 0; i < inputs.length; i++) {
+    inputs[i].addEventListener("input", () => updateCtaPreview(dialog));
+  }
+
+  const urlInput = dialog.querySelector("#cta-url");
+  if (urlInput) urlInput.addEventListener("input", () => clearCtaUrlDefault(urlInput));
+
+  const cancelButton = dialog.querySelector("#cta-cancel");
+  if (cancelButton) cancelButton.addEventListener("click", () => closeCtaDialog(dialog));
+
+  dialog.addEventListener("click", (event) => {
+    if (event.target === dialog) closeCtaDialog(dialog);
+  });
+
+  const removeButton = dialog.querySelector("#cta-remove");
+  if (removeButton) removeButton.addEventListener("click", () => removeCtaButton(dialog));
+
+  const insertButton = dialog.querySelector("#cta-insert");
+  if (insertButton) insertButton.addEventListener("click", () => submitCtaDialog(dialog));
+
+  const resizeHandle = dialog.querySelector("#cta-resize-handle");
+  if (resizeHandle) {
+    resizeHandle.addEventListener("pointerdown", (event) => startCtaResize(dialog, event));
+    resizeHandle.addEventListener("pointermove", (event) => moveCtaResize(dialog, event));
+    resizeHandle.addEventListener("pointerup", (event) => endCtaResize(event));
+    resizeHandle.addEventListener("pointercancel", (event) => endCtaResize(event));
+  }
+
+  const resetButton = dialog.querySelector("#cta-size-reset");
+  if (resetButton) resetButton.addEventListener("click", () => resetCtaSize(dialog));
+};
+
+const startCtaResize = (dialog, event) => {
+  const handle = event.currentTarget;
+  event.preventDefault();
+  handle.setPointerCapture(event.pointerId);
+  ctaResizeStart = {
+    x: event.clientX,
+    y: event.clientY,
+    padX: normalizeCtaPad(dialog.dataset.padX, "x"),
+    padY: normalizeCtaPad(dialog.dataset.padY, "y"),
+  };
+};
+
+const moveCtaResize = (dialog, event) => {
+  if (!ctaResizeStart) return;
+
+  const deltaX = Math.round((event.clientX - ctaResizeStart.x) / 2);
+  const deltaY = Math.round((event.clientY - ctaResizeStart.y) / 2);
+  dialog.dataset.padX = String(normalizeCtaPad(ctaResizeStart.padX + deltaX, "x"));
+  dialog.dataset.padY = String(normalizeCtaPad(ctaResizeStart.padY + deltaY, "y"));
+  updateCtaPreview(dialog);
+};
+
+const endCtaResize = (event) => {
+  const handle = event.currentTarget;
+  if (handle.hasPointerCapture(event.pointerId)) handle.releasePointerCapture(event.pointerId);
+  ctaResizeStart = null;
+};
+
+const resetCtaSize = (dialog) => {
+  dialog.dataset.padX = String(CTA_DEFAULT_PAD.x);
+  dialog.dataset.padY = String(CTA_DEFAULT_PAD.y);
+  updateCtaPreview(dialog);
+};
+
+const clearCtaUrlDefault = (urlInput) => {
+  urlInput.classList.remove("cta-default");
+};
+
+const selectCtaSwatch = (dialog, swatchEl) => {
+  const color = swatchEl.getAttribute("data-color");
+  if (!color) return;
+  const targetId = swatchEl.getAttribute("data-target") || "cta-bg-color";
+  const targetInput = dialog.querySelector("#" + targetId);
+  if (!targetInput) return;
+  targetInput.value = color;
+  updateCtaPreview(dialog);
+};
+
+const selectCtaAlign = (dialog, buttonEl) => {
+  const alignButtons = dialog.querySelectorAll(".cta-align");
+  for (let i = 0; i < alignButtons.length; i++) {
+    alignButtons[i].classList.remove("selected");
+  }
+  buttonEl.classList.add("selected");
+  updateCtaPreview(dialog);
+};
+
+const updateCtaPreview = (dialog) => {
+  const preview = dialog.querySelector("#cta-preview");
+  if (!preview) return;
+
+  const text = dialog.querySelector("#cta-text")?.value.trim() || "Button Text";
+  const bgColor = dialog.querySelector("#cta-bg-color")?.value || "#333333";
+  const textColor = dialog.querySelector("#cta-text-color")?.value || "#ffffff";
+  const padX = normalizeCtaPad(dialog.dataset.padX, "x");
+  const padY = normalizeCtaPad(dialog.dataset.padY, "y");
+
+  preview.textContent = text;
+  preview.style.background = bgColor;
+  preview.style.color = textColor;
+  preview.style.padding = `${padY}px ${padX}px`;
+  toggleCtaSizeReset(dialog, padX, padY);
+
+  const previewWrap = dialog.querySelector(".cta-preview-wrap");
+  if (previewWrap) {
+    const selectedAlignButton = dialog.querySelector(".cta-align.selected");
+    previewWrap.style.textAlign = normalizeCtaAlign(selectedAlignButton?.getAttribute("data-align"));
+  }
+};
+
+const toggleCtaSizeReset = (dialog, padX, padY) => {
+  const resetButton = dialog.querySelector("#cta-size-reset");
+  if (!resetButton) return;
+
+  const isDefaultSize = padX === CTA_DEFAULT_PAD.x && padY === CTA_DEFAULT_PAD.y;
+  if (isDefaultSize) {
+    resetButton.classList.add("hidden");
+  } else {
+    resetButton.classList.remove("hidden");
+  }
+};
+
+const closeCtaDialog = (dialog) => {
+  dialog.remove();
+  activeCtaNode = null;
+  ctaResizeStart = null;
+};
+
+const removeCtaButton = (dialog) => {
+  if (!activeCtaNode || !quillInstance) {
+    closeCtaDialog(dialog);
+    return;
+  }
+  const blot = Quill.find(activeCtaNode);
+  if (blot) {
+    const index = quillInstance.getIndex(blot);
+    quillInstance.deleteText(index, 1, "user");
+  }
+  closeCtaDialog(dialog);
+};
+
+const submitCtaDialog = async (dialog) => {
+  if (!quillInstance) return;
+
+  const value = readCtaDialogValue(dialog);
+  const isValid = await validateCtaDialogValue(value);
+  if (!isValid) return;
+
+  if (activeCtaNode) {
+    updateExistingCtaButton(value);
+  } else {
+    insertNewCtaButton(value);
+  }
+
+  closeCtaDialog(dialog);
+};
+
+const readCtaDialogValue = (dialog) => ({
+  text: dialog.querySelector("#cta-text")?.value.trim() || "",
+  url: dialog.querySelector("#cta-url")?.value.trim() || "",
+  bgColor: dialog.querySelector("#cta-bg-color")?.value || "",
+  textColor: dialog.querySelector("#cta-text-color")?.value || "",
+  align: normalizeCtaAlign(dialog.querySelector(".cta-align.selected")?.getAttribute("data-align")),
+  padX: normalizeCtaPad(dialog.dataset.padX, "x"),
+  padY: normalizeCtaPad(dialog.dataset.padY, "y"),
+});
+
+const validateCtaDialogValue = async (value) => {
+  if (!value.text || !value.url) {
+    await displayPopup("Enter both button text and link", "error");
+    return false;
+  }
+  if (!/^https?:\/\//i.test(value.url)) {
+    await displayPopup("Button link must start with http:// or https://", "error");
+    return false;
+  }
+  if (!/^#[0-9a-f]{6}$/i.test(value.bgColor) || !/^#[0-9a-f]{6}$/i.test(value.textColor)) {
+    await displayPopup("Button colors must be valid hex colors", "error");
+    return false;
+  }
+  return true;
+};
+
+const insertNewCtaButton = (value) => {
+  const range = quillInstance.getSelection(true);
+  const index = range ? range.index : quillInstance.getLength();
+  quillInstance.insertEmbed(index, "ctaButton", value, "user");
+  quillInstance.setSelection(index + 1, 0, "silent");
+};
+
+const updateExistingCtaButton = (value) => {
+  const blot = Quill.find(activeCtaNode);
+  if (!blot) return;
+  const index = quillInstance.getIndex(blot);
+  quillInstance.deleteText(index, 1, "user");
+  quillInstance.insertEmbed(index, "ctaButton", value, "user");
+  quillInstance.setSelection(index + 1, 0, "silent");
 };
 
 // ─── resetQuill ───────────────────────────────────────────────────────────────
@@ -352,18 +779,53 @@ export const runNewsletterImageUpload = async (fileInput) => {
   });
 };
 
+// ─── Report newsletter send result ────────────────────────────────────────────
+// Shared by runSendNewsletter and runSendTestNewsletter. Surfaces the real
+// server message instead of a hardcoded string, so a MAIL_MODE=log response
+// (data.logMode: true — email logged, not actually sent) is not mistaken for
+// a real send, and real server failures are not masked by a generic string.
+
+const reportSendResult = async (data, successText, failureText) => {
+  if (!data || !data.success) {
+    await displayPopup(data && data.message ? data.message : failureText, "error");
+    return;
+  }
+
+  if (data.logMode) {
+    await displayPopup(data.message, "error");
+    return;
+  }
+
+  await displayPopup(successText, "success");
+};
+
+// ─── Editor content check ─────────────────────────────────────────────────────
+// Quill's getText() omits embeds (images, CTA buttons), so a newsletter made of
+// only a button reads as empty. Walk the delta instead: any embed or any
+// non-whitespace text counts as content.
+
+const hasEditorContent = () => {
+  if (!quillInstance) return false;
+
+  const ops = quillInstance.getContents().ops;
+  for (let i = 0; i < ops.length; i++) {
+    const insert = ops[i].insert;
+    if (typeof insert !== "string") return true;
+    if (insert.trim().length > 0) return true;
+  }
+
+  return false;
+};
+
 // ─── Send newsletter ──────────────────────────────────────────────────────────
 
 export const runSendNewsletter = async () => {
   const subject = document.getElementById("newsletter-subject");
 
-  if (!quillInstance || quillInstance.getText().trim().length === 0) {
+  if (!hasEditorContent()) {
     await displayPopup("Please enter a message", "error");
     return null;
   }
-
-  const buttonParams = await readNewsletterButtonParams();
-  if (!buttonParams) return null;
 
   const htmlContent = quillInstance.root.innerHTML;
 
@@ -378,15 +840,12 @@ export const runSendNewsletter = async () => {
     route: "/newsletter/send",
     subject: subject ? subject.value.trim() : "",
     html: htmlContent,
-    ...buttonParams,
   });
 
-  if (!data || !data.success) {
-    await displayPopup("Failed to send newsletter", "error");
-    return null;
-  }
+  await reportSendResult(data, "Newsletter sent successfully", "Failed to send newsletter");
+  if (!data || !data.success) return null;
+  if (data.logMode) return data;
 
-  await displayPopup("Newsletter sent successfully", "success");
   quillInstance = null;
 
   const modal = document.querySelector(".modal-overlay");
@@ -400,13 +859,10 @@ export const runSendNewsletter = async () => {
 export const runSendTestNewsletter = async () => {
   const subject = document.getElementById("newsletter-subject");
 
-  if (!quillInstance || quillInstance.getText().trim().length === 0) {
+  if (!hasEditorContent()) {
     await displayPopup("Please enter a message", "error");
     return null;
   }
-
-  const buttonParams = await readNewsletterButtonParams();
-  if (!buttonParams) return null;
 
   const htmlContent = quillInstance.root.innerHTML;
 
@@ -417,31 +873,12 @@ export const runSendTestNewsletter = async () => {
     route: "/newsletter/send-test",
     subject: subject ? subject.value.trim() : "",
     html: htmlContent,
-    ...buttonParams,
   });
 
-  if (!data || !data.success) {
-    await displayPopup("Failed to send test newsletter", "error");
-    return null;
-  }
+  await reportSendResult(data, "Test newsletter sent", "Failed to send test newsletter");
+  if (!data || !data.success) return null;
 
-  await displayPopup("Test newsletter sent", "success");
   return data;
-};
-
-const readNewsletterButtonParams = async () => {
-  const buttonText = document.getElementById("newsletter-button-text")?.value.trim() || "";
-  const buttonUrl = document.getElementById("newsletter-button-url")?.value.trim() || "";
-
-  if (Boolean(buttonText) !== Boolean(buttonUrl)) {
-    await displayPopup("Enter both button text and link, or leave both blank", "error");
-    return null;
-  }
-  if (buttonUrl && !/^https?:\/\//i.test(buttonUrl)) {
-    await displayPopup("Button link must start with http:// or https://", "error");
-    return null;
-  }
-  return { buttonText, buttonUrl };
 };
 
 // ─── Add subscriber ───────────────────────────────────────────────────────────
@@ -683,7 +1120,7 @@ export const runUpdateNewsletter = async () => {
   }
 
   const html = quillInstance.root.innerHTML;
-  if (!html || quillInstance.getText().trim().length === 0) {
+  if (!html || !hasEditorContent()) {
     await displayPopup("Please enter content", "error");
     return null;
   }
@@ -813,6 +1250,8 @@ export const initEditQuill = () => {
   SizeStyle.whitelist = ["12px", "14px", "16px", "18px", "20px", "22px", "24px", "26px", "28px", "30px", "32px", "34px", "36px", "38px", "40px"];
   Quill.register(SizeStyle, true);
 
+  registerCtaButtonBlot();
+
   quillInstance = new Quill("#edit-newsletter-quill-editor", {
     theme: "snow",
     placeholder: "Newsletter content will appear here after selecting a newsletter...",
@@ -822,12 +1261,13 @@ export const initEditQuill = () => {
           [{ size: [false, "12px", "14px", "16px", "18px", "20px", "22px", "24px", "26px", "28px", "30px", "32px", "34px", "36px", "38px", "40px"] }],
           ["bold", "italic", "underline"],
           [{ list: "ordered" }, { list: "bullet" }],
-          ["link", "image"],
+          ["link", "image", "ctaButton"],
         ],
         handlers: {
           image: () => {
             document.getElementById("edit-newsletter-image-file-input")?.click();
           },
+          ctaButton: () => openCtaDialog(null),
         },
       },
       keyboard: {
@@ -849,6 +1289,8 @@ export const initEditQuill = () => {
   });
 
   const toolbarEl = quillInstance.getModule("toolbar").container;
+  attachCtaToolbarButton(quillInstance);
+
   const buttonTitles = [
     [".ql-bold", "Bold"],
     [".ql-italic", "Italic"],

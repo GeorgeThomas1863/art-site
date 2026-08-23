@@ -4,6 +4,13 @@ import { sendMail } from "./mailer.js";
 import { escapeHtml, sanitizeEmailHeader } from "./sanitize.js";
 import dbModel from "../models/db-model.js";
 
+const LOG_MODE_MESSAGE = "Email NOT sent: server is running with MAIL_MODE=log (logged to console only)";
+
+const buildSendResult = (data, successMessage) => {
+  if (data.mode === "log") return { success: true, message: LOG_MODE_MESSAGE, logMode: true, messageId: data.messageId };
+  return { success: true, message: successMessage, messageId: data.messageId };
+};
+
 export const getSubscribers = async () => {
   const dataModel = new dbModel("", process.env.SUBSCRIBERS_COLLECTION);
   const data = await dataModel.getAll();
@@ -116,7 +123,7 @@ export const sendTestNewsletter = async (inputParams) => {
   try {
     const data = await sendMail(mailParams);
     if (!data) return { success: false, message: "Failed to send test newsletter" };
-    return { success: true, message: "Test newsletter sent successfully", messageId: data.messageId };
+    return buildSendResult(data, "Test newsletter sent successfully");
   } catch (e) {
     console.error("TEST EMAIL ERROR:", e.data?.message || e.message || "Unknown error");
     return { success: false, message: "Failed to send test newsletter" };
@@ -146,7 +153,8 @@ const sendPreparedNewsletter = async (inputParams, includeSubscriberCount = fals
   if (!data) return buildSendFailure(includeSubscriberCount, subscriberArray.length);
 
   const archiveData = await storeSentNewsletter(mailParams, data);
-  const result = { success: true, message: archiveData.success ? "Newsletter sent successfully" : archiveData.message, messageId: data.messageId };
+  const successMessage = archiveData.success ? "Newsletter sent successfully" : archiveData.message;
+  const result = buildSendResult(data, successMessage);
   if (includeSubscriberCount) result.subscriberCount = subscriberArray.length;
   return result;
 };

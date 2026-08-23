@@ -2,7 +2,7 @@
 // archive rows delete/update (via dbGet() called directly — see the local vi.mock below).
 // Mail goes out through mailer.js -> axios, so axios is mocked here per file, not globally.
 
-import { describe, it, expect, vi, beforeEach } from "vitest";
+import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 
 vi.mock("axios", () => {
   return { default: { post: vi.fn() } };
@@ -427,6 +427,57 @@ describe("announceProduct", () => {
 
   it("returns the subscriber count when none exist", async () => {
     expect(await announceProduct({ name: "Art", urlName: "art" }, {})).toEqual({ success: false, message: "No subscribers found", subscriberCount: 0 });
+  });
+});
+
+describe("MAIL_MODE=log", () => {
+  const LOG_MODE_MESSAGE = "Email NOT sent: server is running with MAIL_MODE=log (logged to console only)";
+
+  beforeEach(() => {
+    process.env.MAIL_MODE = "log";
+  });
+
+  afterEach(() => {
+    delete process.env.MAIL_MODE;
+  });
+
+  it("sendTestNewsletter reports log mode instead of a real send", async () => {
+    const result = await sendTestNewsletter({ subject: "News", message: "Body" });
+
+    expect(result).toEqual({
+      success: true,
+      logMode: true,
+      message: LOG_MODE_MESSAGE,
+      messageId: "log-mode",
+    });
+    expect(axios.post).not.toHaveBeenCalled();
+  });
+
+  it("dispatchNewsletter reports log mode and still archives the newsletter", async () => {
+    seedCollection(SUBSCRIBERS, [{ email: "sub1@example.test" }]);
+
+    const result = await dispatchNewsletter({ subject: "News", message: "Hi" });
+
+    expect(result).toEqual({
+      success: true,
+      logMode: true,
+      message: LOG_MODE_MESSAGE,
+      messageId: "log-mode",
+    });
+    expect(axios.post).not.toHaveBeenCalled();
+    const stored = readCollection(NEWSLETTERS);
+    expect(stored).toHaveLength(1);
+    expect(stored[0]).toMatchObject({ subject: "News", messageId: "log-mode" });
+  });
+
+  it("leaves the success message and logMode untouched when MAIL_MODE is unset", async () => {
+    delete process.env.MAIL_MODE;
+    axios.post.mockResolvedValue(okMailResponse);
+
+    const result = await sendTestNewsletter({ subject: "News", message: "Body" });
+
+    expect(result).toEqual({ success: true, message: "Test newsletter sent successfully", messageId: "<msg-1@mg.example.test>" });
+    expect(result.logMode).toBeUndefined();
   });
 });
 

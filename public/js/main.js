@@ -12,6 +12,7 @@ import { buildConfirmOrderForm } from "./forms/confirm-form.js";
 import { buildNewsletterForm } from "./forms/newsletter-form.js";
 
 import { updateAdminStats } from "./helpers/admin-run.js";
+import { loadCategories } from "./helpers/admin-categories.js";
 import { populateProducts, updateCategoryDescription, openProductDetailModalBySlug } from "./helpers/products-run.js";
 import { populateEvents } from "./helpers/events-run.js";
 import { populateNewsletter } from "./helpers/newsletter-run.js";
@@ -51,6 +52,7 @@ export const buildAdminDisplay = async () => {
   const adminFormData = await buildAdminForm();
   adminElement.append(adminFormData);
 
+  await loadCategories();
   await updateAdminStats();
 
   return true;

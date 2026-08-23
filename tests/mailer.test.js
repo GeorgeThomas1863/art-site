@@ -104,7 +104,7 @@ describe("sendMail", () => {
       const result = await sendMail({ from: "a@x.test", to: "b@x.test", subject: "S", text: "t" });
 
       expect(axios.post).not.toHaveBeenCalled();
-      expect(result).toEqual({ messageId: "log-mode" });
+      expect(result).toEqual({ messageId: "log-mode", mode: "log" });
     });
 
     it("still calls axios when MAIL_MODE is unset", async () => {

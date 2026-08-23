@@ -1,5 +1,6 @@
 import { storeProduct, updateProduct, deleteProduct, getProductData, hideOrderedProducts } from "../src/products.js";
 import { storeEvent, updateEvent, deleteEvent, getEventData } from "../src/events.js";
+import { buildCategoryList, addCategory, deleteCategory, buildNextItemId, findItemIdOwner } from "../src/categories.js";
 import { submitContact } from "../src/contact.js";
 import {
   storeSubscriber,
@@ -183,6 +184,48 @@ export const deleteProductControl = async (req, res) => {
   const data = await deleteProduct(productId);
   return res.json(data);
 };
+
+//CATEGORIES CONTROLLER
+
+export const getCategoriesControl = async (req, res) => {
+  const data = await buildCategoryList();
+  return res.json(data || []);
+};
+
+export const addCategoryControl = async (req, res) => {
+  const inputParams = req.body;
+  if (!inputParams) return res.status(500).json({ error: "No input parameters" });
+
+  const safeParams = whitelistFields(inputParams, ["title", "letter"]);
+  const data = await addCategory(safeParams);
+  return res.json(data);
+};
+
+export const deleteCategoryControl = async (req, res) => {
+  const inputParams = req.body;
+  if (!inputParams) return res.status(500).json({ error: "No input parameters" });
+
+  const data = await deleteCategory(inputParams.key);
+  return res.json(data);
+};
+
+export const nextItemIdControl = async (req, res) => {
+  const inputParams = req.body;
+  if (!inputParams) return res.status(500).json({ error: "No input parameters" });
+
+  const itemId = await buildNextItemId(inputParams.productType);
+  return res.json({ itemId });
+};
+
+export const checkItemIdControl = async (req, res) => {
+  const inputParams = req.body;
+  if (!inputParams) return res.status(500).json({ error: "No input parameters" });
+
+  const owner = await findItemIdOwner(inputParams.itemId, inputParams.productId);
+  return res.json({ exists: !!owner, name: owner ? (owner.name ?? null) : null });
+};
+
+//---------------------
 
 export const addNewEventControl = async (req, res) => {
   const inputParams = req.body;
@@ -421,6 +464,11 @@ export const removeSubscriberControl = async (req, res) => {
 export const getNewsletterArchiveControl = async (req, res) => {
   const data = await getNewsletters();
   return res.json(data);
+};
+
+export const getSiteUrlControl = async (req, res) => {
+  const siteUrl = (process.env.SITE_URL || "").replace(/\/$/, "");
+  return res.json({ siteUrl });
 };
 
 export const deleteNewsletterControl = async (req, res) => {

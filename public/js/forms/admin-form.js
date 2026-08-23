@@ -6,6 +6,7 @@ export const buildAdminForm = async () => {
 
   const dashboardHeader = await buildDashboardHeader();
   const productsSection = await buildProductsSection();
+  const categoriesSection = await buildCategoriesSection();
   const eventsSection = await buildEventsSection();
   const newsletterSection = await buildNewsletterSection();
   const statsSection = await buildStatsSection();
@@ -25,7 +26,7 @@ export const buildAdminForm = async () => {
   statsControls.append(statsRefreshButton);
   statsWrapper.append(statsControls, statsSection);
 
-  adminFormWrapper.append(dashboardHeader, productsSection, eventsSection, newsletterSection, statsWrapper);
+  adminFormWrapper.append(dashboardHeader, productsSection, categoriesSection, eventsSection, newsletterSection, statsWrapper);
 
   return adminFormWrapper;
 };
@@ -82,6 +83,98 @@ export const buildProductsSection = async () => {
     contentElement: actionCards,
     isExpanded: true,
     dataAttribute: "products-collapse",
+  });
+
+  section.append(collapseContainer);
+
+  return section;
+};
+
+export const buildCategoriesSection = async () => {
+  const section = document.createElement("div");
+  section.className = "category-section";
+
+  const title = document.createElement("h2");
+  title.className = "category-title";
+  title.textContent = "🏷️ CATEGORIES";
+
+  const addCategorySection = document.createElement("div");
+  addCategorySection.className = "add-category-section";
+
+  const addCategoryLabel = document.createElement("label");
+  addCategoryLabel.className = "form-label";
+  addCategoryLabel.textContent = "Add New Category";
+  addCategoryLabel.setAttribute("for", "new-category-title");
+
+  const addCategoryRow = document.createElement("div");
+  addCategoryRow.className = "add-category-row";
+
+  const categoryTitleInput = document.createElement("input");
+  categoryTitleInput.className = "form-input";
+  categoryTitleInput.type = "text";
+  categoryTitleInput.id = "new-category-title";
+  categoryTitleInput.name = "new-category-title";
+  categoryTitleInput.placeholder = "e.g. Acorns";
+
+  const categoryLetterSelect = document.createElement("select");
+  categoryLetterSelect.className = "form-input";
+  categoryLetterSelect.id = "new-category-letter";
+  categoryLetterSelect.name = "new-category-letter";
+
+  for (let i = 0; i < 26; i++) {
+    const letter = String.fromCharCode(65 + i);
+    const letterOption = document.createElement("option");
+    letterOption.value = letter;
+    letterOption.textContent = letter;
+    categoryLetterSelect.append(letterOption);
+  }
+
+  const addCategoryButton = document.createElement("button");
+  addCategoryButton.className = "btn btn-add-category";
+  addCategoryButton.type = "button";
+  addCategoryButton.textContent = "Add Category";
+  addCategoryButton.setAttribute("data-label", "add-category");
+
+  addCategoryRow.append(categoryTitleInput, categoryLetterSelect, addCategoryButton);
+  addCategorySection.append(addCategoryLabel, addCategoryRow);
+
+  const listHeader = document.createElement("div");
+  listHeader.className = "category-list-header";
+
+  const listLabel = document.createElement("label");
+  listLabel.className = "form-label category-list-label";
+  listLabel.textContent = "Current Categories";
+
+  const refreshButton = document.createElement("button");
+  refreshButton.className = "btn-admin-refresh";
+  refreshButton.type = "button";
+  refreshButton.textContent = "↺ Refresh List";
+  refreshButton.setAttribute("data-label", "refresh-category-list");
+
+  listHeader.append(listLabel, refreshButton);
+
+  const categoryList = document.createElement("div");
+  categoryList.className = "category-list";
+  categoryList.id = "category-list";
+
+  const emptyState = document.createElement("div");
+  emptyState.className = "category-empty-state";
+  emptyState.textContent = "Loading categories…";
+  categoryList.append(emptyState);
+
+  const categoryContainer = document.createElement("div");
+  categoryContainer.className = "category-container";
+  categoryContainer.append(listHeader, categoryList);
+
+  const content = document.createElement("div");
+  content.className = "categories-content";
+  content.append(addCategorySection, categoryContainer);
+
+  const collapseContainer = await buildCollapseContainer({
+    titleElement: title,
+    contentElement: content,
+    isExpanded: true,
+    dataAttribute: "categories-collapse",
   });
 
   section.append(collapseContainer);
@@ -309,8 +402,7 @@ export const buildModalBody = async (mode, entityType) => {
   if (entityType === "newsletter" && mode === "write") {
     const subjectField = await buildNewsletterSubject();
     const messageField = await buildNewsletterMessage();
-    const buttonFields = await buildNewsletterButtonFields();
-    body.append(subjectField, messageField, buttonFields);
+    body.append(subjectField, messageField);
     return body;
   }
 
@@ -471,6 +563,13 @@ export const buildProductDetailsSection = async (mode) => {
 
   // Item Id Row
   const itemIdRow = await buildInfoRow(mode, "item-id", "Item Id");
+  if (mode === "add") {
+    const itemIdHint = document.createElement("div");
+    itemIdHint.className = "item-id-hint";
+    itemIdHint.textContent = "Leave blank to auto-assign";
+    const itemIdContentWrapper = itemIdRow.querySelector(".info-content-wrapper");
+    if (itemIdContentWrapper) itemIdContentWrapper.append(itemIdHint);
+  }
 
   // Product Name Row
   const nameRow = await buildInfoRow(mode, "name", "Product Name");
@@ -482,15 +581,7 @@ export const buildProductDetailsSection = async (mode) => {
   const slugRow = await buildInfoRow(mode, "url-name", "URL Ending");
 
   // Type Row
-  const typeRow = await buildInfoRowSelect(mode, "product-type", "Type", [
-    { value: "acorns", text: "Acorns", selected: true },
-    { value: "mountainTreasureBaskets", text: "Mountain Treasure Baskets" },
-    { value: "animals", text: "Animals" },
-    { value: "geodes", text: "Geodes" },
-    { value: "gnomeHouses", text: "Gnome Houses" },
-    { value: "wallPieces", text: "Wall Pieces" },
-    { value: "other", text: "Other" },
-  ]);
+  const typeRow = await buildInfoRowSelect(mode, "product-type", "Type", []);
 
   // Price Row
   const priceRow = await buildInfoRowPrice(mode, "price", "Price");
@@ -1137,6 +1228,244 @@ export const buildNewsletterMessage = async () => {
   return messageWrapper;
 };
 
+const CTA_SWATCH_COLORS = [
+  ["#000000", "Black"],
+  ["#ffffff", "White"],
+  ["#808080", "Gray"],
+  ["#d32f2f", "Red"],
+  ["#f57c00", "Orange"],
+  ["#fbc02d", "Yellow"],
+  ["#388e3c", "Green"],
+  ["#1976d2", "Blue"],
+  ["#7b1fa2", "Purple"],
+];
+
+const CTA_ALIGN_OPTIONS = [
+  ["left", "Left"],
+  ["center", "Center"],
+  ["right", "Right"],
+];
+
+export const buildCtaButtonDialog = async () => {
+  const overlay = document.createElement("div");
+  overlay.id = "cta-dialog";
+  overlay.className = "cta-dialog";
+
+  const content = document.createElement("div");
+  content.className = "cta-dialog-content";
+
+  const textField = buildCtaField("cta-text", "Button Text", "text", "e.g. Shop Now");
+  const urlField = buildCtaField("cta-url", "Button Link", "url", "https://your-site.com/page");
+  const urlHint = buildCtaUrlHint();
+  urlField.append(urlHint);
+  const colorField = buildCtaColorField("cta-bg-color", "Button Color", "#333333");
+  const textColorField = buildCtaColorField("cta-text-color", "Text Color", "#ffffff");
+  const alignField = buildCtaAlignField();
+  const previewField = buildCtaPreview();
+  const actions = buildCtaActions();
+
+  content.append(textField, urlField, colorField, textColorField, alignField, previewField, actions);
+  overlay.append(content);
+
+  return overlay;
+};
+
+const buildCtaField = (id, labelText, type, placeholder) => {
+  const field = document.createElement("div");
+  field.className = "form-field";
+
+  const label = document.createElement("label");
+  label.className = "form-label";
+  label.setAttribute("for", id);
+  label.textContent = labelText;
+
+  const input = document.createElement("input");
+  input.className = "form-input";
+  input.type = type;
+  input.id = id;
+  input.placeholder = placeholder;
+  input.setAttribute("data-label", id);
+
+  field.append(label, input);
+  return field;
+};
+
+const buildCtaUrlHint = () => {
+  const hint = document.createElement("p");
+  hint.className = "cta-hint";
+  hint.id = "cta-url-hint";
+  hint.textContent = "Defaults to main page, can set to any link.";
+  return hint;
+};
+
+const buildCtaColorField = (id, labelText, defaultValue) => {
+  const field = document.createElement("div");
+  field.className = "form-field";
+
+  const label = document.createElement("label");
+  label.className = "form-label";
+  label.setAttribute("for", id);
+  label.textContent = labelText;
+
+  const colorRow = document.createElement("div");
+  colorRow.className = "cta-color-row";
+
+  const colorInput = document.createElement("input");
+  colorInput.type = "color";
+  colorInput.id = id;
+  colorInput.value = defaultValue;
+  colorInput.setAttribute("data-label", id);
+
+  const swatches = buildCtaSwatches(id);
+
+  colorRow.append(colorInput, swatches);
+  field.append(label, colorRow);
+  return field;
+};
+
+const buildCtaSwatches = (targetId) => {
+  const swatches = document.createElement("div");
+  swatches.className = "cta-swatches";
+
+  for (let i = 0; i < CTA_SWATCH_COLORS.length; i++) {
+    const [color, name] = CTA_SWATCH_COLORS[i];
+    const swatch = document.createElement("button");
+    swatch.className = "cta-swatch";
+    swatch.type = "button";
+    swatch.setAttribute("data-color", color);
+    swatch.setAttribute("data-target", targetId);
+    swatch.title = name;
+    swatch.setAttribute("aria-label", name);
+    swatch.style.background = color;
+    swatches.append(swatch);
+  }
+
+  return swatches;
+};
+
+const buildCtaAlignField = () => {
+  const field = document.createElement("div");
+  field.className = "form-field";
+
+  const label = document.createElement("span");
+  label.className = "form-label";
+  label.textContent = "Position";
+
+  const alignRow = document.createElement("div");
+  alignRow.className = "cta-align-row";
+
+  for (let i = 0; i < CTA_ALIGN_OPTIONS.length; i++) {
+    const [align, text] = CTA_ALIGN_OPTIONS[i];
+    const button = document.createElement("button");
+    button.className = "cta-align";
+    button.type = "button";
+    button.setAttribute("data-align", align);
+    button.setAttribute("data-label", `cta-align-${align}`);
+    button.textContent = text;
+
+    if (align === "center") {
+      button.classList.add("selected");
+    }
+
+    alignRow.append(button);
+  }
+
+  field.append(label, alignRow);
+  return field;
+};
+
+const buildCtaPreview = () => {
+  const field = document.createElement("div");
+  field.className = "form-field";
+
+  const label = document.createElement("span");
+  label.className = "form-label";
+  label.textContent = "Preview";
+
+  const previewWrap = document.createElement("div");
+  previewWrap.className = "cta-preview-wrap";
+  previewWrap.append(buildCtaPreviewBox());
+
+  field.append(label, previewWrap, buildCtaPreviewTools());
+  return field;
+};
+
+const buildCtaPreviewBox = () => {
+  const box = document.createElement("span");
+  box.className = "cta-preview-box";
+
+  const preview = document.createElement("a");
+  preview.id = "cta-preview";
+  preview.href = "#";
+  preview.textContent = "Button";
+  preview.style.display = "inline-block";
+  preview.style.padding = "12px 28px";
+  preview.style.background = "#333333";
+  preview.style.color = "#ffffff";
+  preview.style.textDecoration = "none";
+  preview.style.borderRadius = "4px";
+  preview.style.fontWeight = "bold";
+
+  const resizeHandle = document.createElement("button");
+  resizeHandle.type = "button";
+  resizeHandle.id = "cta-resize-handle";
+  resizeHandle.className = "cta-resize-handle";
+  resizeHandle.setAttribute("aria-label", "Drag to resize button");
+  resizeHandle.title = "Drag to resize";
+  resizeHandle.setAttribute("data-label", "cta-resize-handle");
+
+  box.append(preview, resizeHandle);
+  return box;
+};
+
+const buildCtaPreviewTools = () => {
+  const tools = document.createElement("div");
+  tools.className = "cta-preview-tools";
+
+  const tip = document.createElement("span");
+  tip.className = "cta-preview-tip";
+  tip.textContent = "Click and drag corner of the button to change its size.";
+
+  const resetBtn = document.createElement("button");
+  resetBtn.type = "button";
+  resetBtn.id = "cta-size-reset";
+  resetBtn.className = "revert-image-btn hidden";
+  resetBtn.setAttribute("data-label", "cta-size-reset");
+  resetBtn.textContent = "↩ Revert to default size";
+
+  tools.append(tip, resetBtn);
+  return tools;
+};
+
+const buildCtaActions = () => {
+  const actions = document.createElement("div");
+  actions.className = "cta-dialog-actions";
+
+  const cancelBtn = document.createElement("button");
+  cancelBtn.className = "btn btn-admin-cancel";
+  cancelBtn.type = "button";
+  cancelBtn.id = "cta-cancel";
+  cancelBtn.textContent = "Cancel";
+  cancelBtn.setAttribute("data-label", "cta-cancel");
+
+  const removeBtn = document.createElement("button");
+  removeBtn.className = "btn btn-admin-delete hidden";
+  removeBtn.type = "button";
+  removeBtn.id = "cta-remove";
+  removeBtn.textContent = "Remove";
+  removeBtn.setAttribute("data-label", "cta-remove");
+
+  const insertBtn = document.createElement("button");
+  insertBtn.className = "btn btn-admin-submit";
+  insertBtn.type = "button";
+  insertBtn.id = "cta-insert";
+  insertBtn.textContent = "Add";
+  insertBtn.setAttribute("data-label", "cta-insert");
+
+  actions.append(cancelBtn, removeBtn, insertBtn);
+  return actions;
+};
+
 export const buildProductSubscriberSection = async () => {
   const section = document.createElement("div");
   section.className = "product-section product-subscriber-section";
@@ -1161,8 +1490,8 @@ export const buildProductSubscriberSection = async () => {
   hint.className = "product-email-hint";
   hint.textContent = "Subscribers get the product image, name, price, description and a button.";
 
-  const buttonText = buildNewsletterButtonInput("product-email-button-text", "text", "View Product", "Button Text (optional)");
-  const buttonUrl = buildNewsletterButtonInput("product-email-button-url", "url", "Leave blank to link to the product page", "Button Link (optional)");
+  const buttonText = buildProductEmailButtonInput("product-email-button-text", "text", "View Product", "Button Text (optional)");
+  const buttonUrl = buildProductEmailButtonInput("product-email-button-url", "url", "Leave blank to link to the product page", "Button Link (optional)");
 
   checkbox.addEventListener("change", () => {
     fields.hidden = !checkbox.checked;
@@ -1174,21 +1503,7 @@ export const buildProductSubscriberSection = async () => {
   return section;
 };
 
-export const buildNewsletterButtonFields = async () => {
-  const wrapper = document.createElement("div");
-  wrapper.className = "newsletter-button-fields";
-
-  const title = document.createElement("h4");
-  title.className = "form-label";
-  title.textContent = "Button (optional)";
-
-  const textField = buildNewsletterButtonInput("newsletter-button-text", "text", "Button text, e.g. Shop Now", "Button Text");
-  const urlField = buildNewsletterButtonInput("newsletter-button-url", "url", "https://...", "Button Link");
-  wrapper.append(title, textField, urlField);
-  return wrapper;
-};
-
-const buildNewsletterButtonInput = (id, type, placeholder, labelText) => {
+const buildProductEmailButtonInput = (id, type, placeholder, labelText) => {
   const field = document.createElement("div");
   field.className = "form-field";
 

@@ -1,4 +1,4 @@
-import { formatProductType, formatPrice } from "../helpers/products-run.js";
+import { formatProductType, formatPrice, loadPublicCategories } from "../helpers/products-run.js";
 import { buildCollapseContainer } from "../util/collapse.js";
 import { categoryDescriptions, CAROUSEL_PREV_SVG, CAROUSEL_NEXT_SVG, isPickupOnly } from "../util/define-things.js";
 
@@ -34,15 +34,10 @@ export const buildProductsPageHeader = async () => {
   return pageHeader;
 };
 
-// Build filter bar with category dropdown
-export const buildProductsFilterBar = async () => {
-  const filterBar = document.createElement("div");
-  filterBar.className = "products-filter-bar";
-
-  const filterButtons = document.createElement("div");
-  filterButtons.className = "products-filter-buttons";
-
-  const filterOptions = [
+// Build the filter option list from the live categories route, falling back to
+// the hardcoded list when the route is unreachable or returns nothing usable
+const buildFilterOptions = async () => {
+  const fallbackOptions = [
     { value: "all", text: "All Products", selected: true },
     { value: "acorns", text: "Acorns" },
     { value: "animals", text: "Animals" },
@@ -52,6 +47,27 @@ export const buildProductsFilterBar = async () => {
     { value: "gnomeHouses", text: "Gnome Houses" },
     { value: "other", text: "Other" },
   ];
+
+  const categories = await loadPublicCategories();
+  if (!categories) return fallbackOptions;
+
+  const filterOptions = [{ value: "all", text: "All Products", selected: true }];
+  for (let i = 0; i < categories.length; i++) {
+    filterOptions.push({ value: categories[i].key, text: categories[i].title });
+  }
+
+  return filterOptions;
+};
+
+// Build filter bar with category dropdown
+export const buildProductsFilterBar = async () => {
+  const filterBar = document.createElement("div");
+  filterBar.className = "products-filter-bar";
+
+  const filterButtons = document.createElement("div");
+  filterButtons.className = "products-filter-buttons";
+
+  const filterOptions = await buildFilterOptions();
 
   for (let i = 0; i < filterOptions.length; i++) {
     const optionData = filterOptions[i];
@@ -75,16 +91,20 @@ export const buildProductsFilterBar = async () => {
 
 //---------------------
 
-export const buildCategoryDescription = async (category) => {
-  const descriptionObj = categoryDescriptions[category];
-  if (!descriptionObj || !descriptionObj.title || !descriptionObj.details) return null;
+export const buildCategoryDescription = async (category, fallbackDescriptor = null) => {
+  const knownDescription = categoryDescriptions[category];
+  const descriptionObj = knownDescription || fallbackDescriptor;
+  if (!descriptionObj || !descriptionObj.title) return null;
+  // A hardcoded entry still needs its details filled in to render (unchanged
+  // behavior); a fallback descriptor is allowed to render with title only.
+  if (knownDescription && !knownDescription.details) return null;
 
   const titleElement = document.createElement("h2");
   titleElement.innerHTML = `${descriptionObj.title}`;
   titleElement.className = "category-description-title";
 
   const contentElement = document.createElement("div");
-  contentElement.innerHTML = descriptionObj.details;
+  contentElement.innerHTML = descriptionObj.details || "";
   contentElement.className = "category-description-text";
 
   // Build collapse container

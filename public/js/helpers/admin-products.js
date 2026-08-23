@@ -3,6 +3,7 @@ import { sendToBack } from "../util/api-front.js";
 import { buildNewProductParams, getEditProductParams } from "../util/params.js";
 import { displayPopup, displayConfirmDialog } from "../util/popup.js";
 import { buildPicSlot } from "../forms/admin-form.js";
+import { confirmItemIdUnique, resetAutoItemId } from "./admin-categories.js";
 
 //Add product
 export const runAddNewProduct = async () => {
@@ -42,6 +43,9 @@ export const runAddNewProduct = async () => {
     );
     if (!confirmed) return null;
   }
+
+  const idConfirmed = await confirmItemIdUnique("add");
+  if (!idConfirmed) return null;
 
   const data = await sendToBack(newProductParams);
   if (!data || !data.success) {
@@ -98,6 +102,9 @@ export const runEditProduct = async () => {
   editProductParams.route = "/edit-product-route";
   // console.log("UPDATE PRODUCT PARAMS");
   // console.dir(editProductParams);
+
+  const idConfirmed = await confirmItemIdUnique("edit", productId);
+  if (!idConfirmed) return null;
 
   const data = await sendToBack(editProductParams);
   if (!data || !data.success) {
@@ -326,6 +333,9 @@ export const populateEditFormProducts = async (inputObj) => {
       field.value = adminEditMapArray[i].value || "";
     }
   }
+
+  // The id now in the form is the product's saved id, not an auto-suggestion
+  resetAutoItemId("edit");
 
   // Sync CSS classes on status selects to match their values
   const statusIds = ["edit-display", "edit-sold", "edit-can-ship"];

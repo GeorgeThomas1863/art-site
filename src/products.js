@@ -1,5 +1,6 @@
 // import CONFIG from "../config/config.js";
 import dbModel from "../models/db-model.js";
+import { buildNextItemId } from "./categories.js";
 
 const generateSlug = (name, productId = '') => {
   const slug = (name || '')
@@ -17,6 +18,11 @@ export const storeProduct = async (inputParams) => {
 
   // console.log("PARAMS");
   // console.log(params);
+
+  params.itemId = String(params.itemId ?? "").trim().toUpperCase();
+  if (!params.itemId) {
+    params.itemId = (await buildNextItemId(params.productType)) || "";
+  }
 
   //store
   const storeModel = new dbModel(params, process.env.PRODUCTS_COLLECTION);
@@ -65,6 +71,10 @@ export const storeProduct = async (inputParams) => {
 
 export const updateProduct = async (inputParams) => {
   const { route: _, ...params } = inputParams;
+
+  if ("itemId" in params) {
+    params.itemId = String(params.itemId ?? "").trim().toUpperCase();
+  }
 
   const checkParams = {
     keyToLookup: "productId",

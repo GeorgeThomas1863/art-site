@@ -30,6 +30,11 @@ import {
   addNewProductControl,
   editProductControl,
   deleteProductControl,
+  getCategoriesControl,
+  addCategoryControl,
+  deleteCategoryControl,
+  nextItemIdControl,
+  checkItemIdControl,
   addNewEventControl,
   editEventControl,
   deleteEventControl,
@@ -56,6 +61,7 @@ import {
   getNewsletterArchiveControl,
   deleteNewsletterControl,
   updateNewsletterControl,
+  getSiteUrlControl,
 } from "../controllers/data-controller.js";
 
 const router = express.Router();
@@ -81,6 +87,14 @@ router.post("/add-new-product-route", requireAuth, addNewProductControl);
 router.post("/edit-product-route", requireAuth, editProductControl);
 
 router.post("/delete-product-route", requireAuth, deleteProductControl);
+
+router.post("/add-category-route", requireAuth, addCategoryControl);
+
+router.post("/delete-category-route", requireAuth, deleteCategoryControl);
+
+router.post("/next-item-id-route", requireAuth, nextItemIdControl);
+
+router.post("/check-item-id-route", requireAuth, checkItemIdControl);
 
 router.post("/add-new-event-route", requireAuth, addNewEventControl);
 
@@ -131,6 +145,7 @@ router.post("/newsletter/remove", requireAuth, removeSubscriberControl);
 router.get("/newsletter/archive", getNewsletterArchiveControl);
 router.post("/newsletter/delete", requireAuth, deleteNewsletterControl);
 router.post("/newsletter/update", requireAuth, updateNewsletterControl);
+router.get("/newsletter/site-url", requireAuth, getSiteUrlControl);
 
 //ORDER ROUTES
 router.post("/checkout/place-order", placeOrderControl);
@@ -139,6 +154,8 @@ router.post("/checkout/place-order", placeOrderControl);
 
 //Main routes
 router.get("/get-product-data-route", getProductDataControl);
+
+router.get("/get-categories-route", getCategoriesControl);
 
 router.get("/get-event-data-route", getEventDataControl);
 
