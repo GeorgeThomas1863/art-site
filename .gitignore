@@ -79,3 +79,7 @@ desktop.ini
 # playwright runner output
 test-results/
 playwright-report/
+
+# npm auth tokens / local compose overrides
+.npmrc
+docker-compose.override.yml

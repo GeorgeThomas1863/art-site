@@ -251,6 +251,7 @@
     align-items: stretch;
   }
 
+  .add-category-field,
   .add-category-row #new-category-letter {
     width: 100%;
   }
@@ -528,7 +529,7 @@
     row-gap: 0.5rem;
   }
 
-  .category-item .category-title {
+  .category-item .category-title-input {
     flex: 1 1 140px;
   }
 

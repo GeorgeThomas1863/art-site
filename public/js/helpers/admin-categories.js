@@ -1,12 +1,13 @@
 import { sendToBack } from "../util/api-front.js";
 import { displayPopup, displayConfirmDialog } from "../util/popup.js";
+import { buildLetterSelect } from "../forms/admin-form.js";
 
 // Last auto-assigned id per modal mode, so a saved id loaded into the edit
 // form is never mistaken for one this page generated (add and edit are separate).
 const lastAutoItemIds = { add: "", edit: "" };
 let categoryCache = null;
 
-//LOAD (entry point, called on admin page init and on refresh)
+//LOAD (entry point: admin page init warms the cache; Edit Categories modal open + refresh/add/rename/delete/letter change fill the list)
 export const loadCategories = async () => {
   const categoryArray = await sendToBack({ route: "/get-categories-route" }, "GET");
   if (!Array.isArray(categoryArray)) return null;
@@ -15,7 +16,6 @@ export const loadCategories = async () => {
 
   await populateCategoryList(categoryArray);
   await populateCategorySelects(categoryArray);
-  await updateLetterOptions(categoryArray);
   await prefillNextItemId("add");
 
   return categoryArray;
@@ -52,39 +52,57 @@ export const populateCategoryList = async (categoryArray) => {
   }
 
   for (let i = 0; i < categoryArray.length; i++) {
-    const category = categoryArray[i];
-    const count = category.productCount || 0;
-
-    const categoryItem = document.createElement("div");
-    categoryItem.className = "category-item";
-
-    const letterSpan = document.createElement("span");
-    letterSpan.className = "category-letter";
-    letterSpan.textContent = category.letter;
-
-    const titleSpan = document.createElement("span");
-    titleSpan.className = "category-title";
-    titleSpan.textContent = category.title;
-
-    const countSpan = document.createElement("span");
-    countSpan.className = "category-count";
-    countSpan.textContent = `${count} product${count === 1 ? "" : "s"}`;
-
-    const deleteButton = document.createElement("button");
-    deleteButton.className = "btn-delete-category";
-    deleteButton.type = "button";
-    deleteButton.textContent = "×";
-    deleteButton.title = "Remove category";
-    deleteButton.setAttribute("data-label", "remove-category");
-    deleteButton.setAttribute("data-key", category.key);
-    deleteButton.setAttribute("data-title", category.title);
-    deleteButton.setAttribute("data-count", count);
-
-    categoryItem.append(letterSpan, titleSpan, countSpan, deleteButton);
+    const categoryItem = buildCategoryItem(categoryArray[i]);
+    if (!categoryItem) continue;
     categoryList.append(categoryItem);
   }
 
   return true;
+};
+
+const buildCategoryItem = (category) => {
+  if (!category) return null;
+  const count = category.productCount || 0;
+
+  const categoryItem = document.createElement("div");
+  categoryItem.className = "category-item";
+
+  const letterSelect = buildLetterSelect(`category-letter-${category.key}`, category.letter);
+  letterSelect.classList.add("category-letter-select");
+  letterSelect.title = "Item ID prefix — change it to re-letter this category";
+  letterSelect.setAttribute("data-label", "category-letter-select");
+  letterSelect.setAttribute("data-key", category.key);
+  letterSelect.setAttribute("data-title", category.title);
+  letterSelect.setAttribute("data-count", count);
+  letterSelect.setAttribute("data-letter", category.letter || "");
+
+  const titleInput = document.createElement("input");
+  titleInput.className = "form-input category-title-input";
+  titleInput.type = "text";
+  titleInput.value = category.title;
+  titleInput.maxLength = 60;
+  titleInput.title = "Category name - edit and press Enter or click away to save";
+  titleInput.setAttribute("aria-label", "Category name");
+  titleInput.setAttribute("data-label", "category-title-input");
+  titleInput.setAttribute("data-key", category.key);
+  titleInput.setAttribute("data-title", category.title);
+
+  const countSpan = document.createElement("span");
+  countSpan.className = "category-count";
+  countSpan.textContent = `${count} product${count === 1 ? "" : "s"}`;
+
+  const deleteButton = document.createElement("button");
+  deleteButton.className = "btn-delete-category";
+  deleteButton.type = "button";
+  deleteButton.textContent = "×";
+  deleteButton.title = "Remove category";
+  deleteButton.setAttribute("data-label", "remove-category");
+  deleteButton.setAttribute("data-key", category.key);
+  deleteButton.setAttribute("data-title", category.title);
+  deleteButton.setAttribute("data-count", count);
+
+  categoryItem.append(titleInput, letterSelect, countSpan, deleteButton);
+  return categoryItem;
 };
 
 export const populateCategorySelects = async (categoryArray) => {
@@ -118,36 +136,6 @@ export const populateCategorySelects = async (categoryArray) => {
       select.value = currentValue;
     } else if (select.options.length) {
       select.options[0].selected = true;
-    }
-  }
-
-  return true;
-};
-
-export const updateLetterOptions = async (categoryArray) => {
-  const letterSelect = document.getElementById("new-category-letter");
-  if (!letterSelect) return null;
-
-  const categories = categoryArray || [];
-  const options = letterSelect.options;
-
-  for (let i = 0; i < options.length; i++) {
-    const option = options[i];
-
-    let usedBy = null;
-    for (let j = 0; j < categories.length; j++) {
-      if (categories[j].letter === option.value) {
-        usedBy = categories[j];
-        break;
-      }
-    }
-
-    if (usedBy) {
-      option.disabled = true;
-      option.textContent = `${option.value} (${usedBy.title})`;
-    } else {
-      option.disabled = false;
-      option.textContent = option.value;
     }
   }
 
@@ -199,7 +187,7 @@ export const confirmItemIdUnique = async (mode, productId) => {
 };
 
 //++++++++++++++++++++++++++++++++++
-//ADD / DELETE CATEGORY (wired to responsive.js clickHandler)
+//ADD / RENAME / CHANGE LETTER / DELETE CATEGORY (wired to responsive.js click + change handlers)
 
 export const runAddCategory = async () => {
   const titleInput = document.getElementById("new-category-title");
@@ -209,7 +197,7 @@ export const runAddCategory = async () => {
   const title = titleInput.value.trim();
   const letter = letterSelect.value;
   if (!title || !letter) {
-    await displayPopup("Please enter a title and select a letter", "error");
+    await displayPopup("Please enter a category name and pick a letter", "error");
     return null;
   }
 
@@ -224,6 +212,76 @@ export const runAddCategory = async () => {
   await loadCategories();
 
   return data;
+};
+
+// Saving the name keeps the category's key (what products point at); only the display title changes.
+export const runRenameCategory = async (inputElement) => {
+  if (!inputElement) return null;
+
+  const key = inputElement.getAttribute("data-key");
+  const oldTitle = inputElement.getAttribute("data-title") || "";
+  const newTitle = inputElement.value.trim();
+  if (!key) return null;
+
+  if (!newTitle) {
+    inputElement.value = oldTitle;
+    await displayPopup("Category name cannot be empty", "error");
+    return null;
+  }
+  if (newTitle === oldTitle) {
+    inputElement.value = oldTitle;
+    return null;
+  }
+
+  const data = await sendToBack({ route: "/update-category-title-route", key, title: newTitle });
+  if (!data || !data.success) {
+    await displayPopup(data?.message || "Failed to rename category", "error");
+    inputElement.value = oldTitle;
+    return null;
+  }
+
+  await displayPopup(data.message || `Category renamed to "${newTitle}"`, "success");
+  await loadCategories();
+
+  return data;
+};
+
+// The letter change itself always saves; the popup only decides whether the
+// category's existing <OLD>### item IDs are renamed to <NEW>### as well.
+export const runChangeCategoryLetter = async (selectElement) => {
+  if (!selectElement) return null;
+
+  const key = selectElement.getAttribute("data-key");
+  const title = selectElement.getAttribute("data-title");
+  const count = Number(selectElement.getAttribute("data-count")) || 0;
+  const oldLetter = selectElement.getAttribute("data-letter");
+  const newLetter = selectElement.value;
+  if (!key || !newLetter || newLetter === oldLetter) return null;
+
+  const renumber = await confirmRenameItemIds(title, count, oldLetter, newLetter);
+
+  const data = await sendToBack({ route: "/update-category-letter-route", key, letter: newLetter, renumber });
+  if (!data || !data.success) {
+    await displayPopup(data?.message || "Failed to change category letter", "error");
+    if (oldLetter) selectElement.value = oldLetter;
+    return null;
+  }
+
+  await displayPopup(data.message || `Letter changed to ${newLetter}`, "success");
+  await loadCategories();
+
+  return data;
+};
+
+const confirmRenameItemIds = async (title, count, oldLetter, newLetter) => {
+  if (!count || !oldLetter) return false;
+
+  const message =
+    `"${title}" will now use the letter ${newLetter}. ` +
+    `Also rename the item IDs of its ${count} product${count === 1 ? "" : "s"} from ${oldLetter}### to ${newLetter}###? ` +
+    `(No keeps their current IDs.)`;
+  const confirmDialog = await displayConfirmDialog(message);
+  return !!confirmDialog;
 };
 
 export const runDeleteCategory = async (button) => {

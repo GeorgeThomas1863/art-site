@@ -1,26 +1,4 @@
-// make backup of all pics
-
-// report on number of unique visitors, by page?
-
-// better sending email account for newsletter (display name, pic etc)
-
-// in admin sort IDs by product type / IDs more logical
-
-//w ay to remove / hide old events from display
-
-//videos in newsletters
-
-//test image / vid uploads and editing on multiple displays
-
-//++++++++++++++++++
-
-//RUN ANOTHER FULL CODE REVIEW AND SECURITY REVIEW OF SITE
-
-//MAKE SURE IMAGE EDTING WORKS ON MOBILE, keep testing image editing
-
-// figure out the cloudflare problem and fix it (have claude investigate based on cloudflare docs)
-
-//figure out how to receive email from mailgun through admin email
+//NEED to switch repo given old pics in history
 
 //-----------------
 

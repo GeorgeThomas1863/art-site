@@ -1,7 +1,7 @@
 import { initQuill, resetQuill, populateAdminNewsletterSelector, initEditQuill, populateSubscriberList } from "./admin-newsletter.js";
 import { populateAdminProductSelector } from "./admin-products.js";
 import { populateAdminEventSelector } from "./admin-events.js";
-import { fillProductTypeSelects } from "./admin-categories.js";
+import { fillProductTypeSelects, loadCategories } from "./admin-categories.js";
 // import { ADMIN_EDIT_DEFAULT_ARRAY } from "../util/define-things.js";
 import { sendToBack } from "../util/api-front.js";
 import { buildModal } from "../forms/admin-form.js";
@@ -33,6 +33,11 @@ export const runModalTrigger = async (clickElement) => {
   // Fill product-type select(s) now that the modal's DOM exists (add and edit both use entityType "products")
   if (entityType === "products" && (mode === "add" || mode === "edit")) {
     await fillProductTypeSelects();
+  }
+
+  // Fill the category list now that the modal's DOM exists
+  if (entityType === "categories") {
+    await loadCategories();
   }
 
   // Load data for product edit

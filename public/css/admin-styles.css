@@ -30,8 +30,30 @@
 
 .header-actions {
   display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
   gap: 1.5rem;
   margin-top: 1.5rem;
+}
+
+/* Edit Categories — the site's blue action accent (same gradient as .btn-submit), so it reads as
+   "this changes something" next to the two plain black navigation buttons */
+.dashboard-header [data-label="open-modal-edit-categories"] {
+  background: linear-gradient(135deg, #3573b8 0%, #2563a8 100%);
+  color: #fff;
+  border: 1px solid #2563a8;
+  padding: 0.7rem 1.5rem;
+  font-size: 0.8rem;
+  font-weight: bold;
+  letter-spacing: 1px;
+  box-shadow: 0 2px 8px rgba(74, 144, 226, 0.25);
+}
+
+.dashboard-header [data-label="open-modal-edit-categories"]:hover {
+  background: linear-gradient(135deg, #1d5398 0%, #164388 100%);
+  border-color: #164388;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(74, 144, 226, 0.35);
 }
 
 .dashboard-header [data-label="view-products-btn"],
@@ -345,7 +367,13 @@
   letter-spacing: 0.5px;
 }
 
-/* Categories Panel */
+/* Categories Panel (body of the Edit Categories modal) */
+.categories-content {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
 .add-category-section {
   display: flex;
   flex-direction: column;
@@ -355,17 +383,28 @@
 .add-category-row {
   display: flex;
   gap: 1rem;
-  align-items: stretch;
+  align-items: flex-end;
   flex-wrap: wrap;
 }
 
-.add-category-row #new-category-title {
+/* Label-over-control columns: the name field stretches, the prefix picker hugs its width */
+.add-category-field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  flex: 0 0 auto;
+}
+
+.add-category-field-title {
   flex: 1;
   min-width: 160px;
 }
 
+.add-category-row #new-category-title {
+  width: 100%;
+}
+
 .add-category-row #new-category-letter {
-  flex: 0 0 auto;
   width: auto;
 }
 
@@ -412,31 +451,39 @@
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
 }
 
-.category-letter {
+/* Per-row letter picker: compact, monospace so the prefix reads like an item id */
+.category-item .category-letter-select {
+  flex: 0 0 auto;
+  width: auto;
+  padding: 0.3rem 0.4rem;
   font-family: "Courier New", Courier, monospace;
   font-weight: bold;
   font-size: 0.9rem;
-  color: #000;
-  background: #f0f0f0;
-  border: 1px solid #ddd;
-  border-radius: 4px;
-  width: 28px;
-  height: 28px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-shrink: 0;
 }
 
-.category-item .category-title {
+/* Editable name: reads as plain text until hovered/focused so the list stays calm */
+.category-item .category-title-input {
   flex: 1;
+  min-width: 0;
+  padding: 0.3rem 0.5rem;
   font-size: 0.95rem;
-  font-weight: normal;
   letter-spacing: 0.3px;
   color: #333;
-  margin-bottom: 0;
-  padding-bottom: 0;
-  border-bottom: none;
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: 4px;
+  transition: border-color 0.2s, background-color 0.2s;
+}
+
+.category-item .category-title-input:hover {
+  border-color: #e0e0e0;
+  background: #fafafa;
+}
+
+.category-item .category-title-input:focus {
+  border-color: #999;
+  background: #ffffff;
+  outline: none;
 }
 
 .category-item .category-count {

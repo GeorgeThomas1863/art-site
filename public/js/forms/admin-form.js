@@ -6,7 +6,6 @@ export const buildAdminForm = async () => {
 
   const dashboardHeader = await buildDashboardHeader();
   const productsSection = await buildProductsSection();
-  const categoriesSection = await buildCategoriesSection();
   const eventsSection = await buildEventsSection();
   const newsletterSection = await buildNewsletterSection();
   const statsSection = await buildStatsSection();
@@ -26,7 +25,7 @@ export const buildAdminForm = async () => {
   statsControls.append(statsRefreshButton);
   statsWrapper.append(statsControls, statsSection);
 
-  adminFormWrapper.append(dashboardHeader, productsSection, categoriesSection, eventsSection, newsletterSection, statsWrapper);
+  adminFormWrapper.append(dashboardHeader, productsSection, eventsSection, newsletterSection, statsWrapper);
 
   return adminFormWrapper;
 };
@@ -43,6 +42,13 @@ export const buildDashboardHeader = async () => {
   subtitle.className = "dashboard-subtitle";
   subtitle.textContent = "Manage your products and events";
 
+  // Opens the categories modal via the generic open-modal-<mode>-<entityType> trigger
+  const editCategoriesBtn = document.createElement("button");
+  editCategoriesBtn.className = "btn btn-edit-categories";
+  editCategoriesBtn.type = "button";
+  editCategoriesBtn.textContent = "🏷️ Edit Product Categories";
+  editCategoriesBtn.setAttribute("data-label", "open-modal-edit-categories");
+
   const viewBtn = document.createElement("button");
   viewBtn.className = "btn";
   viewBtn.textContent = "View Products";
@@ -55,7 +61,7 @@ export const buildDashboardHeader = async () => {
 
   const headerActions = document.createElement("div");
   headerActions.className = "header-actions";
-  headerActions.append(viewBtn, viewNewslettersBtn);
+  headerActions.append(editCategoriesBtn, viewBtn, viewNewslettersBtn);
 
   header.append(title, subtitle, headerActions);
 
@@ -90,21 +96,43 @@ export const buildProductsSection = async () => {
   return section;
 };
 
-export const buildCategoriesSection = async () => {
-  const section = document.createElement("div");
-  section.className = "category-section";
+// A–Z picker for a category's item-id prefix; any letter is allowed, duplicates included
+export const buildLetterSelect = (id, selectedLetter) => {
+  const select = document.createElement("select");
+  select.className = "form-input";
+  select.id = id;
+  select.name = id;
 
-  const title = document.createElement("h2");
-  title.className = "category-title";
-  title.textContent = "🏷️ CATEGORIES";
+  for (let i = 0; i < 26; i++) {
+    const letter = String.fromCharCode(65 + i);
+    const option = document.createElement("option");
+    option.value = letter;
+    option.textContent = letter;
+    if (letter === selectedLetter) option.selected = true;
+    select.append(option);
+  }
 
+  return select;
+};
+
+// Label-over-control column for the add-category row (name field, prefix picker)
+const buildAddCategoryField = (labelText, control) => {
+  const field = document.createElement("div");
+  field.className = "add-category-field";
+
+  const label = document.createElement("label");
+  label.className = "form-label";
+  label.textContent = labelText;
+  label.setAttribute("for", control.id);
+
+  field.append(label, control);
+  return field;
+};
+
+// Body of the Edit Categories modal (add row + current list); list is filled by loadCategories on open
+export const buildCategoriesContent = async () => {
   const addCategorySection = document.createElement("div");
   addCategorySection.className = "add-category-section";
-
-  const addCategoryLabel = document.createElement("label");
-  addCategoryLabel.className = "form-label";
-  addCategoryLabel.textContent = "Add New Category";
-  addCategoryLabel.setAttribute("for", "new-category-title");
 
   const addCategoryRow = document.createElement("div");
   addCategoryRow.className = "add-category-row";
@@ -114,20 +142,14 @@ export const buildCategoriesSection = async () => {
   categoryTitleInput.type = "text";
   categoryTitleInput.id = "new-category-title";
   categoryTitleInput.name = "new-category-title";
-  categoryTitleInput.placeholder = "e.g. Acorns";
+  categoryTitleInput.placeholder = "Any name, e.g. Acorns";
+  categoryTitleInput.maxLength = 60;
+  const categoryTitleField = buildAddCategoryField("Add New Category", categoryTitleInput);
+  categoryTitleField.classList.add("add-category-field-title");
 
-  const categoryLetterSelect = document.createElement("select");
-  categoryLetterSelect.className = "form-input";
-  categoryLetterSelect.id = "new-category-letter";
-  categoryLetterSelect.name = "new-category-letter";
-
-  for (let i = 0; i < 26; i++) {
-    const letter = String.fromCharCode(65 + i);
-    const letterOption = document.createElement("option");
-    letterOption.value = letter;
-    letterOption.textContent = letter;
-    categoryLetterSelect.append(letterOption);
-  }
+  const categoryLetterSelect = buildLetterSelect("new-category-letter", "A");
+  categoryLetterSelect.title = "Item ID prefix for this category";
+  const categoryLetterField = buildAddCategoryField("Prefix", categoryLetterSelect);
 
   const addCategoryButton = document.createElement("button");
   addCategoryButton.className = "btn btn-add-category";
@@ -135,8 +157,8 @@ export const buildCategoriesSection = async () => {
   addCategoryButton.textContent = "Add Category";
   addCategoryButton.setAttribute("data-label", "add-category");
 
-  addCategoryRow.append(categoryTitleInput, categoryLetterSelect, addCategoryButton);
-  addCategorySection.append(addCategoryLabel, addCategoryRow);
+  addCategoryRow.append(categoryTitleField, categoryLetterField, addCategoryButton);
+  addCategorySection.append(addCategoryRow);
 
   const listHeader = document.createElement("div");
   listHeader.className = "category-list-header";
@@ -170,16 +192,7 @@ export const buildCategoriesSection = async () => {
   content.className = "categories-content";
   content.append(addCategorySection, categoryContainer);
 
-  const collapseContainer = await buildCollapseContainer({
-    titleElement: title,
-    contentElement: content,
-    isExpanded: true,
-    dataAttribute: "categories-collapse",
-  });
-
-  section.append(collapseContainer);
-
-  return section;
+  return content;
 };
 
 export const buildEventsSection = async () => {
@@ -370,6 +383,8 @@ export const buildModalHeader = async (mode, entityType) => {
     titleText = mode === "write" ? "WRITE NEWSLETTER" : "EDIT NEWSLETTER";
   } else if (entityType === "mailinglist") {
     titleText = "EDIT MAILING LIST";
+  } else if (entityType === "categories") {
+    titleText = "EDIT CATEGORIES";
   } else {
     const entityName = entityType === "products" ? "PRODUCT" : "EVENT";
     titleText = mode === "add" ? `ADD NEW ${entityName}` : `EDIT ${entityName}`;
@@ -416,6 +431,12 @@ export const buildModalBody = async (mode, entityType) => {
   if (entityType === "mailinglist") {
     const mailingListSection = await buildMailingListSection();
     body.append(mailingListSection);
+    return body;
+  }
+
+  if (entityType === "categories") {
+    const categoriesContent = await buildCategoriesContent();
+    body.append(categoriesContent);
     return body;
   }
 
@@ -478,8 +499,14 @@ export const buildModalActions = async (mode, entityType) => {
   const cancelButton = document.createElement("button");
   cancelButton.className = "btn btn-admin-cancel";
   cancelButton.type = "button";
-  cancelButton.textContent = entityType === "mailinglist" ? "Done" : "Cancel";
+  cancelButton.textContent = entityType === "mailinglist" || entityType === "categories" ? "Done" : "Cancel";
   cancelButton.setAttribute("data-label", `close-modal-${mode}-${entityType}`);
+
+  // Categories save on every add/delete, so the only action is closing
+  if (entityType === "categories") {
+    actions.append(cancelButton);
+    return actions;
+  }
 
   // Submit button
   const submitButton = document.createElement("button");

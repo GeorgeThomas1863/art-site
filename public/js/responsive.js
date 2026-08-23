@@ -1,6 +1,6 @@
 import { runModalTrigger, runModalClose, runChangeStatusCard, updateAdminStats } from "./helpers/admin-run.js"; //prettier-ignore
 import { runAddNewProduct, runEditProduct, runDeleteProduct, changeAdminProductSelector, runAddPicSlot, runRemovePicSlot } from "./helpers/admin-products.js";
-import { runAddCategory, runDeleteCategory, loadCategories, prefillNextItemId } from "./helpers/admin-categories.js";
+import { runAddCategory, runDeleteCategory, runRenameCategory, runChangeCategoryLetter, loadCategories, prefillNextItemId } from "./helpers/admin-categories.js";
 import { runAddNewEvent, runEditEvent, runDeleteEvent, changeAdminEventSelector } from "./helpers/admin-events.js";
 import { runSendNewsletter, runSendTestNewsletter, runAddSubscriber, runRemoveSubscriber, runRefreshSubscriberList, changeAdminNewsletterSelector, runDeleteNewsletter, runUpdateNewsletter, handleQuillImageClick, runNewsletterImageUpload } from "./helpers/admin-newsletter.js";
 import { runSlotUploadClick, runSlotUploadPic, runDeleteSlotImage, runEditSlotImage } from "./helpers/upload-pic.js";
@@ -166,6 +166,9 @@ export const keyHandler = async (e) => {
 
   if (keyId === "auth-pw-input") await runAuthSubmit();
 
+  // Enter in a category name field: blur so the change event saves it (preventDefault above stops the native one)
+  if (keyElement.getAttribute("data-label") === "category-title-input") keyElement.blur();
+
   return true;
 };
 
@@ -208,6 +211,10 @@ export const changeHandler = async (e) => {
   //Product type -> auto-fill next item id
   if (changeId === "product-type") await prefillNextItemId("add");
   if (changeId === "edit-product-type") await prefillNextItemId("edit");
+
+  //Category name + letter picker in the Edit Categories modal
+  if (changeType === "category-title-input") await runRenameCategory(changeElement);
+  if (changeType === "category-letter-select") await runChangeCategoryLetter(changeElement);
 
   if (changeId === "event-selector") await changeAdminEventSelector(changeElement);
   if (changeId === "newsletter-archive-selector") await changeAdminNewsletterSelector(changeElement);

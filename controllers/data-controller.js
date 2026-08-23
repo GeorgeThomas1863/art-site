@@ -1,6 +1,6 @@
 import { storeProduct, updateProduct, deleteProduct, getProductData, hideOrderedProducts } from "../src/products.js";
 import { storeEvent, updateEvent, deleteEvent, getEventData } from "../src/events.js";
-import { buildCategoryList, addCategory, deleteCategory, buildNextItemId, findItemIdOwner } from "../src/categories.js";
+import { buildCategoryList, addCategory, updateCategoryTitle, updateCategoryLetter, deleteCategory, buildNextItemId, findItemIdOwner } from "../src/categories.js";
 import { submitContact } from "../src/contact.js";
 import {
   storeSubscriber,
@@ -198,6 +198,23 @@ export const addCategoryControl = async (req, res) => {
 
   const safeParams = whitelistFields(inputParams, ["title", "letter"]);
   const data = await addCategory(safeParams);
+  return res.json(data);
+};
+
+export const updateCategoryTitleControl = async (req, res) => {
+  const inputParams = req.body;
+  if (!inputParams) return res.status(500).json({ error: "No input parameters" });
+
+  const data = await updateCategoryTitle({ key: inputParams.key, title: inputParams.title });
+  return res.json(data);
+};
+
+export const updateCategoryLetterControl = async (req, res) => {
+  const inputParams = req.body;
+  if (!inputParams) return res.status(500).json({ error: "No input parameters" });
+
+  const renumber = inputParams.renumber === true || inputParams.renumber === "true";
+  const data = await updateCategoryLetter({ key: inputParams.key, letter: inputParams.letter, renumber });
   return res.json(data);
 };
 

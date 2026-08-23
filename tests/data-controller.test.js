@@ -19,6 +19,8 @@ import {
   getSiteUrlControl,
   getCategoriesControl,
   addCategoryControl,
+  updateCategoryTitleControl,
+  updateCategoryLetterControl,
   deleteCategoryControl,
   nextItemIdControl,
   checkItemIdControl,
@@ -251,11 +253,20 @@ describe("addCategoryControl", () => {
     expect(readCollection(CATEGORIES)).toHaveLength(DEFAULT_CATEGORIES.length + 1);
   });
 
-  it("rejects a letter that is already used by another category", async () => {
+  it("accepts a letter that another category already uses", async () => {
     const res = buildRes();
     await addCategoryControl(buildReq({ body: { title: "Geckos", letter: "G" } }), res);
-    expect(res.json).toHaveBeenCalledWith({ success: false, message: "Letter G is already used by Geodes" });
-    expect(readCollection(CATEGORIES)).toHaveLength(DEFAULT_CATEGORIES.length);
+    expect(res.json).toHaveBeenCalledWith(expect.objectContaining({
+      success: true,
+      category: expect.objectContaining({ key: "geckos", letter: "G" }),
+    }));
+    expect(readCollection(CATEGORIES)).toHaveLength(DEFAULT_CATEGORIES.length + 1);
+  });
+
+  it("rejects a missing letter", async () => {
+    const res = buildRes();
+    await addCategoryControl(buildReq({ body: { title: "Gems" } }), res);
+    expect(res.json).toHaveBeenCalledWith({ success: false, message: "Letter must be a single letter A-Z" });
   });
 
   it("responds 500 when no input parameters are provided", async () => {
@@ -264,6 +275,78 @@ describe("addCategoryControl", () => {
     expect(res.status).toHaveBeenCalledWith(500);
     expect(res.json).toHaveBeenCalledWith({ error: "No input parameters" });
     expect(readCollection(CATEGORIES)).toHaveLength(0);
+  });
+});
+
+describe("updateCategoryLetterControl", () => {
+  it("changes the letter and renames that category's item IDs when renumber is true", async () => {
+    seedCollection(CATEGORIES, [{ key: "acorns", title: "Acorns", letter: "A", dateCreated: new Date().toISOString() }]);
+    seedCollection(PRODUCTS, [
+      buildProductDoc({ productId: "p1", productType: "acorns", itemId: "A001" }),
+      buildProductDoc({ productId: "p2", productType: "other", itemId: "A002" }),
+    ]);
+    const res = buildRes();
+    await updateCategoryLetterControl(buildReq({ body: { key: "acorns", letter: "z", renumber: true } }), res);
+    expect(res.json).toHaveBeenCalledWith({ success: true, message: "Letter changed to Z; 1 item ID renamed", letter: "Z", renamedCount: 1 });
+    expect(readCollection(CATEGORIES)[0].letter).toBe("Z");
+    expect(readCollection(PRODUCTS)[0].itemId).toBe("Z001");
+    expect(readCollection(PRODUCTS)[1].itemId).toBe("A002");
+  });
+
+  it("changes only the letter when renumber is omitted", async () => {
+    seedCollection(CATEGORIES, [{ key: "acorns", title: "Acorns", letter: "A", dateCreated: new Date().toISOString() }]);
+    seedCollection(PRODUCTS, [buildProductDoc({ productId: "p1", productType: "acorns", itemId: "A001" })]);
+    const res = buildRes();
+    await updateCategoryLetterControl(buildReq({ body: { key: "acorns", letter: "Z" } }), res);
+    expect(res.json).toHaveBeenCalledWith({ success: true, message: "Letter changed to Z", letter: "Z", renamedCount: 0 });
+    expect(readCollection(PRODUCTS)[0].itemId).toBe("A001");
+  });
+
+  it("treats the string \"true\" as renumber", async () => {
+    seedCollection(CATEGORIES, [{ key: "acorns", title: "Acorns", letter: "A", dateCreated: new Date().toISOString() }]);
+    seedCollection(PRODUCTS, [buildProductDoc({ productId: "p1", productType: "acorns", itemId: "A001" })]);
+    const res = buildRes();
+    await updateCategoryLetterControl(buildReq({ body: { key: "acorns", letter: "B", renumber: "true" } }), res);
+    expect(readCollection(PRODUCTS)[0].itemId).toBe("B001");
+  });
+
+  it("reports category not found for an unknown key", async () => {
+    seedCollection(CATEGORIES, [{ key: "acorns", title: "Acorns", letter: "A", dateCreated: new Date().toISOString() }]);
+    const res = buildRes();
+    await updateCategoryLetterControl(buildReq({ body: { key: "nope", letter: "B" } }), res);
+    expect(res.json).toHaveBeenCalledWith({ success: false, message: "Category not found" });
+  });
+
+  it("responds 500 when no input parameters are provided", async () => {
+    const res = buildRes();
+    await updateCategoryLetterControl({}, res);
+    expect(res.status).toHaveBeenCalledWith(500);
+    expect(res.json).toHaveBeenCalledWith({ error: "No input parameters" });
+  });
+});
+
+describe("updateCategoryTitleControl", () => {
+  it("renames the category and keeps its key", async () => {
+    seedCollection(CATEGORIES, [{ key: "acorns", title: "Acorns", letter: "A", dateCreated: new Date().toISOString() }]);
+    const res = buildRes();
+    await updateCategoryTitleControl(buildReq({ body: { key: "acorns", title: "Oak Acorns" } }), res);
+    expect(res.json).toHaveBeenCalledWith({ success: true, message: 'Category renamed to "Oak Acorns"', title: "Oak Acorns" });
+    expect(readCollection(CATEGORIES)[0].key).toBe("acorns");
+    expect(readCollection(CATEGORIES)[0].title).toBe("Oak Acorns");
+  });
+
+  it("reports category not found for an unknown key", async () => {
+    seedCollection(CATEGORIES, [{ key: "acorns", title: "Acorns", letter: "A", dateCreated: new Date().toISOString() }]);
+    const res = buildRes();
+    await updateCategoryTitleControl(buildReq({ body: { key: "nope", title: "Anything" } }), res);
+    expect(res.json).toHaveBeenCalledWith({ success: false, message: "Category not found" });
+  });
+
+  it("responds 500 when no input parameters are provided", async () => {
+    const res = buildRes();
+    await updateCategoryTitleControl({}, res);
+    expect(res.status).toHaveBeenCalledWith(500);
+    expect(res.json).toHaveBeenCalledWith({ error: "No input parameters" });
   });
 });
 
