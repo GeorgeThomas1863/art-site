@@ -133,7 +133,7 @@ export const runChangeStatusCard = async (changeElement) => {
 
 export const enableAdminEditFields = async () => {
   const enableFieldsArray = [
-    "edit-item-id",
+    "edit-product-code",
     "edit-name",
     "edit-product-type",
     "edit-price",
@@ -164,7 +164,7 @@ export const enableAdminEditFields = async () => {
 
 export const disableAdminEditFields = async () => {
   const disableFieldsArray = [
-    "edit-item-id",
+    "edit-product-code",
     "edit-name",
     "edit-product-type",
     "edit-price",
@@ -196,7 +196,7 @@ export const disableAdminEditFields = async () => {
 
 export const clearAdminEditFields = async () => {
   const clearFieldsArray = [
-    "edit-item-id",
+    "edit-product-code",
     "edit-name",
     "edit-price",
     "edit-description",

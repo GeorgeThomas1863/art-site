@@ -267,7 +267,7 @@ const buildEmailHtml = (orderData, type) => {
     const item = items[i];
     const lineTotal = (item.price * item.quantity).toFixed(2);
     itemRows += `<tr>
-      ${isAdmin ? `<td style="padding: 8px; border-bottom: 1px solid #eee;">${escapeHtml(item.itemId || "")}</td>` : ""}
+      ${isAdmin ? `<td style="padding: 8px; border-bottom: 1px solid #eee;">${escapeHtml(item.productCode || "")}</td>` : ""}
       <td style="padding: 8px; border-bottom: 1px solid #eee;">${escapeHtml(item.name)}</td>
       <td style="padding: 8px; border-bottom: 1px solid #eee; text-align: center;">${item.quantity}</td>
       <td style="padding: 8px; border-bottom: 1px solid #eee; text-align: right;">$${lineTotal}</td>
@@ -315,7 +315,7 @@ const buildEmailHtml = (orderData, type) => {
       <table style="width: 100%; border-collapse: collapse;">
         <thead>
           <tr style="background: #f5f5f5;">
-            ${isAdmin ? `<th style="padding: 8px; text-align: left;">Item Id</th>` : ""}
+            ${isAdmin ? `<th style="padding: 8px; text-align: left;">Product Code</th>` : ""}
             <th style="padding: 8px; text-align: left;">Item</th>
             <th style="padding: 8px; text-align: center;">Qty</th>
             <th style="padding: 8px; text-align: right;">Price</th>

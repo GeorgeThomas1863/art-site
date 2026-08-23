@@ -35,8 +35,8 @@ import {
   updateCategoryTitleControl,
   updateCategoryLetterControl,
   deleteCategoryControl,
-  nextItemIdControl,
-  checkItemIdControl,
+  nextProductCodeControl,
+  checkProductCodeControl,
   addNewEventControl,
   editEventControl,
   deleteEventControl,
@@ -98,9 +98,9 @@ router.post("/update-category-letter-route", requireAuth, updateCategoryLetterCo
 
 router.post("/delete-category-route", requireAuth, deleteCategoryControl);
 
-router.post("/next-item-id-route", requireAuth, nextItemIdControl);
+router.post("/next-product-code-route", requireAuth, nextProductCodeControl);
 
-router.post("/check-item-id-route", requireAuth, checkItemIdControl);
+router.post("/check-product-code-route", requireAuth, checkProductCodeControl);
 
 router.post("/add-new-event-route", requireAuth, addNewEventControl);
 

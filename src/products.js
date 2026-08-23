@@ -1,6 +1,6 @@
 // import CONFIG from "../config/config.js";
 import dbModel from "../models/db-model.js";
-import { buildNextItemId } from "./categories.js";
+import { buildNextProductCode } from "./categories.js";
 
 const generateSlug = (name, productId = '') => {
   const slug = (name || '')
@@ -19,9 +19,9 @@ export const storeProduct = async (inputParams) => {
   // console.log("PARAMS");
   // console.log(params);
 
-  params.itemId = String(params.itemId ?? "").trim().toUpperCase();
-  if (!params.itemId) {
-    params.itemId = (await buildNextItemId(params.productType)) || "";
+  params.productCode = String(params.productCode ?? "").trim().toUpperCase();
+  if (!params.productCode) {
+    params.productCode = (await buildNextProductCode(params.productType)) || "";
   }
 
   //store
@@ -72,8 +72,8 @@ export const storeProduct = async (inputParams) => {
 export const updateProduct = async (inputParams) => {
   const { route: _, ...params } = inputParams;
 
-  if ("itemId" in params) {
-    params.itemId = String(params.itemId ?? "").trim().toUpperCase();
+  if ("productCode" in params) {
+    params.productCode = String(params.productCode ?? "").trim().toUpperCase();
   }
 
   const checkParams = {

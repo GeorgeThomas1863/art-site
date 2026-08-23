@@ -4,7 +4,7 @@ import { buildLetterSelect } from "../forms/admin-form.js";
 
 // Last auto-assigned id per modal mode, so a saved id loaded into the edit
 // form is never mistaken for one this page generated (add and edit are separate).
-const lastAutoItemIds = { add: "", edit: "" };
+const lastAutoProductCodes = { add: "", edit: "" };
 let categoryCache = null;
 
 //LOAD (entry point: admin page init warms the cache; Edit Categories modal open + refresh/add/rename/delete/letter change fill the list)
@@ -16,7 +16,7 @@ export const loadCategories = async () => {
 
   await populateCategoryList(categoryArray);
   await populateCategorySelects(categoryArray);
-  await prefillNextItemId("add");
+  await prefillNextProductCode("add");
 
   return categoryArray;
 };
@@ -29,7 +29,7 @@ export const fillProductTypeSelects = async () => {
   if (!categoryCache) return null;
 
   await populateCategorySelects(categoryCache);
-  await prefillNextItemId("add");
+  await prefillNextProductCode("add");
 
   return true;
 };
@@ -69,7 +69,7 @@ const buildCategoryItem = (category) => {
 
   const letterSelect = buildLetterSelect(`category-letter-${category.key}`, category.letter);
   letterSelect.classList.add("category-letter-select");
-  letterSelect.title = "Item ID prefix — change it to re-letter this category";
+  letterSelect.title = "Product Code prefix — change it to re-letter this category";
   letterSelect.setAttribute("data-label", "category-letter-select");
   letterSelect.setAttribute("data-key", category.key);
   letterSelect.setAttribute("data-title", category.title);
@@ -143,46 +143,46 @@ export const populateCategorySelects = async (categoryArray) => {
 };
 
 //++++++++++++++++++++++++++++++++++
-//ITEM ID (wired to product-type change events)
+//PRODUCT CODE (wired to product-type change events)
 
-export const prefillNextItemId = async (mode) => {
-  const itemIdInput = document.getElementById(mode === "edit" ? "edit-item-id" : "item-id");
-  if (!itemIdInput) return null;
+export const prefillNextProductCode = async (mode) => {
+  const productCodeInput = document.getElementById(mode === "edit" ? "edit-product-code" : "product-code");
+  if (!productCodeInput) return null;
 
-  const currentValue = itemIdInput.value.trim();
-  if (currentValue && currentValue !== lastAutoItemIds[mode]) return null;
+  const currentValue = productCodeInput.value.trim();
+  if (currentValue && currentValue !== lastAutoProductCodes[mode]) return null;
 
   const productTypeSelect = document.getElementById(mode === "edit" ? "edit-product-type" : "product-type");
   if (!productTypeSelect || !productTypeSelect.value) return null;
 
-  const data = await sendToBack({ route: "/next-item-id-route", productType: productTypeSelect.value });
-  if (!data || !data.itemId) return null;
+  const data = await sendToBack({ route: "/next-product-code-route", productType: productTypeSelect.value });
+  if (!data || !data.productCode) return null;
 
-  lastAutoItemIds[mode] = data.itemId;
-  itemIdInput.value = data.itemId;
-  return data.itemId;
+  lastAutoProductCodes[mode] = data.productCode;
+  productCodeInput.value = data.productCode;
+  return data.productCode;
 };
 
 // Called whenever a saved product is loaded into the edit form: its id is the
 // product's own, not an auto-suggestion, so a category change must not replace it.
-export const resetAutoItemId = (mode) => {
-  if (!(mode in lastAutoItemIds)) return null;
+export const resetAutoProductCode = (mode) => {
+  if (!(mode in lastAutoProductCodes)) return null;
 
-  lastAutoItemIds[mode] = "";
+  lastAutoProductCodes[mode] = "";
   return true;
 };
 
-export const confirmItemIdUnique = async (mode, productId) => {
-  const itemIdInput = document.getElementById(mode === "edit" ? "edit-item-id" : "item-id");
-  if (!itemIdInput) return true;
+export const confirmProductCodeUnique = async (mode, productId) => {
+  const productCodeInput = document.getElementById(mode === "edit" ? "edit-product-code" : "product-code");
+  if (!productCodeInput) return true;
 
-  const itemId = itemIdInput.value.trim();
-  if (!itemId) return true;
+  const productCode = productCodeInput.value.trim();
+  if (!productCode) return true;
 
-  const data = await sendToBack({ route: "/check-item-id-route", itemId, productId });
+  const data = await sendToBack({ route: "/check-product-code-route", productCode, productId });
   if (!data || !data.exists) return true;
 
-  const confirmDialog = await displayConfirmDialog(`Item ID ${itemId} is already used by "${data.name}". Use it anyway?`);
+  const confirmDialog = await displayConfirmDialog(`Product Code ${productCode} is already used by "${data.name}". Use it anyway?`);
   return !!confirmDialog;
 };
 
@@ -247,7 +247,7 @@ export const runRenameCategory = async (inputElement) => {
 };
 
 // The letter change itself always saves; the popup only decides whether the
-// category's existing <OLD>### item IDs are renamed to <NEW>### as well.
+// category's existing <OLD>### product codes are renamed to <NEW>### as well.
 export const runChangeCategoryLetter = async (selectElement) => {
   if (!selectElement) return null;
 
@@ -258,7 +258,7 @@ export const runChangeCategoryLetter = async (selectElement) => {
   const newLetter = selectElement.value;
   if (!key || !newLetter || newLetter === oldLetter) return null;
 
-  const renumber = await confirmRenameItemIds(title, count, oldLetter, newLetter);
+  const renumber = await confirmRenameProductCodes(title, count, oldLetter, newLetter);
 
   const data = await sendToBack({ route: "/update-category-letter-route", key, letter: newLetter, renumber });
   if (!data || !data.success) {
@@ -273,12 +273,12 @@ export const runChangeCategoryLetter = async (selectElement) => {
   return data;
 };
 
-const confirmRenameItemIds = async (title, count, oldLetter, newLetter) => {
+const confirmRenameProductCodes = async (title, count, oldLetter, newLetter) => {
   if (!count || !oldLetter) return false;
 
   const message =
     `"${title}" will now use the letter ${newLetter}. ` +
-    `Also rename the item IDs of its ${count} product${count === 1 ? "" : "s"} from ${oldLetter}### to ${newLetter}###? ` +
+    `Also rename the product codes of its ${count} product${count === 1 ? "" : "s"} from ${oldLetter}### to ${newLetter}###? ` +
     `(No keeps their current IDs.)`;
   const confirmDialog = await displayConfirmDialog(message);
   return !!confirmDialog;

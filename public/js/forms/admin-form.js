@@ -96,7 +96,7 @@ export const buildProductsSection = async () => {
   return section;
 };
 
-// A–Z picker for a category's item-id prefix; any letter is allowed, duplicates included
+// A–Z picker for a category's product-code prefix; any letter is allowed, duplicates included
 export const buildLetterSelect = (id, selectedLetter) => {
   const select = document.createElement("select");
   select.className = "form-input";
@@ -148,7 +148,7 @@ export const buildCategoriesContent = async () => {
   categoryTitleField.classList.add("add-category-field-title");
 
   const categoryLetterSelect = buildLetterSelect("new-category-letter", "A");
-  categoryLetterSelect.title = "Item ID prefix for this category";
+  categoryLetterSelect.title = "Product Code prefix for this category";
   const categoryLetterField = buildAddCategoryField("Prefix", categoryLetterSelect);
 
   const addCategoryButton = document.createElement("button");
@@ -588,14 +588,14 @@ export const buildProductDetailsSection = async (mode) => {
 
   header.append(icon, title);
 
-  // Item Id Row
-  const itemIdRow = await buildInfoRow(mode, "item-id", "Item Id");
+  // Product Code Row
+  const productCodeRow = await buildInfoRow(mode, "product-code", "Product Code");
   if (mode === "add") {
-    const itemIdHint = document.createElement("div");
-    itemIdHint.className = "item-id-hint";
-    itemIdHint.textContent = "Leave blank to auto-assign";
-    const itemIdContentWrapper = itemIdRow.querySelector(".info-content-wrapper");
-    if (itemIdContentWrapper) itemIdContentWrapper.append(itemIdHint);
+    const productCodeHint = document.createElement("div");
+    productCodeHint.className = "product-code-hint";
+    productCodeHint.textContent = "Leave blank to auto-assign";
+    const productCodeContentWrapper = productCodeRow.querySelector(".info-content-wrapper");
+    if (productCodeContentWrapper) productCodeContentWrapper.append(productCodeHint);
   }
 
   // Product Name Row
@@ -616,7 +616,7 @@ export const buildProductDetailsSection = async (mode) => {
   // Description Row
   const descRow = await buildInfoRowTextarea(mode, "description", "Description");
 
-  section.append(header, itemIdRow, nameRow, typeRow, priceRow, descRow, slugRow);
+  section.append(header, productCodeRow, nameRow, typeRow, priceRow, descRow, slugRow);
 
   return section;
 };

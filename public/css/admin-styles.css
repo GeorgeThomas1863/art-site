@@ -451,7 +451,7 @@
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
 }
 
-/* Per-row letter picker: compact, monospace so the prefix reads like an item id */
+/* Per-row letter picker: compact, monospace so the prefix reads like a product code */
 .category-item .category-letter-select {
   flex: 0 0 auto;
   width: auto;
@@ -554,7 +554,7 @@
   transform: scale(0.95);
 }
 
-.item-id-hint {
+.product-code-hint {
   margin-top: 0.4rem;
   font-size: 0.8rem;
   color: #999;

@@ -3,7 +3,7 @@ import dbModel from "../models/db-model.js";
 const CATEGORIES_COLLECTION = () => process.env.CATEGORIES_COLLECTION || "categories";
 
 // A category is any title the admin chose plus a single admin-chosen letter that prefixes
-// auto-assigned item IDs. Letters are NOT unique across categories — two categories may share
+// auto-assigned product codes. Letters are NOT unique across categories — two categories may share
 // one (and therefore share a running number sequence). `key` is the camelCase productType.
 export const DEFAULT_CATEGORIES = [
   { key: "acorns", title: "Acorns", letter: "A" },
@@ -185,8 +185,8 @@ export const updateCategoryTitle = async (inputParams) => {
   }
 };
 
-// Changes a category's letter. With `renumber`, every product in that category whose item ID
-// is <OLD><digits> becomes <NEW><digits> (number kept); custom item IDs are left alone.
+// Changes a category's letter. With `renumber`, every product in that category whose product code
+// is <OLD><digits> becomes <NEW><digits> (number kept); custom product codes are left alone.
 export const updateCategoryLetter = async (inputParams) => {
   try {
     const { key, letter, renumber } = inputParams || {};
@@ -210,12 +210,12 @@ export const updateCategoryLetter = async (inputParams) => {
 
     if (!renumber) return { success: true, message: `Letter changed to ${newLetter}`, letter: newLetter, renamedCount: 0 };
 
-    const renamedCount = await renameCategoryItemIds(key, oldLetter, newLetter);
+    const renamedCount = await renameCategoryProductCodes(key, oldLetter, newLetter);
     if (renamedCount === null) {
-      return { success: false, message: `Letter changed to ${newLetter}, but renaming item IDs failed` };
+      return { success: false, message: `Letter changed to ${newLetter}, but renaming product codes failed` };
     }
 
-    const message = `Letter changed to ${newLetter}; ${renamedCount} item ID${renamedCount === 1 ? "" : "s"} renamed`;
+    const message = `Letter changed to ${newLetter}; ${renamedCount} product code${renamedCount === 1 ? "" : "s"} renamed`;
     return { success: true, message, letter: newLetter, renamedCount };
   } catch (error) {
     console.error("updateCategoryLetter error:", error);
@@ -223,7 +223,7 @@ export const updateCategoryLetter = async (inputParams) => {
   }
 };
 
-const renameCategoryItemIds = async (productType, oldLetter, newLetter) => {
+const renameCategoryProductCodes = async (productType, oldLetter, newLetter) => {
   try {
     if (!oldLetter) return 0;
 
@@ -231,10 +231,10 @@ const renameCategoryItemIds = async (productType, oldLetter, newLetter) => {
     const products = await productModel.getAll();
     if (!products) return null;
 
-    const existingItemIds = new Set();
+    const existingProductCodes = new Set();
     for (let i = 0; i < products.length; i++) {
-      if (typeof products[i].itemId !== "string") continue;
-      existingItemIds.add(products[i].itemId.toUpperCase());
+      if (typeof products[i].productCode !== "string") continue;
+      existingProductCodes.add(products[i].productCode.toUpperCase());
     }
 
     const pattern = new RegExp(`^${oldLetter}(\\d+)$`, "i");
@@ -242,22 +242,22 @@ const renameCategoryItemIds = async (productType, oldLetter, newLetter) => {
     for (let i = 0; i < products.length; i++) {
       const product = products[i];
       if (product.productType !== productType) continue;
-      if (typeof product.itemId !== "string") continue;
-      const match = product.itemId.match(pattern);
+      if (typeof product.productCode !== "string") continue;
+      const match = product.productCode.match(pattern);
       if (!match) continue;
 
       let nextNumber = parseInt(match[1], 10);
-      let nextItemId = newLetter + match[1];
-      while (existingItemIds.has(nextItemId.toUpperCase()) && nextItemId.toUpperCase() !== product.itemId.toUpperCase()) {
+      let nextProductCode = newLetter + match[1];
+      while (existingProductCodes.has(nextProductCode.toUpperCase()) && nextProductCode.toUpperCase() !== product.productCode.toUpperCase()) {
         nextNumber++;
-        nextItemId = newLetter + String(nextNumber).padStart(3, "0");
+        nextProductCode = newLetter + String(nextNumber).padStart(3, "0");
       }
-      existingItemIds.add(nextItemId.toUpperCase());
+      existingProductCodes.add(nextProductCode.toUpperCase());
 
       const renameParams = {
         keyToLookup: "productId",
         itemValue: product.productId,
-        updateObj: { itemId: nextItemId },
+        updateObj: { productCode: nextProductCode },
       };
       const renameModel = new dbModel(renameParams, process.env.PRODUCTS_COLLECTION);
       await renameModel.updateObjItem();
@@ -266,7 +266,7 @@ const renameCategoryItemIds = async (productType, oldLetter, newLetter) => {
 
     return renamedCount;
   } catch (error) {
-    console.error("renameCategoryItemIds error:", error);
+    console.error("renameCategoryProductCodes error:", error);
     return null;
   }
 };
@@ -291,60 +291,77 @@ export const deleteCategory = async (key) => {
   }
 };
 
-//---------- item id generation ----------
+//---------- product code generation ----------
 
-export const buildNextItemId = async (productType) => {
+export const buildNextProductCode = async (productType) => {
   try {
     const category = await findCategory(productType);
     if (!category) return null;
 
-    const prefix = normalizeLetter(category.letter);
-    if (!prefix) return null;
-
     const productModel = new dbModel("", process.env.PRODUCTS_COLLECTION);
     const products = await productModel.getAll();
     if (!products) return null;
 
-    const pattern = new RegExp(`^${prefix}(\\d+)$`, "i");
-    let maxNumber = 0;
-    for (let i = 0; i < products.length; i++) {
-      const itemId = products[i].itemId;
-      if (typeof itemId !== "string") continue;
-      const match = itemId.match(pattern);
-      if (!match) continue;
-      const numeric = parseInt(match[1], 10);
-      if (numeric > maxNumber) maxNumber = numeric;
-    }
-
-    const nextNumber = maxNumber + 1;
-    return prefix + String(nextNumber).padStart(3, "0");
+    return buildNextProductCodeFromProducts(productType, [category], products);
   } catch (error) {
-    console.error("buildNextItemId error:", error);
+    console.error("buildNextProductCode error:", error);
     return null;
   }
 };
 
-export const findItemIdOwner = async (itemId, excludeProductId) => {
+export const buildNextProductCodeFromProducts = (productType, categories, products) => {
+  const category = findCategoryInList(productType, categories);
+  if (!category) return null;
+
+  const prefix = normalizeLetter(category.letter);
+  if (!prefix) return null;
+
+  const pattern = new RegExp(`^${prefix}(\\d+)$`, "i");
+  let maxNumber = 0;
+  for (let i = 0; i < products.length; i++) {
+    const productCode = products[i].productCode;
+    if (typeof productCode !== "string") continue;
+    const match = productCode.match(pattern);
+    if (!match) continue;
+    const numeric = parseInt(match[1], 10);
+    if (numeric > maxNumber) maxNumber = numeric;
+  }
+
+  const nextNumber = maxNumber + 1;
+  return prefix + String(nextNumber).padStart(3, "0");
+};
+
+const findCategoryInList = (productType, categories) => {
+  if (!productType || !Array.isArray(categories)) return null;
+
+  for (let index = 0; index < categories.length; index++) {
+    if (categories[index].key === productType) return categories[index];
+  }
+
+  return null;
+};
+
+export const findProductCodeOwner = async (productCode, excludeProductId) => {
   try {
-    const trimmedItemId = String(itemId ?? "").trim();
-    if (!trimmedItemId) return null;
+    const trimmedProductCode = String(productCode ?? "").trim();
+    if (!trimmedProductCode) return null;
 
     const productModel = new dbModel("", process.env.PRODUCTS_COLLECTION);
     const products = await productModel.getAll();
     if (!products) return null;
 
-    const upperItemId = trimmedItemId.toUpperCase();
+    const upperProductCode = trimmedProductCode.toUpperCase();
     for (let i = 0; i < products.length; i++) {
       const product = products[i];
       if (product.productId === excludeProductId) continue;
-      const productItemId = String(product.itemId ?? "").trim().toUpperCase();
-      if (productItemId !== upperItemId) continue;
+      const productProductCode = String(product.productCode ?? "").trim().toUpperCase();
+      if (productProductCode !== upperProductCode) continue;
       return product;
     }
 
     return null;
   } catch (error) {
-    console.error("findItemIdOwner error:", error);
+    console.error("findProductCodeOwner error:", error);
     return null;
   }
 };

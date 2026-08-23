@@ -7,7 +7,7 @@ export const buildReq = ({ body = {}, session = {}, ip = "127.0.0.1" } = {}) => 
 export const buildCartItem = (overrides = {}) => {
   return {
     productId: "prod-1",
-    itemId: "A-1",
+    productCode: "A-1",
     name: "Acorn Necklace",
     price: 25,
     quantity: 1,
@@ -24,7 +24,7 @@ export const buildCartItem = (overrides = {}) => {
 export const buildProductDoc = (overrides = {}) => {
   return {
     productId: "prod-1",
-    itemId: "A-1",
+    productCode: "A-1",
     name: "Acorn Necklace",
     price: 25,
     picData: null,

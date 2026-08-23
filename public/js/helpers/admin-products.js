@@ -3,7 +3,7 @@ import { sendToBack } from "../util/api-front.js";
 import { buildNewProductParams, getEditProductParams } from "../util/params.js";
 import { displayPopup, displayConfirmDialog } from "../util/popup.js";
 import { buildPicSlot } from "../forms/admin-form.js";
-import { confirmItemIdUnique, resetAutoItemId } from "./admin-categories.js";
+import { confirmProductCodeUnique, resetAutoProductCode } from "./admin-categories.js";
 
 //Add product
 export const runAddNewProduct = async () => {
@@ -44,7 +44,7 @@ export const runAddNewProduct = async () => {
     if (!confirmed) return null;
   }
 
-  const idConfirmed = await confirmItemIdUnique("add");
+  const idConfirmed = await confirmProductCodeUnique("add");
   if (!idConfirmed) return null;
 
   const data = await sendToBack(newProductParams);
@@ -103,7 +103,7 @@ export const runEditProduct = async () => {
   // console.log("UPDATE PRODUCT PARAMS");
   // console.dir(editProductParams);
 
-  const idConfirmed = await confirmItemIdUnique("edit", productId);
+  const idConfirmed = await confirmProductCodeUnique("edit", productId);
   if (!idConfirmed) return null;
 
   const data = await sendToBack(editProductParams);
@@ -272,13 +272,13 @@ export const populateAdminProductSelector = async (inputArray) => {
     productSelector.append(defaultOption);
   }
 
-  // Sort: letter-prefix itemIds first (A→Z), then numeric-only itemIds (low→high), then no itemId (alpha by name)
+  // Sort: letter-prefix productCodes first (A→Z), then numeric-only productCodes (low→high), then no productCode (alpha by name)
   inputArray.sort((a, b) => {
-    const aHasId = a.itemId != null && String(a.itemId).trim() !== "";
-    const bHasId = b.itemId != null && String(b.itemId).trim() !== "";
+    const aHasId = a.productCode != null && String(a.productCode).trim() !== "";
+    const bHasId = b.productCode != null && String(b.productCode).trim() !== "";
     if (aHasId && bHasId) {
-      const aStr = String(a.itemId);
-      const bStr = String(b.itemId);
+      const aStr = String(a.productCode);
+      const bStr = String(b.productCode);
       const aIsAlpha = /^[a-zA-Z]/.test(aStr);
       const bIsAlpha = /^[a-zA-Z]/.test(bStr);
       if (aIsAlpha && !bIsAlpha) return -1;
@@ -295,9 +295,9 @@ export const populateAdminProductSelector = async (inputArray) => {
     const product = inputArray[i];
     const option = document.createElement("option");
     option.value = product.productId;
-    const hasId = product.itemId != null && String(product.itemId).trim() !== "";
+    const hasId = product.productCode != null && String(product.productCode).trim() !== "";
     option.textContent = hasId
-      ? `Item ID: ${product.itemId} | ${product.name}`
+      ? `Product Code: ${product.productCode} | ${product.name}`
       : product.name;
     option.productData = product; //stores product data to then display on select
     productSelector.append(option);
@@ -309,10 +309,10 @@ export const populateAdminProductSelector = async (inputArray) => {
 export const populateEditFormProducts = async (inputObj) => {
   if (!inputObj) return null;
 
-  const { itemId, name, urlName, productType, price, description, display, sold, picData, canShip, length, width, height, weight } = inputObj;
+  const { productCode, name, urlName, productType, price, description, display, sold, picData, canShip, length, width, height, weight } = inputObj;
 
   const adminEditMapArray = [
-    { id: "edit-item-id", value: itemId },
+    { id: "edit-product-code", value: productCode },
     { id: "edit-name", value: name },
     { id: "edit-url-name", value: urlName },
     { id: "edit-product-type", value: productType },
@@ -335,7 +335,7 @@ export const populateEditFormProducts = async (inputObj) => {
   }
 
   // The id now in the form is the product's saved id, not an auto-suggestion
-  resetAutoItemId("edit");
+  resetAutoProductCode("edit");
 
   // Sync CSS classes on status selects to match their values
   const statusIds = ["edit-display", "edit-sold", "edit-can-ship"];

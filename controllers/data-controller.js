@@ -1,6 +1,6 @@
 import { storeProduct, updateProduct, deleteProduct, getProductData, hideOrderedProducts } from "../src/products.js";
 import { storeEvent, updateEvent, deleteEvent, getEventData } from "../src/events.js";
-import { buildCategoryList, addCategory, updateCategoryTitle, updateCategoryLetter, deleteCategory, buildNextItemId, findItemIdOwner } from "../src/categories.js";
+import { buildCategoryList, addCategory, updateCategoryTitle, updateCategoryLetter, deleteCategory, buildNextProductCode, findProductCodeOwner } from "../src/categories.js";
 import { submitContact } from "../src/contact.js";
 import {
   storeSubscriber,
@@ -116,7 +116,7 @@ export const addNewProductControl = async (req, res) => {
   const emailOptions = { buttonText: inputParams.emailButtonText, buttonUrl: inputParams.emailButtonUrl };
 
   const safeParams = whitelistFields(inputParams, [
-    "itemId",
+    "productCode",
     "name",
     "urlName",
     "productType",
@@ -156,7 +156,7 @@ export const editProductControl = async (req, res) => {
   if (!inputParams) return res.status(500).json({ error: "No input parameters" });
 
   const safeParams = whitelistFields(inputParams, [
-    "itemId",
+    "productCode",
     "name",
     "urlName",
     "productType",
@@ -226,19 +226,19 @@ export const deleteCategoryControl = async (req, res) => {
   return res.json(data);
 };
 
-export const nextItemIdControl = async (req, res) => {
+export const nextProductCodeControl = async (req, res) => {
   const inputParams = req.body;
   if (!inputParams) return res.status(500).json({ error: "No input parameters" });
 
-  const itemId = await buildNextItemId(inputParams.productType);
-  return res.json({ itemId });
+  const productCode = await buildNextProductCode(inputParams.productType);
+  return res.json({ productCode });
 };
 
-export const checkItemIdControl = async (req, res) => {
+export const checkProductCodeControl = async (req, res) => {
   const inputParams = req.body;
   if (!inputParams) return res.status(500).json({ error: "No input parameters" });
 
-  const owner = await findItemIdOwner(inputParams.itemId, inputParams.productId);
+  const owner = await findProductCodeOwner(inputParams.productCode, inputParams.productId);
   return res.json({ exists: !!owner, name: owner ? (owner.name ?? null) : null });
 };
 

@@ -10,8 +10,8 @@ const PRODUCTS = process.env.PRODUCTS_COLLECTION;
 
 beforeEach(() => {
   seedCollection(PRODUCTS, [
-    buildProductDoc({ productId: "prod-1", itemId: "A-1", name: "Acorn Necklace", price: 25 }),
-    buildProductDoc({ productId: "prod-2", itemId: "B-2", name: "Geode", price: 40, canShip: "no", weight: 2 }),
+    buildProductDoc({ productId: "prod-1", productCode: "A-1", name: "Acorn Necklace", price: 25 }),
+    buildProductDoc({ productId: "prod-2", productCode: "B-2", name: "Geode", price: 40, canShip: "no", weight: 2 }),
   ]);
 });
 

@@ -1,7 +1,7 @@
 // src/categories.js is the admin categories layer: category CRUD (with lazy default seed),
 // an admin-chosen single-letter prefix per category (NOT unique — two categories may share a
-// letter and therefore a running sequence), letter changes with optional item-ID renaming,
-// and the <LETTER><NNN> next-item-id generator that scans the products collection.
+// letter and therefore a running sequence), letter changes with optional product-code renaming,
+// and the <LETTER><NNN> next-product-code generator that scans the products collection.
 
 import { describe, it, expect } from "vitest";
 import {
@@ -14,8 +14,8 @@ import {
   updateCategoryLetter,
   deleteCategory,
   findCategory,
-  buildNextItemId,
-  findItemIdOwner,
+  buildNextProductCode,
+  findProductCodeOwner,
   DEFAULT_CATEGORIES,
 } from "../src/categories.js";
 import { seedCollection, readCollection } from "./helpers/fake-db.js";
@@ -207,86 +207,86 @@ describe("addCategory", () => {
 describe("updateCategoryLetter", () => {
   it("changes the letter without touching products when renumber is false", async () => {
     seedCollection(CATEGORIES, [{ key: "acorns", title: "Acorns", letter: "A" }]);
-    seedCollection(PRODUCTS, [buildProductDoc({ productId: "prod-1", productType: "acorns", itemId: "A001" })]);
+    seedCollection(PRODUCTS, [buildProductDoc({ productId: "prod-1", productType: "acorns", productCode: "A001" })]);
 
     const result = await updateCategoryLetter({ key: "acorns", letter: "z", renumber: false });
 
     expect(result).toEqual({ success: true, message: "Letter changed to Z", letter: "Z", renamedCount: 0 });
     expect(readCollection(CATEGORIES)[0].letter).toBe("Z");
-    expect(readCollection(PRODUCTS)[0].itemId).toBe("A001");
+    expect(readCollection(PRODUCTS)[0].productCode).toBe("A001");
   });
 
-  it("renames <OLD><digits> item IDs of that category only, keeping the number", async () => {
+  it("renames <OLD><digits> product codes of that category only, keeping the number", async () => {
     seedCollection(CATEGORIES, [
       { key: "acorns", title: "Acorns", letter: "A" },
       { key: "animals", title: "Animals", letter: "A" },
     ]);
     seedCollection(PRODUCTS, [
-      buildProductDoc({ productId: "prod-1", productType: "acorns", itemId: "A001" }),
-      buildProductDoc({ productId: "prod-2", productType: "acorns", itemId: "a012" }),
-      buildProductDoc({ productId: "prod-3", productType: "acorns", itemId: "CUSTOM-7" }),
-      buildProductDoc({ productId: "prod-4", productType: "animals", itemId: "A002" }),
-      buildProductDoc({ productId: "prod-5", productType: "acorns", itemId: undefined }),
+      buildProductDoc({ productId: "prod-1", productType: "acorns", productCode: "A001" }),
+      buildProductDoc({ productId: "prod-2", productType: "acorns", productCode: "a012" }),
+      buildProductDoc({ productId: "prod-3", productType: "acorns", productCode: "CUSTOM-7" }),
+      buildProductDoc({ productId: "prod-4", productType: "animals", productCode: "A002" }),
+      buildProductDoc({ productId: "prod-5", productType: "acorns", productCode: undefined }),
     ]);
 
     const result = await updateCategoryLetter({ key: "acorns", letter: "Z", renumber: true });
 
-    expect(result).toEqual({ success: true, message: "Letter changed to Z; 2 item IDs renamed", letter: "Z", renamedCount: 2 });
+    expect(result).toEqual({ success: true, message: "Letter changed to Z; 2 product codes renamed", letter: "Z", renamedCount: 2 });
     const products = readCollection(PRODUCTS);
-    expect(products[0].itemId).toBe("Z001");
-    expect(products[1].itemId).toBe("Z012");
-    expect(products[2].itemId).toBe("CUSTOM-7");
-    expect(products[3].itemId).toBe("A002");
-    expect(products[4].itemId).toBeUndefined();
+    expect(products[0].productCode).toBe("Z001");
+    expect(products[1].productCode).toBe("Z012");
+    expect(products[2].productCode).toBe("CUSTOM-7");
+    expect(products[3].productCode).toBe("A002");
+    expect(products[4].productCode).toBeUndefined();
   });
 
-  it("avoids item ID collisions across categories when renumbering", async () => {
+  it("avoids product code collisions across categories when renumbering", async () => {
     seedCollection(CATEGORIES, [
       { key: "acorns", title: "Acorns", letter: "A" },
       { key: "geodes", title: "Geodes", letter: "G" },
     ]);
     seedCollection(PRODUCTS, [
-      buildProductDoc({ productId: "prod-1", productType: "acorns", itemId: "A001" }),
-      buildProductDoc({ productId: "prod-2", productType: "geodes", itemId: "G001" }),
+      buildProductDoc({ productId: "prod-1", productType: "acorns", productCode: "A001" }),
+      buildProductDoc({ productId: "prod-2", productType: "geodes", productCode: "G001" }),
     ]);
 
     await updateCategoryLetter({ key: "acorns", letter: "G", renumber: true });
 
     const products = readCollection(PRODUCTS);
-    expect(products[0].itemId).toBe("G002");
-    expect(products[1].itemId).toBe("G001");
+    expect(products[0].productCode).toBe("G002");
+    expect(products[1].productCode).toBe("G001");
   });
 
   it("keeps existing numbers when the new letter has no conflicts", async () => {
     seedCollection(CATEGORIES, [{ key: "acorns", title: "Acorns", letter: "A" }]);
     seedCollection(PRODUCTS, [
-      buildProductDoc({ productId: "prod-1", productType: "acorns", itemId: "A001" }),
-      buildProductDoc({ productId: "prod-2", productType: "acorns", itemId: "A002" }),
+      buildProductDoc({ productId: "prod-1", productType: "acorns", productCode: "A001" }),
+      buildProductDoc({ productId: "prod-2", productType: "acorns", productCode: "A002" }),
     ]);
 
     await updateCategoryLetter({ key: "acorns", letter: "G", renumber: true });
 
     const products = readCollection(PRODUCTS);
-    expect(products[0].itemId).toBe("G001");
-    expect(products[1].itemId).toBe("G002");
+    expect(products[0].productCode).toBe("G001");
+    expect(products[1].productCode).toBe("G002");
   });
 
-  it("uses singular wording when exactly one item ID is renamed", async () => {
+  it("uses singular wording when exactly one product code is renamed", async () => {
     seedCollection(CATEGORIES, [{ key: "acorns", title: "Acorns", letter: "A" }]);
-    seedCollection(PRODUCTS, [buildProductDoc({ productId: "prod-1", productType: "acorns", itemId: "A001" })]);
+    seedCollection(PRODUCTS, [buildProductDoc({ productId: "prod-1", productType: "acorns", productCode: "A001" })]);
 
     const result = await updateCategoryLetter({ key: "acorns", letter: "B", renumber: true });
-    expect(result.message).toBe("Letter changed to B; 1 item ID renamed");
+    expect(result.message).toBe("Letter changed to B; 1 product code renamed");
   });
 
   it("reports the letter unchanged when the same letter is submitted", async () => {
     seedCollection(CATEGORIES, [{ key: "acorns", title: "Acorns", letter: "A" }]);
-    seedCollection(PRODUCTS, [buildProductDoc({ productId: "prod-1", productType: "acorns", itemId: "A001" })]);
+    seedCollection(PRODUCTS, [buildProductDoc({ productId: "prod-1", productType: "acorns", productCode: "A001" })]);
 
     const result = await updateCategoryLetter({ key: "acorns", letter: "a", renumber: true });
 
     expect(result).toEqual({ success: true, message: "Letter unchanged", letter: "A", renamedCount: 0 });
-    expect(readCollection(PRODUCTS)[0].itemId).toBe("A001");
+    expect(readCollection(PRODUCTS)[0].productCode).toBe("A001");
   });
 
   it("rejects an unknown category", async () => {
@@ -391,26 +391,26 @@ describe("findCategory", () => {
   });
 });
 
-//---------- buildNextItemId ----------
+//---------- buildNextProductCode ----------
 
-describe("buildNextItemId", () => {
+describe("buildNextProductCode", () => {
   it("returns <LETTER>001 when no product uses that letter yet", async () => {
     seedCollection(CATEGORIES, [{ key: "acorns", title: "Acorns", letter: "A" }]);
-    expect(await buildNextItemId("acorns")).toBe("A001");
+    expect(await buildNextProductCode("acorns")).toBe("A001");
   });
 
   it("uses the category's stored letter, not its title", async () => {
     seedCollection(CATEGORIES, [{ key: "samaltman", title: "SamAltman", letter: "Q" }]);
-    expect(await buildNextItemId("samaltman")).toBe("Q001");
+    expect(await buildNextProductCode("samaltman")).toBe("Q001");
   });
 
   it("returns the next number after the highest existing one", async () => {
     seedCollection(CATEGORIES, [{ key: "acorns", title: "Acorns", letter: "A" }]);
     seedCollection(PRODUCTS, [
-      buildProductDoc({ productId: "prod-1", itemId: "A001" }),
-      buildProductDoc({ productId: "prod-2", itemId: "A007" }),
+      buildProductDoc({ productId: "prod-1", productCode: "A001" }),
+      buildProductDoc({ productId: "prod-2", productCode: "A007" }),
     ]);
-    expect(await buildNextItemId("acorns")).toBe("A008");
+    expect(await buildNextProductCode("acorns")).toBe("A008");
   });
 
   it("shares one running sequence between categories with the same letter", async () => {
@@ -418,77 +418,77 @@ describe("buildNextItemId", () => {
       { key: "acorns", title: "Acorns", letter: "A" },
       { key: "animals", title: "Animals", letter: "A" },
     ]);
-    seedCollection(PRODUCTS, [buildProductDoc({ productId: "prod-1", itemId: "A003", productType: "acorns" })]);
-    expect(await buildNextItemId("animals")).toBe("A004");
+    seedCollection(PRODUCTS, [buildProductDoc({ productId: "prod-1", productCode: "A003", productType: "acorns" })]);
+    expect(await buildNextProductCode("animals")).toBe("A004");
   });
 
-  it("ignores itemIds that don't match the letter pattern, other letters, or missing itemId", async () => {
+  it("ignores productCodes that don't match the letter pattern, other letters, or missing productCode", async () => {
     seedCollection(CATEGORIES, [
       { key: "acorns", title: "Acorns", letter: "A" },
       { key: "geodes", title: "Geodes", letter: "B" },
     ]);
     seedCollection(PRODUCTS, [
-      buildProductDoc({ productId: "prod-1", itemId: "a-1" }),
-      buildProductDoc({ productId: "prod-2", itemId: "B003" }),
-      buildProductDoc({ productId: "prod-3", itemId: undefined }),
+      buildProductDoc({ productId: "prod-1", productCode: "a-1" }),
+      buildProductDoc({ productId: "prod-2", productCode: "B003" }),
+      buildProductDoc({ productId: "prod-3", productCode: undefined }),
     ]);
-    expect(await buildNextItemId("acorns")).toBe("A001");
+    expect(await buildNextProductCode("acorns")).toBe("A001");
   });
 
-  it("matches the letter case-insensitively when scanning existing itemIds", async () => {
+  it("matches the letter case-insensitively when scanning existing productCodes", async () => {
     seedCollection(CATEGORIES, [{ key: "acorns", title: "Acorns", letter: "A" }]);
-    seedCollection(PRODUCTS, [buildProductDoc({ productId: "prod-1", itemId: "a005" })]);
-    expect(await buildNextItemId("acorns")).toBe("A006");
+    seedCollection(PRODUCTS, [buildProductDoc({ productId: "prod-1", productCode: "a005" })]);
+    expect(await buildNextProductCode("acorns")).toBe("A006");
   });
 
   it("grows past 3 digits naturally once the max reaches 999", async () => {
     seedCollection(CATEGORIES, [{ key: "acorns", title: "Acorns", letter: "A" }]);
-    seedCollection(PRODUCTS, [buildProductDoc({ productId: "prod-1", itemId: "A999" })]);
-    expect(await buildNextItemId("acorns")).toBe("A1000");
+    seedCollection(PRODUCTS, [buildProductDoc({ productId: "prod-1", productCode: "A999" })]);
+    expect(await buildNextProductCode("acorns")).toBe("A1000");
   });
 
   it("returns null for an unknown category", async () => {
-    expect(await buildNextItemId("nope")).toBeNull();
+    expect(await buildNextProductCode("nope")).toBeNull();
   });
 
   it("returns null when the category has no valid letter", async () => {
     seedCollection(CATEGORIES, [{ key: "acorns", title: "Acorns" }]);
-    expect(await buildNextItemId("acorns")).toBeNull();
+    expect(await buildNextProductCode("acorns")).toBeNull();
   });
 });
 
-//---------- findItemIdOwner ----------
+//---------- findProductCodeOwner ----------
 
-describe("findItemIdOwner", () => {
+describe("findProductCodeOwner", () => {
   it("finds the owning product case-insensitively and with surrounding whitespace trimmed", async () => {
-    seedCollection(PRODUCTS, [buildProductDoc({ productId: "prod-1", itemId: "A001" })]);
-    const owner = await findItemIdOwner("  a001  ");
+    seedCollection(PRODUCTS, [buildProductDoc({ productId: "prod-1", productCode: "A001" })]);
+    const owner = await findProductCodeOwner("  a001  ");
     expect(owner.productId).toBe("prod-1");
   });
 
   it("excludes the product identified by excludeProductId", async () => {
-    seedCollection(PRODUCTS, [buildProductDoc({ productId: "prod-1", itemId: "A001" })]);
-    const owner = await findItemIdOwner("A001", "prod-1");
+    seedCollection(PRODUCTS, [buildProductDoc({ productId: "prod-1", productCode: "A001" })]);
+    const owner = await findProductCodeOwner("A001", "prod-1");
     expect(owner).toBeNull();
   });
 
-  it("still finds a different product's matching itemId when excluding another id", async () => {
+  it("still finds a different product's matching productCode when excluding another id", async () => {
     seedCollection(PRODUCTS, [
-      buildProductDoc({ productId: "prod-1", itemId: "A001" }),
-      buildProductDoc({ productId: "prod-2", itemId: "A001" }),
+      buildProductDoc({ productId: "prod-1", productCode: "A001" }),
+      buildProductDoc({ productId: "prod-2", productCode: "A001" }),
     ]);
-    const owner = await findItemIdOwner("A001", "prod-2");
+    const owner = await findProductCodeOwner("A001", "prod-2");
     expect(owner.productId).toBe("prod-1");
   });
 
-  it("returns null for a blank itemId", async () => {
-    seedCollection(PRODUCTS, [buildProductDoc({ productId: "prod-1", itemId: "A001" })]);
-    expect(await findItemIdOwner("")).toBeNull();
-    expect(await findItemIdOwner("   ")).toBeNull();
+  it("returns null for a blank productCode", async () => {
+    seedCollection(PRODUCTS, [buildProductDoc({ productId: "prod-1", productCode: "A001" })]);
+    expect(await findProductCodeOwner("")).toBeNull();
+    expect(await findProductCodeOwner("   ")).toBeNull();
   });
 
   it("returns null when nothing matches", async () => {
-    seedCollection(PRODUCTS, [buildProductDoc({ productId: "prod-1", itemId: "A001" })]);
-    expect(await findItemIdOwner("Z999")).toBeNull();
+    seedCollection(PRODUCTS, [buildProductDoc({ productId: "prod-1", productCode: "A001" })]);
+    expect(await findProductCodeOwner("Z999")).toBeNull();
   });
 });

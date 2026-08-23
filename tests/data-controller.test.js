@@ -22,8 +22,8 @@ import {
   updateCategoryTitleControl,
   updateCategoryLetterControl,
   deleteCategoryControl,
-  nextItemIdControl,
-  checkItemIdControl,
+  nextProductCodeControl,
+  checkProductCodeControl,
 } from "../controllers/data-controller.js";
 import { buildReq, buildProductDoc } from "./helpers/mock-req.js";
 import { FakeDbModel, seedCollection, readCollection } from "./helpers/fake-db.js";
@@ -279,35 +279,35 @@ describe("addCategoryControl", () => {
 });
 
 describe("updateCategoryLetterControl", () => {
-  it("changes the letter and renames that category's item IDs when renumber is true", async () => {
+  it("changes the letter and renames that category's product codes when renumber is true", async () => {
     seedCollection(CATEGORIES, [{ key: "acorns", title: "Acorns", letter: "A", dateCreated: new Date().toISOString() }]);
     seedCollection(PRODUCTS, [
-      buildProductDoc({ productId: "p1", productType: "acorns", itemId: "A001" }),
-      buildProductDoc({ productId: "p2", productType: "other", itemId: "A002" }),
+      buildProductDoc({ productId: "p1", productType: "acorns", productCode: "A001" }),
+      buildProductDoc({ productId: "p2", productType: "other", productCode: "A002" }),
     ]);
     const res = buildRes();
     await updateCategoryLetterControl(buildReq({ body: { key: "acorns", letter: "z", renumber: true } }), res);
-    expect(res.json).toHaveBeenCalledWith({ success: true, message: "Letter changed to Z; 1 item ID renamed", letter: "Z", renamedCount: 1 });
+    expect(res.json).toHaveBeenCalledWith({ success: true, message: "Letter changed to Z; 1 product code renamed", letter: "Z", renamedCount: 1 });
     expect(readCollection(CATEGORIES)[0].letter).toBe("Z");
-    expect(readCollection(PRODUCTS)[0].itemId).toBe("Z001");
-    expect(readCollection(PRODUCTS)[1].itemId).toBe("A002");
+    expect(readCollection(PRODUCTS)[0].productCode).toBe("Z001");
+    expect(readCollection(PRODUCTS)[1].productCode).toBe("A002");
   });
 
   it("changes only the letter when renumber is omitted", async () => {
     seedCollection(CATEGORIES, [{ key: "acorns", title: "Acorns", letter: "A", dateCreated: new Date().toISOString() }]);
-    seedCollection(PRODUCTS, [buildProductDoc({ productId: "p1", productType: "acorns", itemId: "A001" })]);
+    seedCollection(PRODUCTS, [buildProductDoc({ productId: "p1", productType: "acorns", productCode: "A001" })]);
     const res = buildRes();
     await updateCategoryLetterControl(buildReq({ body: { key: "acorns", letter: "Z" } }), res);
     expect(res.json).toHaveBeenCalledWith({ success: true, message: "Letter changed to Z", letter: "Z", renamedCount: 0 });
-    expect(readCollection(PRODUCTS)[0].itemId).toBe("A001");
+    expect(readCollection(PRODUCTS)[0].productCode).toBe("A001");
   });
 
   it("treats the string \"true\" as renumber", async () => {
     seedCollection(CATEGORIES, [{ key: "acorns", title: "Acorns", letter: "A", dateCreated: new Date().toISOString() }]);
-    seedCollection(PRODUCTS, [buildProductDoc({ productId: "p1", productType: "acorns", itemId: "A001" })]);
+    seedCollection(PRODUCTS, [buildProductDoc({ productId: "p1", productType: "acorns", productCode: "A001" })]);
     const res = buildRes();
     await updateCategoryLetterControl(buildReq({ body: { key: "acorns", letter: "B", renumber: "true" } }), res);
-    expect(readCollection(PRODUCTS)[0].itemId).toBe("B001");
+    expect(readCollection(PRODUCTS)[0].productCode).toBe("B001");
   });
 
   it("reports category not found for an unknown key", async () => {
@@ -373,56 +373,56 @@ describe("deleteCategoryControl", () => {
   });
 });
 
-describe("nextItemIdControl", () => {
-  it("returns the next sequential item ID for a category", async () => {
+describe("nextProductCodeControl", () => {
+  it("returns the next sequential product code for a category", async () => {
     seedCollection(CATEGORIES, [{ key: "acorns", title: "Acorns", letter: "A", dateCreated: new Date().toISOString() }]);
     seedCollection(PRODUCTS, [
-      buildProductDoc({ productId: "p1", itemId: "A001" }),
-      buildProductDoc({ productId: "p2", itemId: "A007" }),
+      buildProductDoc({ productId: "p1", productCode: "A001" }),
+      buildProductDoc({ productId: "p2", productCode: "A007" }),
     ]);
     const res = buildRes();
-    await nextItemIdControl(buildReq({ body: { productType: "acorns" } }), res);
-    expect(res.json).toHaveBeenCalledWith({ itemId: "A008" });
+    await nextProductCodeControl(buildReq({ body: { productType: "acorns" } }), res);
+    expect(res.json).toHaveBeenCalledWith({ productCode: "A008" });
   });
 
   it("returns null for an unknown category", async () => {
     const res = buildRes();
-    await nextItemIdControl(buildReq({ body: { productType: "unknown" } }), res);
-    expect(res.json).toHaveBeenCalledWith({ itemId: null });
+    await nextProductCodeControl(buildReq({ body: { productType: "unknown" } }), res);
+    expect(res.json).toHaveBeenCalledWith({ productCode: null });
   });
 
   it("responds 500 when no input parameters are provided", async () => {
     const res = buildRes();
-    await nextItemIdControl({}, res);
+    await nextProductCodeControl({}, res);
     expect(res.status).toHaveBeenCalledWith(500);
     expect(res.json).toHaveBeenCalledWith({ error: "No input parameters" });
   });
 });
 
-describe("checkItemIdControl", () => {
-  it("reports an existing owner when the item ID is already used", async () => {
-    seedCollection(PRODUCTS, [buildProductDoc({ productId: "p1", itemId: "A001", name: "Acorn Necklace" })]);
+describe("checkProductCodeControl", () => {
+  it("reports an existing owner when the product code is already used", async () => {
+    seedCollection(PRODUCTS, [buildProductDoc({ productId: "p1", productCode: "A001", name: "Acorn Necklace" })]);
     const res = buildRes();
-    await checkItemIdControl(buildReq({ body: { itemId: "a001" } }), res);
+    await checkProductCodeControl(buildReq({ body: { productCode: "a001" } }), res);
     expect(res.json).toHaveBeenCalledWith({ exists: true, name: "Acorn Necklace" });
   });
 
   it("excludes the product being edited via productId", async () => {
-    seedCollection(PRODUCTS, [buildProductDoc({ productId: "p1", itemId: "A001", name: "Acorn Necklace" })]);
+    seedCollection(PRODUCTS, [buildProductDoc({ productId: "p1", productCode: "A001", name: "Acorn Necklace" })]);
     const res = buildRes();
-    await checkItemIdControl(buildReq({ body: { itemId: "A001", productId: "p1" } }), res);
+    await checkProductCodeControl(buildReq({ body: { productCode: "A001", productId: "p1" } }), res);
     expect(res.json).toHaveBeenCalledWith({ exists: false, name: null });
   });
 
-  it("reports no match for a blank item ID", async () => {
+  it("reports no match for a blank product code", async () => {
     const res = buildRes();
-    await checkItemIdControl(buildReq({ body: { itemId: "" } }), res);
+    await checkProductCodeControl(buildReq({ body: { productCode: "" } }), res);
     expect(res.json).toHaveBeenCalledWith({ exists: false, name: null });
   });
 
   it("responds 500 when no input parameters are provided", async () => {
     const res = buildRes();
-    await checkItemIdControl({}, res);
+    await checkProductCodeControl({}, res);
     expect(res.status).toHaveBeenCalledWith(500);
     expect(res.json).toHaveBeenCalledWith({ error: "No input parameters" });
   });
