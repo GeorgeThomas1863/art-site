@@ -317,7 +317,7 @@ async function mainPicTouchEndHandler(e) {
   swipeHandled = true;
   recentTouchSwipe = true;
   setTimeout(() => { recentTouchSwipe = false; }, 500);
-  await rotateMainPic(panel, deltaX < 0 ? "next" : "prev");
+  await rotateMainPic(panel, deltaX < 0 ? "next" : "prev", true);
 }
 
 function mainPicTouchCancelHandler() {
@@ -326,6 +326,7 @@ function mainPicTouchCancelHandler() {
 }
 
 function mainPicMouseDownHandler(e) {
+  if (e.button !== 0) return; // right/middle button mouseups can be eaten by native menus, stranding the drag state
   if (recentTouchSwipe) return;
   const panel = e.target.closest(".split-image-rotating");
   if (!panel) return;
@@ -345,7 +346,7 @@ async function mainPicMouseUpHandler(e) {
   if (Math.abs(deltaX) < 30) return;
 
   swipeHandled = true;
-  await rotateMainPic(panel, deltaX < 0 ? "next" : "prev");
+  await rotateMainPic(panel, deltaX < 0 ? "next" : "prev", true);
 }
 
 const touchEndHandler = (e) => {
@@ -362,6 +363,7 @@ const touchEndHandler = (e) => {
 };
 
 const mouseDownHandler = (e) => {
+  if (e.button !== 0) return; // right/middle button mouseups can be eaten by native menus, stranding the drag state
   if (recentTouchSwipe) return;
   const carousel = e.target.closest(".product-carousel");
   if (!carousel) return;
@@ -383,6 +385,18 @@ const mouseUpHandler = (e) => {
   advanceCarousel(carousel, deltaX < 0 ? "next" : "prev");
 };
 
+// A mousedown's matching mouseup is lost when focus is stolen mid-drag (tab switch, Alt+Tab, dialogs);
+// clear the armed drag state so the next unrelated mouseup can't fire a bogus swipe and swallow a click
+const mouseDragCancelHandler = () => {
+  mainPicMouseStartX = null;
+  mainPicMousePanel = null;
+  mouseStartX = null;
+  mouseDragCarousel = null;
+};
+
+window.addEventListener("blur", mouseDragCancelHandler);
+document.addEventListener("visibilitychange", mouseDragCancelHandler);
+
 if (productsElement) {
   productsElement.addEventListener("click", clickHandler);
   productsElement.addEventListener("keydown", keyHandler);
@@ -398,6 +412,7 @@ if (eventsElement) {
   eventsElement.addEventListener("touchstart", touchStartHandler, { passive: true });
   eventsElement.addEventListener("touchend", touchEndHandler);
   eventsElement.addEventListener("mousedown", mouseDownHandler);
+  document.addEventListener("mouseup", mouseUpHandler);
 }
 
 if (newsletterElement) {

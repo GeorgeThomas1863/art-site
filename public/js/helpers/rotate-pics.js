@@ -83,14 +83,14 @@ export const setCurrentPic = async (element, picURL, checkRatio = false, waitFor
 
   const isExtreme = checkRatio && needsContain(loadedImg, element);
 
-  // Instant path (arrow-button clicks): swap straight in, no crossfade wait
+  // Instant path (arrow-button clicks and swipes): swap straight in, no crossfade wait
   if (instant) {
     element.style.backgroundImage = `url('${picURL}')`;
     applyContainMode(element, isExtreme);
     applyContainMode(layer, false);
     layer.style.transition = "none";
     layer.style.opacity = "0";
-    // Restore transition after the instant reset settles, so the layer is ready to fade for the next auto/swipe rotation
+    // Restore transition after the instant reset settles, so the layer is ready to fade for the next auto rotation
     requestAnimationFrame(() => {
       requestAnimationFrame(() => {
         layer.style.transition = "";

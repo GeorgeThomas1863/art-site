@@ -25,6 +25,19 @@
   align-items: start;
 }
 
+/* Old Events section */
+.old-events-section {
+  margin-top: 3rem;
+}
+
+.old-events-section .collapse-content {
+  padding-top: 1.5rem;
+}
+
+.old-events-section .collapse-content.hidden {
+  padding-top: 0;
+}
+
 .event-card {
   background: #ffffff;
   border-radius: 8px;
