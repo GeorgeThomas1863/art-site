@@ -113,7 +113,7 @@ export const addNewProductControl = async (req, res) => {
   const inputParams = req.body;
   if (!inputParams) return res.status(500).json({ error: "No input parameters" });
   const shouldNotify = inputParams.notifySubscribers === true || inputParams.notifySubscribers === "true";
-  const emailOptions = { buttonText: inputParams.emailButtonText, buttonUrl: inputParams.emailButtonUrl };
+  const introText = typeof inputParams.emailIntroText === "string" ? inputParams.emailIntroText : undefined;
 
   const safeParams = whitelistFields(inputParams, [
     "productCode",
@@ -135,16 +135,16 @@ export const addNewProductControl = async (req, res) => {
   const data = await storeProduct(safeParams);
   if (!shouldNotify || !data?.success) return res.json(data);
 
-  const emailData = await announceStoredProduct(data, emailOptions);
+  const emailData = await announceStoredProduct(data, introText);
   data.emailSent = emailData.success;
   data.emailMessage = emailData.message;
   data.subscriberCount = emailData.subscriberCount ?? 0;
   return res.json(data);
 };
 
-const announceStoredProduct = async (product, options) => {
+const announceStoredProduct = async (product, introText) => {
   try {
-    return await announceProduct(product, options);
+    return await announceProduct(product, introText);
   } catch (e) {
     console.error(`PRODUCT ANNOUNCEMENT ERROR for ${product.productId || product.name || "unknown product"}:`, e.message || e);
     return { success: false, message: "Failed to send newsletter", subscriberCount: 0 };

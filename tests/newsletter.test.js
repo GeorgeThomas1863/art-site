@@ -401,32 +401,71 @@ describe("sendTestNewsletter", () => {
 });
 
 describe("announceProduct", () => {
-  it("sends and archives a complete product announcement with defaults", async () => {
+  const product = { name: "Art <One>", price: "12.5", description: "Line 1\nLine 2", urlName: "art-one", picData: [{ filename: "art.jpg" }] };
+  const whyLine = "You're receiving this because you subscribed to the Two Sisters Fiber Art newsletter, which makes you among the very first to see each new creation.";
+
+  it("uses the default intro in HTML and text", async () => {
     seedCollection(SUBSCRIBERS, [{ email: "one@example.test" }, { email: "two@example.test" }]);
     axios.post.mockResolvedValue(okMailResponse);
-    const result = await announceProduct({ name: "Art <One>", price: "12.5", description: "Line 1\nLine 2", urlName: "art-one", picData: [{ filename: "art.jpg" }] }, {});
+    const result = await announceProduct(product);
     expect(result).toMatchObject({ success: true, subscriberCount: 2, messageId: "<msg-1@mg.example.test>" });
     const { params } = lastPostCall();
+    const html = params.get("html");
     expect(params.get("subject")).toBe("New Product: Art <One>");
-    expect(params.get("html")).toContain("http://localhost:0/images/products/art.jpg");
-    expect(params.get("html")).toContain("$12.50");
-    expect(params.get("html")).toContain('href="http://localhost:0/products/art-one"');
+    expect(html).toContain("http://localhost:0/images/products/art.jpg");
+    expect(html).toContain("$12.50");
+    expect(html).toContain('href="http://localhost:0/products/art-one"');
+    expect(html.match(/<a\b/g)).toHaveLength(1);
+    expect(html).toContain('width="100%"');
+    expect(html).toContain("background:#BEE994");
+    expect(html).toContain("border:2px solid #000000");
+    expect(html).toContain("background:#ffffff");
+    expect(html).toContain("border:1px solid #333333");
+    expect(html).toContain('style="width:100%; max-width:100%; height:auto; display:block;" width="600"');
+    expect(html).toContain("New creation, now available");
+    expect(html).toContain(whyLine);
+    expect(html).toContain(">View Now</a>");
+    expect(params.get("text")).toBe(`New creation, now available\n${whyLine}\nArt <One>\n$12.50\nLine 1\nLine 2\nhttp://localhost:0/products/art-one`);
     expect(params.getAll("bcc")[0]).toContain("one@example.test, two@example.test");
     expect(readCollection(NEWSLETTERS)).toHaveLength(1);
   });
 
-  it("respects button overrides and omits video images", async () => {
+  it("uses and HTML-escapes a custom intro while preserving the why-line and button", async () => {
     seedCollection(SUBSCRIBERS, [{ email: "one@example.test" }]);
     axios.post.mockResolvedValue(okMailResponse);
-    await announceProduct({ name: "Video", price: 3, description: "Desc", urlName: "video", picData: [{ filename: "clip.mp4" }] }, { buttonText: "Buy", buttonUrl: "https://shop.test/item" });
+    await announceProduct(product, "  Fresh <fiber  ");
+    const { params } = lastPostCall();
+    const html = params.get("html");
+    expect(html).toContain("Fresh &lt;fiber");
+    expect(html).not.toContain("New creation, now available");
+    expect(html).toContain(whyLine);
+    expect(html).toContain(">View Now</a>");
+    expect(params.get("text")).toContain(`Fresh <fiber\n${whyLine}`);
+  });
+
+  it("falls back to the default intro for whitespace", async () => {
+    seedCollection(SUBSCRIBERS, [{ email: "one@example.test" }]);
+    axios.post.mockResolvedValue(okMailResponse);
+    await announceProduct(product, "   \t  ");
+    const { params } = lastPostCall();
+    expect(params.get("html")).toContain("New creation, now available");
+    expect(params.get("text")).toContain(`New creation, now available\n${whyLine}`);
+  });
+
+  it("ignores button overrides and omits video images", async () => {
+    seedCollection(SUBSCRIBERS, [{ email: "one@example.test" }]);
+    axios.post.mockResolvedValue(okMailResponse);
+    await announceProduct({ name: "Video", price: 3, description: "Desc", urlName: "video", picData: [{ filename: "clip.mp4" }] }, undefined, { buttonText: "Buy", buttonUrl: "https://shop.test/item" });
     const html = lastPostCall().params.get("html");
-    expect(html).toContain("Buy");
-    expect(html).toContain('href="https://shop.test/item"');
+    expect(html).toContain(">View Now</a>");
+    expect(html).toContain('href="http://localhost:0/products/video"');
+    expect(html).not.toContain(">Buy</a>");
+    expect(html).not.toContain("https://shop.test/item");
     expect(html).not.toContain("clip.mp4");
   });
 
   it("returns the subscriber count when none exist", async () => {
-    expect(await announceProduct({ name: "Art", urlName: "art" }, {})).toEqual({ success: false, message: "No subscribers found", subscriberCount: 0 });
+    expect(await announceProduct({ name: "Art", urlName: "art" })).toEqual({ success: false, message: "No subscribers found", subscriberCount: 0 });
   });
 });
 

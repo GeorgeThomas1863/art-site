@@ -18,7 +18,10 @@ config/
 .superpowers
 .codex/
 .playwright-mcp
+
 docs/
+scripts/
+to-copy.txt
 
 # logs
 logs

@@ -1513,40 +1513,35 @@ export const buildProductSubscriberSection = async () => {
   fields.className = "product-email-fields";
   fields.hidden = true;
 
+  const introField = document.createElement("div");
+  introField.className = "form-field";
+
+  const introLabel = document.createElement("label");
+  introLabel.className = "form-label";
+  introLabel.setAttribute("for", "product-email-intro");
+  introLabel.textContent = "Email Message";
+
+  const introInput = document.createElement("input");
+  introInput.className = "form-input";
+  introInput.type = "text";
+  introInput.id = "product-email-intro";
+  introInput.value = "New creation, now available";
+  introInput.placeholder = "New creation, now available";
+  introInput.setAttribute("data-label", "product-email-intro");
+
   const hint = document.createElement("p");
   hint.className = "product-email-hint";
-  hint.textContent = "Subscribers get the product image, name, price, description and a button.";
-
-  const buttonText = buildProductEmailButtonInput("product-email-button-text", "text", "View Product", "Button Text (optional)");
-  const buttonUrl = buildProductEmailButtonInput("product-email-button-url", "url", "Leave blank to link to the product page", "Button Link (optional)");
+  hint.textContent = "Subscribers get the product image, name, price, description and a View Now button linking to its page.";
 
   checkbox.addEventListener("change", () => {
     fields.hidden = !checkbox.checked;
   });
 
   checkboxWrapper.append(checkbox, label);
-  fields.append(hint, buttonText, buttonUrl);
+  introField.append(introLabel, introInput);
+  fields.append(introField, hint);
   section.append(checkboxWrapper, fields);
   return section;
-};
-
-const buildProductEmailButtonInput = (id, type, placeholder, labelText) => {
-  const field = document.createElement("div");
-  field.className = "form-field";
-
-  const label = document.createElement("label");
-  label.className = "form-label";
-  label.textContent = labelText;
-  label.setAttribute("for", id);
-
-  const input = document.createElement("input");
-  input.className = "form-input";
-  input.type = type;
-  input.id = id;
-  input.placeholder = placeholder;
-  input.setAttribute("data-label", id);
-  field.append(label, input);
-  return field;
 };
 
 export const buildMailingListSection = async () => {

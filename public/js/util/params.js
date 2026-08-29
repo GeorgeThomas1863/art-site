@@ -25,8 +25,7 @@ export const buildNewProductParams = async () => {
     picData: picData,
     dateCreated: new Date().toISOString(),
     notifySubscribers,
-    emailButtonText: document.getElementById("product-email-button-text")?.value.trim() || "",
-    emailButtonUrl: document.getElementById("product-email-button-url")?.value.trim() || "",
+    emailIntroText: document.getElementById("product-email-intro")?.value.trim() || "",
   };
   return params;
 };

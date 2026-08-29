@@ -5,6 +5,9 @@ import { escapeHtml, sanitizeEmailHeader } from "./sanitize.js";
 import dbModel from "../models/db-model.js";
 
 const LOG_MODE_MESSAGE = "Email NOT sent: server is running with MAIL_MODE=log (logged to console only)";
+const PRODUCT_EMAIL_BUTTON_TEXT = "View Now";
+const PRODUCT_EMAIL_DEFAULT_INTRO = "New creation, now available";
+const PRODUCT_EMAIL_INTRO_WHY = "You're receiving this because you subscribed to the Two Sisters Fiber Art newsletter, which makes you among the very first to see each new creation.";
 
 const buildSendResult = (data, successMessage) => {
   if (data.mode === "log") return { success: true, message: LOG_MODE_MESSAGE, logMode: true, messageId: data.messageId };
@@ -130,13 +133,13 @@ export const sendTestNewsletter = async (inputParams) => {
   }
 };
 
-export const announceProduct = async (product, options = {}) => {
+export const announceProduct = async (product, introText) => {
   if (!product) return { success: false, message: "No product provided", subscriberCount: 0 };
-  const { buttonText, buttonUrl } = resolveProductButton(product, options);
-  const validation = validateButton(buttonText, buttonUrl);
-  if (!validation.success) return { ...validation, subscriberCount: 0 };
+  if (!process.env.SITE_URL?.trim()) return { success: false, message: "SITE_URL is not configured", subscriberCount: 0 };
 
-  const mailParams = buildProductMailParams(product, buttonText, buttonUrl);
+  const resolvedIntro = resolveProductIntro(introText);
+  const productUrl = buildProductPageUrl(product);
+  const mailParams = buildProductMailParams(product, resolvedIntro, productUrl);
   return sendPreparedNewsletter(mailParams, true);
 };
 
@@ -229,31 +232,46 @@ export const buildButtonHtml = (text, url) => {
   return `<table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="margin-top:24px;"><tr><td align="center"><a href="${safeUrl}" target="_blank" style="display:inline-block; padding:12px 28px; background:#333333; color:#ffffff; text-decoration:none; border-radius:4px; font-weight:bold;">${safeText}</a></td></tr></table>`;
 };
 
-const resolveProductButton = (product, options) => {
-  const siteUrl = process.env.SITE_URL?.replace(/\/$/, "") || "";
-  const defaultUrl = `${siteUrl}/products/${product.urlName || ""}`;
-  const buttonText = typeof options.buttonText === "string" && options.buttonText.trim() ? options.buttonText.trim() : "View Product";
-  const buttonUrl = typeof options.buttonUrl === "string" && options.buttonUrl.trim() ? options.buttonUrl.trim() : defaultUrl;
-  return { buttonText, buttonUrl };
+const buildProductPageUrl = (product) => {
+  const siteUrl = process.env.SITE_URL.replace(/\/+$/, "");
+  return `${siteUrl}/products/${product.urlName || ""}`;
 };
 
-const buildProductMailParams = (product, buttonText, buttonUrl) => {
+const resolveProductIntro = (introText) => {
+  if (typeof introText !== "string") return PRODUCT_EMAIL_DEFAULT_INTRO;
+  const cleanIntro = introText.trim();
+  return cleanIntro || PRODUCT_EMAIL_DEFAULT_INTRO;
+};
+
+const buildProductMailParams = (product, introText, productUrl) => {
   const name = escapeHtml(String(product.name || ""));
   const description = escapeHtml(String(product.description || "")).replace(/\r?\n/g, "<br>");
   const price = Number(product.price);
   const priceText = Number.isFinite(price) ? `$${price.toFixed(2)}` : "$0.00";
   const imageHtml = buildProductImageHtml(product.picData);
-  const html = `<div style="max-width:600px; margin:0 auto;"><h1>${name}</h1>${imageHtml}<p style="margin:0 0 1em 0;">${escapeHtml(priceText)}</p><p style="margin:0 0 1em 0;">${description}</p>${buildButtonHtml(buttonText, buttonUrl)}</div>`;
-  const text = `${product.name || ""}\n${priceText}\n${product.description || ""}\n${buttonUrl}`;
+  const introHtml = buildProductIntroHtml(introText);
+  const buttonHtml = buildProductButtonHtml(productUrl);
+  const html = `<table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="width:100%; background:#BEE994;"><tr><td align="center" style="padding:24px 12px;"><table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="width:100%; max-width:600px; background:#ffffff; border:2px solid #000000;"><tr><td style="padding:32px;">${introHtml}<h1 style="font-family:Georgia, serif; color:#000000;">${name}</h1>${imageHtml}<p style="font-family:Georgia, serif; color:#000000; font-weight:bold;">${escapeHtml(priceText)}</p><p style="font-family:Georgia, serif; color:#333333; line-height:1.6;">${description}</p>${buttonHtml}</td></tr></table></td></tr></table>`;
+  const text = `${introText}\n${PRODUCT_EMAIL_INTRO_WHY}\n${product.name || ""}\n${priceText}\n${product.description || ""}\n${productUrl}`;
   return { subject: sanitizeEmailHeader(`New Product: ${product.name || ""}`), html, text };
+};
+
+const buildProductIntroHtml = (introText) => {
+  const safeIntro = escapeHtml(introText);
+  return `<p style="font-family:Georgia, serif; color:#000000; font-size:16px; margin:0 0 8px;">${safeIntro}</p><p style="font-family:Georgia, serif; color:#333333; font-size:14px; line-height:1.6; margin:0 0 24px;">${PRODUCT_EMAIL_INTRO_WHY}</p>`;
+};
+
+const buildProductButtonHtml = (url) => {
+  const safeUrl = escapeHtml(url);
+  return `<table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0"><tr><td align="center"><a href="${safeUrl}" target="_blank" style="background:#ffffff; color:#000000; border:1px solid #333333; border-radius:4px; text-transform:uppercase; letter-spacing:2px; font-weight:600; font-size:16px; padding:10px 20px; text-decoration:none; display:inline-block; font-family:Georgia, serif;">${PRODUCT_EMAIL_BUTTON_TEXT}</a></td></tr></table>`;
 };
 
 const buildProductImageHtml = (picData) => {
   const filename = picData?.[0]?.filename;
   if (!filename || /\.(mp4|webm|mov)$/i.test(filename)) return "";
-  const siteUrl = process.env.SITE_URL?.replace(/\/$/, "") || "";
+  const siteUrl = process.env.SITE_URL?.replace(/\/+$/, "") || "";
   const safeSrc = escapeHtml(`${siteUrl}/images/products/${filename}`);
-  return `<img src="${safeSrc}" style="max-width: 100%; height: auto; display: block;" width="600">`;
+  return `<img src="${safeSrc}" style="width:100%; max-width:100%; height:auto; display:block;" width="600">`;
 };
 
 export const deleteNewsletter = async (id) => {

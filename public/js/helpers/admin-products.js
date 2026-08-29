@@ -30,11 +30,6 @@ export const runAddNewProduct = async () => {
     return null;
   }
 
-  if (newProductParams.notifySubscribers && newProductParams.emailButtonUrl && !/^https?:\/\//i.test(newProductParams.emailButtonUrl)) {
-    await displayPopup("Button link must start with http:// or https://", "error");
-    return null;
-  }
-
   if (newProductParams.notifySubscribers) {
     const subscriberData = await sendToBack({ route: "/newsletter/data" }, "GET");
     const subscriberCount = subscriberData ? subscriberData.length : 0;

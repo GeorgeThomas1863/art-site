@@ -164,18 +164,29 @@ describe("addNewProductControl", () => {
 
     const storedProduct = readCollection(PRODUCTS)[0];
     expect(storedProduct).not.toHaveProperty("notifySubscribers");
+    expect(storedProduct).not.toHaveProperty("emailIntroText");
     expect(storedProduct).not.toHaveProperty("emailButtonText");
     expect(storedProduct).not.toHaveProperty("emailButtonUrl");
   });
 
-  it("announces when notifySubscribers is the string true without storing email fields", async () => {
+  it("announces with the custom intro without storing email fields", async () => {
     seedCollection(SUBSCRIBERS, [{ email: "sub@example.test" }]);
     const res = buildRes();
-    await addNewProductControl(buildReq({ body: { ...productBody, notifySubscribers: "true", emailButtonText: "See It", emailButtonUrl: "https://shop.test/art" } }), res);
+    await addNewProductControl(buildReq({ body: { ...productBody, notifySubscribers: "true", emailIntroText: "Studio <news", emailButtonText: "See It", emailButtonUrl: "https://shop.test/art" } }), res);
     expect(res.json).toHaveBeenCalledWith(expect.objectContaining({ success: true, emailSent: true, subscriberCount: 1 }));
-    expect(readCollection(PRODUCTS)[0]).not.toHaveProperty("notifySubscribers");
-    expect(readCollection(PRODUCTS)[0]).not.toHaveProperty("emailButtonText");
-    expect(readCollection(PRODUCTS)[0]).not.toHaveProperty("emailButtonUrl");
+    const storedProduct = readCollection(PRODUCTS)[0];
+    expect(storedProduct).not.toHaveProperty("notifySubscribers");
+    expect(storedProduct).not.toHaveProperty("emailIntroText");
+    expect(storedProduct).not.toHaveProperty("emailButtonText");
+    expect(storedProduct).not.toHaveProperty("emailButtonUrl");
+
+    const archivedNewsletter = readCollection(NEWSLETTERS)[0];
+    expect(archivedNewsletter.html).toContain("Studio &lt;news");
+    expect(archivedNewsletter.text).toContain("Studio <news");
+    expect(archivedNewsletter.html).toContain(">View Now</a>");
+    expect(archivedNewsletter.html).toContain('href="http://localhost:0/products/new-art"');
+    expect(archivedNewsletter.html).not.toContain("See It");
+    expect(archivedNewsletter.html).not.toContain("https://shop.test/art");
   });
 
   it("stores the product when announcement sending fails", async () => {
@@ -207,13 +218,16 @@ describe("addNewProductControl", () => {
     expect(readCollection(NEWSLETTERS)).toHaveLength(0);
   });
 
-  it("stores the product but rejects an invalid announcement button URL", async () => {
+  it("does not accept a button URL override", async () => {
+    seedCollection(SUBSCRIBERS, [{ email: "sub@example.test" }]);
     const res = buildRes();
     await addNewProductControl(buildReq({ body: { ...productBody, notifySubscribers: true, emailButtonUrl: "/local" } }), res);
-    expect(res.json).toHaveBeenCalledWith(expect.objectContaining({ success: true, emailSent: false, emailMessage: "Button link must start with http:// or https://" }));
+    expect(res.json).toHaveBeenCalledWith(expect.objectContaining({ success: true, emailSent: true, subscriberCount: 1 }));
     expect(readCollection(PRODUCTS)).toHaveLength(1);
-    expect(axios.post).not.toHaveBeenCalled();
+    expect(readCollection(NEWSLETTERS)[0].html).toContain('href="http://localhost:0/products/new-art"');
+    expect(axios.post).toHaveBeenCalledTimes(1);
   });
+
 });
 
 describe("getCategoriesControl", () => {
