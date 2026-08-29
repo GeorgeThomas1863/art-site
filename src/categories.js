@@ -203,17 +203,27 @@ export const updateCategoryLetter = async (inputParams) => {
     const oldLetter = normalizeLetter(category.letter);
     if (oldLetter === newLetter) return { success: true, message: "Letter unchanged", letter: newLetter, renamedCount: 0 };
 
+    // Rename product codes BEFORE persisting the new letter: a failed rename leaves the category
+    // on the old letter, so retrying the same change resumes instead of hitting "Letter unchanged".
+    let renamedCount = 0;
+    if (renumber) {
+      renamedCount = await renameCategoryProductCodes(key, oldLetter, newLetter);
+      if (renamedCount === null) {
+        return { success: false, message: "Failed to rename product codes; letter not changed" };
+      }
+    }
+
     const updateParams = { ...lookupParams, updateObj: { letter: newLetter } };
     const updateModel = new dbModel(updateParams, CATEGORIES_COLLECTION());
     const updateData = await updateModel.updateObjItem();
-    if (!updateData) return { success: false, message: "Failed to update category letter" };
+    if (!updateData) {
+      if (renamedCount > 0) {
+        return { success: false, message: `${renamedCount} product code${renamedCount === 1 ? "" : "s"} renamed, but failed to update category letter` };
+      }
+      return { success: false, message: "Failed to update category letter" };
+    }
 
     if (!renumber) return { success: true, message: `Letter changed to ${newLetter}`, letter: newLetter, renamedCount: 0 };
-
-    const renamedCount = await renameCategoryProductCodes(key, oldLetter, newLetter);
-    if (renamedCount === null) {
-      return { success: false, message: `Letter changed to ${newLetter}, but renaming product codes failed` };
-    }
 
     const message = `Letter changed to ${newLetter}; ${renamedCount} product code${renamedCount === 1 ? "" : "s"} renamed`;
     return { success: true, message, letter: newLetter, renamedCount };
@@ -260,7 +270,8 @@ const renameCategoryProductCodes = async (productType, oldLetter, newLetter) => 
         updateObj: { productCode: nextProductCode },
       };
       const renameModel = new dbModel(renameParams, process.env.PRODUCTS_COLLECTION);
-      await renameModel.updateObjItem();
+      const renameData = await renameModel.updateObjItem();
+      if (!renameData?.matchedCount) continue; // product vanished mid-loop — nothing renamed, don't count it
       renamedCount++;
     }
 

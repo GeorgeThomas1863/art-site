@@ -84,3 +84,6 @@ playwright-report/
 .npmrc
 docker-compose.override.yml
 backfill-product-codes.js
+
+# operator script output (CSV exports)
+scripts/exports/

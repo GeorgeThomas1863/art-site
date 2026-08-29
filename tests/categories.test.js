@@ -3,7 +3,7 @@
 // letter and therefore a running sequence), letter changes with optional product-code renaming,
 // and the <LETTER><NNN> next-product-code generator that scans the products collection.
 
-import { describe, it, expect } from "vitest";
+import { describe, it, expect, vi } from "vitest";
 import {
   buildCategoryKey,
   normalizeLetter,
@@ -18,7 +18,7 @@ import {
   findProductCodeOwner,
   DEFAULT_CATEGORIES,
 } from "../src/categories.js";
-import { seedCollection, readCollection } from "./helpers/fake-db.js";
+import { seedCollection, readCollection, FakeDbModel } from "./helpers/fake-db.js";
 import { buildProductDoc } from "./helpers/mock-req.js";
 
 const CATEGORIES = process.env.CATEGORIES_COLLECTION;
@@ -277,6 +277,21 @@ describe("updateCategoryLetter", () => {
 
     const result = await updateCategoryLetter({ key: "acorns", letter: "B", renumber: true });
     expect(result.message).toBe("Letter changed to B; 1 product code renamed");
+  });
+
+  it("leaves the category letter unchanged when renaming product codes fails", async () => {
+    seedCollection(CATEGORIES, [{ key: "acorns", title: "Acorns", letter: "A" }]);
+    seedCollection(PRODUCTS, [buildProductDoc({ productId: "prod-1", productType: "acorns", productCode: "A001" })]);
+
+    const updateSpy = vi.spyOn(FakeDbModel.prototype, "updateObjItem").mockImplementation(async () => {
+      throw new Error("write failed");
+    });
+    const result = await updateCategoryLetter({ key: "acorns", letter: "B", renumber: true });
+    updateSpy.mockRestore();
+
+    expect(result).toEqual({ success: false, message: "Failed to rename product codes; letter not changed" });
+    expect(readCollection(CATEGORIES)[0].letter).toBe("A");
+    expect(readCollection(PRODUCTS)[0].productCode).toBe("A001");
   });
 
   it("reports the letter unchanged when the same letter is submitted", async () => {
