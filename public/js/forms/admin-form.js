@@ -96,23 +96,17 @@ export const buildProductsSection = async () => {
   return section;
 };
 
-// A–Z picker for a category's product-code prefix; any letter is allowed, duplicates included
-export const buildLetterSelect = (id, selectedLetter) => {
-  const select = document.createElement("select");
-  select.className = "form-input";
-  select.id = id;
-  select.name = id;
+// 1-3 letter text input for a category's product-code prefix; any A-Z combo is allowed, duplicates included
+export const buildLetterInput = (id, letter) => {
+  const input = document.createElement("input");
+  input.className = "form-input";
+  input.type = "text";
+  input.id = id;
+  input.name = id;
+  input.maxLength = 3;
+  input.value = letter || "";
 
-  for (let i = 0; i < 26; i++) {
-    const letter = String.fromCharCode(65 + i);
-    const option = document.createElement("option");
-    option.value = letter;
-    option.textContent = letter;
-    if (letter === selectedLetter) option.selected = true;
-    select.append(option);
-  }
-
-  return select;
+  return input;
 };
 
 // Label-over-control column for the add-category row (name field, prefix picker)
@@ -147,9 +141,9 @@ export const buildCategoriesContent = async () => {
   const categoryTitleField = buildAddCategoryField("Add New Category", categoryTitleInput);
   categoryTitleField.classList.add("add-category-field-title");
 
-  const categoryLetterSelect = buildLetterSelect("new-category-letter", "A");
-  categoryLetterSelect.title = "Product Code prefix for this category";
-  const categoryLetterField = buildAddCategoryField("Prefix", categoryLetterSelect);
+  const categoryLetterInput = buildLetterInput("new-category-letter", "A");
+  categoryLetterInput.title = "Product Code prefix for this category";
+  const categoryLetterField = buildAddCategoryField("Prefix", categoryLetterInput);
 
   const addCategoryButton = document.createElement("button");
   addCategoryButton.className = "btn btn-add-category";

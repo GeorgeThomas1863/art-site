@@ -405,7 +405,10 @@
 }
 
 .add-category-row #new-category-letter {
-  width: auto;
+  width: 4.5ch;
+  font-family: "Courier New", Courier, monospace;
+  font-weight: bold;
+  text-transform: uppercase;
 }
 
 .category-list-header {
@@ -451,14 +454,15 @@
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
 }
 
-/* Per-row letter picker: compact, monospace so the prefix reads like a product code */
+/* Per-row letter input: compact, monospace so the prefix reads like a product code */
 .category-item .category-letter-select {
   flex: 0 0 auto;
-  width: auto;
+  width: 4.5ch;
   padding: 0.3rem 0.4rem;
   font-family: "Courier New", Courier, monospace;
   font-weight: bold;
   font-size: 0.9rem;
+  text-transform: uppercase;
 }
 
 /* Editable name: reads as plain text until hovered/focused so the list stays calm */

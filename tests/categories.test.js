@@ -1,5 +1,5 @@
 // src/categories.js is the admin categories layer: category CRUD (with lazy default seed),
-// an admin-chosen single-letter prefix per category (NOT unique — two categories may share a
+// an admin-chosen 1-3 letter prefix per category (NOT unique — two categories may share a
 // letter and therefore a running sequence), letter changes with optional product-code renaming,
 // and the <LETTER><NNN> next-product-code generator that scans the products collection.
 
@@ -62,8 +62,14 @@ describe("normalizeLetter", () => {
     expect(normalizeLetter("Z")).toBe("Z");
   });
 
-  it("returns null for anything that is not exactly one A-Z letter", () => {
-    expect(normalizeLetter("AB")).toBeNull();
+  it("uppercases and trims 2-3 letter prefixes", () => {
+    expect(normalizeLetter("ab")).toBe("AB");
+    expect(normalizeLetter(" abc ")).toBe("ABC");
+  });
+
+  it("returns null for anything that is not 1-3 A-Z letters", () => {
+    expect(normalizeLetter("ABCD")).toBeNull();
+    expect(normalizeLetter("A1")).toBeNull();
     expect(normalizeLetter("1")).toBeNull();
     expect(normalizeLetter("")).toBeNull();
     expect(normalizeLetter(undefined)).toBeNull();
@@ -88,9 +94,9 @@ describe("getCategories", () => {
     expect(seededKeys).toEqual(expectedKeys);
   });
 
-  it("seeds every default with a single-letter prefix", async () => {
+  it("seeds every default with a 1-3 letter prefix", async () => {
     const result = await getCategories();
-    for (const category of result) expect(category.letter).toMatch(/^[A-Z]$/);
+    for (const category of result) expect(category.letter).toMatch(/^[A-Z]{1,3}$/);
   });
 
   it("does not reseed when categories already exist", async () => {
@@ -140,6 +146,17 @@ describe("addCategory", () => {
     expect(result.success).toBe(true);
     expect(result.category).toMatchObject({ key: "geodes", title: "Geodes", letter: "G" });
     expect(readCollection(CATEGORIES)).toHaveLength(2);
+  });
+
+  it("uppercases a 2-3 letter prefix", async () => {
+    seedCollection(CATEGORIES, [{ key: "acorns", title: "Acorns", letter: "A" }]);
+    const result = await addCategory({ title: "Trinkets", letter: "ab" });
+    expect(result.success).toBe(true);
+    expect(result.category.letter).toBe("AB");
+
+    const result2 = await addCategory({ title: "Charms", letter: "aBc" });
+    expect(result2.success).toBe(true);
+    expect(result2.category.letter).toBe("ABC");
   });
 
   it("accepts arbitrary alphanumeric titles", async () => {
@@ -193,8 +210,8 @@ describe("addCategory", () => {
     expect(result).toEqual({ success: false, message: "Category already exists" });
   });
 
-  it("rejects a letter that isn't a single A-Z character", async () => {
-    expect((await addCategory({ title: "Geodes", letter: "AB" })).success).toBe(false);
+  it("rejects a letter that isn't 1-3 A-Z characters", async () => {
+    expect((await addCategory({ title: "Geodes", letter: "ABCD" })).success).toBe(false);
     expect((await addCategory({ title: "Baskets", letter: "1" })).success).toBe(false);
     expect((await addCategory({ title: "Other Stuff", letter: "" })).success).toBe(false);
     expect((await addCategory({ title: "No Letter" })).success).toBe(false);
@@ -238,6 +255,39 @@ describe("updateCategoryLetter", () => {
     expect(products[2].productCode).toBe("CUSTOM-7");
     expect(products[3].productCode).toBe("A002");
     expect(products[4].productCode).toBeUndefined();
+  });
+
+  it("renumbers to a 2-character letter", async () => {
+    seedCollection(CATEGORIES, [{ key: "acorns", title: "Acorns", letter: "A" }]);
+    seedCollection(PRODUCTS, [
+      buildProductDoc({ productId: "prod-1", productType: "acorns", productCode: "A001" }),
+      buildProductDoc({ productId: "prod-2", productType: "acorns", productCode: "A002" }),
+    ]);
+
+    const result = await updateCategoryLetter({ key: "acorns", letter: "AB", renumber: true });
+
+    expect(result).toEqual({ success: true, message: "Letter changed to AB; 2 product codes renamed", letter: "AB", renamedCount: 2 });
+    const products = readCollection(PRODUCTS);
+    expect(products[0].productCode).toBe("AB001");
+    expect(products[1].productCode).toBe("AB002");
+  });
+
+  it("renames only the matching 2-character prefix, not a shorter prefix that's a substring", async () => {
+    seedCollection(CATEGORIES, [
+      { key: "acorns", title: "Acorns", letter: "AB" },
+      { key: "animals", title: "Animals", letter: "A" },
+    ]);
+    seedCollection(PRODUCTS, [
+      buildProductDoc({ productId: "prod-1", productType: "acorns", productCode: "AB001" }),
+      buildProductDoc({ productId: "prod-2", productType: "animals", productCode: "A001" }),
+    ]);
+
+    const result = await updateCategoryLetter({ key: "acorns", letter: "C", renumber: true });
+
+    expect(result).toEqual({ success: true, message: "Letter changed to C; 1 product code renamed", letter: "C", renamedCount: 1 });
+    const products = readCollection(PRODUCTS);
+    expect(products[0].productCode).toBe("C001");
+    expect(products[1].productCode).toBe("A001");
   });
 
   it("avoids product code collisions across categories when renumbering", async () => {
@@ -313,7 +363,7 @@ describe("updateCategoryLetter", () => {
   it("rejects a missing key or an invalid letter", async () => {
     seedCollection(CATEGORIES, [{ key: "acorns", title: "Acorns", letter: "A" }]);
     expect((await updateCategoryLetter({ letter: "B" })).success).toBe(false);
-    expect((await updateCategoryLetter({ key: "acorns", letter: "BB" })).success).toBe(false);
+    expect((await updateCategoryLetter({ key: "acorns", letter: "BBBB" })).success).toBe(false);
     expect((await updateCategoryLetter({ key: "acorns", letter: "" })).success).toBe(false);
     expect(readCollection(CATEGORIES)[0].letter).toBe("A");
   });
@@ -428,6 +478,20 @@ describe("buildNextProductCode", () => {
     expect(await buildNextProductCode("acorns")).toBe("A008");
   });
 
+  it("returns <LETTER>001 for a 2-3 letter prefix when no product uses it yet", async () => {
+    seedCollection(CATEGORIES, [{ key: "acorns", title: "Acorns", letter: "AB" }]);
+    expect(await buildNextProductCode("acorns")).toBe("AB001");
+  });
+
+  it("returns the next number for a 2-3 letter prefix, matching case-insensitively", async () => {
+    seedCollection(CATEGORIES, [{ key: "acorns", title: "Acorns", letter: "AB" }]);
+    seedCollection(PRODUCTS, [
+      buildProductDoc({ productId: "prod-1", productCode: "AB001" }),
+      buildProductDoc({ productId: "prod-2", productCode: "ab007" }),
+    ]);
+    expect(await buildNextProductCode("acorns")).toBe("AB008");
+  });
+
   it("shares one running sequence between categories with the same letter", async () => {
     seedCollection(CATEGORIES, [
       { key: "acorns", title: "Acorns", letter: "A" },
@@ -447,6 +511,12 @@ describe("buildNextProductCode", () => {
       buildProductDoc({ productId: "prod-2", productCode: "B003" }),
       buildProductDoc({ productId: "prod-3", productCode: undefined }),
     ]);
+    expect(await buildNextProductCode("acorns")).toBe("A001");
+  });
+
+  it("does not let a single-letter prefix match a longer prefix's codes", async () => {
+    seedCollection(CATEGORIES, [{ key: "acorns", title: "Acorns", letter: "A" }]);
+    seedCollection(PRODUCTS, [buildProductDoc({ productId: "prod-1", productCode: "AB001" })]);
     expect(await buildNextProductCode("acorns")).toBe("A001");
   });
 

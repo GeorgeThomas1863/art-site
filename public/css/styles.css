@@ -227,6 +227,7 @@ h3 {
   /* background-size: 100% 100%;  */
   background-repeat: no-repeat;
   flex: 1;
+  touch-action: manipulation;
 }
 
 .image-crossfade-layer {
@@ -735,6 +736,7 @@ h3 {
   position: relative;
   overflow: hidden;
   cursor: grab;
+  touch-action: manipulation;
   user-select: none;
   border-bottom: 1px solid #e0e0e0;
 }
@@ -772,6 +774,7 @@ h3 {
   background-color: #ccc;
   border: none;
   cursor: pointer;
+  touch-action: manipulation;
   padding: 0;
   transition: background-color 0.2s;
 }
@@ -795,6 +798,7 @@ h3 {
   height: 50px;
   border-radius: 50%;
   cursor: pointer;
+  touch-action: manipulation;
   display: flex;
   align-items: center;
   justify-content: center;

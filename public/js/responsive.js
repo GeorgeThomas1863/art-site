@@ -186,6 +186,7 @@ export const keyHandler = async (e) => {
 
   // Enter in a category name field: blur so the change event saves it (preventDefault above stops the native one)
   if (keyElement.getAttribute("data-label") === "category-title-input") keyElement.blur();
+  if (keyElement.getAttribute("data-label") === "category-letter-select") keyElement.blur();
 
   return true;
 };

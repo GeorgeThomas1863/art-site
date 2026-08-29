@@ -81,11 +81,24 @@ describe("storeProduct", () => {
     expect(result.productCode).toBe("A001");
   });
 
+  it("auto-assigns the next productCode with multi-letter prefix when productCode is blank", async () => {
+    seedCollection(CATEGORIES, [{ key: "special", title: "Special Items", letter: "AB" }]);
+    const result = await storeProduct({ name: "Special Item", productType: "special" });
+    expect(result.productCode).toBe("AB001");
+  });
+
   it("continues the sequence when auto-assigning against existing productCodes", async () => {
     seedCollection(CATEGORIES, [{ key: "acorns", title: "Acorns", letter: "A" }]);
     seedCollection(PRODUCTS, [buildProductDoc({ productId: "prod-1", productCode: "A004" })]);
     const result = await storeProduct({ name: "Acorn Necklace", productType: "acorns" });
     expect(result.productCode).toBe("A005");
+  });
+
+  it("continues the sequence with multi-letter prefix when auto-assigning against existing productCodes", async () => {
+    seedCollection(CATEGORIES, [{ key: "special", title: "Special Items", letter: "AB" }]);
+    seedCollection(PRODUCTS, [buildProductDoc({ productId: "prod-1", productCode: "AB004" })]);
+    const result = await storeProduct({ name: "Special Item", productType: "special" });
+    expect(result.productCode).toBe("AB005");
   });
 
   it("leaves productCode blank when the productType's category is unknown", async () => {
@@ -96,6 +109,11 @@ describe("storeProduct", () => {
   it("uppercases and trims a supplied productCode instead of generating one", async () => {
     const result = await storeProduct({ name: "Acorn Necklace", productCode: "  a1  " });
     expect(result.productCode).toBe("A1");
+  });
+
+  it("uppercases and trims a multi-letter supplied productCode instead of generating one", async () => {
+    const result = await storeProduct({ name: "Special Item", productCode: "  abc001  " });
+    expect(result.productCode).toBe("ABC001");
   });
 });
 
@@ -155,6 +173,13 @@ describe("updateProduct", () => {
     const result = await updateProduct({ productId: "prod-1", productCode: "  b2  " });
     expect(result.productCode).toBe("B2");
     expect(readCollection(PRODUCTS)[0].productCode).toBe("B2");
+  });
+
+  it("uppercases and trims a multi-letter supplied productCode on update", async () => {
+    seedCollection(PRODUCTS, [buildProductDoc({ productId: "prod-1" })]);
+    const result = await updateProduct({ productId: "prod-1", productCode: "ab12" });
+    expect(result.productCode).toBe("AB12");
+    expect(readCollection(PRODUCTS)[0].productCode).toBe("AB12");
   });
 
   it("never auto-generates an productCode on update, even when it normalizes to blank", async () => {

@@ -267,6 +267,15 @@ describe("addCategoryControl", () => {
     expect(readCollection(CATEGORIES)).toHaveLength(DEFAULT_CATEGORIES.length + 1);
   });
 
+  it("accepts a 3-letter letter", async () => {
+    const res = buildRes();
+    await addCategoryControl(buildReq({ body: { title: "Gemstones", letter: "GEM" } }), res);
+    expect(res.json).toHaveBeenCalledWith(expect.objectContaining({
+      success: true,
+      category: expect.objectContaining({ key: "gemstones", title: "Gemstones", letter: "GEM" }),
+    }));
+  });
+
   it("accepts a letter that another category already uses", async () => {
     const res = buildRes();
     await addCategoryControl(buildReq({ body: { title: "Geckos", letter: "G" } }), res);
@@ -280,7 +289,7 @@ describe("addCategoryControl", () => {
   it("rejects a missing letter", async () => {
     const res = buildRes();
     await addCategoryControl(buildReq({ body: { title: "Gems" } }), res);
-    expect(res.json).toHaveBeenCalledWith({ success: false, message: "Letter must be a single letter A-Z" });
+    expect(res.json).toHaveBeenCalledWith({ success: false, message: "Letter must be 1-3 letters A-Z" });
   });
 
   it("responds 500 when no input parameters are provided", async () => {

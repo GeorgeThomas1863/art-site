@@ -2,7 +2,7 @@ import dbModel from "../models/db-model.js";
 
 const CATEGORIES_COLLECTION = () => process.env.CATEGORIES_COLLECTION || "categories";
 
-// A category is any title the admin chose plus a single admin-chosen letter that prefixes
+// A category is any title the admin chose plus a 1-3 letter admin-chosen prefix that prefixes
 // auto-assigned product codes. Letters are NOT unique across categories — two categories may share
 // one (and therefore share a running number sequence). `key` is the camelCase productType.
 export const DEFAULT_CATEGORIES = [
@@ -43,7 +43,7 @@ export const buildCategoryKey = (title) => {
 
 export const normalizeLetter = (letter) => {
   const upperLetter = String(letter ?? "").trim().toUpperCase();
-  if (!/^[A-Z]$/.test(upperLetter)) return null;
+  if (!/^[A-Z]{1,3}$/.test(upperLetter)) return null;
 
   return upperLetter;
 };
@@ -134,7 +134,7 @@ export const addCategory = async (inputParams) => {
     if (key === "all") return { success: false, message: 'Category name "all" is reserved' };
 
     const upperLetter = normalizeLetter(letter);
-    if (!upperLetter) return { success: false, message: "Letter must be a single letter A-Z" };
+    if (!upperLetter) return { success: false, message: "Letter must be 1-3 letters A-Z" };
 
     const categories = await getCategories();
     if (!categories) return { success: false, message: "Failed to load categories" };
@@ -193,7 +193,7 @@ export const updateCategoryLetter = async (inputParams) => {
     if (!key) return { success: false, message: "No category key provided" };
 
     const newLetter = normalizeLetter(letter);
-    if (!newLetter) return { success: false, message: "Letter must be a single letter A-Z" };
+    if (!newLetter) return { success: false, message: "Letter must be 1-3 letters A-Z" };
 
     const lookupParams = { keyToLookup: "key", itemValue: key };
     const checkModel = new dbModel(lookupParams, CATEGORIES_COLLECTION());

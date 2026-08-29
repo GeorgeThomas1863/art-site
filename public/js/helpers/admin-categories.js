@@ -1,6 +1,6 @@
 import { sendToBack } from "../util/api-front.js";
 import { displayPopup, displayConfirmDialog } from "../util/popup.js";
-import { buildLetterSelect } from "../forms/admin-form.js";
+import { buildLetterInput } from "../forms/admin-form.js";
 
 // Last auto-assigned id per modal mode, so a saved id loaded into the edit
 // form is never mistaken for one this page generated (add and edit are separate).
@@ -67,14 +67,14 @@ const buildCategoryItem = (category) => {
   const categoryItem = document.createElement("div");
   categoryItem.className = "category-item";
 
-  const letterSelect = buildLetterSelect(`category-letter-${category.key}`, category.letter);
-  letterSelect.classList.add("category-letter-select");
-  letterSelect.title = "Product Code prefix — change it to re-letter this category";
-  letterSelect.setAttribute("data-label", "category-letter-select");
-  letterSelect.setAttribute("data-key", category.key);
-  letterSelect.setAttribute("data-title", category.title);
-  letterSelect.setAttribute("data-count", count);
-  letterSelect.setAttribute("data-letter", category.letter || "");
+  const letterInput = buildLetterInput(`category-letter-${category.key}`, category.letter);
+  letterInput.classList.add("category-letter-select");
+  letterInput.title = "Product Code prefix — change it to re-letter this category";
+  letterInput.setAttribute("data-label", "category-letter-select");
+  letterInput.setAttribute("data-key", category.key);
+  letterInput.setAttribute("data-title", category.title);
+  letterInput.setAttribute("data-count", count);
+  letterInput.setAttribute("data-letter", category.letter || "");
 
   const titleInput = document.createElement("input");
   titleInput.className = "form-input category-title-input";
@@ -101,7 +101,7 @@ const buildCategoryItem = (category) => {
   deleteButton.setAttribute("data-title", category.title);
   deleteButton.setAttribute("data-count", count);
 
-  categoryItem.append(titleInput, letterSelect, countSpan, deleteButton);
+  categoryItem.append(titleInput, letterInput, countSpan, deleteButton);
   return categoryItem;
 };
 
@@ -197,17 +197,32 @@ export const confirmProductCodeUnique = async (mode, productId) => {
 //++++++++++++++++++++++++++++++++++
 //ADD / RENAME / CHANGE LETTER / DELETE CATEGORY (wired to responsive.js click + change handlers)
 
-export const runAddCategory = async () => {
-  const titleInput = document.getElementById("new-category-title");
-  const letterSelect = document.getElementById("new-category-letter");
-  if (!titleInput || !letterSelect) return null;
-
-  const title = titleInput.value.trim();
-  const letter = letterSelect.value;
-  if (!title || !letter) {
-    await displayPopup("Please enter a category name and pick a letter", "error");
+// Trims/uppercases a typed prefix and checks it against the backend rule (1-3 letters A-Z);
+// shows the same error the backend would return and yields null so callers can bail out.
+const normalizeCategoryLetter = async (rawLetter) => {
+  const letter = (rawLetter || "").trim().toUpperCase();
+  if (!/^[A-Z]{1,3}$/.test(letter)) {
+    await displayPopup("Letter must be 1-3 letters A-Z", "error");
     return null;
   }
+
+  return letter;
+};
+
+export const runAddCategory = async () => {
+  const titleInput = document.getElementById("new-category-title");
+  const letterInput = document.getElementById("new-category-letter");
+  if (!titleInput || !letterInput) return null;
+
+  const title = titleInput.value.trim();
+  if (!title) {
+    await displayPopup("Please enter a category name and a letter", "error");
+    return null;
+  }
+
+  const letter = await normalizeCategoryLetter(letterInput.value);
+  if (!letter) return null;
+  letterInput.value = letter;
 
   const data = await sendToBack({ route: "/add-category-route", title, letter });
   if (!data || !data.success) {
@@ -256,22 +271,30 @@ export const runRenameCategory = async (inputElement) => {
 
 // The letter change itself always saves; the popup only decides whether the
 // category's existing <OLD>### product codes are renamed to <NEW>### as well.
-export const runChangeCategoryLetter = async (selectElement) => {
-  if (!selectElement) return null;
+export const runChangeCategoryLetter = async (inputElement) => {
+  if (!inputElement) return null;
 
-  const key = selectElement.getAttribute("data-key");
-  const title = selectElement.getAttribute("data-title");
-  const count = Number(selectElement.getAttribute("data-count")) || 0;
-  const oldLetter = selectElement.getAttribute("data-letter");
-  const newLetter = selectElement.value;
-  if (!key || !newLetter || newLetter === oldLetter) return null;
+  const key = inputElement.getAttribute("data-key");
+  const title = inputElement.getAttribute("data-title");
+  const count = Number(inputElement.getAttribute("data-count")) || 0;
+  const oldLetter = inputElement.getAttribute("data-letter");
+  if (!key) return null;
+
+  const newLetter = await normalizeCategoryLetter(inputElement.value);
+  if (!newLetter) {
+    inputElement.value = oldLetter;
+    return null;
+  }
+
+  inputElement.value = newLetter;
+  if (newLetter === oldLetter) return null;
 
   const renumber = await confirmRenameProductCodes(title, count, oldLetter, newLetter);
 
   const data = await sendToBack({ route: "/update-category-letter-route", key, letter: newLetter, renumber });
   if (!data || !data.success) {
     await displayPopup(data?.message || "Failed to change category letter", "error");
-    if (oldLetter) selectElement.value = oldLetter;
+    if (oldLetter) inputElement.value = oldLetter;
     return null;
   }
 

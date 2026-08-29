@@ -748,6 +748,17 @@
     min-height: 200px;
   }
 
+  /* Carousel (shared: products + events) */
+  .carousel-arrow {
+    width: 64px;
+    height: 64px;
+  }
+
+  .carousel-arrow svg {
+    width: 38px;
+    height: 38px;
+  }
+
   /* Products */
   .products-container {
     padding: 1rem;
