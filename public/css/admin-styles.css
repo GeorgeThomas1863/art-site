@@ -1584,16 +1584,37 @@
 
 .cta-resize-handle {
   position: absolute;
-  right: -8px;
-  bottom: -8px;
   width: 18px;
   height: 18px;
   padding: 0;
   border: 2px solid #333;
   border-radius: 50%;
   background: #ffffff;
-  cursor: nwse-resize;
   touch-action: none;
+}
+
+.cta-resize-handle[data-corner="nw"] {
+  top: -8px;
+  left: -8px;
+  cursor: nwse-resize;
+}
+
+.cta-resize-handle[data-corner="ne"] {
+  top: -8px;
+  right: -8px;
+  cursor: nesw-resize;
+}
+
+.cta-resize-handle[data-corner="sw"] {
+  bottom: -8px;
+  left: -8px;
+  cursor: nesw-resize;
+}
+
+.cta-resize-handle[data-corner="se"] {
+  right: -8px;
+  bottom: -8px;
+  cursor: nwse-resize;
 }
 
 .cta-resize-handle:hover,
@@ -1674,6 +1695,12 @@
   background: #1a1a1a;
   overflow: hidden;
   position: relative;
+}
+
+/* Cropper mounts inside this frame; the 24px gap keeps the bottom crop handles
+   (which hang 21px below the crop box) clear of the modal footer's hit area */
+.image-editor-canvas-frame {
+  height: calc(100% - 24px);
 }
 
 .image-editor-canvas-area img {

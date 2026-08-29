@@ -1,4 +1,5 @@
 import { buildCollapseContainer } from "../util/collapse.js";
+import { isCanonicalDateString } from "../helpers/events-date.js";
 import { buildCarouselElement } from "./products-form.js";
 
 // Build the events page
@@ -9,9 +10,10 @@ export const buildEventsForm = async () => {
 
   const eventsHeader = await buildEventsHeader();
   const eventsGrid = await buildEventsGrid();
+  const oldEventsSection = await buildOldEventsSection();
   const newsletterSection = await buildEventsNewsletterSection();
 
-  eventsContainer.append(eventsHeader, eventsGrid, newsletterSection);
+  eventsContainer.append(eventsHeader, eventsGrid, oldEventsSection, newsletterSection);
 
   return eventsContainer;
 };
@@ -37,6 +39,22 @@ export const buildEventsGrid = async () => {
   eventsGrid.className = "events-grid";
 
   return eventsGrid;
+};
+
+export const buildOldEventsSection = async () => {
+  const oldEventsTitle = document.createElement("h2");
+  oldEventsTitle.className = "events-page-title";
+  oldEventsTitle.textContent = "Old Events";
+
+  const oldEventsGrid = document.createElement("div");
+  oldEventsGrid.id = "old-events-grid";
+  oldEventsGrid.className = "events-grid";
+
+  return buildCollapseContainer({
+    titleElement: oldEventsTitle,
+    contentElement: oldEventsGrid,
+    className: "old-events-section",
+  });
 };
 
 // Build individual event card
@@ -81,20 +99,22 @@ export const buildEventImage = async (eventData) => {
 export const buildEventContent = async (eventData) => {
   if (!eventData) return null;
   const { name, eventDate, eventLocation, eventDescription } = eventData;
+  const normalizedEventDate = typeof eventDate === "string" ? eventDate : "";
 
   const eventContentContainer = document.createElement("div");
   eventContentContainer.className = "event-content";
 
   const eventDateElement = document.createElement("div");
   eventDateElement.className = "event-date";
-  const [year, month, day] = eventDate.split('-').map(Number);
-  const dateObj = new Date(year, month - 1, day);
-  const formatted = dateObj.toLocaleDateString('en-US', {
+  const dateParts = normalizedEventDate.split('-');
+  const dateObj = new Date(Number(dateParts[0]), Number(dateParts[1]) - 1, Number(dateParts[2]));
+  dateObj.setFullYear(Number(dateParts[0])); // the Date constructor maps years 0-99 to 1900-1999
+  const formatted = isCanonicalDateString(normalizedEventDate) ? dateObj.toLocaleDateString('en-US', {
     weekday: 'long',
     year: 'numeric',
     month: 'long',
     day: 'numeric',
-  });
+  }) : "Date unavailable";
   eventDateElement.textContent = `📅 ${formatted}`;
 
   const eventTitleElement = document.createElement("div");

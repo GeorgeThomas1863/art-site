@@ -5,6 +5,8 @@ import { displayPopup, displayConfirmDialog } from "../util/popup.js";
 import { buildPicSlot } from "../forms/admin-form.js";
 import { confirmProductCodeUnique, resetAutoProductCode } from "./admin-categories.js";
 
+let adminProductCache = [];
+
 //Add product
 export const runAddNewProduct = async () => {
   const newProductParams = await buildNewProductParams();
@@ -117,11 +119,14 @@ export const runEditProduct = async () => {
     await populateAdminProductSelector(productData);
     await updateProductStats(productData);
 
+    // A type change can move the product outside the active filter; retarget the filter so it stays selectable
+    if (!findSelectorOption(productSelector, productId)) syncProductFilterToEdited(productId);
+
     // Re-select the product that was just updated so user can see the changes
     productSelector.value = productId;
 
     // Re-populate the form with the updated data
-    const updatedOption = productSelector.options[productSelector.selectedIndex];
+    const updatedOption = findSelectorOption(productSelector, productId);
     if (updatedOption && updatedOption.productData) {
       await populateEditFormProducts(updatedOption.productData);
     }
@@ -220,23 +225,10 @@ export const changeAdminProductSelector = async (changeElement) => {
   if (!changeElement) return null;
 
   await clearAdminEditFields();
-
-  // Reset product image slots to a single disabled empty slot
-  const container = document.querySelector(".pic-slots-container");
-  if (container) {
-    container.innerHTML = "";
-    const emptySlot = buildPicSlot(0);
-    const slotUploadBtn = emptySlot.querySelector(".upload-btn");
-    const slotFileInput = emptySlot.querySelector(".pic-file-input");
-    if (slotUploadBtn) slotUploadBtn.disabled = true;
-    if (slotFileInput) slotFileInput.disabled = true;
-    container.append(emptySlot);
-  }
-  const addBtn = document.querySelector("[data-label='add-pic-slot']");
-  if (addBtn) addBtn.disabled = true;
+  resetAdminPicSlots();
 
   const selectedOption = changeElement.options[changeElement.selectedIndex];
-  if (!selectedOption.value) {
+  if (!selectedOption || !selectedOption.value) {
     // User selected the default "-- Select a product --" option
     await disableAdminEditFields();
     return null;
@@ -251,14 +243,64 @@ export const changeAdminProductSelector = async (changeElement) => {
   await populateEditFormProducts(productObj);
 };
 
+export const changeAdminProductFilter = async (changeElement) => {
+  if (!changeElement) return null;
+
+  const matchingProducts = getProductsByType(adminProductCache, changeElement.value);
+  const rendered = renderAdminProductSelector(matchingProducts);
+  if (!rendered) return null;
+
+  // The rerender deselects any product, so the edit form must return to its placeholder state
+  await clearAdminEditFields();
+  resetAdminPicSlots();
+  await disableAdminEditFields();
+  return rendered;
+};
+
+// Reset product image slots to a single disabled empty slot
+const resetAdminPicSlots = () => {
+  const container = document.querySelector(".pic-slots-container");
+  if (container) {
+    container.innerHTML = "";
+    const emptySlot = buildPicSlot(0);
+    const slotUploadBtn = emptySlot.querySelector(".upload-btn");
+    const slotFileInput = emptySlot.querySelector(".pic-file-input");
+    if (slotUploadBtn) slotUploadBtn.disabled = true;
+    if (slotFileInput) slotFileInput.disabled = true;
+    container.append(emptySlot);
+  }
+
+  const addBtn = document.querySelector("[data-label='add-pic-slot']");
+  if (addBtn) addBtn.disabled = true;
+};
+
 //+++++++++++++++++++++++++++++++++++++++++++++++
 
 //DATA
 export const populateAdminProductSelector = async (inputArray) => {
-  if (!inputArray || !inputArray.length) return null;
+  if (!Array.isArray(inputArray)) return null;
+
+  adminProductCache = inputArray;
+  const productFilter = document.getElementById("edit-product-filter");
+  const matchingProducts = getProductsByType(inputArray, productFilter?.value || "All");
+  return renderAdminProductSelector(matchingProducts);
+};
+
+const getProductsByType = (products, productType) => {
+  if (productType === "All") return products;
+
+  const matchingProducts = [];
+  for (let i = 0; i < products.length; i++) {
+    if (products[i].productType === productType) matchingProducts.push(products[i]);
+  }
+
+  return matchingProducts;
+};
+
+const renderAdminProductSelector = (inputArray) => {
 
   const productSelector = document.getElementById("product-selector");
-  if (!productSelector) return;
+  if (!productSelector) return null;
 
   // Clear existing options except the default one
   const defaultOption = productSelector.querySelector("option[disabled]");
@@ -267,8 +309,11 @@ export const populateAdminProductSelector = async (inputArray) => {
     productSelector.append(defaultOption);
   }
 
+  productSelector.value = "";
+
   // Sort: letter-prefix productCodes first (A→Z), then numeric-only productCodes (low→high), then no productCode (alpha by name)
-  inputArray.sort((a, b) => {
+  const sortedProducts = [...inputArray];
+  sortedProducts.sort((a, b) => {
     const aHasId = a.productCode != null && String(a.productCode).trim() !== "";
     const bHasId = b.productCode != null && String(b.productCode).trim() !== "";
     if (aHasId && bHasId) {
@@ -286,8 +331,8 @@ export const populateAdminProductSelector = async (inputArray) => {
   });
 
   // Add all products as options
-  for (let i = 0; i < inputArray.length; i++) {
-    const product = inputArray[i];
+  for (let i = 0; i < sortedProducts.length; i++) {
+    const product = sortedProducts[i];
     const option = document.createElement("option");
     option.value = product.productId;
     const hasId = product.productCode != null && String(product.productCode).trim() !== "";
@@ -299,6 +344,37 @@ export const populateAdminProductSelector = async (inputArray) => {
   }
 
   return true;
+};
+
+const findSelectorOption = (productSelector, productId) => {
+  if (!productSelector) return null;
+
+  for (let i = 0; i < productSelector.options.length; i++) {
+    if (String(productSelector.options[i].value) === String(productId)) return productSelector.options[i];
+  }
+
+  return null;
+};
+
+const syncProductFilterToEdited = (productId) => {
+  const productFilter = document.getElementById("edit-product-filter");
+  if (!productFilter) return null;
+
+  const editedProduct = findCachedProduct(productId);
+  if (!editedProduct) return null;
+
+  const targetType = editedProduct.productType || "All";
+  productFilter.value = targetType;
+  if (productFilter.value !== targetType) productFilter.value = "All"; // the type key is missing from the filter options
+  return renderAdminProductSelector(getProductsByType(adminProductCache, productFilter.value));
+};
+
+const findCachedProduct = (productId) => {
+  for (let i = 0; i < adminProductCache.length; i++) {
+    if (String(adminProductCache[i].productId) === String(productId)) return adminProductCache[i];
+  }
+
+  return null;
 };
 
 export const populateEditFormProducts = async (inputObj) => {

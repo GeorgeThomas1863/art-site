@@ -402,7 +402,6 @@ describe("sendTestNewsletter", () => {
 
 describe("announceProduct", () => {
   const product = { name: "Art <One>", price: "12.5", description: "Line 1\nLine 2", urlName: "art-one", picData: [{ filename: "art.jpg" }] };
-  const whyLine = "You're receiving this because you subscribed to the Two Sisters Fiber Art newsletter, which makes you among the very first to see each new creation.";
 
   it("uses the default intro in HTML and text", async () => {
     seedCollection(SUBSCRIBERS, [{ email: "one@example.test" }, { email: "two@example.test" }]);
@@ -422,25 +421,25 @@ describe("announceProduct", () => {
     expect(html).toContain("background:#ffffff");
     expect(html).toContain("border:1px solid #333333");
     expect(html).toContain('style="width:100%; max-width:100%; height:auto; display:block;" width="600"');
-    expect(html).toContain("New creation, now available");
-    expect(html).toContain(whyLine);
+    expect(html).toContain("New Creation! Now Available on our Website!");
+    expect(html).not.toContain("You're receiving this because");
     expect(html).toContain(">View Now</a>");
-    expect(params.get("text")).toBe(`New creation, now available\n${whyLine}\nArt <One>\n$12.50\nLine 1\nLine 2\nhttp://localhost:0/products/art-one`);
+    expect(params.get("text")).toBe(`New Creation! Now Available on our Website!\nArt <One>\n$12.50\nLine 1\nLine 2\nhttp://localhost:0/products/art-one`);
     expect(params.getAll("bcc")[0]).toContain("one@example.test, two@example.test");
     expect(readCollection(NEWSLETTERS)).toHaveLength(1);
   });
 
-  it("uses and HTML-escapes a custom intro while preserving the why-line and button", async () => {
+  it("uses and HTML-escapes a custom intro while preserving the button", async () => {
     seedCollection(SUBSCRIBERS, [{ email: "one@example.test" }]);
     axios.post.mockResolvedValue(okMailResponse);
     await announceProduct(product, "  Fresh <fiber  ");
     const { params } = lastPostCall();
     const html = params.get("html");
     expect(html).toContain("Fresh &lt;fiber");
-    expect(html).not.toContain("New creation, now available");
-    expect(html).toContain(whyLine);
+    expect(html).not.toContain("New Creation! Now Available on our Website!");
+    expect(html).not.toContain("You're receiving this because");
     expect(html).toContain(">View Now</a>");
-    expect(params.get("text")).toContain(`Fresh <fiber\n${whyLine}`);
+    expect(params.get("text")).toContain("Fresh <fiber\nArt <One>");
   });
 
   it("falls back to the default intro for whitespace", async () => {
@@ -448,8 +447,8 @@ describe("announceProduct", () => {
     axios.post.mockResolvedValue(okMailResponse);
     await announceProduct(product, "   \t  ");
     const { params } = lastPostCall();
-    expect(params.get("html")).toContain("New creation, now available");
-    expect(params.get("text")).toContain(`New creation, now available\n${whyLine}`);
+    expect(params.get("html")).toContain("New Creation! Now Available on our Website!");
+    expect(params.get("text")).toContain("New Creation! Now Available on our Website!\nArt <One>");
   });
 
   it("ignores button overrides and omits video images", async () => {

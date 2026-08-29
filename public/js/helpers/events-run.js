@@ -1,4 +1,5 @@
 import { buildEventCard } from "../forms/events-form.js";
+import { splitEventsByDate } from "./events-date.js";
 import { sendToBack } from "../util/api-front.js";
 import { displayPopup } from "../util/popup.js";
 
@@ -6,26 +7,36 @@ import { displayPopup } from "../util/popup.js";
 export const populateEvents = async (inputArray) => {
   if (!inputArray || !inputArray.length) return null;
 
-  inputArray.sort((a, b) => a.eventDate.localeCompare(b.eventDate));
-
   const eventsGrid = document.getElementById("events-grid");
-
-  if (!eventsGrid) {
-    console.error("Events grid not found");
+  const oldEventsGrid = document.getElementById("old-events-grid");
+  if (!eventsGrid || !oldEventsGrid) {
+    console.error("Events grids not found");
     return;
   }
 
-  // Clear existing events
+  const todayString = buildLocalDateString(new Date());
+  const { upcomingEvents, oldEvents } = splitEventsByDate(inputArray, todayString);
+
+  await populateEventsGrid(eventsGrid, upcomingEvents);
+  await populateEventsGrid(oldEventsGrid, oldEvents);
+  return true;
+};
+
+const populateEventsGrid = async (eventsGrid, events) => {
   eventsGrid.innerHTML = "";
 
-  // Build and append each event card
-  for (let i = 0; i < inputArray.length; i++) {
-    const event = inputArray[i];
+  for (const event of events) {
     const eventCard = await buildEventCard(event);
+    if (!eventCard) continue;
     eventsGrid.append(eventCard);
   }
+};
 
-  return true;
+const buildLocalDateString = (date) => {
+  const year = String(date.getFullYear()).padStart(4, "0");
+  const month = String(date.getMonth() + 1).padStart(2, "0");
+  const day = String(date.getDate()).padStart(2, "0");
+  return `${year}-${month}-${day}`;
 };
 
 //-----------------

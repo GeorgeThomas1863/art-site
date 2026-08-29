@@ -6,8 +6,7 @@ import dbModel from "../models/db-model.js";
 
 const LOG_MODE_MESSAGE = "Email NOT sent: server is running with MAIL_MODE=log (logged to console only)";
 const PRODUCT_EMAIL_BUTTON_TEXT = "View Now";
-const PRODUCT_EMAIL_DEFAULT_INTRO = "New creation, now available";
-const PRODUCT_EMAIL_INTRO_WHY = "You're receiving this because you subscribed to the Two Sisters Fiber Art newsletter, which makes you among the very first to see each new creation.";
+const PRODUCT_EMAIL_DEFAULT_INTRO = "New Creation! Now Available on our Website!";
 
 const buildSendResult = (data, successMessage) => {
   if (data.mode === "log") return { success: true, message: LOG_MODE_MESSAGE, logMode: true, messageId: data.messageId };
@@ -252,13 +251,13 @@ const buildProductMailParams = (product, introText, productUrl) => {
   const introHtml = buildProductIntroHtml(introText);
   const buttonHtml = buildProductButtonHtml(productUrl);
   const html = `<table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="width:100%; background:#BEE994;"><tr><td align="center" style="padding:24px 12px;"><table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="width:100%; max-width:600px; background:#ffffff; border:2px solid #000000;"><tr><td style="padding:32px;">${introHtml}<h1 style="font-family:Georgia, serif; color:#000000;">${name}</h1>${imageHtml}<p style="font-family:Georgia, serif; color:#000000; font-weight:bold;">${escapeHtml(priceText)}</p><p style="font-family:Georgia, serif; color:#333333; line-height:1.6;">${description}</p>${buttonHtml}</td></tr></table></td></tr></table>`;
-  const text = `${introText}\n${PRODUCT_EMAIL_INTRO_WHY}\n${product.name || ""}\n${priceText}\n${product.description || ""}\n${productUrl}`;
+  const text = `${introText}\n${product.name || ""}\n${priceText}\n${product.description || ""}\n${productUrl}`;
   return { subject: sanitizeEmailHeader(`New Product: ${product.name || ""}`), html, text };
 };
 
 const buildProductIntroHtml = (introText) => {
   const safeIntro = escapeHtml(introText);
-  return `<p style="font-family:Georgia, serif; color:#000000; font-size:16px; margin:0 0 8px;">${safeIntro}</p><p style="font-family:Georgia, serif; color:#333333; font-size:14px; line-height:1.6; margin:0 0 24px;">${PRODUCT_EMAIL_INTRO_WHY}</p>`;
+  return `<p style="font-family:Georgia, serif; color:#000000; font-size:16px; margin:0 0 24px;">${safeIntro}</p>`;
 };
 
 const buildProductButtonHtml = (url) => {

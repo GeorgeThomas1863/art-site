@@ -108,7 +108,7 @@ const buildCategoryItem = (category) => {
 export const populateCategorySelects = async (categoryArray) => {
   if (!categoryArray) return null;
 
-  const selectIds = ["product-type", "edit-product-type"];
+  const selectIds = ["product-type", "edit-product-type", "edit-product-filter"];
   for (let i = 0; i < selectIds.length; i++) {
     const select = document.getElementById(selectIds[i]);
     if (!select) continue;
@@ -116,6 +116,12 @@ export const populateCategorySelects = async (categoryArray) => {
     const currentValue = select.value;
 
     select.innerHTML = "";
+    if (select.id === "edit-product-filter") {
+      const allOption = document.createElement("option");
+      allOption.value = "All";
+      allOption.textContent = "All";
+      select.append(allOption);
+    }
     for (let j = 0; j < categoryArray.length; j++) {
       const category = categoryArray[j];
       const option = document.createElement("option");
@@ -124,7 +130,7 @@ export const populateCategorySelects = async (categoryArray) => {
       select.append(option);
     }
 
-    let stillExists = false;
+    let stillExists = currentValue === "All" && select.id === "edit-product-filter";
     for (let j = 0; j < categoryArray.length; j++) {
       if (categoryArray[j].key === currentValue) {
         stillExists = true;
@@ -134,6 +140,8 @@ export const populateCategorySelects = async (categoryArray) => {
 
     if (stillExists) {
       select.value = currentValue;
+    } else if (select.id === "edit-product-filter") {
+      select.value = "All";
     } else if (select.options.length) {
       select.options[0].selected = true;
     }

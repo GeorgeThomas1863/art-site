@@ -1,5 +1,5 @@
 import { runModalTrigger, runModalClose, runChangeStatusCard, updateAdminStats } from "./helpers/admin-run.js"; //prettier-ignore
-import { runAddNewProduct, runEditProduct, runDeleteProduct, changeAdminProductSelector, runAddPicSlot, runRemovePicSlot } from "./helpers/admin-products.js";
+import { runAddNewProduct, runEditProduct, runDeleteProduct, changeAdminProductSelector, changeAdminProductFilter, runAddPicSlot, runRemovePicSlot } from "./helpers/admin-products.js";
 import { runAddCategory, runDeleteCategory, runRenameCategory, runChangeCategoryLetter, loadCategories, prefillNextProductCode } from "./helpers/admin-categories.js";
 import { runAddNewEvent, runEditEvent, runDeleteEvent, changeAdminEventSelector } from "./helpers/admin-events.js";
 import { runSendNewsletter, runSendTestNewsletter, runAddSubscriber, runRemoveSubscriber, runRefreshSubscriberList, changeAdminNewsletterSelector, runDeleteNewsletter, runUpdateNewsletter, handleQuillImageClick, runNewsletterImageUpload } from "./helpers/admin-newsletter.js";
@@ -17,6 +17,7 @@ import { runToggleMenu } from "./util/collapse.js";
 import { runAuthSubmit, runPwToggle } from "./auth.js";
 import { closePopup, closeConfirmDialog } from "./util/popup.js";
 import debounce from "./util/debounce.js";
+import { rotateMainPic } from "./helpers/rotate-pics.js";
 
 const generateSlug = (name) => {
   return (name || '')
@@ -33,6 +34,8 @@ let swipeHandled = false;
 let mouseStartX = null;
 let mouseDragCarousel = null;
 let recentTouchSwipe = false;
+let mainPicTouchStartX = null;
+let mainPicTouchPanel = null;
 
 const authElement = document.getElementById("auth-element");
 const displayElement = document.getElementById("display-element");
@@ -46,7 +49,11 @@ const aboutElement = document.getElementById("about-element");
 const checkoutElement = document.getElementById("checkout-element");
 
 export const clickHandler = async (e) => {
-  if (swipeHandled) { swipeHandled = false; return; }
+  if (swipeHandled) {
+    swipeHandled = false;
+    e.preventDefault();
+    return;
+  }
   const clickElement = e.target;
   const clickId = clickElement.id;
   const clickType = clickElement.getAttribute("data-label");
@@ -207,6 +214,7 @@ export const changeHandler = async (e) => {
 
   //Product selector
   if (changeId === "product-selector") await changeAdminProductSelector(changeElement);
+  if (changeId === "edit-product-filter") await changeAdminProductFilter(changeElement);
 
   //Product type -> auto-fill next product code
   if (changeId === "product-type") await prefillNextProductCode("add");
@@ -258,6 +266,9 @@ if (authElement) {
 if (displayElement) {
   displayElement.addEventListener("click", clickHandler);
   displayElement.addEventListener("keydown", keyHandler);
+  displayElement.addEventListener("touchstart", mainPicTouchStartHandler, { passive: true });
+  displayElement.addEventListener("touchend", mainPicTouchEndHandler);
+  displayElement.addEventListener("touchcancel", mainPicTouchCancelHandler);
 }
 
 if (adminElement) {
@@ -272,6 +283,32 @@ const touchStartHandler = (e) => {
   if (!e.target.closest(".product-carousel")) return;
   touchStartX = e.changedTouches[0].clientX;
 };
+
+function mainPicTouchStartHandler(e) {
+  const panel = e.target.closest(".split-image-rotating");
+  if (!panel) return;
+
+  mainPicTouchStartX = e.changedTouches[0].clientX;
+  mainPicTouchPanel = panel;
+}
+
+async function mainPicTouchEndHandler(e) {
+  if (mainPicTouchStartX === null || !mainPicTouchPanel) return;
+
+  const deltaX = e.changedTouches[0].clientX - mainPicTouchStartX;
+  const panel = mainPicTouchPanel;
+  mainPicTouchStartX = null;
+  mainPicTouchPanel = null;
+  if (Math.abs(deltaX) < 30) return;
+
+  swipeHandled = true;
+  await rotateMainPic(panel, deltaX < 0 ? "next" : "prev");
+}
+
+function mainPicTouchCancelHandler() {
+  mainPicTouchStartX = null;
+  mainPicTouchPanel = null;
+}
 
 const touchEndHandler = (e) => {
   if (touchStartX === null) return;

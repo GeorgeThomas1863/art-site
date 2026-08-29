@@ -1,4 +1,5 @@
 import { sendToBack } from "../util/api-front.js";
+import { buildProductRotationEntries } from "./product-rotation.js";
 
 // Fallback array of image URLs to rotate through
 const mainPicArray = [
@@ -20,9 +21,14 @@ const aboutPicArray = [
 ];
 
 const aboutStaticPic = "/images/background/selfie1.jpg";
+const MAIN_ROTATION_INTERVAL = 5000;
+const RIGHT_ROTATION_DELAY = 2500;
+const CROSSFADE_DURATION = 1600;
 
 let aboutIndexTop = 0;
 let aboutIndexBottom = 4;
+let mainRotationEntries = [];
+const mainRotationStates = new Map();
 
 // Append a crossfade overlay layer to a rotating element
 const initCrossfadeLayer = (element) => {
@@ -56,7 +62,7 @@ const applyContainMode = (element, enable) => {
 };
 
 // Set background image with crossfade transition
-export const setCurrentPic = async (element, picURL, checkRatio = false) => {
+export const setCurrentPic = async (element, picURL, checkRatio = false, waitForTransition = false) => {
   if (!element) return;
 
   // First call (no layer yet — init was just called): just set directly
@@ -83,7 +89,7 @@ export const setCurrentPic = async (element, picURL, checkRatio = false) => {
   layer.style.opacity = "1";
 
   // After fade completes, promote to parent and reset layer instantly
-  setTimeout(() => {
+  const transitionPromise = new Promise((resolve) => setTimeout(() => {
     element.style.backgroundImage = `url('${picURL}')`;
     applyContainMode(element, isExtreme);
     applyContainMode(layer, false);
@@ -95,11 +101,13 @@ export const setCurrentPic = async (element, picURL, checkRatio = false) => {
         layer.style.transition = "";
       });
     });
-  }, 1600); // slightly longer than the 1.5s CSS transition
+    resolve();
+  }, CROSSFADE_DURATION)); // slightly longer than the 1.5s CSS transition
+  if (waitForTransition) await transitionPromise;
 };
 
-// Returns sorted/shuffled product image URL array, or null on failure/empty
-const getProductImages = async () => {
+// Returns sorted/shuffled product rotation entries, or null on failure/empty
+export const getProductRotationEntries = async () => {
   const productData = await sendToBack({ route: "/get-product-data-route" }, "GET");
   if (!productData || !Array.isArray(productData) || productData.length === 0) return null;
 
@@ -107,8 +115,7 @@ const getProductImages = async () => {
   for (let i = 0; i < productData.length; i++) {
     const p = productData[i];
     if (p.display === "no") continue;
-    const pics = Array.isArray(p.picData) ? p.picData : (p.picData ? [p.picData] : []);
-    if (!pics[0]?.filename) continue;
+    if (buildProductRotationEntries([p]).length === 0) continue;
     filtered.push(p);
   }
   if (filtered.length === 0) return null;
@@ -120,51 +127,97 @@ const getProductImages = async () => {
     const temp = rest[i]; rest[i] = rest[j]; rest[j] = temp;
   }
   const sorted = [filtered[0], ...rest];
-  const urls = [];
-  for (let i = 0; i < sorted.length; i++) {
-    const pics = Array.isArray(sorted[i].picData) ? sorted[i].picData : [sorted[i].picData];
-    urls.push(`/images/products/${pics[0].filename}`);
-  }
-  return urls;
+  return buildProductRotationEntries(sorted);
 };
 
 // Initialize image rotation
 export const startMainPicRotation = async () => {
-  const productImages = await getProductImages();
-  const images = (productImages && productImages.length > 0) ? productImages : mainPicArray;
+  const productEntries = await getProductRotationEntries();
+  mainRotationEntries = productEntries?.length ? productEntries : buildFallbackRotationEntries();
 
   const splitImageLeft = document.getElementById("split-image-left");
   const splitImageRight = document.getElementById("split-image-right");
+  if (!splitImageLeft || !splitImageRight) return;
 
   initCrossfadeLayer(splitImageLeft);
   initCrossfadeLayer(splitImageRight);
 
-  let mainIndexLeft = 0;
-  let mainIndexRight = Math.min(Math.floor(images.length / 2), images.length - 1);
+  const leftState = buildMainRotationState(splitImageLeft, 0);
+  const rightIndex = Math.min(Math.floor(mainRotationEntries.length / 2), mainRotationEntries.length - 1);
+  const rightState = buildMainRotationState(splitImageRight, rightIndex);
 
-  // Set initial image
-  await setCurrentPic(splitImageLeft, images[mainIndexLeft], true);
-  await setCurrentPic(splitImageRight, images[mainIndexRight], true);
+  await Promise.all([
+    setMainRotationEntry(splitImageLeft, mainRotationEntries[leftState.index]),
+    setMainRotationEntry(splitImageRight, mainRotationEntries[rightState.index]),
+  ]);
 
-  // Rotate left image
-  setInterval(async () => {
-    mainIndexLeft++;
-    if (mainIndexLeft >= images.length) {
-      mainIndexLeft = 0;
-    }
-    await setCurrentPic(splitImageLeft, images[mainIndexLeft], true);
-  }, 5000);
+  scheduleMainRotation(leftState, MAIN_ROTATION_INTERVAL);
+  scheduleMainRotation(rightState, RIGHT_ROTATION_DELAY);
+};
 
-  // Rotate right image (offset by 2.5 seconds for visual interest)
-  setTimeout(() => {
-    setInterval(async () => {
-      mainIndexRight++;
-      if (mainIndexRight >= images.length) {
-        mainIndexRight = 0;
-      }
-      await setCurrentPic(splitImageRight, images[mainIndexRight], true);
-    }, 5000);
-  }, 2500);
+export const rotateMainPic = async (element, direction) => {
+  const state = mainRotationStates.get(element);
+  if (!state) return;
+
+  clearTimeout(state.timerId);
+  if (state.transitionPromise) await state.transitionPromise;
+  await advanceMainRotation(state, direction);
+  scheduleMainRotation(state, MAIN_ROTATION_INTERVAL);
+};
+
+const buildMainRotationState = (element, index) => {
+  const state = { element, index, timerId: null, transitionPromise: null };
+  mainRotationStates.set(element, state);
+  return state;
+};
+
+const scheduleMainRotation = (state, delay) => {
+  clearTimeout(state.timerId);
+  state.timerId = setTimeout(async () => {
+    await advanceMainRotation(state, "next");
+    scheduleMainRotation(state, MAIN_ROTATION_INTERVAL);
+  }, delay);
+};
+
+const advanceMainRotation = async (state, direction) => {
+  if (!state || mainRotationEntries.length === 0) return;
+
+  state.index = getAdjacentRotationIndex(state.index, mainRotationEntries.length, direction);
+  state.transitionPromise = setMainRotationEntry(state.element, mainRotationEntries[state.index]);
+  await state.transitionPromise;
+  state.transitionPromise = null;
+};
+
+export const getAdjacentRotationIndex = (index, entryCount, direction) => {
+  if (entryCount <= 0) return 0;
+  if (direction === "prev") return (index - 1 + entryCount) % entryCount;
+  return (index + 1) % entryCount;
+};
+
+const buildFallbackRotationEntries = () => {
+  const entries = [];
+  for (let i = 0; i < mainPicArray.length; i++) {
+    entries.push({ src: mainPicArray[i], urlName: null });
+  }
+  return entries;
+};
+
+export const setMainRotationEntry = async (element, entry) => {
+  if (!element || !entry) return;
+
+  await setCurrentPic(element, entry.src, true, true);
+  setMainRotationLink(element, entry.urlName);
+};
+
+const setMainRotationLink = (element, urlName) => {
+  if (!urlName) {
+    delete element.dataset.urlName;
+    element.href = "/products";
+    return;
+  }
+
+  element.dataset.urlName = urlName;
+  element.href = `/products/${urlName}`;
 };
 
 //+++++++++++++++++++++++++

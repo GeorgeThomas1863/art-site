@@ -56,10 +56,13 @@ function buildEditorOverlay() {
 
   const canvasArea = document.createElement('div');
   canvasArea.className = 'image-editor-canvas-area';
+  const canvasFrame = document.createElement('div');
+  canvasFrame.className = 'image-editor-canvas-frame';
   const img = document.createElement('img');
   img.id = 'image-editor-img';
   img.alt = 'Image to edit';
-  canvasArea.appendChild(img);
+  canvasFrame.appendChild(img);
+  canvasArea.appendChild(canvasFrame);
 
   const toolbar = document.createElement('div');
   toolbar.className = 'image-editor-toolbar';

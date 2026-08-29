@@ -616,7 +616,11 @@ export const buildProductDetailsSection = async (mode) => {
   // Description Row
   const descRow = await buildInfoRowTextarea(mode, "description", "Description");
 
-  section.append(header, productCodeRow, nameRow, typeRow, priceRow, descRow, slugRow);
+  if (mode === "add") {
+    section.append(header, typeRow, productCodeRow, nameRow, priceRow, descRow, slugRow);
+  } else {
+    section.append(header, productCodeRow, nameRow, typeRow, priceRow, descRow, slugRow);
+  }
 
   return section;
 };
@@ -1116,6 +1120,21 @@ export const buildAdminProductSelector = async () => {
   const selectorWrapper = document.createElement("li");
   selectorWrapper.className = "form-field product-selector-field";
 
+  const filterLabel = document.createElement("label");
+  filterLabel.setAttribute("for", "edit-product-filter");
+  filterLabel.textContent = "Type";
+
+  const typeFilter = document.createElement("select");
+  typeFilter.className = "form-select";
+  typeFilter.id = "edit-product-filter";
+  typeFilter.name = "edit-product-filter";
+
+  const allOption = document.createElement("option");
+  allOption.value = "All";
+  allOption.textContent = "All";
+  allOption.selected = true;
+  typeFilter.append(allOption);
+
   const productSelect = document.createElement("select");
   productSelect.className = "form-select";
   productSelect.id = "product-selector";
@@ -1129,8 +1148,7 @@ export const buildAdminProductSelector = async () => {
   defaultOption.disabled = true;
   productSelect.append(defaultOption);
 
-  // selectorWrapper.append(selectorLabel, productSelect);
-  selectorWrapper.append(productSelect);
+  selectorWrapper.append(filterLabel, typeFilter, productSelect);
 
   return selectorWrapper;
 };
@@ -1267,11 +1285,15 @@ const CTA_SWATCH_COLORS = [
   ["#7b1fa2", "Purple"],
 ];
 
+export const CTA_DEFAULT_TEXT = "Shop Now";
+
 const CTA_ALIGN_OPTIONS = [
   ["left", "Left"],
   ["center", "Center"],
   ["right", "Right"],
 ];
+
+const CTA_RESIZE_CORNERS = ["nw", "ne", "sw", "se"];
 
 export const buildCtaButtonDialog = async () => {
   const overlay = document.createElement("div");
@@ -1424,7 +1446,7 @@ const buildCtaPreviewBox = () => {
   const preview = document.createElement("a");
   preview.id = "cta-preview";
   preview.href = "#";
-  preview.textContent = "Button";
+  preview.textContent = CTA_DEFAULT_TEXT;
   preview.style.display = "inline-block";
   preview.style.padding = "12px 28px";
   preview.style.background = "#333333";
@@ -1433,16 +1455,26 @@ const buildCtaPreviewBox = () => {
   preview.style.borderRadius = "4px";
   preview.style.fontWeight = "bold";
 
+  box.append(preview);
+  appendCtaResizeHandles(box);
+  return box;
+};
+
+const appendCtaResizeHandles = (box) => {
+  for (const corner of CTA_RESIZE_CORNERS) {
+    box.append(buildCtaResizeHandle(corner));
+  }
+};
+
+const buildCtaResizeHandle = (corner) => {
   const resizeHandle = document.createElement("button");
   resizeHandle.type = "button";
-  resizeHandle.id = "cta-resize-handle";
   resizeHandle.className = "cta-resize-handle";
-  resizeHandle.setAttribute("aria-label", "Drag to resize button");
+  resizeHandle.setAttribute("data-corner", corner);
+  resizeHandle.setAttribute("aria-label", `Drag ${corner} corner to resize button`);
   resizeHandle.title = "Drag to resize";
-  resizeHandle.setAttribute("data-label", "cta-resize-handle");
-
-  box.append(preview, resizeHandle);
-  return box;
+  resizeHandle.setAttribute("data-label", `cta-resize-handle-${corner}`);
+  return resizeHandle;
 };
 
 const buildCtaPreviewTools = () => {
@@ -1525,8 +1557,7 @@ export const buildProductSubscriberSection = async () => {
   introInput.className = "form-input";
   introInput.type = "text";
   introInput.id = "product-email-intro";
-  introInput.value = "New creation, now available";
-  introInput.placeholder = "New creation, now available";
+  introInput.placeholder = "New Creation! Now Available on our Website!";
   introInput.setAttribute("data-label", "product-email-intro");
 
   const hint = document.createElement("p");

@@ -608,6 +608,24 @@
   .cta-resize-handle {
     width: 28px;
     height: 28px;
+  }
+
+  .cta-resize-handle[data-corner="nw"] {
+    top: -12px;
+    left: -12px;
+  }
+
+  .cta-resize-handle[data-corner="ne"] {
+    top: -12px;
+    right: -12px;
+  }
+
+  .cta-resize-handle[data-corner="sw"] {
+    bottom: -12px;
+    left: -12px;
+  }
+
+  .cta-resize-handle[data-corner="se"] {
     right: -12px;
     bottom: -12px;
   }

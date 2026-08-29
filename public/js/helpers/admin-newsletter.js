@@ -202,7 +202,7 @@ import { sendToBack, sendToBackFile } from "../util/api-front.js";
 import { displayPopup, displayConfirmDialog } from "../util/popup.js";
 import { updateSubscriberStats } from "./admin-run.js";
 import { openImageEditor } from "./image-editor.js";
-import { buildCtaButtonDialog } from "../forms/admin-form.js";
+import { buildCtaButtonDialog, CTA_DEFAULT_TEXT } from "../forms/admin-form.js";
 
 // ─── Quill instance — module-scoped so runSendNewsletter can read it ──────────
 let quillInstance = null;
@@ -525,16 +525,24 @@ const wireCtaDialog = (dialog) => {
   const insertButton = dialog.querySelector("#cta-insert");
   if (insertButton) insertButton.addEventListener("click", () => submitCtaDialog(dialog));
 
-  const resizeHandle = dialog.querySelector("#cta-resize-handle");
-  if (resizeHandle) {
-    resizeHandle.addEventListener("pointerdown", (event) => startCtaResize(dialog, event));
-    resizeHandle.addEventListener("pointermove", (event) => moveCtaResize(dialog, event));
-    resizeHandle.addEventListener("pointerup", (event) => endCtaResize(event));
-    resizeHandle.addEventListener("pointercancel", (event) => endCtaResize(event));
-  }
+  wireCtaResizeHandles(dialog);
 
   const resetButton = dialog.querySelector("#cta-size-reset");
   if (resetButton) resetButton.addEventListener("click", () => resetCtaSize(dialog));
+};
+
+const wireCtaResizeHandles = (dialog) => {
+  const resizeHandles = dialog.querySelectorAll(".cta-resize-handle");
+  for (const resizeHandle of resizeHandles) {
+    wireCtaResizeHandle(dialog, resizeHandle);
+  }
+};
+
+const wireCtaResizeHandle = (dialog, resizeHandle) => {
+  resizeHandle.addEventListener("pointerdown", (event) => startCtaResize(dialog, event));
+  resizeHandle.addEventListener("pointermove", (event) => moveCtaResize(dialog, event));
+  resizeHandle.addEventListener("pointerup", (event) => endCtaResize(event));
+  resizeHandle.addEventListener("pointercancel", (event) => endCtaResize(event));
 };
 
 const startCtaResize = (dialog, event) => {
@@ -546,14 +554,16 @@ const startCtaResize = (dialog, event) => {
     y: event.clientY,
     padX: normalizeCtaPad(dialog.dataset.padX, "x"),
     padY: normalizeCtaPad(dialog.dataset.padY, "y"),
+    directionX: handle.dataset.corner.includes("w") ? -1 : 1,
+    directionY: handle.dataset.corner.includes("n") ? -1 : 1,
   };
 };
 
 const moveCtaResize = (dialog, event) => {
   if (!ctaResizeStart) return;
 
-  const deltaX = Math.round((event.clientX - ctaResizeStart.x) / 2);
-  const deltaY = Math.round((event.clientY - ctaResizeStart.y) / 2);
+  const deltaX = Math.round(((event.clientX - ctaResizeStart.x) * ctaResizeStart.directionX) / 2);
+  const deltaY = Math.round(((event.clientY - ctaResizeStart.y) * ctaResizeStart.directionY) / 2);
   dialog.dataset.padX = String(normalizeCtaPad(ctaResizeStart.padX + deltaX, "x"));
   dialog.dataset.padY = String(normalizeCtaPad(ctaResizeStart.padY + deltaY, "y"));
   updateCtaPreview(dialog);
@@ -598,7 +608,7 @@ const updateCtaPreview = (dialog) => {
   const preview = dialog.querySelector("#cta-preview");
   if (!preview) return;
 
-  const text = dialog.querySelector("#cta-text")?.value.trim() || "Button Text";
+  const text = dialog.querySelector("#cta-text")?.value.trim() || CTA_DEFAULT_TEXT;
   const bgColor = dialog.querySelector("#cta-bg-color")?.value || "#333333";
   const textColor = dialog.querySelector("#cta-text-color")?.value || "#ffffff";
   const padX = normalizeCtaPad(dialog.dataset.padX, "x");
