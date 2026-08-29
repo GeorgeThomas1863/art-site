@@ -21,8 +21,8 @@ const aboutPicArray = [
 ];
 
 const aboutStaticPic = "/images/background/selfie1.jpg";
-const MAIN_ROTATION_INTERVAL = 5000;
-const RIGHT_ROTATION_DELAY = 2500;
+const MAIN_ROTATION_INTERVAL = 10000;
+const RIGHT_ROTATION_DELAY = 5000;
 const CROSSFADE_DURATION = 1600;
 
 let aboutIndexTop = 0;
@@ -61,8 +61,8 @@ const applyContainMode = (element, enable) => {
   element.classList.toggle("bg-contain-mode", enable);
 };
 
-// Set background image with crossfade transition
-export const setCurrentPic = async (element, picURL, checkRatio = false, waitForTransition = false) => {
+// Set background image with crossfade transition (or an instant swap — see `instant`)
+export const setCurrentPic = async (element, picURL, checkRatio = false, waitForTransition = false, instant = false) => {
   if (!element) return;
 
   // First call (no layer yet — init was just called): just set directly
@@ -82,6 +82,22 @@ export const setCurrentPic = async (element, picURL, checkRatio = false, waitFor
   }
 
   const isExtreme = checkRatio && needsContain(loadedImg, element);
+
+  // Instant path (arrow-button clicks): swap straight in, no crossfade wait
+  if (instant) {
+    element.style.backgroundImage = `url('${picURL}')`;
+    applyContainMode(element, isExtreme);
+    applyContainMode(layer, false);
+    layer.style.transition = "none";
+    layer.style.opacity = "0";
+    // Restore transition after the instant reset settles, so the layer is ready to fade for the next auto/swipe rotation
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => {
+        layer.style.transition = "";
+      });
+    });
+    return;
+  }
 
   applyContainMode(layer, isExtreme);
   // Set image on the crossfade layer and fade it in
@@ -155,13 +171,13 @@ export const startMainPicRotation = async () => {
   scheduleMainRotation(rightState, RIGHT_ROTATION_DELAY);
 };
 
-export const rotateMainPic = async (element, direction) => {
+export const rotateMainPic = async (element, direction, instant = false) => {
   const state = mainRotationStates.get(element);
   if (!state) return;
 
   clearTimeout(state.timerId);
   if (state.transitionPromise) await state.transitionPromise;
-  await advanceMainRotation(state, direction);
+  await advanceMainRotation(state, direction, instant);
   scheduleMainRotation(state, MAIN_ROTATION_INTERVAL);
 };
 
@@ -179,11 +195,11 @@ const scheduleMainRotation = (state, delay) => {
   }, delay);
 };
 
-const advanceMainRotation = async (state, direction) => {
+const advanceMainRotation = async (state, direction, instant = false) => {
   if (!state || mainRotationEntries.length === 0) return;
 
   state.index = getAdjacentRotationIndex(state.index, mainRotationEntries.length, direction);
-  state.transitionPromise = setMainRotationEntry(state.element, mainRotationEntries[state.index]);
+  state.transitionPromise = setMainRotationEntry(state.element, mainRotationEntries[state.index], instant);
   await state.transitionPromise;
   state.transitionPromise = null;
 };
@@ -202,10 +218,10 @@ const buildFallbackRotationEntries = () => {
   return entries;
 };
 
-export const setMainRotationEntry = async (element, entry) => {
+export const setMainRotationEntry = async (element, entry, instant = false) => {
   if (!element || !entry) return;
 
-  await setCurrentPic(element, entry.src, true, true);
+  await setCurrentPic(element, entry.src, true, true, instant);
   setMainRotationLink(element, entry.urlName);
 };
 

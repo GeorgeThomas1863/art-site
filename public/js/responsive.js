@@ -36,6 +36,8 @@ let mouseDragCarousel = null;
 let recentTouchSwipe = false;
 let mainPicTouchStartX = null;
 let mainPicTouchPanel = null;
+let mainPicMouseStartX = null;
+let mainPicMousePanel = null;
 
 const authElement = document.getElementById("auth-element");
 const displayElement = document.getElementById("display-element");
@@ -94,6 +96,15 @@ export const clickHandler = async (e) => {
   if (clickType === "product-carousel-dot") await runProductCarouselDot(clickElement);
   if (clickType === "carousel-prev") await runCarouselPrev(clickElement);
   if (clickType === "carousel-next") await runCarouselNext(clickElement);
+
+  if (clickType === "main-pic-prev") {
+    const panel = clickElement.closest(".split-image-frame")?.querySelector(".split-image-rotating");
+    if (panel) await rotateMainPic(panel, "prev", true);
+  }
+  if (clickType === "main-pic-next") {
+    const panel = clickElement.closest(".split-image-frame")?.querySelector(".split-image-rotating");
+    if (panel) await rotateMainPic(panel, "next", true);
+  }
 
   if (clickType === "category-filter-btn") await changeProductsFilterButton(clickElement);
 
@@ -269,6 +280,8 @@ if (displayElement) {
   displayElement.addEventListener("touchstart", mainPicTouchStartHandler, { passive: true });
   displayElement.addEventListener("touchend", mainPicTouchEndHandler);
   displayElement.addEventListener("touchcancel", mainPicTouchCancelHandler);
+  displayElement.addEventListener("mousedown", mainPicMouseDownHandler);
+  document.addEventListener("mouseup", mainPicMouseUpHandler);
 }
 
 if (adminElement) {
@@ -302,12 +315,37 @@ async function mainPicTouchEndHandler(e) {
   if (Math.abs(deltaX) < 30) return;
 
   swipeHandled = true;
+  recentTouchSwipe = true;
+  setTimeout(() => { recentTouchSwipe = false; }, 500);
   await rotateMainPic(panel, deltaX < 0 ? "next" : "prev");
 }
 
 function mainPicTouchCancelHandler() {
   mainPicTouchStartX = null;
   mainPicTouchPanel = null;
+}
+
+function mainPicMouseDownHandler(e) {
+  if (recentTouchSwipe) return;
+  const panel = e.target.closest(".split-image-rotating");
+  if (!panel) return;
+
+  e.preventDefault(); // panels are <a> elements; suppress native link drag + text selection during the gesture
+  mainPicMouseStartX = e.clientX;
+  mainPicMousePanel = panel;
+}
+
+async function mainPicMouseUpHandler(e) {
+  if (mainPicMouseStartX === null || !mainPicMousePanel) return;
+
+  const deltaX = e.clientX - mainPicMouseStartX;
+  const panel = mainPicMousePanel;
+  mainPicMouseStartX = null;
+  mainPicMousePanel = null;
+  if (Math.abs(deltaX) < 30) return;
+
+  swipeHandled = true;
+  await rotateMainPic(panel, deltaX < 0 ? "next" : "prev");
 }
 
 const touchEndHandler = (e) => {

@@ -1,4 +1,4 @@
-import { FACEBOOK_ICON_SVG, INSTAGRAM_ICON_SVG, TIKTOK_ICON_SVG } from "../util/define-things.js";
+import { FACEBOOK_ICON_SVG, INSTAGRAM_ICON_SVG, TIKTOK_ICON_SVG, MAIN_PIC_PREV_SVG, MAIN_PIC_NEXT_SVG } from "../util/define-things.js";
 // import { initMobileMenu } from "../util/collapse.js";
 
 // Main function to build and render the photography site
@@ -250,10 +250,7 @@ export const buildSplitImage = async () => {
   const leftCol = document.createElement("div");
   leftCol.className = "split-image-col";
 
-  const rotatingLeft = document.createElement("a");
-  rotatingLeft.className = "split-image-rotating";
-  rotatingLeft.id = "split-image-left";
-  rotatingLeft.href = "/products";
+  const leftFrame = buildRotatingPanelFrame("split-image-left");
 
   const rotatingLeftText = document.createElement("div");
   rotatingLeftText.className = "split-image-text split-image-text-desktop";
@@ -263,24 +260,47 @@ export const buildSplitImage = async () => {
   rotatingLeftTextMobile.className = "split-image-text split-image-text-mobile";
   rotatingLeftTextMobile.textContent = "Unique Products, Natural Materials";
 
-  leftCol.append(rotatingLeft, rotatingLeftText, rotatingLeftTextMobile);
+  leftCol.append(leftFrame, rotatingLeftText, rotatingLeftTextMobile);
 
   // Right column
   const rightCol = document.createElement("div");
   rightCol.className = "split-image-col";
 
-  const rotatingRight = document.createElement("a");
-  rotatingRight.className = "split-image-rotating";
-  rotatingRight.id = "split-image-right";
-  rotatingRight.href = "/products";
+  const rightFrame = buildRotatingPanelFrame("split-image-right");
 
   const rotatingRightText = document.createElement("div");
   rotatingRightText.className = "split-image-text";
   rotatingRightText.textContent = "Natural Materials";
 
-  rightCol.append(rotatingRight, rotatingRightText);
+  rightCol.append(rightFrame, rotatingRightText);
 
   splitImage.append(leftCol, rightCol);
 
   return splitImage;
+};
+
+// Build one rotating panel: positioned frame holding the product link with the arrow buttons as siblings — buttons must never nest inside the <a> (middle-click/drag would hit the link)
+const buildRotatingPanelFrame = (panelId) => {
+  const frame = document.createElement("div");
+  frame.className = "split-image-frame";
+
+  const rotating = document.createElement("a");
+  rotating.className = "split-image-rotating";
+  rotating.id = panelId;
+  rotating.href = "/products";
+
+  const prevBtn = document.createElement("button");
+  prevBtn.className = "carousel-arrow carousel-arrow-prev";
+  prevBtn.setAttribute("data-label", "main-pic-prev");
+  prevBtn.type = "button";
+  prevBtn.innerHTML = MAIN_PIC_PREV_SVG;
+
+  const nextBtn = document.createElement("button");
+  nextBtn.className = "carousel-arrow carousel-arrow-next";
+  nextBtn.setAttribute("data-label", "main-pic-next");
+  nextBtn.type = "button";
+  nextBtn.innerHTML = MAIN_PIC_NEXT_SVG;
+
+  frame.append(rotating, prevBtn, nextBtn);
+  return frame;
 };

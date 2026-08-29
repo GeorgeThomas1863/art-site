@@ -213,6 +213,13 @@ h3 {
   flex-direction: column;
 }
 
+/* Positioning context for the arrow buttons, which sit beside the <a> panel (never inside it) */
+.split-image-frame {
+  position: relative;
+  display: flex;
+  flex: 1;
+}
+
 .split-image-rotating {
   position: relative;
   background-position: center;

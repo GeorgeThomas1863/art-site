@@ -1,6 +1,6 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { buildProductRotationEntries } from "../public/js/helpers/product-rotation.js";
-import { getAdjacentRotationIndex, setMainRotationEntry } from "../public/js/helpers/rotate-pics.js";
+import { getAdjacentRotationIndex, setCurrentPic, setMainRotationEntry } from "../public/js/helpers/rotate-pics.js";
 
 afterEach(() => {
   vi.useRealTimers();
@@ -94,6 +94,53 @@ describe("setMainRotationEntry", () => {
     await vi.advanceTimersByTimeAsync(1600);
     await updatePromise;
     expect(element.href).toBe("/products/new-product");
+  });
+});
+
+describe("setCurrentPic instant path", () => {
+  it("swaps the image directly with no crossfade wait when instant is true", async () => {
+    const layer = buildCrossfadeLayer();
+    const element = buildRotatingPanel(layer);
+    vi.stubGlobal("requestAnimationFrame", (callback) => callback());
+    vi.stubGlobal("Image", class {
+      set src(value) {
+        this.naturalWidth = 400;
+        this.naturalHeight = 400;
+        this.onload();
+      }
+    });
+
+    await setCurrentPic(element, "/images/products/new.jpg", true, true, true);
+
+    expect(element.style.backgroundImage).toBe("url('/images/products/new.jpg')");
+    expect(layer.style.opacity).toBe("0");
+    expect(layer.style.backgroundImage).toBeUndefined();
+  });
+
+  it("still fades (layer opacity set to 1 first) when instant is omitted", async () => {
+    vi.useFakeTimers();
+    const layer = buildCrossfadeLayer();
+    const element = buildRotatingPanel(layer);
+    vi.stubGlobal("requestAnimationFrame", (callback) => callback());
+    vi.stubGlobal("Image", class {
+      set src(value) {
+        this.naturalWidth = 400;
+        this.naturalHeight = 400;
+        this.onload();
+      }
+    });
+
+    const updatePromise = setCurrentPic(element, "/images/products/new.jpg", true, true);
+    await Promise.resolve();
+
+    expect(layer.style.opacity).toBe("1");
+    expect(layer.style.backgroundImage).toBe("url('/images/products/new.jpg')");
+    expect(element.style.backgroundImage).not.toBe("url('/images/products/new.jpg')");
+
+    await vi.advanceTimersByTimeAsync(1600);
+    await updatePromise;
+    expect(element.style.backgroundImage).toBe("url('/images/products/new.jpg')");
+    expect(layer.style.opacity).toBe("0");
   });
 });
 
