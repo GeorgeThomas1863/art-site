@@ -1129,6 +1129,18 @@ export const buildAdminProductSelector = async () => {
   allOption.selected = true;
   typeFilter.append(allOption);
 
+  const selectorRow = document.createElement("div");
+  selectorRow.className = "product-selector-row";
+  selectorRow.id = "product-selector-row";
+
+  const nameSelectorGroup = document.createElement("div");
+  nameSelectorGroup.className = "product-selector-control";
+
+  const nameSelectorLabel = document.createElement("label");
+  nameSelectorLabel.className = "form-label product-selector-label";
+  nameSelectorLabel.setAttribute("for", "product-selector");
+  nameSelectorLabel.textContent = "Select by Name / ID";
+
   const productSelect = document.createElement("select");
   productSelect.className = "form-select";
   productSelect.id = "product-selector";
@@ -1142,9 +1154,59 @@ export const buildAdminProductSelector = async () => {
   defaultOption.disabled = true;
   productSelect.append(defaultOption);
 
-  selectorWrapper.append(filterLabel, typeFilter, productSelect);
+  nameSelectorGroup.append(nameSelectorLabel, productSelect);
+
+  const picSelectorGroup = buildAdminPicSelector();
+  selectorRow.append(nameSelectorGroup, picSelectorGroup);
+
+  selectorWrapper.append(filterLabel, typeFilter, selectorRow);
 
   return selectorWrapper;
+};
+
+const buildAdminPicSelector = () => {
+  const group = document.createElement("div");
+  group.className = "product-selector-control product-pic-selector";
+
+  const label = document.createElement("label");
+  label.className = "form-label product-selector-label";
+  label.id = "product-pic-selector-label";
+  label.setAttribute("for", "product-pic-selector-trigger");
+  label.textContent = "Select by Pic";
+
+  const trigger = buildAdminPicSelectorTrigger();
+  const list = document.createElement("div");
+  list.className = "product-pic-selector-list";
+  list.id = "product-pic-selector-list";
+  list.hidden = true;
+  list.setAttribute("role", "listbox");
+  list.setAttribute("aria-labelledby", "product-pic-selector-label");
+
+  group.append(label, trigger, list);
+  return group;
+};
+
+const buildAdminPicSelectorTrigger = () => {
+  const trigger = document.createElement("button");
+  trigger.className = "product-pic-selector-trigger";
+  trigger.id = "product-pic-selector-trigger";
+  trigger.type = "button";
+  trigger.setAttribute("data-label", "product-pic-selector-trigger");
+  trigger.setAttribute("aria-haspopup", "listbox");
+  trigger.setAttribute("aria-expanded", "false");
+  trigger.setAttribute("aria-controls", "product-pic-selector-list");
+  trigger.setAttribute("aria-labelledby", "product-pic-selector-label product-pic-selector-trigger-name");
+
+  const image = document.createElement("span");
+  image.className = "product-pic-placeholder";
+  image.id = "product-pic-selector-trigger-image";
+
+  const name = document.createElement("span");
+  name.id = "product-pic-selector-trigger-name";
+  name.textContent = "Select by Pic";
+
+  trigger.append(image, name);
+  return trigger;
 };
 
 export const buildAdminEventSelector = async () => {

@@ -1,5 +1,5 @@
 import { runModalTrigger, runModalClose, runChangeStatusCard, updateAdminStats } from "./helpers/admin-run.js"; //prettier-ignore
-import { runAddNewProduct, runEditProduct, runDeleteProduct, changeAdminProductSelector, changeAdminProductFilter, changeEditProductType, runAddPicSlot, runRemovePicSlot } from "./helpers/admin-products.js";
+import { runAddNewProduct, runEditProduct, runDeleteProduct, changeAdminProductSelector, changeAdminProductFilter, changeEditProductType, runAddPicSlot, runRemovePicSlot, toggleAdminPicSelector, closeAdminPicSelector, selectAdminProductByPic, moveAdminPicSelectorFocus } from "./helpers/admin-products.js";
 import { runAddCategory, runDeleteCategory, runRenameCategory, runChangeCategoryLetter, loadCategories, prefillNextProductCode, startCategoryDrag, moveCategoryDrag, endCategoryDrag, cancelCategoryDrag } from "./helpers/admin-categories.js"; //prettier-ignore
 import { runAddNewEvent, runEditEvent, runDeleteEvent, changeAdminEventSelector } from "./helpers/admin-events.js";
 import { runSendNewsletter, runSendTestNewsletter, runAddSubscriber, runRemoveSubscriber, runRefreshSubscriberList, changeAdminNewsletterSelector, runDeleteNewsletter, runUpdateNewsletter, handleQuillImageClick, runNewsletterImageUpload } from "./helpers/admin-newsletter.js";
@@ -59,6 +59,7 @@ export const clickHandler = async (e) => {
   const clickElement = e.target;
   const clickId = clickElement.id;
   const clickType = clickElement.getAttribute("data-label");
+  const picSelectorControl = clickElement.closest?.("[data-label='product-pic-selector-trigger'], [data-label='product-pic-selector-option']");
   // const tabType = clickElement.getAttribute("data-tab");
 
   // console.log("CLICK HANDLER");
@@ -139,6 +140,12 @@ export const clickHandler = async (e) => {
 
   if (clickType === "contact-submit") await runContactSubmit();
 
+  if (picSelectorControl?.getAttribute("data-label") === "product-pic-selector-trigger") toggleAdminPicSelector();
+  if (picSelectorControl?.getAttribute("data-label") === "product-pic-selector-option") {
+    await selectAdminProductByPic(picSelectorControl.getAttribute("data-product-id"));
+  }
+  if (!clickElement.closest?.(".product-pic-selector")) closeAdminPicSelector();
+
   if (clickType === "new-product-submit") await runAddNewProduct();
   if (clickType === "edit-product-submit") await runEditProduct();
   if (clickType === "delete-product-submit") await runDeleteProduct();
@@ -162,6 +169,12 @@ export const clickHandler = async (e) => {
 };
 
 export const keyHandler = async (e) => {
+  const keyType = e.target.getAttribute?.("data-label");
+  if (keyType === "product-pic-selector-trigger" || keyType === "product-pic-selector-option") {
+    const handled = await runAdminPicSelectorKey(e, keyType);
+    if (handled) return true;
+  }
+
   if (e.key === "Escape") {
     if (document.getElementById('image-editor-overlay')?.classList.contains('visible')) {
       closeImageEditor();
@@ -188,6 +201,26 @@ export const keyHandler = async (e) => {
   if (keyElement.getAttribute("data-label") === "category-title-input") keyElement.blur();
   if (keyElement.getAttribute("data-label") === "category-letter-select") keyElement.blur();
 
+  return true;
+};
+
+const runAdminPicSelectorKey = async (event, keyType) => {
+  if (event.key === "Escape") {
+    event.preventDefault();
+    closeAdminPicSelector();
+    document.getElementById("product-pic-selector-trigger")?.focus();
+    return true;
+  }
+  if (event.key === "ArrowDown" || event.key === "ArrowUp") {
+    event.preventDefault();
+    if (keyType === "product-pic-selector-trigger") toggleAdminPicSelector();
+    if (keyType === "product-pic-selector-option") moveAdminPicSelectorFocus(event.target, event.key === "ArrowDown" ? 1 : -1);
+    return true;
+  }
+  if (event.key !== "Enter" && event.key !== " ") return false;
+  event.preventDefault();
+  if (keyType === "product-pic-selector-trigger") toggleAdminPicSelector();
+  if (keyType === "product-pic-selector-option") await selectAdminProductByPic(event.target.getAttribute("data-product-id"));
   return true;
 };
 

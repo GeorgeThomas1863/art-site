@@ -123,12 +123,14 @@
   font-size: 1.1rem;
   color: #111;
   line-height: 1.8;
-  max-height: 550px;
-  overflow-y: auto;
 }
 
 .newsletter-card .collapse-content {
   padding: 0;
+}
+
+.newsletter-card .collapse-content:not(.hidden) {
+  max-height: none;
 }
 
 .newsletter-card-body img {

@@ -43,6 +43,7 @@ backups/
 !**/public/images/events/.gitkeep
 **/public/images/newsletter/*
 !**/public/images/newsletter/.gitkeep
+public/images/thumbnails/*
 
 todo.txt
 

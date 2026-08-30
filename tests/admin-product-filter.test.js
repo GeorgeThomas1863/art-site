@@ -90,13 +90,15 @@ describe("admin product type filter", () => {
 
     const wrapper = await buildAdminProductSelector();
     const filter = findById(wrapper, "edit-product-filter");
+    const selectorRow = findById(wrapper, "product-selector-row");
     const selector = findById(wrapper, "product-selector");
 
     expect(filter).not.toBeNull();
     expect(filter.children).toHaveLength(1);
     expect(filter.children[0].value).toBe("All");
     expect(filter.children[0].selected).toBe(true);
-    expect(wrapper.children.indexOf(filter)).toBeLessThan(wrapper.children.indexOf(selector));
+    expect(wrapper.children.indexOf(filter)).toBeLessThan(wrapper.children.indexOf(selectorRow));
+    expect(selector).not.toBeNull();
   });
 
   test("filters cached products by type and resets to the placeholder", async () => {

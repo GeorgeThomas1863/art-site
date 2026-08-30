@@ -9,7 +9,7 @@ import path from "path";
 vi.mock("sharp", () => ({ default: vi.fn() }));
 
 import sharp from "sharp";
-import { deletePic, resizeNewsletterImage, uploadDir } from "../src/upload-back.js";
+import { deletePic, generateProductThumbnail, resizeNewsletterImage, uploadDir } from "../src/upload-back.js";
 
 describe("module import", () => {
   it("creates public/images/newsletter as a side effect of loading the module", () => {
@@ -19,10 +19,13 @@ describe("module import", () => {
 
 describe("deletePic", () => {
   let tempFile;
+  let tempThumbnail;
 
   afterEach(() => {
     if (tempFile && fs.existsSync(tempFile)) fs.unlinkSync(tempFile);
+    if (tempThumbnail && fs.existsSync(tempThumbnail)) fs.unlinkSync(tempThumbnail);
     tempFile = undefined;
+    tempThumbnail = undefined;
   });
 
   it("rejects an invalid entity type", async () => {
@@ -67,6 +70,90 @@ describe("deletePic", () => {
 
     expect(result).toEqual({ success: true, message: "File deleted successfully" });
     expect(fs.existsSync(tempFile)).toBe(false);
+  });
+
+  it("deletes a product image and its matching thumbnail", async () => {
+    tempFile = path.join(uploadDir, "products", "upload-back-product-delete.jpg");
+    tempThumbnail = path.join(uploadDir, "thumbnails", "upload-back-product-delete.jpg");
+    fs.mkdirSync(path.dirname(tempThumbnail), { recursive: true });
+    fs.writeFileSync(tempFile, "original-bytes");
+    fs.writeFileSync(tempThumbnail, "thumbnail-bytes");
+
+    const result = await deletePic("upload-back-product-delete.jpg", "products");
+
+    expect(result).toEqual({ success: true, message: "File deleted successfully" });
+    expect(fs.existsSync(tempFile)).toBe(false);
+    expect(fs.existsSync(tempThumbnail)).toBe(false);
+  });
+
+  it("deletes a product image when its thumbnail is missing", async () => {
+    tempFile = path.join(uploadDir, "products", "upload-back-no-thumbnail.jpg");
+    fs.writeFileSync(tempFile, "original-bytes");
+
+    const result = await deletePic("upload-back-no-thumbnail.jpg", "products");
+
+    expect(result).toEqual({ success: true, message: "File deleted successfully" });
+    expect(fs.existsSync(tempFile)).toBe(false);
+  });
+});
+
+describe("generateProductThumbnail", () => {
+  let originalFile;
+  let thumbnailFile;
+  let consoleErrorSpy;
+
+  beforeEach(() => {
+    consoleErrorSpy = vi.spyOn(console, "error").mockImplementation(() => {});
+  });
+
+  afterEach(() => {
+    consoleErrorSpy.mockRestore();
+    if (originalFile && fs.existsSync(originalFile)) fs.unlinkSync(originalFile);
+    if (thumbnailFile && fs.existsSync(thumbnailFile)) fs.unlinkSync(thumbnailFile);
+    originalFile = undefined;
+    thumbnailFile = undefined;
+  });
+
+  it("writes a 200px-wide thumbnail with the product image filename", async () => {
+    const filename = "upload-back-thumbnail.jpg";
+    originalFile = path.join(uploadDir, "products", filename);
+    thumbnailFile = path.join(uploadDir, "thumbnails", filename);
+    fs.writeFileSync(originalFile, "original-bytes");
+
+    const outputBuffer = Buffer.from("thumbnail-bytes");
+    const toBuffer = vi.fn().mockResolvedValue(outputBuffer);
+    const resize = vi.fn().mockReturnValue({ toBuffer });
+    sharp.mockReturnValue({ resize });
+
+    await generateProductThumbnail(filename);
+
+    expect(sharp).toHaveBeenCalledWith(Buffer.from("original-bytes"));
+    expect(resize).toHaveBeenCalledWith({ width: 200 });
+    expect(fs.readFileSync(thumbnailFile)).toEqual(outputBuffer);
+  });
+
+  it("skips thumbnail generation for product videos", async () => {
+    await generateProductThumbnail("upload-back-video.mp4");
+
+    expect(sharp).not.toHaveBeenCalled();
+  });
+
+  it("swallows sharp failures and logs the product filename", async () => {
+    const filename = "upload-back-thumbnail-fail.jpg";
+    originalFile = path.join(uploadDir, "products", filename);
+    thumbnailFile = path.join(uploadDir, "thumbnails", filename);
+    fs.writeFileSync(originalFile, "original-bytes");
+
+    const toBuffer = vi.fn().mockRejectedValue(new Error("sharp blew up"));
+    const resize = vi.fn().mockReturnValue({ toBuffer });
+    sharp.mockReturnValue({ resize });
+
+    await expect(generateProductThumbnail(filename)).resolves.toBeUndefined();
+
+    expect(fs.existsSync(thumbnailFile)).toBe(false);
+    expect(consoleErrorSpy).toHaveBeenCalledWith(
+      `Product thumbnail generation failed: sharp blew up (${filename})`
+    );
   });
 });
 

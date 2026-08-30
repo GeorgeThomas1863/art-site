@@ -237,6 +237,10 @@
     gap: 0.5rem;
   }
 
+  .product-selector-row {
+    grid-template-columns: 1fr;
+  }
+
   .info-label {
     padding-top: 0;
   }

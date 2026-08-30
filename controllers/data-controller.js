@@ -19,7 +19,7 @@ import { buildCart, getCartStats, addCartItem, updateCartItem, removeCartItem } 
 import { fetchShippingRates, getShippingFromSession, clearShippingFromSession, updateSelectedRate } from "../src/shipping.js";
 import { placeNewOrder } from "../src/orders.js";
 import path from "path";
-import { deletePic, resizeNewsletterImage, uploadDir } from "../src/upload-back.js";
+import { deletePic, generateProductThumbnail, resizeNewsletterImage, uploadDir } from "../src/upload-back.js";
 import {
   validateEmail,
   validateZip,
@@ -68,6 +68,10 @@ export const uploadPicControl = async (req, res) => {
 
   if (req.path === "/upload-newsletter-pic-route") {
     await resizeNewsletterImage(req.file.path);
+  }
+
+  if (req.path === "/upload-product-pic-route") {
+    await generateProductThumbnail(req.file.filename);
   }
 
   const mediaType = req.file.mimetype.startsWith("video/") ? "video" : "image";

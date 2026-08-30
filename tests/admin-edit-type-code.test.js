@@ -70,42 +70,109 @@ describe("changeEditProductType", () => {
     delete global.document;
   });
 
-  test("suggests a new code when the category changes away from the product's saved type", async () => {
+  test("preserves a typed custom code through switches away and back without fetching", async () => {
+    const { codeInput } = await loadEditForm({ productType: "acorns", productCode: "AB001" });
+    codeInput.value = "CUSTOM-7";
+
+    await changeEditProductType({ value: "gems" });
+    await changeEditProductType({ value: "acorns" });
+
+    expect(codeInput.value).toBe("CUSTOM-7");
+    expect(prefillNextProductCode).not.toHaveBeenCalled();
+  });
+
+  test("preserves the loaded product code when switching away without fetching", async () => {
     const { codeInput } = await loadEditForm({ productType: "acorns", productCode: "AB001" });
 
-    let codeInputValueAtCallTime;
+    await changeEditProductType({ value: "gems" });
+
+    expect(codeInput.value).toBe("AB001");
+    expect(prefillNextProductCode).not.toHaveBeenCalled();
+  });
+
+  test("fills a suggestion when a cleared field switches to a different category", async () => {
+    const { codeInput } = await loadEditForm({ productType: "acorns", productCode: "AB001" });
+    codeInput.value = "";
+
     prefillNextProductCode.mockImplementation(async () => {
-      codeInputValueAtCallTime = codeInput.value; // captures whether the saved code was cleared first
       codeInput.value = "GM001";
       return "GM001";
     });
 
     const result = await changeEditProductType({ value: "gems" });
 
-    expect(codeInputValueAtCallTime).toBe(""); // saved code AB001 must be cleared before the fetch, or prefillNextProductCode's own guard blocks the overwrite
     expect(prefillNextProductCode).toHaveBeenCalledWith("edit");
     expect(codeInput.value).toBe("GM001");
     expect(result).toBe("GM001");
   });
 
-  test("restores the product's saved code when the saved category is picked again", async () => {
+  test("replaces an auto-suggestion on a second category switch", async () => {
     const { codeInput } = await loadEditForm({ productType: "acorns", productCode: "AB001" });
+    codeInput.value = "";
+
+    prefillNextProductCode.mockImplementation(async () => {
+      const suggestion = prefillNextProductCode.mock.calls.length === 1 ? "GM001" : "PT001";
+      codeInput.value = suggestion;
+      return suggestion;
+    });
+
+    await changeEditProductType({ value: "gems" });
+    const result = await changeEditProductType({ value: "prints" });
+
+    expect(prefillNextProductCode).toHaveBeenCalledTimes(2);
+    expect(codeInput.value).toBe("PT001");
+    expect(result).toBe("PT001");
+  });
+
+  test("restores the saved code when a blank field switches back to the saved category", async () => {
+    const { codeInput } = await loadEditForm({ productType: "acorns", productCode: "AB001" });
+    codeInput.value = "";
+
+    await changeEditProductType({ value: "gems" });
+    codeInput.value = "";
+    const result = await changeEditProductType({ value: "acorns" });
+
+    expect(codeInput.value).toBe("AB001");
+    expect(result).toBe("AB001");
+    expect(prefillNextProductCode).toHaveBeenCalledTimes(1);
+  });
+
+  test("treats whitespace-only code as blank when switching categories", async () => {
+    const { codeInput } = await loadEditForm({ productType: "acorns", productCode: "AB001" });
+    codeInput.value = "   ";
 
     prefillNextProductCode.mockImplementation(async () => {
       codeInput.value = "GM001";
       return "GM001";
     });
 
-    await changeEditProductType({ value: "gems" }); // moves away from the saved type first
-    const result = await changeEditProductType({ value: "acorns" }); // back to the saved type
+    await changeEditProductType({ value: "gems" });
 
-    expect(codeInput.value).toBe("AB001");
-    expect(result).toBe("AB001");
-    expect(prefillNextProductCode).toHaveBeenCalledTimes(1); // restoring must not hit the fetch path
+    expect(prefillNextProductCode).toHaveBeenCalledWith("edit");
+    expect(codeInput.value).toBe("GM001");
   });
 
-  test("leaves a manual edit alone when the same category is re-selected without an intervening change", async () => {
+  test("keeps an auto-restored saved code replaceable on the next switch", async () => {
     const { codeInput } = await loadEditForm({ productType: "acorns", productCode: "AB001" });
+    codeInput.value = "";
+
+    prefillNextProductCode.mockImplementation(async () => {
+      codeInput.value = "PT001";
+      return "PT001";
+    });
+
+    await changeEditProductType({ value: "gems" });
+    codeInput.value = "";
+    await changeEditProductType({ value: "acorns" });
+    await changeEditProductType({ value: "prints" });
+
+    expect(codeInput.value).toBe("PT001");
+    expect(prefillNextProductCode).toHaveBeenCalledTimes(2);
+  });
+
+  test("leaves a manual edit alone when the same category is re-selected", async () => {
+    const { codeInput } = await loadEditForm({ productType: "acorns", productCode: "AB001" });
+    codeInput.value = "";
 
     prefillNextProductCode.mockImplementation(async () => {
       codeInput.value = "GM001";
@@ -113,13 +180,45 @@ describe("changeEditProductType", () => {
     });
 
     const selectElement = { value: "gems" };
-    await changeEditProductType(selectElement); // suggestion path
-    codeInput.value = "GM005"; // admin manually edits the suggestion
-
-    const result = await changeEditProductType(selectElement); // same value as last time -> no-op
+    await changeEditProductType(selectElement);
+    codeInput.value = "GM005";
+    const result = await changeEditProductType(selectElement);
 
     expect(codeInput.value).toBe("GM005");
     expect(result).toBe(null);
-    expect(prefillNextProductCode).toHaveBeenCalledTimes(1); // not called again
+    expect(prefillNextProductCode).toHaveBeenCalledTimes(1);
+  });
+
+  test("keeps the winning code auto-replaceable when a stale switch's prefill resolves last", async () => {
+    const { codeInput } = await loadEditForm({ productType: "acorns", productCode: "AB001" });
+    codeInput.value = "";
+
+    let releaseFirst;
+    let releaseSecond;
+    prefillNextProductCode
+      .mockReturnValueOnce(new Promise((resolve) => { releaseFirst = resolve; }))
+      .mockReturnValueOnce(new Promise((resolve) => { releaseSecond = resolve; }));
+
+    const firstPending = changeEditProductType({ value: "gems" }); // switch 1
+    const secondPending = changeEditProductType({ value: "prints" }); // switch 2 before switch 1's prefill answers
+
+    codeInput.value = "PT001"; // the newest prefill wins the field
+    releaseSecond("PT001");
+    releaseFirst(null); // the stale gems prefill was discarded, so its switch resolves null last
+    const firstResult = await firstPending;
+    const secondResult = await secondPending;
+
+    expect(firstResult).toBe(null);
+    expect(secondResult).toBe("PT001");
+
+    // PT001 must still count as auto-filled, so the next switch may replace it
+    prefillNextProductCode.mockImplementation(async () => {
+      codeInput.value = "GM001";
+      return "GM001";
+    });
+    const thirdResult = await changeEditProductType({ value: "gems" });
+
+    expect(thirdResult).toBe("GM001");
+    expect(codeInput.value).toBe("GM001");
   });
 });

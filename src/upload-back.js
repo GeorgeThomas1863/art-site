@@ -13,6 +13,7 @@ const __dirname = dirname(__filename);
 
 // Define upload directory
 const uploadDir = path.join(__dirname, "../public/images");
+const thumbnailDir = path.join(uploadDir, "thumbnails");
 
 // Create directories if they don't exist
 if (!fs.existsSync(uploadDir)) {
@@ -20,6 +21,7 @@ if (!fs.existsSync(uploadDir)) {
 }
 
 fs.mkdirSync(path.join(uploadDir, "newsletter"), { recursive: true });
+fs.mkdirSync(thumbnailDir, { recursive: true });
 
 // Configure storage
 const storage = multer.diskStorage({
@@ -88,7 +90,32 @@ export const deletePic = async (filename, entityType) => {
   }
 
   fs.unlinkSync(resolvedPath);
+  if (entityType === "products") deleteProductThumbnail(safeName);
   return { success: true, message: "File deleted successfully" };
+};
+
+const deleteProductThumbnail = (filename) => {
+  const thumbnailPath = path.join(thumbnailDir, filename);
+  if (!fs.existsSync(thumbnailPath)) return;
+
+  fs.unlinkSync(thumbnailPath);
+};
+
+export const generateProductThumbnail = async (filename) => {
+  const ext = path.extname(filename).toLowerCase();
+  if ([".mp4", ".webm", ".mov"].includes(ext)) return;
+
+  try {
+    const productPath = path.join(uploadDir, "products", filename);
+    const thumbnailPath = path.join(thumbnailDir, filename);
+    const inputBuffer = await fs.promises.readFile(productPath);
+    const outputBuffer = await sharp(inputBuffer)
+      .resize({ width: 200 })
+      .toBuffer();
+    await fs.promises.writeFile(thumbnailPath, outputBuffer);
+  } catch (err) {
+    console.error(`Product thumbnail generation failed: ${err.message} (${filename})`);
+  }
 };
 
 export const resizeNewsletterImage = async (filePath) => {

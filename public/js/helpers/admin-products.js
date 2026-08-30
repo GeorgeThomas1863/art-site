@@ -10,7 +10,7 @@ let adminProductCache = [];
 // The loaded edit-form product's saved type/code plus the last category actually picked,
 // so changeEditProductType can tell a genuine category change from a re-pick of the same
 // value (module state, populated by populateEditFormProducts on every product load).
-let editProductTypeState = { savedType: "", savedCode: "", lastSelectedType: "" };
+let editProductTypeState = { savedType: "", savedCode: "", lastSelectedType: "", autoFilledCode: "" };
 
 //Add product
 export const runAddNewProduct = async () => {
@@ -129,6 +129,7 @@ export const runEditProduct = async () => {
 
     // Re-select the product that was just updated so user can see the changes
     productSelector.value = productId;
+    syncAdminPicSelector(productId);
 
     // Re-populate the form with the updated data
     const updatedOption = findSelectorOption(productSelector, productId);
@@ -229,6 +230,8 @@ export const runRemovePicSlot = async (removeBtn) => {
 export const changeAdminProductSelector = async (changeElement) => {
   if (!changeElement) return null;
 
+  syncAdminPicSelector(changeElement.value);
+
   await clearAdminEditFields();
   resetAdminPicSlots();
 
@@ -248,10 +251,8 @@ export const changeAdminProductSelector = async (changeElement) => {
   await populateEditFormProducts(productObj);
 };
 
-// Edit-form category change: picking a category different from the loaded product's saved
-// one suggests the next code for it (reuses prefillNextProductCode's fetch, forced past its
-// guard by clearing the field first); picking the saved category back restores the product's
-// own code. Re-picking the same category as last time is a no-op, so a manual edit survives.
+// Edit-form category change: preserve loaded or admin-entered codes. Blank fields and values
+// written by prior category switches remain eligible for a new suggestion or saved-code restore.
 export const changeEditProductType = async (selectElement) => {
   if (!selectElement) return null;
 
@@ -260,13 +261,27 @@ export const changeEditProductType = async (selectElement) => {
   editProductTypeState.lastSelectedType = newType;
 
   const codeInput = document.getElementById("edit-product-code");
+  if (hasProtectedEditProductCode(codeInput)) return null;
+
   if (newType === editProductTypeState.savedType) {
     if (codeInput) codeInput.value = editProductTypeState.savedCode;
+    editProductTypeState.autoFilledCode = String(editProductTypeState.savedCode).trim();
     return editProductTypeState.savedCode;
   }
 
-  if (codeInput) codeInput.value = ""; // empties the saved code so prefillNextProductCode's guard allows a fresh suggestion
-  return prefillNextProductCode("edit");
+  if (codeInput) codeInput.value = "";
+  const suggestedCode = await prefillNextProductCode("edit");
+  // A newer category switch happened while the request was in flight — its continuation owns the state
+  if (editProductTypeState.lastSelectedType !== newType) return null;
+  editProductTypeState.autoFilledCode = suggestedCode ? String(suggestedCode).trim() : "";
+  return suggestedCode;
+};
+
+const hasProtectedEditProductCode = (codeInput) => {
+  if (!codeInput) return false;
+
+  const currentCode = codeInput.value.trim();
+  return !!currentCode && currentCode !== editProductTypeState.autoFilledCode;
 };
 
 export const changeAdminProductFilter = async (changeElement) => {
@@ -324,7 +339,6 @@ const getProductsByType = (products, productType) => {
 };
 
 const renderAdminProductSelector = (inputArray) => {
-
   const productSelector = document.getElementById("product-selector");
   if (!productSelector) return null;
 
@@ -338,23 +352,7 @@ const renderAdminProductSelector = (inputArray) => {
   productSelector.value = "";
 
   // Sort: letter-prefix productCodes first (A→Z), then numeric-only productCodes (low→high), then no productCode (alpha by name)
-  const sortedProducts = [...inputArray];
-  sortedProducts.sort((a, b) => {
-    const aHasId = a.productCode != null && String(a.productCode).trim() !== "";
-    const bHasId = b.productCode != null && String(b.productCode).trim() !== "";
-    if (aHasId && bHasId) {
-      const aStr = String(a.productCode);
-      const bStr = String(b.productCode);
-      const aIsAlpha = /^[a-zA-Z]/.test(aStr);
-      const bIsAlpha = /^[a-zA-Z]/.test(bStr);
-      if (aIsAlpha && !bIsAlpha) return -1;
-      if (!aIsAlpha && bIsAlpha) return 1;
-      return aStr.localeCompare(bStr, undefined, { numeric: true, sensitivity: 'base' });
-    }
-    if (aHasId) return -1;
-    if (bHasId) return 1;
-    return a.name.localeCompare(b.name);
-  });
+  const sortedProducts = sortAdminProducts(inputArray);
 
   // Add all products as options
   for (let i = 0; i < sortedProducts.length; i++) {
@@ -369,7 +367,188 @@ const renderAdminProductSelector = (inputArray) => {
     productSelector.append(option);
   }
 
+  renderAdminPicSelector(sortedProducts);
+
   return true;
+};
+
+const sortAdminProducts = (inputArray) => {
+  const sortedProducts = [...inputArray];
+  sortedProducts.sort(compareAdminProducts);
+  return sortedProducts;
+};
+
+const compareAdminProducts = (a, b) => {
+  const aHasId = a.productCode != null && String(a.productCode).trim() !== "";
+  const bHasId = b.productCode != null && String(b.productCode).trim() !== "";
+  if (aHasId && bHasId) return compareProductCodes(a.productCode, b.productCode);
+  if (aHasId) return -1;
+  if (bHasId) return 1;
+  return a.name.localeCompare(b.name);
+};
+
+const compareProductCodes = (aCode, bCode) => {
+  const aString = String(aCode);
+  const bString = String(bCode);
+  const aIsAlpha = /^[a-zA-Z]/.test(aString);
+  const bIsAlpha = /^[a-zA-Z]/.test(bString);
+  if (aIsAlpha && !bIsAlpha) return -1;
+  if (!aIsAlpha && bIsAlpha) return 1;
+  return aString.localeCompare(bString, undefined, { numeric: true, sensitivity: "base" });
+};
+
+const renderAdminPicSelector = (products) => {
+  const list = document.getElementById("product-pic-selector-list");
+  if (!list) return null;
+
+  list.innerHTML = "";
+  for (let i = 0; i < products.length; i++) {
+    list.append(buildAdminPicOption(products[i]));
+  }
+  syncAdminPicSelector("");
+  return list;
+};
+
+const buildAdminPicOption = (product) => {
+  const option = document.createElement("button");
+  option.className = "product-pic-selector-option";
+  option.type = "button";
+  option.setAttribute("role", "option");
+  option.setAttribute("aria-selected", "false");
+  option.setAttribute("data-label", "product-pic-selector-option");
+  option.setAttribute("data-product-id", product.productId);
+  option.productData = product;
+  option.append(buildAdminProductThumbnail(product), buildAdminPicOptionName(product.name));
+  return option;
+};
+
+const buildAdminPicOptionName = (name) => {
+  const nameElement = document.createElement("span");
+  nameElement.className = "product-pic-selector-name";
+  nameElement.textContent = name;
+  return nameElement;
+};
+
+const buildAdminProductThumbnail = (product) => {
+  const filename = findFirstProductImage(product.picData);
+  if (!filename) return buildAdminProductPlaceholder();
+
+  const image = document.createElement("img");
+  image.className = "product-pic-selector-image";
+  image.alt = "";
+  image.src = `/images/thumbnails/${filename}`;
+  image.onerror = () => fallbackAdminProductThumbnail(image, filename);
+  return image;
+};
+
+const findFirstProductImage = (picData) => {
+  const pictures = picData ? (Array.isArray(picData) ? picData : [picData]) : [];
+  for (let i = 0; i < pictures.length; i++) {
+    if (isVideoPic(pictures[i])) continue;
+    if (pictures[i]?.filename) return pictures[i].filename;
+  }
+  return null;
+};
+
+// Legacy picData entries may lack mediaType, so the extension is the fallback signal
+const isVideoPic = (pic) => {
+  if (!pic) return false;
+  if (String(pic.mediaType || "").toLowerCase() === "video") return true;
+  return /\.(mp4|webm|mov)$/i.test(pic.filename || "");
+};
+
+const buildAdminProductPlaceholder = () => {
+  const placeholder = document.createElement("span");
+  placeholder.className = "product-pic-placeholder";
+  placeholder.setAttribute("aria-hidden", "true");
+  return placeholder;
+};
+
+const fallbackAdminProductThumbnail = (image, filename) => {
+  image.onerror = null;
+  image.src = `/images/products/${filename}`;
+};
+
+export const selectAdminProductByPic = async (productId) => {
+  const productSelector = document.getElementById("product-selector");
+  const option = findSelectorOption(productSelector, productId);
+  if (!option) return null;
+
+  productSelector.value = String(productId);
+  for (let i = 0; i < productSelector.options.length; i++) {
+    if (productSelector.options[i] === option) productSelector.selectedIndex = i;
+  }
+  closeAdminPicSelector();
+  return changeAdminProductSelector(productSelector);
+};
+
+export const syncAdminPicSelector = (productId) => {
+  const trigger = document.getElementById("product-pic-selector-trigger");
+  const name = document.getElementById("product-pic-selector-trigger-name");
+  if (!trigger || !name) return null;
+
+  const product = findCachedProduct(productId);
+  replaceAdminPicTriggerImage(trigger, product);
+  name.textContent = product?.name || "Select by Pic";
+  syncAdminPicOptionStates(productId);
+  return trigger;
+};
+
+const replaceAdminPicTriggerImage = (trigger, product) => {
+  const currentImage = document.getElementById("product-pic-selector-trigger-image");
+  const nextImage = product ? buildAdminProductThumbnail(product) : buildAdminProductPlaceholder();
+  nextImage.id = "product-pic-selector-trigger-image";
+  if (currentImage?.replaceWith) {
+    currentImage.replaceWith(nextImage);
+    return;
+  }
+  if (currentImage) {
+    const imageIndex = trigger.children.indexOf(currentImage);
+    if (imageIndex >= 0) trigger.children[imageIndex] = nextImage;
+  }
+};
+
+const syncAdminPicOptionStates = (productId) => {
+  const list = document.getElementById("product-pic-selector-list");
+  if (!list) return null;
+  for (let i = 0; i < list.children.length; i++) {
+    const isSelected = String(list.children[i].getAttribute("data-product-id")) === String(productId);
+    list.children[i].setAttribute("aria-selected", String(isSelected));
+  }
+  return list;
+};
+
+export const toggleAdminPicSelector = () => {
+  const trigger = document.getElementById("product-pic-selector-trigger");
+  const list = document.getElementById("product-pic-selector-list");
+  if (!trigger || !list) return null;
+
+  const isOpening = list.hidden;
+  list.hidden = !isOpening;
+  trigger.setAttribute("aria-expanded", String(isOpening));
+  if (isOpening && list.children[0]?.focus) list.children[0].focus();
+  return isOpening;
+};
+
+export const closeAdminPicSelector = () => {
+  const trigger = document.getElementById("product-pic-selector-trigger");
+  const list = document.getElementById("product-pic-selector-list");
+  if (!trigger || !list) return null;
+  list.hidden = true;
+  trigger.setAttribute("aria-expanded", "false");
+  return true;
+};
+
+export const moveAdminPicSelectorFocus = (option, direction) => {
+  const list = document.getElementById("product-pic-selector-list");
+  if (!list || !list.children.length) return null;
+  let currentIndex = 0;
+  for (let i = 0; i < list.children.length; i++) {
+    if (list.children[i] === option) currentIndex = i;
+  }
+  const nextIndex = (currentIndex + direction + list.children.length) % list.children.length;
+  list.children[nextIndex].focus();
+  return list.children[nextIndex];
 };
 
 const findSelectorOption = (productSelector, productId) => {
@@ -436,7 +615,12 @@ export const populateEditFormProducts = async (inputObj) => {
 
   // Remember what this product is actually saved as, so a later category change can
   // suggest/restore correctly (see changeEditProductType)
-  editProductTypeState = { savedType: productType || "", savedCode: productCode || "", lastSelectedType: productType || "" };
+  editProductTypeState = {
+    savedType: productType || "",
+    savedCode: productCode || "",
+    lastSelectedType: productType || "",
+    autoFilledCode: "",
+  };
 
   // Sync CSS classes on status selects to match their values
   const statusIds = ["edit-display", "edit-sold", "edit-can-ship"];

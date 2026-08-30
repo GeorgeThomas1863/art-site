@@ -5,6 +5,8 @@ import { buildLetterInput } from "../forms/admin-form.js";
 // Last auto-assigned id per modal mode, so a saved id loaded into the edit
 // form is never mistaken for one this page generated (add and edit are separate).
 const lastAutoProductCodes = { add: "", edit: "" };
+// Monotonic per-mode request ids: with several prefills in flight, only the newest may write the field
+const prefillRequestIds = { add: 0, edit: 0 };
 let categoryCache = null;
 
 //LOAD (entry point: admin page init warms the cache; Edit Categories modal open + refresh/add/rename/delete/letter change fill the list)
@@ -170,8 +172,14 @@ export const prefillNextProductCode = async (mode) => {
   const productTypeSelect = document.getElementById(mode === "edit" ? "edit-product-type" : "product-type");
   if (!productTypeSelect || !productTypeSelect.value) return null;
 
+  const requestId = ++prefillRequestIds[mode];
   const data = await sendToBack({ route: "/next-product-code-route", productType: productTypeSelect.value });
   if (!data || !data.productCode) return null;
+
+  // A newer prefill owns the field — this response is for a category no longer selected
+  if (requestId !== prefillRequestIds[mode]) return null;
+  // The admin may have typed while the request was in flight — never clobber that
+  if (productCodeInput.value.trim() !== currentValue) return null;
 
   lastAutoProductCodes[mode] = data.productCode;
   productCodeInput.value = data.productCode;
