@@ -405,7 +405,7 @@
 }
 
 .add-category-row #new-category-letter {
-  width: 4.5ch;
+  width: 8ch;
   font-family: "Courier New", Courier, monospace;
   font-weight: bold;
   text-transform: uppercase;
@@ -457,7 +457,7 @@
 /* Per-row letter input: compact, monospace so the prefix reads like a product code */
 .category-item .category-letter-select {
   flex: 0 0 auto;
-  width: 4.5ch;
+  width: 6.5ch;
   padding: 0.3rem 0.4rem;
   font-family: "Courier New", Courier, monospace;
   font-weight: bold;
@@ -556,6 +556,33 @@
 
 .btn-delete-category:active {
   transform: scale(0.95);
+}
+
+/* Drag handle prepended to each category row for click-and-drag reordering */
+.category-drag-handle {
+  flex: 0 0 auto;
+  cursor: grab;
+  user-select: none;
+  touch-action: none;
+  color: #999;
+  padding: 0.2rem 0.3rem;
+  font-size: 1.1rem;
+  line-height: 1;
+  transition: color 0.2s;
+}
+
+.category-drag-handle:hover {
+  color: #333;
+}
+
+.category-item.dragging {
+  opacity: 0.85;
+  border-color: #999;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+}
+
+.category-item.dragging .category-drag-handle {
+  cursor: grabbing;
 }
 
 .product-code-hint {

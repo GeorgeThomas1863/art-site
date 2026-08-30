@@ -66,6 +66,13 @@ const buildCategoryItem = (category) => {
 
   const categoryItem = document.createElement("div");
   categoryItem.className = "category-item";
+  categoryItem.setAttribute("data-key", category.key);
+
+  const dragHandle = document.createElement("span");
+  dragHandle.className = "category-drag-handle";
+  dragHandle.setAttribute("data-label", "category-drag-handle");
+  dragHandle.title = "Drag to reorder";
+  dragHandle.textContent = "⠿";
 
   const letterInput = buildLetterInput(`category-letter-${category.key}`, category.letter);
   letterInput.classList.add("category-letter-select");
@@ -101,7 +108,7 @@ const buildCategoryItem = (category) => {
   deleteButton.setAttribute("data-title", category.title);
   deleteButton.setAttribute("data-count", count);
 
-  categoryItem.append(titleInput, letterInput, countSpan, deleteButton);
+  categoryItem.append(dragHandle, titleInput, letterInput, countSpan, deleteButton);
   return categoryItem;
 };
 
@@ -337,4 +344,118 @@ export const runDeleteCategory = async (button) => {
   await loadCategories();
 
   return data;
+};
+
+//++++++++++++++++++++++++++++++++++
+//DRAG REORDER (wired to responsive.js mousedown/mousemove/mouseup + touch handlers)
+
+let draggingCategoryItem = null;
+
+// Pure query: current on-screen order of category keys, in DOM order. Used both to
+// persist a finished drag and to detect whether anything actually moved.
+export const buildOrderedCategoryKeys = (listElement) => {
+  if (!listElement) return null;
+
+  const orderedKeys = [];
+  for (let i = 0; i < listElement.children.length; i++) {
+    const child = listElement.children[i];
+    if (!child.classList.contains("category-item")) continue;
+
+    const key = child.getAttribute("data-key");
+    if (!key) continue;
+
+    orderedKeys.push(key);
+  }
+
+  return orderedKeys;
+};
+
+// Arms drag state for the row under the given handle; call on mousedown/touchstart.
+export const startCategoryDrag = (handleElement) => {
+  if (!handleElement) return null;
+  if (draggingCategoryItem) return null; // a second pointer (e.g. second finger) must not steal the armed drag — it would orphan the first row's .dragging class
+
+  const categoryItem = handleElement.closest(".category-item");
+  if (!categoryItem) return null;
+
+  draggingCategoryItem = categoryItem;
+  categoryItem.classList.add("dragging");
+
+  return true;
+};
+
+// Repositions the dragged row among its siblings; call on mousemove/touchmove.
+export const moveCategoryDrag = (clientY) => {
+  if (!draggingCategoryItem) return null;
+
+  const listElement = document.getElementById("category-list");
+  if (!listElement) return null;
+
+  let targetSibling = null;
+  for (let i = 0; i < listElement.children.length; i++) {
+    const sibling = listElement.children[i];
+    if (sibling === draggingCategoryItem) continue;
+    if (!sibling.classList.contains("category-item")) continue;
+
+    const rect = sibling.getBoundingClientRect();
+    const midpoint = rect.top + rect.height / 2;
+    if (midpoint <= clientY) continue;
+
+    targetSibling = sibling;
+    break;
+  }
+
+  if (targetSibling) {
+    listElement.insertBefore(draggingCategoryItem, targetSibling);
+  } else {
+    listElement.append(draggingCategoryItem);
+  }
+
+  return true;
+};
+
+// Compares the just-dropped order against the cache loadCategories last filled, so a
+// drag that ends where it started doesn't trigger a needless save + popup.
+const hasCategoryOrderChanged = (orderedKeys) => {
+  if (!categoryCache || categoryCache.length !== orderedKeys.length) return true;
+
+  for (let i = 0; i < orderedKeys.length; i++) {
+    if (categoryCache[i].key !== orderedKeys[i]) return true;
+  }
+
+  return false;
+};
+
+// Drops the dragged row where it landed; persists the new order if it actually changed.
+export const endCategoryDrag = async () => {
+  if (!draggingCategoryItem) return null;
+
+  const listElement = document.getElementById("category-list");
+  draggingCategoryItem.classList.remove("dragging");
+  draggingCategoryItem = null;
+
+  const orderedKeys = buildOrderedCategoryKeys(listElement);
+  if (!orderedKeys || !hasCategoryOrderChanged(orderedKeys)) return null;
+
+  const data = await sendToBack({ route: "/update-category-order-route", orderedKeys });
+  if (!data || !data.success) {
+    await displayPopup(data?.message || "Failed to reorder categories", "error");
+    await loadCategories();
+    return null;
+  }
+
+  await displayPopup(data.message || "Category order updated", "success");
+  await loadCategories();
+
+  return data;
+};
+
+// Abandons an in-progress drag without saving; call on blur/visibilitychange/touchcancel.
+export const cancelCategoryDrag = () => {
+  if (!draggingCategoryItem) return null;
+
+  draggingCategoryItem.classList.remove("dragging");
+  draggingCategoryItem = null;
+
+  return true;
 };

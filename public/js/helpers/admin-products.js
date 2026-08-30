@@ -3,9 +3,14 @@ import { sendToBack } from "../util/api-front.js";
 import { buildNewProductParams, getEditProductParams } from "../util/params.js";
 import { displayPopup, displayConfirmDialog } from "../util/popup.js";
 import { buildPicSlot } from "../forms/admin-form.js";
-import { confirmProductCodeUnique, resetAutoProductCode } from "./admin-categories.js";
+import { confirmProductCodeUnique, resetAutoProductCode, prefillNextProductCode } from "./admin-categories.js";
 
 let adminProductCache = [];
+
+// The loaded edit-form product's saved type/code plus the last category actually picked,
+// so changeEditProductType can tell a genuine category change from a re-pick of the same
+// value (module state, populated by populateEditFormProducts on every product load).
+let editProductTypeState = { savedType: "", savedCode: "", lastSelectedType: "" };
 
 //Add product
 export const runAddNewProduct = async () => {
@@ -243,6 +248,27 @@ export const changeAdminProductSelector = async (changeElement) => {
   await populateEditFormProducts(productObj);
 };
 
+// Edit-form category change: picking a category different from the loaded product's saved
+// one suggests the next code for it (reuses prefillNextProductCode's fetch, forced past its
+// guard by clearing the field first); picking the saved category back restores the product's
+// own code. Re-picking the same category as last time is a no-op, so a manual edit survives.
+export const changeEditProductType = async (selectElement) => {
+  if (!selectElement) return null;
+
+  const newType = selectElement.value;
+  if (newType === editProductTypeState.lastSelectedType) return null;
+  editProductTypeState.lastSelectedType = newType;
+
+  const codeInput = document.getElementById("edit-product-code");
+  if (newType === editProductTypeState.savedType) {
+    if (codeInput) codeInput.value = editProductTypeState.savedCode;
+    return editProductTypeState.savedCode;
+  }
+
+  if (codeInput) codeInput.value = ""; // empties the saved code so prefillNextProductCode's guard allows a fresh suggestion
+  return prefillNextProductCode("edit");
+};
+
 export const changeAdminProductFilter = async (changeElement) => {
   if (!changeElement) return null;
 
@@ -407,6 +433,10 @@ export const populateEditFormProducts = async (inputObj) => {
 
   // The id now in the form is the product's saved id, not an auto-suggestion
   resetAutoProductCode("edit");
+
+  // Remember what this product is actually saved as, so a later category change can
+  // suggest/restore correctly (see changeEditProductType)
+  editProductTypeState = { savedType: productType || "", savedCode: productCode || "", lastSelectedType: productType || "" };
 
   // Sync CSS classes on status selects to match their values
   const statusIds = ["edit-display", "edit-sold", "edit-can-ship"];

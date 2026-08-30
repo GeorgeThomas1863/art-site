@@ -954,6 +954,15 @@
     padding: 1rem;
   }
 
+  /* Bigger touch target for the drag handle on small screens */
+  .category-drag-handle {
+    min-width: 32px;
+    min-height: 32px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+  }
+
   .action-card {
     padding: 1.5rem;
   }

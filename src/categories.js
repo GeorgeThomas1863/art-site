@@ -50,22 +50,28 @@ export const normalizeLetter = (letter) => {
 
 //---------- read ----------
 
+// Docs missing sortOrder (pre-existing data) sort after every doc that has one, keeping
+// their relative order — a stable sort with a MAX_SAFE_INTEGER fallback achieves that.
+const sortCategoriesByOrder = (categories) => {
+  return [...categories].sort((a, b) => (a.sortOrder ?? Number.MAX_SAFE_INTEGER) - (b.sortOrder ?? Number.MAX_SAFE_INTEGER));
+};
+
 export const getCategories = async () => {
   try {
     const dataModel = new dbModel("", CATEGORIES_COLLECTION());
     const existing = await dataModel.getAll();
     if (!existing) return null;
-    if (existing.length > 0) return existing;
+    if (existing.length > 0) return sortCategoriesByOrder(existing);
 
     for (let i = 0; i < DEFAULT_CATEGORIES.length; i++) {
-      const seedParams = { ...DEFAULT_CATEGORIES[i], dateCreated: new Date().toISOString() };
+      const seedParams = { ...DEFAULT_CATEGORIES[i], sortOrder: i, dateCreated: new Date().toISOString() };
       const seedModel = new dbModel(seedParams, CATEGORIES_COLLECTION());
       await seedModel.storeAny();
     }
 
     const seededModel = new dbModel("", CATEGORIES_COLLECTION());
     const seeded = await seededModel.getAll();
-    return seeded || null;
+    return seeded ? sortCategoriesByOrder(seeded) : null;
   } catch (error) {
     console.error("getCategories error:", error);
     return null;
@@ -143,7 +149,27 @@ export const addCategory = async (inputParams) => {
       if (categories[i].key === key) return { success: false, message: "Category already exists" };
     }
 
-    const newCategory = { key, title: trimmedTitle, letter: upperLetter, dateCreated: new Date().toISOString() };
+    // Legacy docs seeded before sortOrder existed have none; getCategories() already sorts them
+    // to the end, so backfilling sortOrder = index there preserves their current order and stops
+    // the new category (computed below) from jumping ahead of them.
+    for (let i = 0; i < categories.length; i++) {
+      if (typeof categories[i].sortOrder === "number") continue;
+
+      const backfillParams = { keyToLookup: "key", itemValue: categories[i].key, updateObj: { sortOrder: i } };
+      const backfillModel = new dbModel(backfillParams, CATEGORIES_COLLECTION());
+      const backfillData = await backfillModel.updateObjItem();
+      if (!backfillData?.matchedCount) return { success: false, message: "Failed to backfill category order" }; // key vanished since the snapshot — updateOne resolves truthy even on no match
+
+      categories[i].sortOrder = i;
+    }
+
+    let maxSortOrder = -1;
+    for (let i = 0; i < categories.length; i++) {
+      if (categories[i].sortOrder > maxSortOrder) maxSortOrder = categories[i].sortOrder;
+    }
+    const nextSortOrder = maxSortOrder + 1;
+
+    const newCategory = { key, title: trimmedTitle, letter: upperLetter, sortOrder: nextSortOrder, dateCreated: new Date().toISOString() };
     const storeModel = new dbModel(newCategory, CATEGORIES_COLLECTION());
     const storeData = await storeModel.storeAny();
     if (!storeData) return { success: false, message: "Failed to store category" };
@@ -182,6 +208,50 @@ export const updateCategoryTitle = async (inputParams) => {
   } catch (error) {
     console.error("updateCategoryTitle error:", error);
     return { success: false, message: "Failed to update category title" };
+  }
+};
+
+// Persists a new display order for all categories. orderedKeys must be a permutation of every
+// existing category key — each key's index in the array becomes its sortOrder.
+export const updateCategoryOrder = async (orderedKeys) => {
+  try {
+    if (!Array.isArray(orderedKeys) || orderedKeys.length === 0) {
+      return { success: false, message: "orderedKeys must be a non-empty array" };
+    }
+    for (let i = 0; i < orderedKeys.length; i++) {
+      if (typeof orderedKeys[i] !== "string") return { success: false, message: "orderedKeys must contain only strings" };
+    }
+
+    const categories = await getCategories();
+    if (!categories) return { success: false, message: "Failed to load categories" };
+    if (orderedKeys.length !== categories.length) return { success: false, message: "orderedKeys must match existing categories" };
+
+    const seenKeys = Object.create(null);
+    for (let i = 0; i < orderedKeys.length; i++) {
+      if (seenKeys[orderedKeys[i]]) return { success: false, message: "orderedKeys must not contain duplicate keys" };
+      seenKeys[orderedKeys[i]] = true;
+
+      let found = false;
+      for (let j = 0; j < categories.length; j++) {
+        if (categories[j].key === orderedKeys[i]) {
+          found = true;
+          break;
+        }
+      }
+      if (!found) return { success: false, message: "orderedKeys must match existing categories" };
+    }
+
+    for (let index = 0; index < orderedKeys.length; index++) {
+      const updateParams = { keyToLookup: "key", itemValue: orderedKeys[index], updateObj: { sortOrder: index } };
+      const updateModel = new dbModel(updateParams, CATEGORIES_COLLECTION());
+      const updateData = await updateModel.updateObjItem();
+      if (!updateData?.matchedCount) return { success: false, message: "Failed to update category order" }; // key vanished since the snapshot — updateOne resolves truthy even on no match
+    }
+
+    return { success: true, message: "Category order updated" };
+  } catch (error) {
+    console.error("updateCategoryOrder error:", error);
+    return { success: false, message: "Failed to update category order" };
   }
 };
 

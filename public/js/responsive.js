@@ -1,6 +1,6 @@
 import { runModalTrigger, runModalClose, runChangeStatusCard, updateAdminStats } from "./helpers/admin-run.js"; //prettier-ignore
-import { runAddNewProduct, runEditProduct, runDeleteProduct, changeAdminProductSelector, changeAdminProductFilter, runAddPicSlot, runRemovePicSlot } from "./helpers/admin-products.js";
-import { runAddCategory, runDeleteCategory, runRenameCategory, runChangeCategoryLetter, loadCategories, prefillNextProductCode } from "./helpers/admin-categories.js";
+import { runAddNewProduct, runEditProduct, runDeleteProduct, changeAdminProductSelector, changeAdminProductFilter, changeEditProductType, runAddPicSlot, runRemovePicSlot } from "./helpers/admin-products.js";
+import { runAddCategory, runDeleteCategory, runRenameCategory, runChangeCategoryLetter, loadCategories, prefillNextProductCode, startCategoryDrag, moveCategoryDrag, endCategoryDrag, cancelCategoryDrag } from "./helpers/admin-categories.js"; //prettier-ignore
 import { runAddNewEvent, runEditEvent, runDeleteEvent, changeAdminEventSelector } from "./helpers/admin-events.js";
 import { runSendNewsletter, runSendTestNewsletter, runAddSubscriber, runRemoveSubscriber, runRefreshSubscriberList, changeAdminNewsletterSelector, runDeleteNewsletter, runUpdateNewsletter, handleQuillImageClick, runNewsletterImageUpload } from "./helpers/admin-newsletter.js";
 import { runSlotUploadClick, runSlotUploadPic, runDeleteSlotImage, runEditSlotImage } from "./helpers/upload-pic.js";
@@ -230,7 +230,7 @@ export const changeHandler = async (e) => {
 
   //Product type -> auto-fill next product code
   if (changeId === "product-type") await prefillNextProductCode("add");
-  if (changeId === "edit-product-type") await prefillNextProductCode("edit");
+  if (changeId === "edit-product-type") await changeEditProductType(changeElement);
 
   //Category name + letter picker in the Edit Categories modal
   if (changeType === "category-title-input") await runRenameCategory(changeElement);
@@ -285,11 +285,55 @@ if (displayElement) {
   document.addEventListener("mouseup", mainPicMouseUpHandler);
 }
 
+// Category row drag-to-reorder: mousedown/touchstart arm the drag on the handle,
+// mousemove/touchmove reposition the row, mouseup/touchend drop + persist it.
+const categoryDragMouseDownHandler = (e) => {
+  if (e.button !== 0) return; // right/middle button mouseups can be eaten by native menus, stranding the drag state
+  if (e.target.getAttribute("data-label") !== "category-drag-handle") return;
+
+  e.preventDefault(); // suppress text selection while dragging the row
+  startCategoryDrag(e.target);
+};
+
+const categoryDragMouseMoveHandler = (e) => {
+  moveCategoryDrag(e.clientY); // no-op unless a drag is armed
+};
+
+const categoryDragMouseUpHandler = async () => {
+  await endCategoryDrag(); // no-op unless a drag is armed
+};
+
+const categoryDragTouchStartHandler = (e) => {
+  if (e.target.getAttribute("data-label") !== "category-drag-handle") return;
+  startCategoryDrag(e.target);
+};
+
+const categoryDragTouchMoveHandler = (e) => {
+  if (!document.querySelector(".category-item.dragging")) return; // not dragging: let the modal scroll normally
+  e.preventDefault();
+  moveCategoryDrag(e.changedTouches[0].clientY);
+};
+
+const categoryDragTouchEndHandler = async () => {
+  await endCategoryDrag(); // no-op unless a drag is armed
+};
+
+const categoryDragTouchCancelHandler = () => {
+  cancelCategoryDrag(); // no-op unless a drag is armed
+};
+
 if (adminElement) {
   adminElement.addEventListener("click", clickHandler);
   adminElement.addEventListener("keydown", keyHandler);
   adminElement.addEventListener("change", changeHandler);
   adminElement.addEventListener("input", inputHandler);
+  adminElement.addEventListener("mousedown", categoryDragMouseDownHandler);
+  adminElement.addEventListener("touchstart", categoryDragTouchStartHandler, { passive: true });
+  adminElement.addEventListener("touchmove", categoryDragTouchMoveHandler, { passive: false });
+  adminElement.addEventListener("touchend", categoryDragTouchEndHandler);
+  adminElement.addEventListener("touchcancel", categoryDragTouchCancelHandler);
+  document.addEventListener("mousemove", categoryDragMouseMoveHandler);
+  document.addEventListener("mouseup", categoryDragMouseUpHandler);
   // adminElement.addEventListener("click", overlayClickHandler);
 }
 
@@ -393,6 +437,7 @@ const mouseDragCancelHandler = () => {
   mainPicMousePanel = null;
   mouseStartX = null;
   mouseDragCarousel = null;
+  cancelCategoryDrag();
 };
 
 window.addEventListener("blur", mouseDragCancelHandler);
