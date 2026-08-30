@@ -602,7 +602,7 @@ export const buildProductDetailsSection = async (mode) => {
   const slugRow = await buildInfoRow(mode, "url-name", "URL Ending");
 
   // Type Row
-  const typeRow = await buildInfoRowSelect(mode, "product-type", "Type", []);
+  const typeRow = await buildInfoRowSelect(mode, "product-type", "Product Type", []);
 
   // Price Row
   const priceRow = await buildInfoRowPrice(mode, "price", "Price");
@@ -1116,7 +1116,7 @@ export const buildAdminProductSelector = async () => {
 
   const filterLabel = document.createElement("label");
   filterLabel.setAttribute("for", "edit-product-filter");
-  filterLabel.textContent = "Type";
+  filterLabel.textContent = "Select Product Type";
 
   const typeFilter = document.createElement("select");
   typeFilter.className = "form-select";

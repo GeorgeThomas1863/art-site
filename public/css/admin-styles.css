@@ -1109,6 +1109,10 @@
   border: 1px solid #e0e0e0;
 }
 
+.product-selector-field #product-selector {
+  margin-top: 0.75rem;
+}
+
 .form-select {
   font-family: "Georgia", serif;
   font-size: 1rem;
