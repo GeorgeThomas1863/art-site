@@ -8,7 +8,7 @@ afterEach(() => {
 });
 
 describe("buildProductRotationEntries", () => {
-  it("builds an entry for every image while preserving its product urlName", () => {
+  it("builds exactly one entry per product — the first image — preserving its urlName", () => {
     const products = [
       {
         urlName: "multi-image-art",
@@ -23,8 +23,24 @@ describe("buildProductRotationEntries", () => {
 
     expect(buildProductRotationEntries(products)).toEqual([
       { src: "/images/products/front.jpg", urlName: "multi-image-art" },
-      { src: "/images/products/detail.jpg", urlName: "multi-image-art" },
       { src: "/images/products/single.jpg", urlName: "single-image-art" },
+    ]);
+  });
+
+  it("skips a leading non-image picture and uses the first actual image instead", () => {
+    const products = [
+      {
+        urlName: "video-first-art",
+        picData: [
+          { filename: "teaser.mp4", mediaType: "video" },
+          { filename: "second.jpg", mediaType: "image" },
+          { filename: "third.jpg", mediaType: "image" },
+        ],
+      },
+    ];
+
+    expect(buildProductRotationEntries(products)).toEqual([
+      { src: "/images/products/second.jpg", urlName: "video-first-art" },
     ]);
   });
 

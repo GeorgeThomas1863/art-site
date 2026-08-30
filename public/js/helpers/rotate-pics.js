@@ -24,6 +24,9 @@ const aboutStaticPic = "/images/background/selfie1.jpg";
 const MAIN_ROTATION_INTERVAL = 10000;
 const RIGHT_ROTATION_DELAY = 5000;
 const CROSSFADE_DURATION = 1600;
+// Manual nav (arrow click / drag / swipe) pauses that panel's auto-rotation for this long; each
+// manual interaction resets the pause, and normal-interval auto-rotation resumes once it elapses.
+const MANUAL_INTERACTION_PAUSE = 30000;
 
 let aboutIndexTop = 0;
 let aboutIndexBottom = 4;
@@ -178,7 +181,7 @@ export const rotateMainPic = async (element, direction, instant = false) => {
   clearTimeout(state.timerId);
   if (state.transitionPromise) await state.transitionPromise;
   await advanceMainRotation(state, direction, instant);
-  scheduleMainRotation(state, MAIN_ROTATION_INTERVAL);
+  scheduleMainRotation(state, MANUAL_INTERACTION_PAUSE);
 };
 
 const buildMainRotationState = (element, index) => {

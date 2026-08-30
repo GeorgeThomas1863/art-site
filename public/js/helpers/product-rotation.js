@@ -1,3 +1,4 @@
+// Homepage rotation: exactly one entry per product — the product's first valid image.
 export const buildProductRotationEntries = (products) => {
   if (!Array.isArray(products) || products.length === 0) return [];
 
@@ -16,6 +17,7 @@ const appendProductEntries = (entries, product) => {
     const entry = buildRotationEntry(pics[i], product.urlName);
     if (!entry) continue;
     entries.push(entry);
+    return; // stop at the first valid image — homepage shows one picture per product
   }
 };
 
