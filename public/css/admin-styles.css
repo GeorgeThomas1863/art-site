@@ -1132,9 +1132,7 @@
   display: flex;
   align-items: center;
   width: 100%;
-  min-height: 76px;
   gap: 0.75rem;
-  padding: 0.35rem;
   border: 1px solid #333;
   background: #fff;
   color: #000;
@@ -1145,7 +1143,21 @@
 }
 
 .product-pic-selector-trigger {
+  padding: 0.9rem 2.5rem 0.9rem 1rem;
   border-radius: 4px;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath fill='%23555' d='M0 0l5 6 5-6z'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 0.85rem center;
+}
+
+.product-pic-selector-trigger > .product-pic-placeholder {
+  display: none;
+}
+
+/* A chosen product puts a real thumbnail in the trigger; grow to fit it */
+.product-pic-selector-trigger:has(.product-pic-selector-image) {
+  min-height: 76px;
+  padding: 0.35rem 2.5rem 0.35rem 0.35rem;
 }
 
 .product-pic-selector-trigger:focus,
@@ -1174,6 +1186,7 @@
 
 .product-pic-selector-option {
   min-height: 80px;
+  padding: 0.35rem;
   border-width: 0 0 1px;
   border-radius: 0;
 }
