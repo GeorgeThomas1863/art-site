@@ -24,6 +24,9 @@ export const addCartItem = async (req) => {
   const productModel = new dbModel({ keyToLookup: "productId", itemValue: safeProductId }, process.env.PRODUCTS_COLLECTION);
   const productData = await productModel.getUniqueItem();
   if (!productData) return { success: false, message: "Product not found" };
+  if (productData.sold === "yes" || productData.display === "no") {
+    return { success: false, message: "Product is no longer available" };
+  }
 
   let existingItem = null;
   for (let i = 0; i < req.session.cart.length; i++) {

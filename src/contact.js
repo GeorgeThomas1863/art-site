@@ -60,7 +60,8 @@ export const submitContact = async (inputParams) => {
 
     return { success: true, message: "Email sent successfully", messageId: data.messageId };
   } catch (error) {
-    console.error("EMAIL ERROR:", error);
+    //never log the full error object — axios errors embed the Mailgun key in their config
+    console.error("EMAIL ERROR:", error.message);
     return { success: false, message: "Failed to send email" };
   }
 };

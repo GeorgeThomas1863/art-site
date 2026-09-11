@@ -101,14 +101,15 @@ describe("getUSPS", () => {
 //---------- rate fetching ----------
 
 describe("fetchShippingRates — input guards", () => {
-  it("fails without zip or productArray", async () => {
+  it("fails without zip or a cart in the session", async () => {
     expect((await fetchShippingRates(buildReq({ body: {} }))).success).toBe(false);
     expect((await fetchShippingRates(buildReq({ body: { zip: "22150" } }))).success).toBe(false);
+    expect((await fetchShippingRates(buildReq({ body: { zip: "22150" }, session: { cart: [] } }))).success).toBe(false);
     expect(axios.post).not.toHaveBeenCalled();
   });
 
   it("rejects a malformed ZIP before calling ShipEngine", async () => {
-    const req = buildReq({ body: { zip: "ABCDE", productArray: [{ productId: "ship-1", quantity: 1 }] } });
+    const req = buildReq({ body: { zip: "ABCDE" }, session: { cart: [{ productId: "ship-1", quantity: 1 }] } });
     const result = await fetchShippingRates(req);
     expect(result).toEqual({ success: false, message: "Invalid ZIP code format" });
     expect(axios.get).not.toHaveBeenCalled();
@@ -117,7 +118,7 @@ describe("fetchShippingRates — input guards", () => {
 
 describe("fetchShippingRates — pickup-only carts", () => {
   it("returns a synthetic $0 Pickup rate and never calls ShipEngine", async () => {
-    const req = buildReq({ body: { zip: "22150", productArray: [{ productId: "pickup-1", quantity: 2 }] } });
+    const req = buildReq({ body: { zip: "22150" }, session: { cart: [{ productId: "pickup-1", quantity: 2 }] } });
 
     const result = await fetchShippingRates(req);
 
@@ -130,7 +131,7 @@ describe("fetchShippingRates — pickup-only carts", () => {
   });
 
   it("treats unknown products as non-shippable", async () => {
-    const req = buildReq({ body: { zip: "22150", productArray: [{ productId: "ghost", quantity: 1 }] } });
+    const req = buildReq({ body: { zip: "22150" }, session: { cart: [{ productId: "ghost", quantity: 1 }] } });
     const result = await fetchShippingRates(req);
     expect(result.allPickup).toBe(true);
   });
@@ -140,9 +141,9 @@ describe("fetchShippingRates — package math", () => {
   it("sums weight by quantity and takes the max of each dimension, ignoring pickup-only items", async () => {
     mockCarriersAndRates([buildRate()]);
     const req = buildReq({
-      body: {
-        zip: "22150",
-        productArray: [
+      body: { zip: "22150" },
+      session: {
+        cart: [
           { productId: "ship-1", quantity: 2 }, // 2 lb, 10x4x3
           { productId: "ship-2", quantity: 1 }, // 2.5 lb, 6x8x2
           { productId: "pickup-1", quantity: 1 }, // ignored
@@ -164,7 +165,7 @@ describe("fetchShippingRates — package math", () => {
   it("scales width and height down so girth never exceeds 100 inches", async () => {
     seedCollection(PRODUCTS, [buildProductDoc({ productId: "big", weight: 1, length: 10, width: 40, height: 30 })]);
     mockCarriersAndRates([buildRate()]);
-    const req = buildReq({ body: { zip: "22150", productArray: [{ productId: "big", quantity: 1 }] } });
+    const req = buildReq({ body: { zip: "22150" }, session: { cart: [{ productId: "big", quantity: 1 }] } });
 
     await fetchShippingRates(req);
 
@@ -176,9 +177,9 @@ describe("fetchShippingRates — package math", () => {
   it("skips products with a non-positive or non-numeric quantity", async () => {
     mockCarriersAndRates([buildRate()]);
     const req = buildReq({
-      body: {
-        zip: "22150",
-        productArray: [
+      body: { zip: "22150" },
+      session: {
+        cart: [
           { productId: "ship-1", quantity: 0 },
           { productId: "ship-2", quantity: "x" },
           { productId: "ship-1", quantity: 1 },
@@ -195,7 +196,7 @@ describe("fetchShippingRates — package math", () => {
 describe("fetchShippingRates — rate processing", () => {
   it("applies house adjustments and stores adjusted rates in the session", async () => {
     mockCarriersAndRates([buildRate({ shipping_amount: { amount: 10 }, delivery_days: 2 })]);
-    const req = buildReq({ body: { zip: "22150", productArray: [{ productId: "ship-1", quantity: 1 }] } });
+    const req = buildReq({ body: { zip: "22150" }, session: { cart: [{ productId: "ship-1", quantity: 1 }] } });
 
     const result = await fetchShippingRates(req);
 
@@ -214,7 +215,7 @@ describe("fetchShippingRates — rate processing", () => {
       buildRate({ service_type: "USPS First Class", package_type: "large_envelope_or_flat" }),
       buildRate({ service_type: "USPS Ground Advantage", package_type: "package" }),
     ]);
-    const req = buildReq({ body: { zip: "22150", productArray: [{ productId: "ship-1", quantity: 1 }] } });
+    const req = buildReq({ body: { zip: "22150" }, session: { cart: [{ productId: "ship-1", quantity: 1 }] } });
 
     const result = await fetchShippingRates(req);
 
@@ -228,7 +229,7 @@ describe("fetchShippingRates — rate processing", () => {
       buildRate({ service_type: "A" }),
       buildRate({ service_type: "B" }),
     ]);
-    const req = buildReq({ body: { zip: "22150", productArray: [{ productId: "ship-1", quantity: 1 }] } });
+    const req = buildReq({ body: { zip: "22150" }, session: { cart: [{ productId: "ship-1", quantity: 1 }] } });
 
     const result = await fetchShippingRates(req);
 
@@ -241,7 +242,7 @@ describe("fetchShippingRates — rate processing", () => {
       buildRate({ service_type: "Cheap", shipping_amount: { amount: 5 } }),
       buildRate({ service_type: "Envelope Cheapest", package_type: "letter", shipping_amount: { amount: 1 } }),
     ]);
-    const req = buildReq({ body: { zip: "22150", productArray: [{ productId: "ship-1", quantity: 1 }] } });
+    const req = buildReq({ body: { zip: "22150" }, session: { cart: [{ productId: "ship-1", quantity: 1 }] } });
 
     await fetchShippingRates(req);
 
@@ -252,7 +253,7 @@ describe("fetchShippingRates — rate processing", () => {
   it("returns a failure (not a throw) when ShipEngine errors", async () => {
     axios.get.mockResolvedValue(CARRIERS_RESPONSE);
     axios.post.mockRejectedValue(new Error("502"));
-    const req = buildReq({ body: { zip: "22150", productArray: [{ productId: "ship-1", quantity: 1 }] } });
+    const req = buildReq({ body: { zip: "22150" }, session: { cart: [{ productId: "ship-1", quantity: 1 }] } });
 
     const result = await fetchShippingRates(req);
 
@@ -262,7 +263,7 @@ describe("fetchShippingRates — rate processing", () => {
 
   it("returns a failure when USPS is not available on the account", async () => {
     axios.get.mockResolvedValue({ data: { carriers: [] } });
-    const req = buildReq({ body: { zip: "22150", productArray: [{ productId: "ship-1", quantity: 1 }] } });
+    const req = buildReq({ body: { zip: "22150" }, session: { cart: [{ productId: "ship-1", quantity: 1 }] } });
 
     const result = await fetchShippingRates(req);
 

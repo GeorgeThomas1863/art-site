@@ -30,11 +30,21 @@ export const placeNewOrder = async (req) => {
   const totalCost = +(subtotal + shippingCost + tax).toFixed(2);
   const totalInCents = Math.round(totalCost * 100);
 
+  let itemsReserved = false;
+  let paymentCompleted = false;
+
   try {
+    // Atomically mark every cart item sold before charging — blocks concurrent double-selling
+    const reserveData = await reserveCartItems(req.session.cart);
+    if (!reserveData.success) return reserveData;
+    itemsReserved = true;
+
     const paymentData = await processPayment(totalInCents, inputParams);
     if (!paymentData || !paymentData.success || !paymentData.payment) {
+      await releaseCartItems(req.session.cart);
       return { success: false, message: "Failed to process payment" };
     }
+    paymentCompleted = true;
 
     const payment = paymentData.payment;
     const { route, paymentToken, ...customerObj } = inputParams;
@@ -99,8 +109,57 @@ export const placeNewOrder = async (req) => {
 
     return returnObj;
   } catch (e) {
-    console.error("ORDER ERROR:", e);
+    //never log the full error object — API errors embed credentials in their config
+    console.error("ORDER ERROR:", e.message);
+    // Payment already captured keeps items sold; anything earlier gives them back
+    if (itemsReserved && !paymentCompleted) await releaseCartItems(req.session.cart);
     return { success: false, message: "Failed to place order" };
+  }
+};
+
+//----------
+
+const reserveCartItems = async (cartArray) => {
+  const reservedArray = [];
+
+  try {
+    for (const item of cartArray) {
+      const reserveParams = {
+        keyToLookup: "productId",
+        itemValue: item.productId,
+        guardObj: { sold: "yes", display: "no" },
+        updateObj: { sold: "yes" },
+      };
+
+      const reserveModel = new dbModel(reserveParams, process.env.PRODUCTS_COLLECTION);
+      const reserveData = await reserveModel.updateItemWhereNot();
+      if (!reserveData || !reserveData.matchedCount) {
+        await releaseCartItems(reservedArray);
+        return { success: false, message: `"${item.name}" is no longer available` };
+      }
+
+      reservedArray.push(item);
+    }
+  } catch (e) {
+    console.error("RESERVE ITEMS ERROR:", e.message);
+    await releaseCartItems(reservedArray);
+    return { success: false, message: "Failed to reserve cart items" };
+  }
+
+  return { success: true, message: "Cart items reserved" };
+};
+
+//----------
+
+const releaseCartItems = async (cartArray) => {
+  for (const item of cartArray) {
+    try {
+      const releaseParams = { keyToLookup: "productId", itemValue: item.productId, updateObj: { sold: "no" } };
+      const releaseModel = new dbModel(releaseParams, process.env.PRODUCTS_COLLECTION);
+      await releaseModel.updateObjItem();
+    } catch (e) {
+      console.error("RELEASE ITEM ERROR:", item.productId, e.message);
+    }
   }
 };
 

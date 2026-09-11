@@ -45,6 +45,17 @@ export class FakeDbModel {
     return { acknowledged: true, matchedCount: 1, modifiedCount: 1 };
   }
 
+  async updateItemWhereNot() {
+    const { keyToLookup, itemValue, guardObj, updateObj } = this.dataObject;
+    const doc = findFirstDoc(this.collection, { [keyToLookup]: itemValue });
+    if (!doc) return { acknowledged: true, matchedCount: 0, modifiedCount: 0 };
+    for (const key of Object.keys(guardObj)) {
+      if (doc[key] === guardObj[key]) return { acknowledged: true, matchedCount: 0, modifiedCount: 0 };
+    }
+    Object.assign(doc, stripDollarKeys(updateObj));
+    return { acknowledged: true, matchedCount: 1, modifiedCount: 1 };
+  }
+
   async matchMultiItems() {
     const { keyToLookup1, keyToLookup2, keyToLookup3, itemValue1, itemValue2, itemValue3 } = this.dataObject;
     const doc = findFirstDoc(this.collection, {

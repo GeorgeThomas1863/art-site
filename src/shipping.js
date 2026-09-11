@@ -3,10 +3,14 @@ import dbModel from "../models/db-model.js";
 import { validateZip, sanitizeMongoValue, validatePositiveInt } from "./sanitize.js";
 
 export const fetchShippingRates = async (req) => {
-  if (!req || !req.body || !req.body.zip || !req.body.productArray) return { success: false, message: "No ZIP code or product array provided" };
-  const { zip, productArray } = req.body;
+  if (!req || !req.body || !req.body.zip) return { success: false, message: "No ZIP code provided" };
+  const { zip } = req.body;
 
   if (!validateZip(zip)) return { success: false, message: "Invalid ZIP code format" };
+
+  // Price shipping from the server-side cart, never a client-sent product list
+  const productArray = req.session.cart;
+  if (!productArray || !productArray.length) return { success: false, message: "Cart is empty" };
 
   // console.log("PRODUCT ARRAY");
   // console.log(productArray);

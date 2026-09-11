@@ -11,10 +11,11 @@ import { processPayment } from "../src/payments.js";
 import { sendMail } from "../src/mailer.js";
 import { placeNewOrder, storeOrderData, getOrderNumber, sendOrderConfirmationEmails } from "../src/orders.js";
 import { seedCollection, readCollection } from "./helpers/fake-db.js";
-import { buildReq, buildCartItem } from "./helpers/mock-req.js";
+import { buildReq, buildCartItem, buildProductDoc } from "./helpers/mock-req.js";
 
 const ORDERS = process.env.ORDERS_COLLECTION;
 const CUSTOMERS = process.env.CUSTOMERS_COLLECTION;
+const PRODUCTS = process.env.PRODUCTS_COLLECTION;
 
 //---------- fixtures ----------
 
@@ -86,6 +87,7 @@ const mockPaymentSuccess = (paymentOverrides = {}) => {
 
 let errorSpy;
 beforeEach(() => {
+  seedCollection(PRODUCTS, [buildProductDoc({ productId: "prod-1" }), buildProductDoc({ productId: "prod-2", name: "Geode" })]);
   sendMail.mockResolvedValue({ messageId: "<m@x>" });
   errorSpy = vi.spyOn(console, "error").mockImplementation(() => {});
 });
@@ -111,6 +113,65 @@ describe("placeNewOrder — guards", () => {
     req.session.shipping = null;
     const result = await placeNewOrder(req);
     expect(result).toEqual({ success: false, message: "No shipping rate selected" });
+    expect(processPayment).not.toHaveBeenCalled();
+  });
+
+  it("rejects checkout before charging when a cart item was sold or hidden", async () => {
+    seedCollection(PRODUCTS, [buildProductDoc({ productId: "prod-1", sold: "yes" }), buildProductDoc({ productId: "prod-2", name: "Geode" })]);
+    const req = buildCheckoutReq();
+    const result = await placeNewOrder(req);
+    expect(result.success).toBe(false);
+    expect(result.message).toContain("no longer available");
+    expect(processPayment).not.toHaveBeenCalled();
+  });
+});
+
+//---------- reservation (double-sell race) ----------
+
+describe("placeNewOrder — item reservation", () => {
+  it("marks cart items sold before charging the card", async () => {
+    processPayment.mockImplementation(async () => {
+      for (const doc of readCollection(PRODUCTS)) expect(doc.sold).toBe("yes");
+      return { success: true, payment: buildSquarePayment() };
+    });
+    const result = await placeNewOrder(buildCheckoutReq());
+    expect(result.success).toBe(true);
+    expect(processPayment).toHaveBeenCalledTimes(1);
+  });
+
+  it("releases reserved items when payment fails", async () => {
+    processPayment.mockResolvedValue({ success: false });
+    const result = await placeNewOrder(buildCheckoutReq());
+    expect(result).toEqual({ success: false, message: "Failed to process payment" });
+    for (const doc of readCollection(PRODUCTS)) expect(doc.sold).toBe("no");
+  });
+
+  it("releases reserved items when a later cart item is unavailable, without charging", async () => {
+    seedCollection(PRODUCTS, [buildProductDoc({ productId: "prod-1" }), buildProductDoc({ productId: "prod-2", name: "Geode", sold: "yes" })]);
+    const result = await placeNewOrder(buildCheckoutReq());
+    expect(result.success).toBe(false);
+    expect(result.message).toContain("no longer available");
+    expect(processPayment).not.toHaveBeenCalled();
+    const prod1 = readCollection(PRODUCTS).find((doc) => doc.productId === "prod-1");
+    expect(prod1.sold).toBe("no");
+  });
+
+  it("blocks a second checkout for the same items after the first succeeds", async () => {
+    mockPaymentSuccess();
+    const firstResult = await placeNewOrder(buildCheckoutReq());
+    expect(firstResult.success).toBe(true);
+
+    const secondResult = await placeNewOrder(buildCheckoutReq());
+    expect(secondResult.success).toBe(false);
+    expect(secondResult.message).toContain("no longer available");
+    expect(processPayment).toHaveBeenCalledTimes(1);
+  });
+
+  it("rejects a hidden (display no) item without charging", async () => {
+    seedCollection(PRODUCTS, [buildProductDoc({ productId: "prod-1", display: "no" }), buildProductDoc({ productId: "prod-2", name: "Geode" })]);
+    const result = await placeNewOrder(buildCheckoutReq());
+    expect(result.success).toBe(false);
+    expect(result.message).toContain("no longer available");
     expect(processPayment).not.toHaveBeenCalled();
   });
 });

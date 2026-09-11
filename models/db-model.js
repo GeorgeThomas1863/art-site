@@ -29,6 +29,23 @@ class dbModel {
     return updateData;
   }
 
+  async updateItemWhereNot() {
+    const { keyToLookup, itemValue, guardObj, updateObj } = this.dataObject;
+    const safeValue = sanitizeMongoValue(itemValue);
+    // Atomic check-and-set: only matches when every guard field differs from its guard value
+    const filterObj = { [keyToLookup]: safeValue };
+    for (const key of Object.keys(guardObj)) {
+      if (!key.startsWith("$")) filterObj[key] = { $ne: sanitizeMongoValue(guardObj[key]) };
+    }
+    // Strip any $-prefixed keys from the update object
+    const safeUpdateObj = {};
+    for (const key of Object.keys(updateObj)) {
+      if (!key.startsWith("$")) safeUpdateObj[key] = updateObj[key];
+    }
+    const updateData = await dbGet().collection(this.collection).updateOne(filterObj, { $set: { ...safeUpdateObj } }); //prettier-ignore
+    return updateData;
+  }
+
   //---------------
 
   async matchMultiItems() {
