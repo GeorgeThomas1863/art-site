@@ -18,6 +18,8 @@ export const loadCategories = async () => {
 
   await populateCategoryList(categoryArray);
   await populateCategorySelects(categoryArray);
+  populateSubcategorySelect("add");
+  populateSubcategorySelect("edit");
   await prefillNextProductCode("add");
 
   return categoryArray;
@@ -31,6 +33,8 @@ export const fillProductTypeSelects = async () => {
   if (!categoryCache) return null;
 
   await populateCategorySelects(categoryCache);
+  populateSubcategorySelect("add");
+  populateSubcategorySelect("edit");
   await prefillNextProductCode("add");
 
   return true;
@@ -110,8 +114,96 @@ const buildCategoryItem = (category) => {
   deleteButton.setAttribute("data-title", category.title);
   deleteButton.setAttribute("data-count", count);
 
-  categoryItem.append(dragHandle, titleInput, letterInput, countSpan, deleteButton);
+  const subcategoryPanel = buildSubcategoryPanel(category);
+
+  categoryItem.append(dragHandle, titleInput, letterInput, countSpan, deleteButton, subcategoryPanel);
   return categoryItem;
+};
+
+const buildSubcategoryPanel = (category) => {
+  const panel = document.createElement("div");
+  panel.className = "subcategory-panel";
+
+  const subcategories = category.subcategories || [];
+  for (let i = 0; i < subcategories.length; i++) {
+    panel.append(buildSubcategoryRow(category.key, subcategories[i], i, subcategories.length));
+  }
+
+  panel.append(buildAddSubcategoryRow(category.key));
+  return panel;
+};
+
+const buildSubcategoryRow = (categoryKey, subcategory, index, total) => {
+  const row = document.createElement("div");
+  row.className = "subcategory-row";
+
+  const titleInput = document.createElement("input");
+  titleInput.className = "form-input subcategory-title-input";
+  titleInput.type = "text";
+  titleInput.value = subcategory.title;
+  titleInput.maxLength = 60;
+  titleInput.title = "Subcategory name - edit and press Enter or click away to save";
+  titleInput.setAttribute("aria-label", "Subcategory name");
+  titleInput.setAttribute("data-label", "subcategory-title-input");
+  setSubcategoryAttributes(titleInput, categoryKey, subcategory);
+
+  const upButton = buildSubcategoryMoveButton(categoryKey, subcategory, "up", index === 0);
+  const downButton = buildSubcategoryMoveButton(categoryKey, subcategory, "down", index === total - 1);
+
+  const deleteButton = document.createElement("button");
+  deleteButton.className = "btn-delete-category btn-delete-subcategory";
+  deleteButton.type = "button";
+  deleteButton.textContent = "×";
+  deleteButton.title = "Remove subcategory";
+  deleteButton.setAttribute("data-label", "remove-subcategory");
+  setSubcategoryAttributes(deleteButton, categoryKey, subcategory);
+
+  row.append(titleInput, upButton, downButton, deleteButton);
+  return row;
+};
+
+const buildSubcategoryMoveButton = (categoryKey, subcategory, direction, isDisabled) => {
+  const button = document.createElement("button");
+  button.className = "btn-move-subcategory";
+  button.type = "button";
+  button.textContent = direction === "up" ? "▲" : "▼";
+  button.title = direction === "up" ? "Move up" : "Move down";
+  button.disabled = isDisabled;
+  button.setAttribute("data-label", "move-subcategory");
+  button.setAttribute("data-direction", direction);
+  setSubcategoryAttributes(button, categoryKey, subcategory);
+  return button;
+};
+
+const setSubcategoryAttributes = (element, categoryKey, subcategory) => {
+  element.setAttribute("data-category-key", categoryKey);
+  element.setAttribute("data-key", subcategory.key);
+  element.setAttribute("data-title", subcategory.title);
+};
+
+const buildAddSubcategoryRow = (categoryKey) => {
+  const row = document.createElement("div");
+  row.className = "subcategory-row subcategory-add-row";
+
+  const titleInput = document.createElement("input");
+  titleInput.className = "form-input subcategory-new-input";
+  titleInput.type = "text";
+  titleInput.id = `new-subcategory-${categoryKey}`;
+  titleInput.maxLength = 60;
+  titleInput.placeholder = "Add subcategory, e.g. Earrings";
+  titleInput.setAttribute("aria-label", "New subcategory name");
+  titleInput.setAttribute("data-label", "new-subcategory-input");
+  titleInput.setAttribute("data-category-key", categoryKey);
+
+  const addButton = document.createElement("button");
+  addButton.className = "btn-add-subcategory";
+  addButton.type = "button";
+  addButton.textContent = "+ Add";
+  addButton.setAttribute("data-label", "add-subcategory");
+  addButton.setAttribute("data-category-key", categoryKey);
+
+  row.append(titleInput, addButton);
+  return row;
 };
 
 export const populateCategorySelects = async (categoryArray) => {
@@ -157,6 +249,60 @@ export const populateCategorySelects = async (categoryArray) => {
   }
 
   return true;
+};
+
+// Fills a product form's Subcategory dropdown from its chosen category and hides the row when that
+// category has none. Without selectedKey the current pick is kept if the new list still has it.
+export const populateSubcategorySelect = (mode, selectedKey) => {
+  const typeSelect = document.getElementById(mode === "edit" ? "edit-product-type" : "product-type");
+  const subSelect = document.getElementById(mode === "edit" ? "edit-product-sub-type" : "product-sub-type");
+  if (!typeSelect || !subSelect) return null;
+
+  const keyToSelect = selectedKey ?? subSelect.value;
+  const subcategories = findCachedSubcategories(typeSelect.value);
+
+  subSelect.innerHTML = "";
+  subSelect.append(buildSubcategoryOption("", "None"));
+  for (let i = 0; i < subcategories.length; i++) {
+    subSelect.append(buildSubcategoryOption(subcategories[i].key, subcategories[i].title));
+  }
+
+  // A saved product can point at a deleted subcategory; keep that key so an edit-save doesn't erase it
+  if (mode === "edit" && keyToSelect && !hasSubcategoryKey(subcategories, keyToSelect)) {
+    subSelect.append(buildSubcategoryOption(keyToSelect, `${keyToSelect} (deleted)`));
+  }
+
+  subSelect.value = keyToSelect;
+  if (subSelect.value !== keyToSelect) subSelect.value = "";
+
+  const row = subSelect.closest(".info-row");
+  if (row) row.classList.toggle("hidden", subSelect.options.length <= 1);
+  return true;
+};
+
+const hasSubcategoryKey = (subcategories, key) => {
+  for (let i = 0; i < subcategories.length; i++) {
+    if (subcategories[i].key === key) return true;
+  }
+
+  return false;
+};
+
+const findCachedSubcategories = (categoryKey) => {
+  if (!categoryCache) return [];
+
+  for (let i = 0; i < categoryCache.length; i++) {
+    if (categoryCache[i].key === categoryKey) return categoryCache[i].subcategories || [];
+  }
+
+  return [];
+};
+
+const buildSubcategoryOption = (value, text) => {
+  const option = document.createElement("option");
+  option.value = value;
+  option.textContent = text;
+  return option;
 };
 
 //++++++++++++++++++++++++++++++++++
@@ -349,6 +495,109 @@ export const runDeleteCategory = async (button) => {
   }
 
   await displayPopup(data.message || `Category "${title}" deleted successfully`, "success");
+  await loadCategories();
+
+  return data;
+};
+
+//++++++++++++++++++++++++++++++++++
+//ADD / RENAME / MOVE / DELETE SUBCATEGORY (wired to responsive.js click + change + Enter handlers)
+
+export const runAddSubcategory = async (triggerElement) => {
+  if (!triggerElement) return null;
+
+  const categoryKey = triggerElement.getAttribute("data-category-key");
+  const titleInput = document.getElementById(`new-subcategory-${categoryKey}`);
+  if (!categoryKey || !titleInput) return null;
+
+  const title = titleInput.value.trim();
+  if (!title) {
+    await displayPopup("Please enter a subcategory name", "error");
+    return null;
+  }
+
+  const data = await sendToBack({ route: "/add-subcategory-route", categoryKey, title });
+  if (!data || !data.success) {
+    await displayPopup(data?.message || "Failed to add subcategory", "error");
+    return null;
+  }
+
+  await displayPopup(data.message || "Subcategory added successfully", "success");
+  await loadCategories();
+
+  return data;
+};
+
+export const runRenameSubcategory = async (inputElement) => {
+  if (!inputElement) return null;
+
+  const categoryKey = inputElement.getAttribute("data-category-key");
+  const subcategoryKey = inputElement.getAttribute("data-key");
+  const oldTitle = inputElement.getAttribute("data-title") || "";
+  const newTitle = inputElement.value.trim();
+  if (!categoryKey || !subcategoryKey) return null;
+
+  if (!newTitle) {
+    inputElement.value = oldTitle;
+    await displayPopup("Subcategory name cannot be empty", "error");
+    return null;
+  }
+  if (newTitle === oldTitle) {
+    inputElement.value = oldTitle;
+    return null;
+  }
+
+  const data = await sendToBack({ route: "/update-subcategory-title-route", categoryKey, subcategoryKey, title: newTitle });
+  if (!data || !data.success) {
+    await displayPopup(data?.message || "Failed to rename subcategory", "error");
+    inputElement.value = oldTitle;
+    return null;
+  }
+
+  await displayPopup(data.message || `Subcategory renamed to "${newTitle}"`, "success");
+  await loadCategories();
+
+  return data;
+};
+
+export const runMoveSubcategory = async (button) => {
+  if (!button) return null;
+
+  const categoryKey = button.getAttribute("data-category-key");
+  const subcategoryKey = button.getAttribute("data-key");
+  const direction = button.getAttribute("data-direction");
+  if (!categoryKey || !subcategoryKey) return null;
+
+  const data = await sendToBack({ route: "/move-subcategory-route", categoryKey, subcategoryKey, direction });
+  if (!data || !data.success) {
+    await displayPopup(data?.message || "Failed to move subcategory", "error");
+    return null;
+  }
+
+  await loadCategories();
+
+  return data;
+};
+
+export const runDeleteSubcategory = async (button) => {
+  if (!button) return null;
+
+  const categoryKey = button.getAttribute("data-category-key");
+  const subcategoryKey = button.getAttribute("data-key");
+  const title = button.getAttribute("data-title");
+  if (!categoryKey || !subcategoryKey) return null;
+
+  const confirmMessage = `Delete subcategory "${title}"? Its products are not changed and stay in their category.`;
+  const confirmDialog = await displayConfirmDialog(confirmMessage);
+  if (!confirmDialog) return null;
+
+  const data = await sendToBack({ route: "/delete-subcategory-route", categoryKey, subcategoryKey });
+  if (!data || !data.success) {
+    await displayPopup(data?.message || "Failed to delete subcategory", "error");
+    return null;
+  }
+
+  await displayPopup(data.message || `Subcategory "${title}" deleted successfully`, "success");
   await loadCategories();
 
   return data;

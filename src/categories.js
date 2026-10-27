@@ -48,6 +48,13 @@ export const normalizeLetter = (letter) => {
   return upperLetter;
 };
 
+const findTitleError = (trimmedTitle) => {
+  if (!trimmedTitle) return "Title is required";
+  if (trimmedTitle.length > 60) return "Title must be 60 characters or fewer";
+
+  return null;
+};
+
 //---------- read ----------
 
 // Docs missing sortOrder (pre-existing data) sort after every doc that has one, keeping
@@ -97,7 +104,8 @@ export const buildCategoryList = async () => {
     for (let i = 0; i < categories.length; i++) {
       const category = categories[i];
       const productCount = countsByType[category.key] || 0;
-      list.push({ key: category.key, title: category.title, letter: category.letter, productCount });
+      const subcategories = category.subcategories || [];
+      list.push({ key: category.key, title: category.title, letter: category.letter, productCount, subcategories });
     }
 
     return list;
@@ -132,8 +140,8 @@ export const addCategory = async (inputParams) => {
     const { title, letter } = inputParams || {};
 
     const trimmedTitle = String(title ?? "").trim();
-    if (!trimmedTitle) return { success: false, message: "Title is required" };
-    if (trimmedTitle.length > 60) return { success: false, message: "Title must be 60 characters or fewer" };
+    const titleError = findTitleError(trimmedTitle);
+    if (titleError) return { success: false, message: titleError };
 
     const key = buildCategoryKey(trimmedTitle);
     if (!key) return { success: false, message: "Title must contain at least one letter or number" };
@@ -189,8 +197,8 @@ export const updateCategoryTitle = async (inputParams) => {
     if (!key) return { success: false, message: "No category key provided" };
 
     const trimmedTitle = String(title ?? "").trim();
-    if (!trimmedTitle) return { success: false, message: "Title is required" };
-    if (trimmedTitle.length > 60) return { success: false, message: "Title must be 60 characters or fewer" };
+    const titleError = findTitleError(trimmedTitle);
+    if (titleError) return { success: false, message: titleError };
 
     const lookupParams = { keyToLookup: "key", itemValue: key };
     const checkModel = new dbModel(lookupParams, CATEGORIES_COLLECTION());
@@ -370,6 +378,148 @@ export const deleteCategory = async (key) => {
     console.error("deleteCategory error:", error);
     return { success: false, message: "Failed to delete category" };
   }
+};
+
+//---------- subcategories ----------
+
+// Subcategories live on their parent category doc as an ordered array of { key, title }; array
+// position is display order. A product points at one through productSubType (the key). Product
+// codes never depend on a subcategory, and deleting one leaves its products untouched.
+
+export const addSubcategory = async (inputParams) => {
+  try {
+    const { categoryKey, title } = inputParams || {};
+    if (!categoryKey) return { success: false, message: "No category key provided" };
+
+    const trimmedTitle = String(title ?? "").trim();
+    const titleError = findTitleError(trimmedTitle);
+    if (titleError) return { success: false, message: titleError };
+
+    const key = buildCategoryKey(trimmedTitle);
+    if (!key) return { success: false, message: "Title must contain at least one letter or number" };
+    if (key === "all") return { success: false, message: 'Subcategory name "all" is reserved' };
+
+    const subcategories = await getSubcategories(categoryKey);
+    if (!subcategories) return { success: false, message: "Category not found" };
+    if (findSubcategoryIndex(subcategories, key) !== -1) return { success: false, message: "Subcategory already exists" };
+
+    const newSubcategory = { key, title: trimmedTitle };
+    subcategories.push(newSubcategory);
+
+    const saveData = await saveSubcategories(categoryKey, subcategories);
+    if (!saveData.success) return saveData;
+
+    return { success: true, message: "Subcategory added successfully", subcategory: newSubcategory };
+  } catch (error) {
+    console.error("addSubcategory error:", error);
+    return { success: false, message: "Failed to add subcategory" };
+  }
+};
+
+export const updateSubcategoryTitle = async (inputParams) => {
+  try {
+    const { categoryKey, subcategoryKey, title } = inputParams || {};
+    if (!categoryKey || !subcategoryKey) return { success: false, message: "No subcategory key provided" };
+
+    const trimmedTitle = String(title ?? "").trim();
+    const titleError = findTitleError(trimmedTitle);
+    if (titleError) return { success: false, message: titleError };
+
+    const subcategories = await getSubcategories(categoryKey);
+    if (!subcategories) return { success: false, message: "Category not found" };
+
+    const index = findSubcategoryIndex(subcategories, subcategoryKey);
+    if (index === -1) return { success: false, message: "Subcategory not found" };
+    if (subcategories[index].title === trimmedTitle) return { success: true, message: "Title unchanged", title: trimmedTitle };
+
+    subcategories[index] = { ...subcategories[index], title: trimmedTitle };
+
+    const saveData = await saveSubcategories(categoryKey, subcategories);
+    if (!saveData.success) return saveData;
+
+    return { success: true, message: `Subcategory renamed to "${trimmedTitle}"`, title: trimmedTitle };
+  } catch (error) {
+    console.error("updateSubcategoryTitle error:", error);
+    return { success: false, message: "Failed to update subcategory title" };
+  }
+};
+
+export const moveSubcategory = async (inputParams) => {
+  try {
+    const { categoryKey, subcategoryKey, direction } = inputParams || {};
+    if (!categoryKey || !subcategoryKey) return { success: false, message: "No subcategory key provided" };
+    if (direction !== "up" && direction !== "down") return { success: false, message: "Direction must be up or down" };
+
+    const subcategories = await getSubcategories(categoryKey);
+    if (!subcategories) return { success: false, message: "Category not found" };
+
+    const index = findSubcategoryIndex(subcategories, subcategoryKey);
+    if (index === -1) return { success: false, message: "Subcategory not found" };
+
+    const targetIndex = direction === "up" ? index - 1 : index + 1;
+    if (targetIndex < 0 || targetIndex >= subcategories.length) return { success: false, message: "Subcategory cannot move further" };
+
+    const movedSubcategory = subcategories[index];
+    subcategories[index] = subcategories[targetIndex];
+    subcategories[targetIndex] = movedSubcategory;
+
+    const saveData = await saveSubcategories(categoryKey, subcategories);
+    if (!saveData.success) return saveData;
+
+    return { success: true, message: "Subcategory order updated" };
+  } catch (error) {
+    console.error("moveSubcategory error:", error);
+    return { success: false, message: "Failed to move subcategory" };
+  }
+};
+
+export const deleteSubcategory = async (inputParams) => {
+  try {
+    const { categoryKey, subcategoryKey } = inputParams || {};
+    if (!categoryKey || !subcategoryKey) return { success: false, message: "No subcategory key provided" };
+
+    const subcategories = await getSubcategories(categoryKey);
+    if (!subcategories) return { success: false, message: "Category not found" };
+
+    const index = findSubcategoryIndex(subcategories, subcategoryKey);
+    if (index === -1) return { success: false, message: "Subcategory not found" };
+
+    subcategories.splice(index, 1);
+
+    const saveData = await saveSubcategories(categoryKey, subcategories);
+    if (!saveData.success) return saveData;
+
+    return { success: true, message: "Subcategory deleted successfully" };
+  } catch (error) {
+    console.error("deleteSubcategory error:", error);
+    return { success: false, message: "Failed to delete subcategory" };
+  }
+};
+
+const getSubcategories = async (categoryKey) => {
+  const lookupParams = { keyToLookup: "key", itemValue: categoryKey };
+  const checkModel = new dbModel(lookupParams, CATEGORIES_COLLECTION());
+  const category = await checkModel.getUniqueItem();
+  if (!category) return null;
+
+  return [...(category.subcategories || [])];
+};
+
+const findSubcategoryIndex = (subcategories, key) => {
+  for (let i = 0; i < subcategories.length; i++) {
+    if (subcategories[i].key === key) return i;
+  }
+
+  return -1;
+};
+
+const saveSubcategories = async (categoryKey, subcategories) => {
+  const updateParams = { keyToLookup: "key", itemValue: categoryKey, updateObj: { subcategories } };
+  const updateModel = new dbModel(updateParams, CATEGORIES_COLLECTION());
+  const updateData = await updateModel.updateObjItem();
+  if (!updateData?.matchedCount) return { success: false, message: "Failed to save subcategories" };
+
+  return { success: true, message: "Subcategories saved" };
 };
 
 //---------- product code generation ----------

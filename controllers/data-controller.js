@@ -1,6 +1,6 @@
 import { storeProduct, updateProduct, deleteProduct, getProductData, hideOrderedProducts } from "../src/products.js";
 import { storeEvent, updateEvent, deleteEvent, getEventData } from "../src/events.js";
-import { buildCategoryList, addCategory, updateCategoryTitle, updateCategoryLetter, updateCategoryOrder, deleteCategory, buildNextProductCode, findProductCodeOwner } from "../src/categories.js";
+import { buildCategoryList, addCategory, updateCategoryTitle, updateCategoryLetter, updateCategoryOrder, deleteCategory, addSubcategory, updateSubcategoryTitle, moveSubcategory, deleteSubcategory, buildNextProductCode, findProductCodeOwner } from "../src/categories.js"; //prettier-ignore
 import { submitContact } from "../src/contact.js";
 import {
   storeSubscriber,
@@ -116,6 +116,7 @@ export const deletePicControl = async (req, res) => {
 export const addNewProductControl = async (req, res) => {
   const inputParams = req.body;
   if (!inputParams) return res.status(500).json({ error: "No input parameters" });
+  if (!isValidSubType(inputParams.productSubType)) return res.status(400).json({ error: "Invalid subcategory" });
   const shouldNotify = inputParams.notifySubscribers === true || inputParams.notifySubscribers === "true";
   const introText = typeof inputParams.emailIntroText === "string" ? inputParams.emailIntroText : undefined;
 
@@ -124,6 +125,7 @@ export const addNewProductControl = async (req, res) => {
     "name",
     "urlName",
     "productType",
+    "productSubType",
     "price",
     "canShip",
     "length",
@@ -158,12 +160,14 @@ const announceStoredProduct = async (product, introText) => {
 export const editProductControl = async (req, res) => {
   const inputParams = req.body;
   if (!inputParams) return res.status(500).json({ error: "No input parameters" });
+  if (!isValidSubType(inputParams.productSubType)) return res.status(400).json({ error: "Invalid subcategory" });
 
   const safeParams = whitelistFields(inputParams, [
     "productCode",
     "name",
     "urlName",
     "productType",
+    "productSubType",
     "price",
     "canShip",
     "length",
@@ -178,6 +182,12 @@ export const editProductControl = async (req, res) => {
   ]);
   const data = await updateProduct(safeParams);
   return res.json(data);
+};
+
+// Optional field; when sent it must be a subcategory key string (deleted keys are kept on purpose, so no membership check)
+const isValidSubType = (subType) => {
+  if (subType === undefined) return true;
+  return typeof subType === "string" && subType.length <= 100;
 };
 
 export const deleteProductControl = async (req, res) => {
@@ -236,6 +246,42 @@ export const deleteCategoryControl = async (req, res) => {
   if (!inputParams) return res.status(500).json({ error: "No input parameters" });
 
   const data = await deleteCategory(inputParams.key);
+  return res.json(data);
+};
+
+export const addSubcategoryControl = async (req, res) => {
+  const inputParams = req.body;
+  if (!inputParams) return res.status(500).json({ error: "No input parameters" });
+
+  const safeParams = whitelistFields(inputParams, ["categoryKey", "title"]);
+  const data = await addSubcategory(safeParams);
+  return res.json(data);
+};
+
+export const updateSubcategoryTitleControl = async (req, res) => {
+  const inputParams = req.body;
+  if (!inputParams) return res.status(500).json({ error: "No input parameters" });
+
+  const safeParams = whitelistFields(inputParams, ["categoryKey", "subcategoryKey", "title"]);
+  const data = await updateSubcategoryTitle(safeParams);
+  return res.json(data);
+};
+
+export const moveSubcategoryControl = async (req, res) => {
+  const inputParams = req.body;
+  if (!inputParams) return res.status(500).json({ error: "No input parameters" });
+
+  const safeParams = whitelistFields(inputParams, ["categoryKey", "subcategoryKey", "direction"]);
+  const data = await moveSubcategory(safeParams);
+  return res.json(data);
+};
+
+export const deleteSubcategoryControl = async (req, res) => {
+  const inputParams = req.body;
+  if (!inputParams) return res.status(500).json({ error: "No input parameters" });
+
+  const safeParams = whitelistFields(inputParams, ["categoryKey", "subcategoryKey"]);
+  const data = await deleteSubcategory(safeParams);
   return res.json(data);
 };
 

@@ -20,10 +20,11 @@ vi.mock("../public/js/helpers/admin-categories.js", () => ({
   confirmProductCodeUnique: vi.fn(),
   resetAutoProductCode: vi.fn(),
   prefillNextProductCode: vi.fn(),
+  populateSubcategorySelect: vi.fn(),
 }));
 
-import { changeEditProductType, populateEditFormProducts } from "../public/js/helpers/admin-products.js";
-import { prefillNextProductCode } from "../public/js/helpers/admin-categories.js";
+import { changeEditProductType, populateEditFormProducts, resetEditSubcategory } from "../public/js/helpers/admin-products.js";
+import { prefillNextProductCode, populateSubcategorySelect } from "../public/js/helpers/admin-categories.js";
 
 class FakeElement {
   constructor(tagName) {
@@ -220,5 +221,43 @@ describe("changeEditProductType", () => {
 
     expect(thirdResult).toBe("GM001");
     expect(codeInput.value).toBe("GM001");
+  });
+});
+
+describe("resetEditSubcategory", () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+  });
+
+  afterEach(() => {
+    delete global.document;
+  });
+
+  test("loading a product selects its saved subcategory", async () => {
+    await loadEditForm({ productType: "wearableArt", productCode: "W001", productSubType: "earrings" });
+
+    expect(populateSubcategorySelect).toHaveBeenCalledWith("edit", "earrings");
+  });
+
+  test("switching away resets to None and switching back restores the saved subcategory", async () => {
+    await loadEditForm({ productType: "wearableArt", productCode: "W001", productSubType: "earrings" });
+    populateSubcategorySelect.mockClear();
+
+    resetEditSubcategory({ value: "wallPieces" });
+    resetEditSubcategory({ value: "wearableArt" });
+
+    expect(populateSubcategorySelect.mock.calls).toEqual([
+      ["edit", ""],
+      ["edit", "earrings"],
+    ]);
+  });
+
+  test("a product with no subcategory restores None", async () => {
+    await loadEditForm({ productType: "wearableArt", productCode: "W001" });
+    populateSubcategorySelect.mockClear();
+
+    resetEditSubcategory({ value: "wearableArt" });
+
+    expect(populateSubcategorySelect).toHaveBeenCalledWith("edit", "");
   });
 });

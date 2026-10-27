@@ -9,7 +9,7 @@ vi.mock("../public/js/helpers/admin-run.js", () => ({
 vi.mock("../public/js/util/api-front.js", () => ({ sendToBack: vi.fn() }));
 vi.mock("../public/js/util/params.js", () => ({}));
 vi.mock("../public/js/util/popup.js", () => ({}));
-vi.mock("../public/js/helpers/admin-categories.js", () => ({ resetAutoProductCode: vi.fn() }));
+vi.mock("../public/js/helpers/admin-categories.js", () => ({ resetAutoProductCode: vi.fn(), populateSubcategorySelect: vi.fn() }));
 
 class FakeClassList {
   constructor(element) {

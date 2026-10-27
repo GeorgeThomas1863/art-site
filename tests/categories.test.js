@@ -124,15 +124,15 @@ describe("buildCategoryList", () => {
     const list = await buildCategoryList();
 
     expect(list).toEqual([
-      { key: "acorns", title: "Acorns", letter: "A", productCount: 2 },
-      { key: "geodes", title: "Geodes", letter: "G", productCount: 1 },
+      { key: "acorns", title: "Acorns", letter: "A", productCount: 2, subcategories: [] },
+      { key: "geodes", title: "Geodes", letter: "G", productCount: 1, subcategories: [] },
     ]);
   });
 
   it("reports zero products for a category nothing uses", async () => {
     seedCollection(CATEGORIES, [{ key: "other", title: "Other", letter: "O" }]);
     const list = await buildCategoryList();
-    expect(list).toEqual([{ key: "other", title: "Other", letter: "O", productCount: 0 }]);
+    expect(list).toEqual([{ key: "other", title: "Other", letter: "O", productCount: 0, subcategories: [] }]);
   });
 });
 

@@ -1,11 +1,11 @@
 import { runModalTrigger, runModalClose, runChangeStatusCard, updateAdminStats } from "./helpers/admin-run.js"; //prettier-ignore
-import { runAddNewProduct, runEditProduct, runDeleteProduct, changeAdminProductSelector, changeAdminProductFilter, changeEditProductType, runAddPicSlot, runRemovePicSlot, toggleAdminPicSelector, closeAdminPicSelector, selectAdminProductByPic, moveAdminPicSelectorFocus } from "./helpers/admin-products.js";
-import { runAddCategory, runDeleteCategory, runRenameCategory, runChangeCategoryLetter, loadCategories, prefillNextProductCode, startCategoryDrag, moveCategoryDrag, endCategoryDrag, cancelCategoryDrag } from "./helpers/admin-categories.js"; //prettier-ignore
+import { runAddNewProduct, runEditProduct, runDeleteProduct, changeAdminProductSelector, changeAdminProductFilter, changeEditProductType, resetEditSubcategory, runAddPicSlot, runRemovePicSlot, toggleAdminPicSelector, closeAdminPicSelector, selectAdminProductByPic, moveAdminPicSelectorFocus } from "./helpers/admin-products.js";
+import { runAddCategory, runDeleteCategory, runRenameCategory, runChangeCategoryLetter, loadCategories, prefillNextProductCode, populateSubcategorySelect, runAddSubcategory, runRenameSubcategory, runMoveSubcategory, runDeleteSubcategory, startCategoryDrag, moveCategoryDrag, endCategoryDrag, cancelCategoryDrag } from "./helpers/admin-categories.js"; //prettier-ignore
 import { runAddNewEvent, runEditEvent, runDeleteEvent, changeAdminEventSelector } from "./helpers/admin-events.js";
 import { runSendNewsletter, runSendTestNewsletter, runAddSubscriber, runRemoveSubscriber, runRefreshSubscriberList, changeAdminNewsletterSelector, runDeleteNewsletter, runUpdateNewsletter, handleQuillImageClick, runNewsletterImageUpload } from "./helpers/admin-newsletter.js";
 import { runSlotUploadClick, runSlotUploadPic, runDeleteSlotImage, runEditSlotImage } from "./helpers/upload-pic.js";
 import { closeImageEditor, applyImageEditor, revertImageEditor, zoomIn, zoomOut, rotateLeft, rotateRight, flipH, flipV } from "./helpers/image-editor.js";
-import { changeProductsFilterButton, openProductDetailModal, closeProductDetailModal, runProductCarouselDot, runCarouselPrev, runCarouselNext, advanceCarousel } from "./helpers/products-run.js";
+import { changeProductsFilterButton, changeSubcategoryFilterButton, openProductDetailModal, closeProductDetailModal, runProductCarouselDot, runCarouselPrev, runCarouselNext, advanceCarousel } from "./helpers/products-run.js";
 import { runContactSubmit } from "./helpers/contact-run.js";
 import { runEventsNewsletterToggle, runEventsNewsletterSubmit } from "./helpers/events-run.js";
 import { runAddToCart, runIncreaseQuantity, runDecreaseQuantity, runRemoveFromCart } from "./helpers/cart-run.js";
@@ -108,6 +108,7 @@ export const clickHandler = async (e) => {
   }
 
   if (clickType === "category-filter-btn") await changeProductsFilterButton(clickElement);
+  if (clickType === "subcategory-filter-btn") await changeSubcategoryFilterButton(clickElement);
 
   if (clickType === "product-card-click") await openProductDetailModal(clickElement);
   if (clickType === "close-product-modal") await closeProductDetailModal();
@@ -153,6 +154,9 @@ export const clickHandler = async (e) => {
   if (clickType === "add-category") await runAddCategory();
   if (clickType === "remove-category") await runDeleteCategory(clickElement);
   if (clickType === "refresh-category-list") await loadCategories();
+  if (clickType === "add-subcategory") await runAddSubcategory(clickElement);
+  if (clickType === "move-subcategory") await runMoveSubcategory(clickElement);
+  if (clickType === "remove-subcategory") await runDeleteSubcategory(clickElement);
 
   if (clickType === "new-event-submit") await runAddNewEvent();
   if (clickType === "edit-event-submit") await runEditEvent();
@@ -200,6 +204,8 @@ export const keyHandler = async (e) => {
   // Enter in a category name field: blur so the change event saves it (preventDefault above stops the native one)
   if (keyElement.getAttribute("data-label") === "category-title-input") keyElement.blur();
   if (keyElement.getAttribute("data-label") === "category-letter-select") keyElement.blur();
+  if (keyElement.getAttribute("data-label") === "subcategory-title-input") keyElement.blur();
+  if (keyElement.getAttribute("data-label") === "new-subcategory-input") await runAddSubcategory(keyElement);
 
   return true;
 };
@@ -262,12 +268,16 @@ export const changeHandler = async (e) => {
   if (changeId === "edit-product-filter") await changeAdminProductFilter(changeElement);
 
   //Product type -> auto-fill next product code
+  // Subcategory list first: the code prefill awaits a fetch, and the old category's list must not stay pickable meanwhile
+  if (changeId === "product-type") populateSubcategorySelect("add", "");
   if (changeId === "product-type") await prefillNextProductCode("add");
+  if (changeId === "edit-product-type") resetEditSubcategory(changeElement);
   if (changeId === "edit-product-type") await changeEditProductType(changeElement);
 
   //Category name + letter picker in the Edit Categories modal
   if (changeType === "category-title-input") await runRenameCategory(changeElement);
   if (changeType === "category-letter-select") await runChangeCategoryLetter(changeElement);
+  if (changeType === "subcategory-title-input") await runRenameSubcategory(changeElement);
 
   if (changeId === "event-selector") await changeAdminEventSelector(changeElement);
   if (changeId === "newsletter-archive-selector") await changeAdminNewsletterSelector(changeElement);

@@ -3,14 +3,14 @@ import { sendToBack } from "../util/api-front.js";
 import { buildNewProductParams, getEditProductParams } from "../util/params.js";
 import { displayPopup, displayConfirmDialog } from "../util/popup.js";
 import { buildPicSlot } from "../forms/admin-form.js";
-import { confirmProductCodeUnique, resetAutoProductCode, prefillNextProductCode } from "./admin-categories.js";
+import { confirmProductCodeUnique, resetAutoProductCode, prefillNextProductCode, populateSubcategorySelect } from "./admin-categories.js";
 
 let adminProductCache = [];
 
-// The loaded edit-form product's saved type/code plus the last category actually picked,
+// The loaded edit-form product's saved type/code/subcategory plus the last category actually picked,
 // so changeEditProductType can tell a genuine category change from a re-pick of the same
 // value (module state, populated by populateEditFormProducts on every product load).
-let editProductTypeState = { savedType: "", savedCode: "", lastSelectedType: "", autoFilledCode: "" };
+let editProductTypeState = { savedType: "", savedCode: "", savedSubType: "", lastSelectedType: "", autoFilledCode: "" };
 
 //Add product
 export const runAddNewProduct = async () => {
@@ -275,6 +275,14 @@ export const changeEditProductType = async (selectElement) => {
   if (editProductTypeState.lastSelectedType !== newType) return null;
   editProductTypeState.autoFilledCode = suggestedCode ? String(suggestedCode).trim() : "";
   return suggestedCode;
+};
+
+// Switching back to the product's saved category restores its saved subcategory; any other category starts at None
+export const resetEditSubcategory = (selectElement) => {
+  if (!selectElement) return null;
+
+  const isSavedType = selectElement.value === editProductTypeState.savedType;
+  return populateSubcategorySelect("edit", isSavedType ? editProductTypeState.savedSubType : "");
 };
 
 const hasProtectedEditProductCode = (codeInput) => {
@@ -585,7 +593,7 @@ const findCachedProduct = (productId) => {
 export const populateEditFormProducts = async (inputObj) => {
   if (!inputObj) return null;
 
-  const { productCode, name, urlName, productType, price, description, display, sold, picData, canShip, length, width, height, weight } = inputObj;
+  const { productCode, name, urlName, productType, productSubType, price, description, display, sold, picData, canShip, length, width, height, weight } = inputObj; //prettier-ignore
 
   const adminEditMapArray = [
     { id: "edit-product-code", value: productCode },
@@ -610,6 +618,8 @@ export const populateEditFormProducts = async (inputObj) => {
     }
   }
 
+  populateSubcategorySelect("edit", productSubType || "");
+
   // The id now in the form is the product's saved id, not an auto-suggestion
   resetAutoProductCode("edit");
 
@@ -618,6 +628,7 @@ export const populateEditFormProducts = async (inputObj) => {
   editProductTypeState = {
     savedType: productType || "",
     savedCode: productCode || "",
+    savedSubType: productSubType || "",
     lastSelectedType: productType || "",
     autoFilledCode: "",
   };

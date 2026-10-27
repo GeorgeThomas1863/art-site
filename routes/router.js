@@ -36,6 +36,10 @@ import {
   updateCategoryLetterControl,
   updateCategoryOrderControl,
   deleteCategoryControl,
+  addSubcategoryControl,
+  updateSubcategoryTitleControl,
+  moveSubcategoryControl,
+  deleteSubcategoryControl,
   nextProductCodeControl,
   checkProductCodeControl,
   addNewEventControl,
@@ -100,6 +104,14 @@ router.post("/update-category-letter-route", requireAuth, updateCategoryLetterCo
 router.post("/update-category-order-route", requireAuth, updateCategoryOrderControl);
 
 router.post("/delete-category-route", requireAuth, deleteCategoryControl);
+
+router.post("/add-subcategory-route", requireAuth, addSubcategoryControl);
+
+router.post("/update-subcategory-title-route", requireAuth, updateSubcategoryTitleControl);
+
+router.post("/move-subcategory-route", requireAuth, moveSubcategoryControl);
+
+router.post("/delete-subcategory-route", requireAuth, deleteSubcategoryControl);
 
 router.post("/next-product-code-route", requireAuth, nextProductCodeControl);
 

@@ -136,6 +136,7 @@ export const enableAdminEditFields = async () => {
     "edit-product-code",
     "edit-name",
     "edit-product-type",
+    "edit-product-sub-type",
     "edit-price",
     "edit-description",
     "edit-display",
@@ -167,6 +168,7 @@ export const disableAdminEditFields = async () => {
     "edit-product-code",
     "edit-name",
     "edit-product-type",
+    "edit-product-sub-type",
     "edit-price",
     "edit-description",
     "edit-display",
@@ -212,6 +214,8 @@ export const clearAdminEditFields = async () => {
     }
   }
 
+  clearEditSubcategorySelect();
+
   // const deleteButton = document.getElementById("delete-product-button");
   // if (deleteButton) deleteButton.style.display = "none";
 
@@ -221,6 +225,17 @@ export const clearAdminEditFields = async () => {
   const deleteEventButton = document.getElementById("delete-event-button");
   if (deleteEventButton) deleteEventButton.disabled = true;
 
+  return true;
+};
+
+// The next product load rebuilds the options, so empty and hide the row until then
+const clearEditSubcategorySelect = () => {
+  const subSelect = document.getElementById("edit-product-sub-type");
+  if (!subSelect) return null;
+
+  subSelect.innerHTML = "";
+  const row = subSelect.closest(".info-row");
+  if (row) row.classList.add("hidden");
   return true;
 };
 

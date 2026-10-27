@@ -239,7 +239,7 @@ describe("getCategoriesControl", () => {
     ]);
     const res = buildRes();
     await getCategoriesControl(buildReq(), res);
-    expect(res.json).toHaveBeenCalledWith([{ key: "acorns", title: "Acorns", letter: "A", productCount: 2 }]);
+    expect(res.json).toHaveBeenCalledWith([{ key: "acorns", title: "Acorns", letter: "A", productCount: 2, subcategories: [] }]);
   });
 
   it("returns an empty array instead of null when categories fail to load", async () => {

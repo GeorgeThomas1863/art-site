@@ -604,6 +604,10 @@ export const buildProductDetailsSection = async (mode) => {
   // Type Row
   const typeRow = await buildInfoRowSelect(mode, "product-type", "Product Type", []);
 
+  // Subcategory Row (shown by populateSubcategorySelect once the chosen category has subcategories)
+  const subTypeRow = await buildInfoRowSelect(mode, "product-sub-type", "Subcategory", []);
+  subTypeRow.classList.add("hidden");
+
   // Price Row
   const priceRow = await buildInfoRowPrice(mode, "price", "Price");
 
@@ -611,9 +615,9 @@ export const buildProductDetailsSection = async (mode) => {
   const descRow = await buildInfoRowTextarea(mode, "description", "Description");
 
   if (mode === "add") {
-    section.append(header, typeRow, productCodeRow, nameRow, priceRow, descRow, slugRow);
+    section.append(header, typeRow, subTypeRow, productCodeRow, nameRow, priceRow, descRow, slugRow);
   } else {
-    section.append(header, productCodeRow, nameRow, typeRow, priceRow, descRow, slugRow);
+    section.append(header, productCodeRow, nameRow, typeRow, subTypeRow, priceRow, descRow, slugRow);
   }
 
   return section;

@@ -19,6 +19,7 @@ vi.mock("../public/js/forms/admin-form.js", () => ({ buildPicSlot: vi.fn() }));
 vi.mock("../public/js/helpers/admin-categories.js", () => ({
   confirmProductCodeUnique: vi.fn(),
   resetAutoProductCode: vi.fn(),
+  populateSubcategorySelect: vi.fn(),
 }));
 
 import { runEditProduct } from "../public/js/helpers/admin-products.js";

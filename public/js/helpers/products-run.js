@@ -1,4 +1,4 @@
-import { buildProductCard, buildCategoryDescription, buildProductDetailModal } from "../forms/products-form.js";
+import { buildProductCard, buildCategoryDescription, buildSubcategoryFilterBar, buildProductDetailModal } from "../forms/products-form.js";
 import { needsContain } from "./rotate-pics.js";
 import { sendToBack } from "../util/api-front.js";
 import { categoryDescriptions } from "../util/define-things.js";
@@ -15,14 +15,17 @@ export const populateProducts = async (inputArray) => {
 
   productsArray = inputArray;
 
+  return renderProductCards(inputArray);
+};
+
+const renderProductCards = async (inputArray) => {
   const productsGrid = document.getElementById("products-grid");
 
   if (!productsGrid) {
     console.error("Products grid not found");
-    return;
+    return null;
   }
 
-  // Clear existing products
   productsGrid.innerHTML = "";
 
   // Build all product cards in parallel
@@ -34,6 +37,8 @@ export const populateProducts = async (inputArray) => {
   for (let i = 0; i < cards.length; i++) {
     productsGrid.append(cards[i]);
   }
+
+  return true;
 };
 
 // Filter products by category
@@ -48,6 +53,17 @@ export const filterProducts = async (inputArray, category) => {
     if (product.productType === category) {
       filteredProducts.push(product);
     }
+  }
+
+  return filteredProducts;
+};
+
+export const filterProductsBySubcategory = (inputArray, subcategory) => {
+  if (subcategory === "all") return inputArray;
+
+  const filteredProducts = [];
+  for (let i = 0; i < inputArray.length; i++) {
+    if (inputArray[i].productSubType === subcategory) filteredProducts.push(inputArray[i]);
   }
 
   return filteredProducts;
@@ -93,10 +109,15 @@ export const loadPublicCategories = async () => {
 const buildFallbackDescriptor = (category) => {
   if (categoryDescriptions[category]) return null;
 
+  const fetchedCategory = findFetchedCategory(category);
+  if (!fetchedCategory) return null;
+
+  return { title: fetchedCategory.title, details: "" };
+};
+
+const findFetchedCategory = (category) => {
   for (let i = 0; i < fetchedCategories.length; i++) {
-    if (fetchedCategories[i].key === category) {
-      return { title: fetchedCategories[i].title, details: "" };
-    }
+    if (fetchedCategories[i].key === category) return fetchedCategories[i];
   }
 
   return null;
@@ -119,28 +140,44 @@ export const changeProductsFilterButton = async (clickElement) => {
   clickElement.classList.add("active");
 
   const filteredArray = await filterProducts(productsArray, categoryFilter);
-
-  const productsGrid = document.getElementById("products-grid");
-
-  if (!productsGrid) {
-    console.error("Products grid not found");
-    return;
-  }
-
-  productsGrid.innerHTML = "";
-
-  // Build all filtered product cards in parallel
-  const cardPromises = [];
-  for (let i = 0; i < filteredArray.length; i++) {
-    cardPromises.push(buildProductCard(filteredArray[i]));
-  }
-  const cards = await Promise.all(cardPromises);
-  for (let i = 0; i < cards.length; i++) {
-    productsGrid.append(cards[i]);
-  }
+  const rendered = await renderProductCards(filteredArray);
+  if (!rendered) return null;
 
   await updateCategoryDescription(categoryFilter);
+  updateSubcategoryFilterBar(categoryFilter);
 
+  return true;
+};
+
+export const changeSubcategoryFilterButton = async (clickElement) => {
+  if (!clickElement) return null;
+
+  const categoryFilter = clickElement.getAttribute("data-category");
+  const subcategoryFilter = clickElement.getAttribute("data-subcategory");
+
+  const subcategoryButtons = document.querySelectorAll(".products-subcategory-btn");
+  for (let i = 0; i < subcategoryButtons.length; i++) {
+    subcategoryButtons[i].classList.remove("active");
+  }
+  clickElement.classList.add("active");
+
+  const categoryArray = await filterProducts(productsArray, categoryFilter);
+  const filteredArray = filterProductsBySubcategory(categoryArray, subcategoryFilter);
+  return renderProductCards(filteredArray);
+};
+
+// Sits directly under the main filter bar, above the category description
+const updateSubcategoryFilterBar = (category) => {
+  const existingBar = document.querySelector(".products-subcategory-bar");
+  if (existingBar) existingBar.remove();
+
+  const subcategoryBar = buildSubcategoryFilterBar(findFetchedCategory(category));
+  if (!subcategoryBar) return null;
+
+  const filterBar = document.querySelector(".products-filter-bar");
+  if (!filterBar) return null;
+
+  filterBar.insertAdjacentElement("afterend", subcategoryBar);
   return true;
 };
 

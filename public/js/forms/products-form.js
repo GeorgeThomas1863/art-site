@@ -89,6 +89,35 @@ export const buildProductsFilterBar = async () => {
   return filterBar;
 };
 
+// Second filter row for a category that has subcategories; null when it has none
+export const buildSubcategoryFilterBar = (category) => {
+  const subcategories = category?.subcategories || [];
+  if (!subcategories.length) return null;
+
+  const subcategoryBar = document.createElement("div");
+  subcategoryBar.className = "products-subcategory-bar";
+
+  const allButton = buildSubcategoryFilterButton(category.key, "all", `All ${category.title}`);
+  allButton.classList.add("active");
+  subcategoryBar.append(allButton);
+
+  for (let i = 0; i < subcategories.length; i++) {
+    subcategoryBar.append(buildSubcategoryFilterButton(category.key, subcategories[i].key, subcategories[i].title));
+  }
+
+  return subcategoryBar;
+};
+
+const buildSubcategoryFilterButton = (categoryKey, subcategoryKey, text) => {
+  const button = document.createElement("button");
+  button.className = "products-filter-btn products-subcategory-btn";
+  button.setAttribute("data-label", "subcategory-filter-btn");
+  button.setAttribute("data-category", categoryKey);
+  button.setAttribute("data-subcategory", subcategoryKey);
+  button.textContent = text;
+  return button;
+};
+
 //---------------------
 
 export const buildCategoryDescription = async (category, fallbackDescriptor = null) => {
