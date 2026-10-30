@@ -1,6 +1,6 @@
-// Subcategories live on their parent category doc as an ordered { key, title } array. Products
-// point at one through productSubType. Product codes never depend on a subcategory, and deleting
-// a subcategory never touches products.
+// Subcategories live on their parent category doc as an ordered { key, title, letter? } array.
+// Products point at one through productSubType. A lettered subcategory's products take that
+// product-code prefix instead of the category's; deleting a subcategory never touches products.
 
 import { describe, it, expect, vi } from "vitest";
 
@@ -11,12 +11,14 @@ vi.mock("axios", () => {
 import {
   addSubcategory,
   updateSubcategoryTitle,
+  updateSubcategoryLetter,
+  updateCategoryLetter,
   moveSubcategory,
   deleteSubcategory,
   buildCategoryList,
   buildNextProductCode,
 } from "../src/categories.js";
-import { addSubcategoryControl, editProductControl, addNewProductControl } from "../controllers/data-controller.js";
+import { addSubcategoryControl, editProductControl, addNewProductControl, updateSubcategoryLetterControl, nextProductCodeControl } from "../controllers/data-controller.js"; //prettier-ignore
 import { seedCollection, readCollection } from "./helpers/fake-db.js";
 import { buildReq, buildProductDoc } from "./helpers/mock-req.js";
 
@@ -114,6 +116,112 @@ describe("addSubcategory", () => {
   it("fails when no category key is given", async () => {
     const result = await addSubcategory({ title: "Earrings" });
     expect(result).toEqual({ success: false, message: "No category key provided" });
+  });
+
+  it("stores an optional letter uppercased", async () => {
+    seedWearableArt([]);
+
+    const result = await addSubcategory({ categoryKey: "wearableArt", title: "Earrings", letter: " er " });
+
+    expect(result.success).toBe(true);
+    expect(readSubcategories()).toEqual([{ key: "earrings", title: "Earrings", letter: "ER" }]);
+  });
+
+  it("rejects an invalid letter without adding the subcategory", async () => {
+    seedWearableArt([]);
+
+    const result = await addSubcategory({ categoryKey: "wearableArt", title: "Earrings", letter: "E1" });
+
+    expect(result).toEqual({ success: false, message: "Letter must be 1-3 letters A-Z" });
+    expect(readSubcategories()).toEqual([]);
+  });
+});
+
+//---------- updateSubcategoryLetter ----------
+
+describe("updateSubcategoryLetter", () => {
+  const seedEarringProducts = () => {
+    seedCollection(PRODUCTS, [
+      buildProductDoc({ productId: "p1", productCode: "WA001", productType: "wearableArt", productSubType: "earrings" }),
+      buildProductDoc({ productId: "p2", productCode: "WA002", productType: "wearableArt", productSubType: "necklaces" }),
+      buildProductDoc({ productId: "p3", productCode: "CUSTOM", productType: "wearableArt", productSubType: "earrings" }),
+    ]);
+  };
+
+  const readCodes = () => {
+    const codes = [];
+    const products = readCollection(PRODUCTS);
+    for (let i = 0; i < products.length; i++) codes.push(products[i].productCode);
+    return codes;
+  };
+
+  it("sets a letter without touching product codes when renumber is off", async () => {
+    seedWearableArt([EARRINGS, NECKLACES]);
+    seedEarringProducts();
+
+    const result = await updateSubcategoryLetter({ categoryKey: "wearableArt", subcategoryKey: "earrings", letter: "e" });
+
+    expect(result).toEqual({ success: true, message: "Letter changed to E", letter: "E", renamedCount: 0 });
+    expect(readSubcategories()).toEqual([{ ...EARRINGS, letter: "E" }, NECKLACES]);
+    expect(readCodes()).toEqual(["WA001", "WA002", "CUSTOM"]);
+  });
+
+  it("renumber renames only that subcategory's category-prefix codes", async () => {
+    seedWearableArt([EARRINGS, NECKLACES]);
+    seedEarringProducts();
+
+    const result = await updateSubcategoryLetter({ categoryKey: "wearableArt", subcategoryKey: "earrings", letter: "E", renumber: true });
+
+    expect(result.renamedCount).toBe(1);
+    expect(readCodes()).toEqual(["E001", "WA002", "CUSTOM"]);
+  });
+
+  it("clearing the letter with renumber moves codes back to the category prefix", async () => {
+    seedWearableArt([{ ...EARRINGS, letter: "E" }]);
+    seedCollection(PRODUCTS, [buildProductDoc({ productId: "p1", productCode: "E004", productType: "wearableArt", productSubType: "earrings" })]);
+
+    const result = await updateSubcategoryLetter({ categoryKey: "wearableArt", subcategoryKey: "earrings", letter: "", renumber: true });
+
+    expect(result.success).toBe(true);
+    expect(readSubcategories()).toEqual([EARRINGS]);
+    expect(readCodes()).toEqual(["WA004"]);
+  });
+
+  it("rejects an invalid letter and leaves the subcategory alone", async () => {
+    seedWearableArt([EARRINGS]);
+
+    const result = await updateSubcategoryLetter({ categoryKey: "wearableArt", subcategoryKey: "earrings", letter: "ABCD" });
+
+    expect(result).toEqual({ success: false, message: "Letter must be 1-3 letters A-Z" });
+    expect(readSubcategories()).toEqual([EARRINGS]);
+  });
+
+  it("fails for an unknown subcategory", async () => {
+    seedWearableArt([EARRINGS]);
+    const result = await updateSubcategoryLetter({ categoryKey: "wearableArt", subcategoryKey: "rings", letter: "R" });
+    expect(result).toEqual({ success: false, message: "Subcategory not found" });
+  });
+});
+
+//---------- updateCategoryLetter with subcategories ----------
+
+describe("updateCategoryLetter with subcategories", () => {
+  it("renumber skips a subcategory whose own letter is the old category letter", async () => {
+    seedWearableArt([{ ...EARRINGS, letter: "WA" }, NECKLACES, { ...RINGS, letter: "R" }]);
+    seedCollection(PRODUCTS, [
+      buildProductDoc({ productId: "p1", productCode: "WA001", productType: "wearableArt", productSubType: "earrings" }),
+      buildProductDoc({ productId: "p2", productCode: "WA002", productType: "wearableArt", productSubType: "necklaces" }),
+      buildProductDoc({ productId: "p3", productCode: "WA003", productType: "wearableArt", productSubType: "rings" }),
+      buildProductDoc({ productId: "p4", productCode: "WA004", productType: "wearableArt" }),
+    ]);
+
+    const result = await updateCategoryLetter({ key: "wearableArt", letter: "X", renumber: true });
+
+    const codes = [];
+    const products = readCollection(PRODUCTS);
+    for (let i = 0; i < products.length; i++) codes.push(products[i].productCode);
+    expect(result.renamedCount).toBe(3);
+    expect(codes).toEqual(["WA001", "X002", "X003", "X004"]);
   });
 });
 
@@ -223,17 +331,25 @@ describe("deleteSubcategory", () => {
 //---------- category list + product codes ----------
 
 describe("buildCategoryList", () => {
-  it("includes each category's subcategories in order", async () => {
+  it("includes each category's subcategories in order with their product counts", async () => {
     seedWearableArt([NECKLACES, EARRINGS]);
+    seedCollection(PRODUCTS, [
+      buildProductDoc({ productId: "p1", productType: "wearableArt", productSubType: "earrings" }),
+      buildProductDoc({ productId: "p2", productType: "wearableArt", productSubType: "earrings" }),
+      buildProductDoc({ productId: "p3", productType: "other", productSubType: "necklaces" }),
+    ]);
 
     const list = await buildCategoryList();
 
-    expect(list[0].subcategories).toEqual([NECKLACES, EARRINGS]);
+    expect(list[0].subcategories).toEqual([
+      { ...NECKLACES, productCount: 0 },
+      { ...EARRINGS, productCount: 2 },
+    ]);
   });
 });
 
 describe("buildNextProductCode", () => {
-  it("numbers products by the parent category letter whatever their subcategory", async () => {
+  it("numbers unlettered subcategories by the parent category letter", async () => {
     seedWearableArt([EARRINGS, NECKLACES]);
     seedCollection(PRODUCTS, [
       buildProductDoc({ productId: "p1", productCode: "WA001", productType: "wearableArt", productSubType: "earrings" }),
@@ -241,6 +357,23 @@ describe("buildNextProductCode", () => {
     ]);
 
     expect(await buildNextProductCode("wearableArt")).toBe("WA003");
+    expect(await buildNextProductCode("wearableArt", "earrings")).toBe("WA003");
+  });
+
+  it("uses a lettered subcategory's own prefix and sequence", async () => {
+    seedWearableArt([{ ...EARRINGS, letter: "E" }, NECKLACES]);
+    seedCollection(PRODUCTS, [
+      buildProductDoc({ productId: "p1", productCode: "WA001", productType: "wearableArt" }),
+      buildProductDoc({ productId: "p2", productCode: "E007", productType: "wearableArt", productSubType: "earrings" }),
+    ]);
+
+    expect(await buildNextProductCode("wearableArt", "earrings")).toBe("E008");
+    expect(await buildNextProductCode("wearableArt", "necklaces")).toBe("WA002");
+  });
+
+  it("falls back to the category prefix for a deleted subcategory key", async () => {
+    seedWearableArt([]);
+    expect(await buildNextProductCode("wearableArt", "earrings")).toBe("WA001");
   });
 });
 
@@ -255,6 +388,44 @@ describe("addSubcategoryControl", () => {
 
     expect(res.json.mock.calls[0][0].success).toBe(true);
     expect(readSubcategories()).toEqual([EARRINGS]);
+  });
+});
+
+describe("updateSubcategoryLetterControl", () => {
+  it("passes the letter through and treats renumber 'true' as true", async () => {
+    seedWearableArt([EARRINGS]);
+    seedCollection(PRODUCTS, [buildProductDoc({ productId: "p1", productCode: "WA001", productType: "wearableArt", productSubType: "earrings" })]);
+    const res = buildRes();
+
+    await updateSubcategoryLetterControl(buildReq({ body: { categoryKey: "wearableArt", subcategoryKey: "earrings", letter: "E", renumber: "true" } }), res);
+
+    expect(res.json.mock.calls[0][0].success).toBe(true);
+    expect(readSubcategories()).toEqual([{ ...EARRINGS, letter: "E" }]);
+    expect(readCollection(PRODUCTS)[0].productCode).toBe("E001");
+  });
+});
+
+describe("nextProductCodeControl", () => {
+  it("suggests a code from the chosen subcategory's letter", async () => {
+    seedWearableArt([{ ...EARRINGS, letter: "E" }]);
+    seedCollection(PRODUCTS, []);
+    const res = buildRes();
+
+    await nextProductCodeControl(buildReq({ body: { productType: "wearableArt", productSubType: "earrings" } }), res);
+
+    expect(res.json).toHaveBeenCalledWith({ productCode: "E001" });
+  });
+});
+
+describe("addNewProductControl auto code", () => {
+  it("assigns a blank product code from its lettered subcategory", async () => {
+    seedWearableArt([{ ...EARRINGS, letter: "E" }]);
+    seedCollection(PRODUCTS, []);
+    const res = buildRes();
+
+    await addNewProductControl(buildReq({ body: { name: "Hoop", price: "20", productType: "wearableArt", productSubType: "earrings" } }), res);
+
+    expect(readCollection(PRODUCTS)[0].productCode).toBe("E001");
   });
 });
 

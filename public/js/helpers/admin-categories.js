@@ -47,6 +47,8 @@ export const populateCategoryList = async (categoryArray) => {
   const categoryList = document.getElementById("category-list");
   if (!categoryList) return null;
 
+  // Read before the redraw so an add row the admin opened stays open (a fresh modal has none open)
+  const openAddKeys = findOpenSubcategoryAddKeys(categoryList);
   categoryList.innerHTML = "";
 
   if (!categoryArray || !categoryArray.length) {
@@ -58,7 +60,7 @@ export const populateCategoryList = async (categoryArray) => {
   }
 
   for (let i = 0; i < categoryArray.length; i++) {
-    const categoryItem = buildCategoryItem(categoryArray[i]);
+    const categoryItem = buildCategoryItem(categoryArray[i], openAddKeys.has(categoryArray[i].key));
     if (!categoryItem) continue;
     categoryList.append(categoryItem);
   }
@@ -66,7 +68,17 @@ export const populateCategoryList = async (categoryArray) => {
   return true;
 };
 
-const buildCategoryItem = (category) => {
+const findOpenSubcategoryAddKeys = (categoryList) => {
+  const openKeys = new Set();
+  const openRows = categoryList.querySelectorAll(".subcategory-add-row:not(.hidden)");
+  for (let i = 0; i < openRows.length; i++) {
+    openKeys.add(openRows[i].getAttribute("data-category-key"));
+  }
+
+  return openKeys;
+};
+
+const buildCategoryItem = (category, isAddOpen) => {
   if (!category) return null;
   const count = category.productCount || 0;
 
@@ -114,26 +126,64 @@ const buildCategoryItem = (category) => {
   deleteButton.setAttribute("data-title", category.title);
   deleteButton.setAttribute("data-count", count);
 
-  const subcategoryPanel = buildSubcategoryPanel(category);
+  const subcategoryPanel = buildSubcategoryPanel(category, isAddOpen);
 
   categoryItem.append(dragHandle, titleInput, letterInput, countSpan, deleteButton, subcategoryPanel);
   return categoryItem;
 };
 
-const buildSubcategoryPanel = (category) => {
+const buildSubcategoryPanel = (category, isAddOpen) => {
   const panel = document.createElement("div");
   panel.className = "subcategory-panel";
 
   const subcategories = category.subcategories || [];
   for (let i = 0; i < subcategories.length; i++) {
-    panel.append(buildSubcategoryRow(category.key, subcategories[i], i, subcategories.length));
+    panel.append(buildSubcategoryRow(category, subcategories[i], i, subcategories.length));
   }
 
-  panel.append(buildAddSubcategoryRow(category.key));
+  panel.append(buildSubcategoryToggleRow(category, isAddOpen), buildAddSubcategoryRow(category, isAddOpen));
   return panel;
 };
 
-const buildSubcategoryRow = (categoryKey, subcategory, index, total) => {
+// "+ Add subcategory" link that shows/hides the add row below it (collapsed by default)
+const buildSubcategoryToggleRow = (category, isAddOpen) => {
+  const row = document.createElement("div");
+  row.className = "subcategory-row subcategory-toggle-row";
+
+  const spacer = document.createElement("span");
+
+  const toggleButton = document.createElement("button");
+  toggleButton.className = "btn-toggle-subcategory-add";
+  toggleButton.type = "button";
+  toggleButton.id = `toggle-subcategory-add-${category.key}`;
+  toggleButton.setAttribute("data-label", "toggle-add-subcategory");
+  toggleButton.setAttribute("data-category-key", category.key);
+  toggleButton.setAttribute("data-has-subcategories", (category.subcategories || []).length > 0);
+  setSubcategoryToggleState(toggleButton, isAddOpen);
+
+  row.append(spacer, toggleButton);
+  return row;
+};
+
+const setSubcategoryToggleState = (toggleButton, isOpen) => {
+  const hasSubcategories = toggleButton.getAttribute("data-has-subcategories") === "true";
+  const closedLabel = hasSubcategories ? "+ Add more subcategories" : "+ Add subcategory";
+  toggleButton.textContent = isOpen ? "− Hide" : closedLabel;
+  toggleButton.setAttribute("aria-expanded", isOpen ? "true" : "false");
+};
+
+// Optional 1-3 letter prefix; the placeholder shows the category prefix used when it is left blank
+const buildSubcategoryLetterInput = (id, letter, category) => {
+  const letterInput = buildLetterInput(id, letter);
+  letterInput.classList.add("subcategory-letter-input");
+  letterInput.placeholder = category.letter || "";
+  letterInput.title = `Product Code prefix for this subcategory. Leave blank to use the category prefix (${category.letter || "none"}).`;
+  letterInput.setAttribute("aria-label", "Subcategory product code prefix");
+  return letterInput;
+};
+
+const buildSubcategoryRow = (category, subcategory, index, total) => {
+  const categoryKey = category.key;
   const row = document.createElement("div");
   row.className = "subcategory-row";
 
@@ -147,8 +197,23 @@ const buildSubcategoryRow = (categoryKey, subcategory, index, total) => {
   titleInput.setAttribute("data-label", "subcategory-title-input");
   setSubcategoryAttributes(titleInput, categoryKey, subcategory);
 
+  const letterInput = buildSubcategoryLetterInput(`subcategory-letter-${categoryKey}-${subcategory.key}`, subcategory.letter, category);
+  letterInput.setAttribute("data-label", "subcategory-letter-input");
+  letterInput.setAttribute("data-letter", subcategory.letter || "");
+  letterInput.setAttribute("data-category-letter", category.letter || "");
+  letterInput.setAttribute("data-count", subcategory.productCount || 0);
+  setSubcategoryAttributes(letterInput, categoryKey, subcategory);
+
+  // Rows share the category row's grid columns: marker under the drag handle, arrows under the product count
+  const marker = document.createElement("span");
+  marker.className = "subcategory-marker";
+  marker.textContent = "↳";
+
+  const moveGroup = document.createElement("div");
+  moveGroup.className = "subcategory-move-group";
   const upButton = buildSubcategoryMoveButton(categoryKey, subcategory, "up", index === 0);
   const downButton = buildSubcategoryMoveButton(categoryKey, subcategory, "down", index === total - 1);
+  moveGroup.append(upButton, downButton);
 
   const deleteButton = document.createElement("button");
   deleteButton.className = "btn-delete-category btn-delete-subcategory";
@@ -158,7 +223,7 @@ const buildSubcategoryRow = (categoryKey, subcategory, index, total) => {
   deleteButton.setAttribute("data-label", "remove-subcategory");
   setSubcategoryAttributes(deleteButton, categoryKey, subcategory);
 
-  row.append(titleInput, upButton, downButton, deleteButton);
+  row.append(marker, titleInput, letterInput, moveGroup, deleteButton);
   return row;
 };
 
@@ -181,16 +246,20 @@ const setSubcategoryAttributes = (element, categoryKey, subcategory) => {
   element.setAttribute("data-title", subcategory.title);
 };
 
-const buildAddSubcategoryRow = (categoryKey) => {
+const buildAddSubcategoryRow = (category, isAddOpen) => {
+  const categoryKey = category.key;
   const row = document.createElement("div");
   row.className = "subcategory-row subcategory-add-row";
+  row.id = `subcategory-add-row-${categoryKey}`;
+  row.setAttribute("data-category-key", categoryKey);
+  row.classList.toggle("hidden", !isAddOpen);
 
   const titleInput = document.createElement("input");
   titleInput.className = "form-input subcategory-new-input";
   titleInput.type = "text";
   titleInput.id = `new-subcategory-${categoryKey}`;
   titleInput.maxLength = 60;
-  titleInput.placeholder = "Add subcategory, e.g. Earrings";
+  titleInput.placeholder = "e.g. Earrings";
   titleInput.setAttribute("aria-label", "New subcategory name");
   titleInput.setAttribute("data-label", "new-subcategory-input");
   titleInput.setAttribute("data-category-key", categoryKey);
@@ -198,11 +267,21 @@ const buildAddSubcategoryRow = (categoryKey) => {
   const addButton = document.createElement("button");
   addButton.className = "btn-add-subcategory";
   addButton.type = "button";
-  addButton.textContent = "+ Add";
+  addButton.textContent = "Add";
   addButton.setAttribute("data-label", "add-subcategory");
   addButton.setAttribute("data-category-key", categoryKey);
 
-  row.append(titleInput, addButton);
+  const letterInput = buildSubcategoryLetterInput(`new-subcategory-letter-${categoryKey}`, "", category);
+  letterInput.setAttribute("data-label", "new-subcategory-input");
+  letterInput.setAttribute("data-category-key", categoryKey);
+
+  // Button + name share the name column so the letter input lands in the letter column
+  const spacer = document.createElement("span");
+  const addGroup = document.createElement("div");
+  addGroup.className = "subcategory-add-group";
+  addGroup.append(addButton, titleInput);
+
+  row.append(spacer, addGroup, letterInput);
   return row;
 };
 
@@ -318,8 +397,11 @@ export const prefillNextProductCode = async (mode) => {
   const productTypeSelect = document.getElementById(mode === "edit" ? "edit-product-type" : "product-type");
   if (!productTypeSelect || !productTypeSelect.value) return null;
 
+  // A lettered subcategory changes the prefix, so the suggestion depends on it too
+  const productSubType = document.getElementById(mode === "edit" ? "edit-product-sub-type" : "product-sub-type")?.value || "";
+
   const requestId = ++prefillRequestIds[mode];
-  const data = await sendToBack({ route: "/next-product-code-route", productType: productTypeSelect.value });
+  const data = await sendToBack({ route: "/next-product-code-route", productType: productTypeSelect.value, productSubType });
   if (!data || !data.productCode) return null;
 
   // A newer prefill owns the field — this response is for a category no longer selected
@@ -516,13 +598,95 @@ export const runAddSubcategory = async (triggerElement) => {
     return null;
   }
 
-  const data = await sendToBack({ route: "/add-subcategory-route", categoryKey, title });
+  // Letter is optional; blank means its products keep the category's prefix
+  const letterInput = document.getElementById(`new-subcategory-letter-${categoryKey}`);
+  let letter = "";
+  if (letterInput && letterInput.value.trim()) {
+    letter = await normalizeCategoryLetter(letterInput.value);
+    if (!letter) return null;
+  }
+
+  const data = await sendToBack({ route: "/add-subcategory-route", categoryKey, title, letter });
   if (!data || !data.success) {
     await displayPopup(data?.message || "Failed to add subcategory", "error");
     return null;
   }
 
   await displayPopup(data.message || "Subcategory added successfully", "success");
+  await loadCategories();
+  // The add row stays open after the redraw; put the cursor back so the next one can be typed straight away
+  document.getElementById(`new-subcategory-${categoryKey}`)?.focus();
+
+  return data;
+};
+
+// Opens or closes one category's add-subcategory row; opening puts the cursor in the name box
+export const toggleSubcategoryAddRow = (toggleButton) => {
+  if (!toggleButton) return null;
+
+  const categoryKey = toggleButton.getAttribute("data-category-key");
+  const addRow = document.getElementById(`subcategory-add-row-${categoryKey}`);
+  if (!addRow) return null;
+
+  const isOpen = addRow.classList.toggle("hidden") === false;
+  setSubcategoryToggleState(toggleButton, isOpen);
+  if (isOpen) document.getElementById(`new-subcategory-${categoryKey}`)?.focus();
+
+  return isOpen;
+};
+
+// Escape inside an open add row closes it and returns focus to its toggle link
+export const closeSubcategoryAddRow = (inputElement) => {
+  if (!inputElement) return null;
+
+  const categoryKey = inputElement.getAttribute("data-category-key");
+  const addRow = document.getElementById(`subcategory-add-row-${categoryKey}`);
+  const toggleButton = document.getElementById(`toggle-subcategory-add-${categoryKey}`);
+  if (!addRow || !toggleButton) return null;
+
+  addRow.classList.add("hidden");
+  setSubcategoryToggleState(toggleButton, false);
+  toggleButton.focus();
+
+  return true;
+};
+
+// Same flow as runChangeCategoryLetter, but a blank letter is allowed (falls back to the category's prefix)
+export const runChangeSubcategoryLetter = async (inputElement) => {
+  if (!inputElement) return null;
+
+  const categoryKey = inputElement.getAttribute("data-category-key");
+  const subcategoryKey = inputElement.getAttribute("data-key");
+  const title = inputElement.getAttribute("data-title");
+  const count = Number(inputElement.getAttribute("data-count")) || 0;
+  const oldLetter = inputElement.getAttribute("data-letter") || "";
+  const categoryLetter = inputElement.getAttribute("data-category-letter") || "";
+  if (!categoryKey || !subcategoryKey) return null;
+
+  let newLetter = "";
+  if (inputElement.value.trim()) {
+    newLetter = await normalizeCategoryLetter(inputElement.value);
+    if (!newLetter) {
+      inputElement.value = oldLetter;
+      return null;
+    }
+  }
+
+  inputElement.value = newLetter;
+  if (newLetter === oldLetter) return null;
+
+  const oldPrefix = oldLetter || categoryLetter;
+  const newPrefix = newLetter || categoryLetter;
+  const renumber = oldPrefix !== newPrefix && (await confirmRenameProductCodes(title, count, oldPrefix, newPrefix));
+
+  const data = await sendToBack({ route: "/update-subcategory-letter-route", categoryKey, subcategoryKey, letter: newLetter, renumber });
+  if (!data || !data.success) {
+    await displayPopup(data?.message || "Failed to change subcategory letter", "error");
+    inputElement.value = oldLetter;
+    return null;
+  }
+
+  await displayPopup(data.message || "Subcategory letter changed", "success");
   await loadCategories();
 
   return data;

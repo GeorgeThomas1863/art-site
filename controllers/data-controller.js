@@ -1,6 +1,6 @@
 import { storeProduct, updateProduct, deleteProduct, getProductData, hideOrderedProducts } from "../src/products.js";
 import { storeEvent, updateEvent, deleteEvent, getEventData } from "../src/events.js";
-import { buildCategoryList, addCategory, updateCategoryTitle, updateCategoryLetter, updateCategoryOrder, deleteCategory, addSubcategory, updateSubcategoryTitle, moveSubcategory, deleteSubcategory, buildNextProductCode, findProductCodeOwner } from "../src/categories.js"; //prettier-ignore
+import { buildCategoryList, addCategory, updateCategoryTitle, updateCategoryLetter, updateCategoryOrder, deleteCategory, addSubcategory, updateSubcategoryTitle, updateSubcategoryLetter, moveSubcategory, deleteSubcategory, buildNextProductCode, findProductCodeOwner } from "../src/categories.js"; //prettier-ignore
 import { submitContact } from "../src/contact.js";
 import {
   storeSubscriber,
@@ -253,8 +253,18 @@ export const addSubcategoryControl = async (req, res) => {
   const inputParams = req.body;
   if (!inputParams) return res.status(500).json({ error: "No input parameters" });
 
-  const safeParams = whitelistFields(inputParams, ["categoryKey", "title"]);
+  const safeParams = whitelistFields(inputParams, ["categoryKey", "title", "letter"]);
   const data = await addSubcategory(safeParams);
+  return res.json(data);
+};
+
+export const updateSubcategoryLetterControl = async (req, res) => {
+  const inputParams = req.body;
+  if (!inputParams) return res.status(500).json({ error: "No input parameters" });
+
+  const renumber = inputParams.renumber === true || inputParams.renumber === "true";
+  const safeParams = whitelistFields(inputParams, ["categoryKey", "subcategoryKey", "letter"]);
+  const data = await updateSubcategoryLetter({ ...safeParams, renumber });
   return res.json(data);
 };
 
@@ -289,7 +299,7 @@ export const nextProductCodeControl = async (req, res) => {
   const inputParams = req.body;
   if (!inputParams) return res.status(500).json({ error: "No input parameters" });
 
-  const productCode = await buildNextProductCode(inputParams.productType);
+  const productCode = await buildNextProductCode(inputParams.productType, inputParams.productSubType);
   return res.json({ productCode });
 };
 

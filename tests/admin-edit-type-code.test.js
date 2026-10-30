@@ -23,7 +23,7 @@ vi.mock("../public/js/helpers/admin-categories.js", () => ({
   populateSubcategorySelect: vi.fn(),
 }));
 
-import { changeEditProductType, populateEditFormProducts, resetEditSubcategory } from "../public/js/helpers/admin-products.js";
+import { changeEditProductType, changeEditProductSubType, populateEditFormProducts, resetEditSubcategory } from "../public/js/helpers/admin-products.js";
 import { prefillNextProductCode, populateSubcategorySelect } from "../public/js/helpers/admin-categories.js";
 
 class FakeElement {
@@ -123,6 +123,27 @@ describe("changeEditProductType", () => {
     expect(prefillNextProductCode).toHaveBeenCalledTimes(2);
     expect(codeInput.value).toBe("PT001");
     expect(result).toBe("PT001");
+  });
+
+  test("a subcategory switch on a cleared field suggests a code, and switching back restores the saved one", async () => {
+    const { codeInput } = await loadEditForm({ productType: "wearableArt", productSubType: "earrings", productCode: "WA001" });
+    const typeSelect = { value: "wearableArt" };
+    const getElementById = global.document.getElementById;
+    global.document.getElementById = (id) => (id === "edit-product-type" ? typeSelect : getElementById(id));
+    codeInput.value = "";
+
+    prefillNextProductCode.mockImplementation(async () => {
+      codeInput.value = "N001";
+      return "N001";
+    });
+
+    const suggested = await changeEditProductSubType({ value: "necklaces" });
+    const restored = await changeEditProductSubType({ value: "earrings" });
+
+    expect(suggested).toBe("N001");
+    expect(restored).toBe("WA001");
+    expect(codeInput.value).toBe("WA001");
+    expect(prefillNextProductCode).toHaveBeenCalledTimes(1);
   });
 
   test("restores the saved code when a blank field switches back to the saved category", async () => {

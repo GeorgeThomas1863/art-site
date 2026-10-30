@@ -95,16 +95,25 @@ export const buildCategoryList = async () => {
     if (!products) products = [];
 
     const countsByType = {};
+    const countsBySubType = {};
     for (let i = 0; i < products.length; i++) {
       const productType = products[i].productType;
       countsByType[productType] = (countsByType[productType] || 0) + 1;
+      if (!products[i].productSubType) continue;
+      const subTypeKey = productType + "/" + products[i].productSubType;
+      countsBySubType[subTypeKey] = (countsBySubType[subTypeKey] || 0) + 1;
     }
 
     const list = [];
     for (let i = 0; i < categories.length; i++) {
       const category = categories[i];
       const productCount = countsByType[category.key] || 0;
-      const subcategories = category.subcategories || [];
+      const subcategories = [];
+      const savedSubcategories = category.subcategories || [];
+      for (let j = 0; j < savedSubcategories.length; j++) {
+        const subcategoryCount = countsBySubType[category.key + "/" + savedSubcategories[j].key] || 0;
+        subcategories.push({ ...savedSubcategories[j], productCount: subcategoryCount });
+      }
       list.push({ key: category.key, title: category.title, letter: category.letter, productCount, subcategories });
     }
 
@@ -264,7 +273,8 @@ export const updateCategoryOrder = async (orderedKeys) => {
 };
 
 // Changes a category's letter. With `renumber`, every product in that category whose product code
-// is <OLD><digits> becomes <NEW><digits> (number kept); custom product codes are left alone.
+// is <OLD><digits> becomes <NEW><digits> (number kept); custom product codes are left alone, and so
+// are products in a subcategory whose own letter is <OLD> (those codes follow the subcategory).
 export const updateCategoryLetter = async (inputParams) => {
   try {
     const { key, letter, renumber } = inputParams || {};
@@ -285,7 +295,8 @@ export const updateCategoryLetter = async (inputParams) => {
     // on the old letter, so retrying the same change resumes instead of hitting "Letter unchanged".
     let renamedCount = 0;
     if (renumber) {
-      renamedCount = await renameCategoryProductCodes(key, oldLetter, newLetter);
+      const skippedSubTypes = findSubcategoryKeysWithLetter(category, oldLetter);
+      renamedCount = await renameCategoryProductCodes(key, oldLetter, newLetter, null, skippedSubTypes);
       if (renamedCount === null) {
         return { success: false, message: "Failed to rename product codes; letter not changed" };
       }
@@ -311,7 +322,19 @@ export const updateCategoryLetter = async (inputParams) => {
   }
 };
 
-const renameCategoryProductCodes = async (productType, oldLetter, newLetter) => {
+const findSubcategoryKeysWithLetter = (category, letter) => {
+  const keys = new Set();
+  const subcategories = category.subcategories || [];
+  for (let i = 0; i < subcategories.length; i++) {
+    if (normalizeLetter(subcategories[i].letter) === letter) keys.add(subcategories[i].key);
+  }
+
+  return keys;
+};
+
+// With productSubType, only that subcategory's products are renamed (a subcategory letter change);
+// products in any skippedSubTypes subcategory are never renamed
+const renameCategoryProductCodes = async (productType, oldLetter, newLetter, productSubType, skippedSubTypes) => {
   try {
     if (!oldLetter) return 0;
 
@@ -330,6 +353,8 @@ const renameCategoryProductCodes = async (productType, oldLetter, newLetter) => 
     for (let i = 0; i < products.length; i++) {
       const product = products[i];
       if (product.productType !== productType) continue;
+      if (productSubType && product.productSubType !== productSubType) continue;
+      if (skippedSubTypes && skippedSubTypes.has(product.productSubType)) continue;
       if (typeof product.productCode !== "string") continue;
       const match = product.productCode.match(pattern);
       if (!match) continue;
@@ -382,14 +407,20 @@ export const deleteCategory = async (key) => {
 
 //---------- subcategories ----------
 
-// Subcategories live on their parent category doc as an ordered array of { key, title }; array
-// position is display order. A product points at one through productSubType (the key). Product
-// codes never depend on a subcategory, and deleting one leaves its products untouched.
+// Subcategories live on their parent category doc as an ordered array of { key, title, letter? };
+// array position is display order. A product points at one through productSubType (the key). A
+// subcategory with a letter gives its products that product-code prefix instead of the category's;
+// without one they use the category's. Deleting a subcategory leaves its products untouched.
 
 export const addSubcategory = async (inputParams) => {
   try {
-    const { categoryKey, title } = inputParams || {};
+    const { categoryKey, title, letter } = inputParams || {};
     if (!categoryKey) return { success: false, message: "No category key provided" };
+
+    // Letter is optional: blank means the subcategory's products use the category's prefix
+    const hasLetter = String(letter ?? "").trim() !== "";
+    const upperLetter = normalizeLetter(letter);
+    if (hasLetter && !upperLetter) return { success: false, message: "Letter must be 1-3 letters A-Z" };
 
     const trimmedTitle = String(title ?? "").trim();
     const titleError = findTitleError(trimmedTitle);
@@ -403,7 +434,7 @@ export const addSubcategory = async (inputParams) => {
     if (!subcategories) return { success: false, message: "Category not found" };
     if (findSubcategoryIndex(subcategories, key) !== -1) return { success: false, message: "Subcategory already exists" };
 
-    const newSubcategory = { key, title: trimmedTitle };
+    const newSubcategory = upperLetter ? { key, title: trimmedTitle, letter: upperLetter } : { key, title: trimmedTitle };
     subcategories.push(newSubcategory);
 
     const saveData = await saveSubcategories(categoryKey, subcategories);
@@ -441,6 +472,60 @@ export const updateSubcategoryTitle = async (inputParams) => {
   } catch (error) {
     console.error("updateSubcategoryTitle error:", error);
     return { success: false, message: "Failed to update subcategory title" };
+  }
+};
+
+// Sets or clears (blank letter) a subcategory's own prefix. With `renumber`, that subcategory's
+// products whose code is <OLD PREFIX><digits> become <NEW PREFIX><digits>, where no letter means
+// the category's prefix. Renames before saving the letter, same as updateCategoryLetter.
+export const updateSubcategoryLetter = async (inputParams) => {
+  try {
+    const { categoryKey, subcategoryKey, letter, renumber } = inputParams || {};
+    if (!categoryKey || !subcategoryKey) return { success: false, message: "No subcategory key provided" };
+
+    const hasLetter = String(letter ?? "").trim() !== "";
+    const newLetter = normalizeLetter(letter);
+    if (hasLetter && !newLetter) return { success: false, message: "Letter must be 1-3 letters A-Z" };
+
+    const category = await findCategory(categoryKey);
+    if (!category) return { success: false, message: "Category not found" };
+
+    const subcategories = [...(category.subcategories || [])];
+    const index = findSubcategoryIndex(subcategories, subcategoryKey);
+    if (index === -1) return { success: false, message: "Subcategory not found" };
+
+    const oldLetter = normalizeLetter(subcategories[index].letter);
+    if (oldLetter === newLetter) return { success: true, message: "Letter unchanged", letter: newLetter || "", renamedCount: 0 };
+
+    const categoryLetter = normalizeLetter(category.letter);
+    const oldPrefix = oldLetter || categoryLetter;
+    const newPrefix = newLetter || categoryLetter;
+
+    let renamedCount = 0;
+    if (renumber && newPrefix && oldPrefix !== newPrefix) {
+      renamedCount = await renameCategoryProductCodes(categoryKey, oldPrefix, newPrefix, subcategoryKey);
+      if (renamedCount === null) return { success: false, message: "Failed to rename product codes; letter not changed" };
+    }
+
+    const { letter: _oldLetter, ...subcategoryWithoutLetter } = subcategories[index];
+    subcategories[index] = newLetter ? { ...subcategoryWithoutLetter, letter: newLetter } : subcategoryWithoutLetter;
+
+    const saveData = await saveSubcategories(categoryKey, subcategories);
+    if (!saveData.success) {
+      if (renamedCount > 0) {
+        return { success: false, message: `${renamedCount} product code${renamedCount === 1 ? "" : "s"} renamed, but failed to update subcategory letter` };
+      }
+      return saveData;
+    }
+
+    const letterMessage = newLetter ? `Letter changed to ${newLetter}` : `Letter cleared; products now use the category prefix ${categoryLetter || ""}`.trim();
+    if (!renumber) return { success: true, message: letterMessage, letter: newLetter || "", renamedCount: 0 };
+
+    const message = `${letterMessage}; ${renamedCount} product code${renamedCount === 1 ? "" : "s"} renamed`;
+    return { success: true, message, letter: newLetter || "", renamedCount };
+  } catch (error) {
+    console.error("updateSubcategoryLetter error:", error);
+    return { success: false, message: "Failed to update subcategory letter" };
   }
 };
 
@@ -524,7 +609,7 @@ const saveSubcategories = async (categoryKey, subcategories) => {
 
 //---------- product code generation ----------
 
-export const buildNextProductCode = async (productType) => {
+export const buildNextProductCode = async (productType, productSubType) => {
   try {
     const category = await findCategory(productType);
     if (!category) return null;
@@ -533,18 +618,18 @@ export const buildNextProductCode = async (productType) => {
     const products = await productModel.getAll();
     if (!products) return null;
 
-    return buildNextProductCodeFromProducts(productType, [category], products);
+    return buildNextProductCodeFromProducts(productType, [category], products, productSubType);
   } catch (error) {
     console.error("buildNextProductCode error:", error);
     return null;
   }
 };
 
-export const buildNextProductCodeFromProducts = (productType, categories, products) => {
+export const buildNextProductCodeFromProducts = (productType, categories, products, productSubType) => {
   const category = findCategoryInList(productType, categories);
   if (!category) return null;
 
-  const prefix = normalizeLetter(category.letter);
+  const prefix = findCodePrefix(category, productSubType);
   if (!prefix) return null;
 
   const pattern = new RegExp(`^${prefix}(\\d+)$`, "i");
@@ -560,6 +645,15 @@ export const buildNextProductCodeFromProducts = (productType, categories, produc
 
   const nextNumber = maxNumber + 1;
   return prefix + String(nextNumber).padStart(3, "0");
+};
+
+// A lettered subcategory's prefix wins; no subcategory, an unlettered one, or a deleted one falls back to the category's
+const findCodePrefix = (category, productSubType) => {
+  const subcategories = category.subcategories || [];
+  const index = productSubType ? findSubcategoryIndex(subcategories, productSubType) : -1;
+  const subcategoryLetter = index === -1 ? null : normalizeLetter(subcategories[index].letter);
+
+  return subcategoryLetter || normalizeLetter(category.letter);
 };
 
 const findCategoryInList = (productType, categories) => {

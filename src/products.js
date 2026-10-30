@@ -21,7 +21,7 @@ export const storeProduct = async (inputParams) => {
 
   params.productCode = String(params.productCode ?? "").trim().toUpperCase();
   if (!params.productCode) {
-    params.productCode = (await buildNextProductCode(params.productType)) || "";
+    params.productCode = (await buildNextProductCode(params.productType, params.productSubType)) || "";
   }
 
   //store

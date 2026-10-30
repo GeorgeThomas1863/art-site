@@ -1,6 +1,6 @@
 import { runModalTrigger, runModalClose, runChangeStatusCard, updateAdminStats } from "./helpers/admin-run.js"; //prettier-ignore
-import { runAddNewProduct, runEditProduct, runDeleteProduct, changeAdminProductSelector, changeAdminProductFilter, changeEditProductType, resetEditSubcategory, runAddPicSlot, runRemovePicSlot, toggleAdminPicSelector, closeAdminPicSelector, selectAdminProductByPic, moveAdminPicSelectorFocus } from "./helpers/admin-products.js";
-import { runAddCategory, runDeleteCategory, runRenameCategory, runChangeCategoryLetter, loadCategories, prefillNextProductCode, populateSubcategorySelect, runAddSubcategory, runRenameSubcategory, runMoveSubcategory, runDeleteSubcategory, startCategoryDrag, moveCategoryDrag, endCategoryDrag, cancelCategoryDrag } from "./helpers/admin-categories.js"; //prettier-ignore
+import { runAddNewProduct, runEditProduct, runDeleteProduct, changeAdminProductSelector, changeAdminProductFilter, changeEditProductType, changeEditProductSubType, resetEditSubcategory, runAddPicSlot, runRemovePicSlot, toggleAdminPicSelector, closeAdminPicSelector, selectAdminProductByPic, moveAdminPicSelectorFocus } from "./helpers/admin-products.js";
+import { runAddCategory, runDeleteCategory, runRenameCategory, runChangeCategoryLetter, loadCategories, prefillNextProductCode, populateSubcategorySelect, runAddSubcategory, toggleSubcategoryAddRow, closeSubcategoryAddRow, runChangeSubcategoryLetter, runRenameSubcategory, runMoveSubcategory, runDeleteSubcategory, startCategoryDrag, moveCategoryDrag, endCategoryDrag, cancelCategoryDrag } from "./helpers/admin-categories.js"; //prettier-ignore
 import { runAddNewEvent, runEditEvent, runDeleteEvent, changeAdminEventSelector } from "./helpers/admin-events.js";
 import { runSendNewsletter, runSendTestNewsletter, runAddSubscriber, runRemoveSubscriber, runRefreshSubscriberList, changeAdminNewsletterSelector, runDeleteNewsletter, runUpdateNewsletter, handleQuillImageClick, runNewsletterImageUpload } from "./helpers/admin-newsletter.js";
 import { runSlotUploadClick, runSlotUploadPic, runDeleteSlotImage, runEditSlotImage } from "./helpers/upload-pic.js";
@@ -154,6 +154,7 @@ export const clickHandler = async (e) => {
   if (clickType === "add-category") await runAddCategory();
   if (clickType === "remove-category") await runDeleteCategory(clickElement);
   if (clickType === "refresh-category-list") await loadCategories();
+  if (clickType === "toggle-add-subcategory") toggleSubcategoryAddRow(clickElement);
   if (clickType === "add-subcategory") await runAddSubcategory(clickElement);
   if (clickType === "move-subcategory") await runMoveSubcategory(clickElement);
   if (clickType === "remove-subcategory") await runDeleteSubcategory(clickElement);
@@ -180,6 +181,10 @@ export const keyHandler = async (e) => {
   }
 
   if (e.key === "Escape") {
+    if (keyType === "new-subcategory-input") {
+      closeSubcategoryAddRow(e.target);
+      return;
+    }
     if (document.getElementById('image-editor-overlay')?.classList.contains('visible')) {
       closeImageEditor();
       return;
@@ -205,6 +210,7 @@ export const keyHandler = async (e) => {
   if (keyElement.getAttribute("data-label") === "category-title-input") keyElement.blur();
   if (keyElement.getAttribute("data-label") === "category-letter-select") keyElement.blur();
   if (keyElement.getAttribute("data-label") === "subcategory-title-input") keyElement.blur();
+  if (keyElement.getAttribute("data-label") === "subcategory-letter-input") keyElement.blur();
   if (keyElement.getAttribute("data-label") === "new-subcategory-input") await runAddSubcategory(keyElement);
 
   return true;
@@ -273,11 +279,15 @@ export const changeHandler = async (e) => {
   if (changeId === "product-type") await prefillNextProductCode("add");
   if (changeId === "edit-product-type") resetEditSubcategory(changeElement);
   if (changeId === "edit-product-type") await changeEditProductType(changeElement);
+  // A lettered subcategory has its own code prefix, so picking one re-suggests the code
+  if (changeId === "product-sub-type") await prefillNextProductCode("add");
+  if (changeId === "edit-product-sub-type") await changeEditProductSubType(changeElement);
 
   //Category name + letter picker in the Edit Categories modal
   if (changeType === "category-title-input") await runRenameCategory(changeElement);
   if (changeType === "category-letter-select") await runChangeCategoryLetter(changeElement);
   if (changeType === "subcategory-title-input") await runRenameSubcategory(changeElement);
+  if (changeType === "subcategory-letter-input") await runChangeSubcategoryLetter(changeElement);
 
   if (changeId === "event-selector") await changeAdminEventSelector(changeElement);
   if (changeId === "newsletter-archive-selector") await changeAdminNewsletterSelector(changeElement);

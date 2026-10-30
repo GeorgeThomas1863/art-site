@@ -7,10 +7,10 @@ import { confirmProductCodeUnique, resetAutoProductCode, prefillNextProductCode,
 
 let adminProductCache = [];
 
-// The loaded edit-form product's saved type/code/subcategory plus the last category actually picked,
-// so changeEditProductType can tell a genuine category change from a re-pick of the same
+// The loaded edit-form product's saved type/code/subcategory plus the last "category/subcategory"
+// actually picked, so refreshEditProductCode can tell a genuine change from a re-pick of the same
 // value (module state, populated by populateEditFormProducts on every product load).
-let editProductTypeState = { savedType: "", savedCode: "", savedSubType: "", lastSelectedType: "", autoFilledCode: "" };
+let editProductTypeState = { savedType: "", savedCode: "", savedSubType: "", lastSelection: "", autoFilledCode: "" };
 
 //Add product
 export const runAddNewProduct = async () => {
@@ -256,14 +256,28 @@ export const changeAdminProductSelector = async (changeElement) => {
 export const changeEditProductType = async (selectElement) => {
   if (!selectElement) return null;
 
-  const newType = selectElement.value;
-  if (newType === editProductTypeState.lastSelectedType) return null;
-  editProductTypeState.lastSelectedType = newType;
+  const subSelect = document.getElementById("edit-product-sub-type");
+  return refreshEditProductCode(selectElement.value, subSelect ? subSelect.value : "");
+};
+
+// Edit-form subcategory change: a lettered subcategory has its own prefix, so it is treated like a category change
+export const changeEditProductSubType = async (selectElement) => {
+  if (!selectElement) return null;
+
+  const typeSelect = document.getElementById("edit-product-type");
+  if (!typeSelect) return null;
+  return refreshEditProductCode(typeSelect.value, selectElement.value);
+};
+
+const refreshEditProductCode = async (newType, newSubType) => {
+  const newSelection = newType + "/" + newSubType;
+  if (newSelection === editProductTypeState.lastSelection) return null;
+  editProductTypeState.lastSelection = newSelection;
 
   const codeInput = document.getElementById("edit-product-code");
   if (hasProtectedEditProductCode(codeInput)) return null;
 
-  if (newType === editProductTypeState.savedType) {
+  if (newSelection === editProductTypeState.savedType + "/" + editProductTypeState.savedSubType) {
     if (codeInput) codeInput.value = editProductTypeState.savedCode;
     editProductTypeState.autoFilledCode = String(editProductTypeState.savedCode).trim();
     return editProductTypeState.savedCode;
@@ -271,8 +285,8 @@ export const changeEditProductType = async (selectElement) => {
 
   if (codeInput) codeInput.value = "";
   const suggestedCode = await prefillNextProductCode("edit");
-  // A newer category switch happened while the request was in flight — its continuation owns the state
-  if (editProductTypeState.lastSelectedType !== newType) return null;
+  // A newer category/subcategory switch happened while the request was in flight — its continuation owns the state
+  if (editProductTypeState.lastSelection !== newSelection) return null;
   editProductTypeState.autoFilledCode = suggestedCode ? String(suggestedCode).trim() : "";
   return suggestedCode;
 };
@@ -629,7 +643,7 @@ export const populateEditFormProducts = async (inputObj) => {
     savedType: productType || "",
     savedCode: productCode || "",
     savedSubType: productSubType || "",
-    lastSelectedType: productType || "",
+    lastSelection: (productType || "") + "/" + (productSubType || ""),
     autoFilledCode: "",
   };
 

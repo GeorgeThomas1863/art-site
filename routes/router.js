@@ -38,6 +38,7 @@ import {
   deleteCategoryControl,
   addSubcategoryControl,
   updateSubcategoryTitleControl,
+  updateSubcategoryLetterControl,
   moveSubcategoryControl,
   deleteSubcategoryControl,
   nextProductCodeControl,
@@ -108,6 +109,8 @@ router.post("/delete-category-route", requireAuth, deleteCategoryControl);
 router.post("/add-subcategory-route", requireAuth, addSubcategoryControl);
 
 router.post("/update-subcategory-title-route", requireAuth, updateSubcategoryTitleControl);
+
+router.post("/update-subcategory-letter-route", requireAuth, updateSubcategoryLetterControl);
 
 router.post("/move-subcategory-route", requireAuth, moveSubcategoryControl);
 

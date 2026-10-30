@@ -527,14 +527,71 @@
     padding: 1rem;
   }
 
-  /* Categories Panel */
-  .category-item {
-    flex-wrap: wrap;
-    row-gap: 0.5rem;
+  /* Categories Panel: too narrow for one line, so each row puts its name on top and controls below,
+     still on shared columns so category and subcategory rows line up */
+  .category-item,
+  .subcategory-row {
+    grid-template-columns: 1.2rem 3.5rem minmax(0, 1fr) 2.25rem;
+    grid-template-areas:
+      "handle name name name"
+      ". letter count delete";
+    column-gap: 0.5rem;
+    row-gap: 0.4rem;
   }
 
-  .category-item .category-title-input {
-    flex: 1 1 140px;
+  .category-list {
+    padding: 0.5rem;
+  }
+
+  .category-item {
+    padding: 0.6rem;
+  }
+
+  .subcategory-move-group .btn-move-subcategory {
+    width: 1.6rem;
+  }
+
+  .category-item .category-count {
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  /* The toggle link row only has a name, so it gets no second line */
+  .subcategory-toggle-row {
+    grid-template-areas: "handle name name name";
+  }
+
+  .category-drag-handle,
+  .subcategory-marker,
+  .subcategory-add-row > span,
+  .subcategory-toggle-row > span {
+    grid-area: handle;
+  }
+
+  .category-title-input,
+  .subcategory-title-input,
+  .subcategory-add-group,
+  .btn-toggle-subcategory-add {
+    grid-area: name;
+  }
+
+  .category-letter-select,
+  .subcategory-letter-input {
+    grid-area: letter;
+  }
+
+  .category-count,
+  .subcategory-move-group {
+    grid-area: count;
+  }
+
+  .category-item .btn-delete-category {
+    grid-area: delete;
+  }
+
+  .subcategory-panel {
+    grid-area: auto;
+    grid-column: 1 / -1;
   }
 
   .modal-wrapper {

@@ -404,6 +404,14 @@
   width: 100%;
 }
 
+/* Taller add-category controls; inputs and button share one height so the row lines up */
+.add-category-row #new-category-title,
+.add-category-row #new-category-letter,
+.add-category-row .btn-add-category {
+  box-sizing: border-box;
+  height: 3.75rem;
+}
+
 .add-category-row #new-category-letter {
   width: 8ch;
   font-family: "Courier New", Courier, monospace;
@@ -433,11 +441,19 @@
   overflow-y: auto;
 }
 
+/* Category rows and their subcategory rows share these columns so names, letters and buttons line up:
+   drag handle | name | letter | product count (arrows on subcategory rows) | delete */
+.category-list {
+  --category-columns: 1.6rem minmax(0, 1fr) 4.5rem 6rem 2.25rem;
+  --category-control-height: 2.25rem;
+}
+
 .category-item {
-  display: flex;
-  flex-wrap: wrap;
+  display: grid;
+  grid-template-columns: var(--category-columns);
   align-items: center;
-  gap: 0.8rem;
+  column-gap: 0.8rem;
+  row-gap: 0.6rem;
   padding: 0.8rem 1rem;
   background: #ffffff;
   border: 1px solid #e0e0e0;
@@ -457,8 +473,8 @@
 
 /* Per-row letter input: compact, monospace so the prefix reads like a product code */
 .category-item .category-letter-select {
-  flex: 0 0 auto;
-  width: 6.5ch;
+  width: 100%;
+  height: var(--category-control-height);
   padding: 0.3rem 0.4rem;
   font-family: "Courier New", Courier, monospace;
   font-weight: bold;
@@ -468,8 +484,8 @@
 
 /* Editable name: reads as plain text until hovered/focused so the list stays calm */
 .category-item .category-title-input {
-  flex: 1;
   min-width: 0;
+  height: var(--category-control-height);
   padding: 0.3rem 0.5rem;
   font-size: 0.95rem;
   letter-spacing: 0.3px;
@@ -586,27 +602,56 @@
   cursor: grabbing;
 }
 
-/* Subcategory rows: full-width block wrapped under each category row, indented to read as children */
+.category-item .btn-delete-category {
+  justify-self: center;
+  width: var(--category-control-height);
+  height: var(--category-control-height);
+}
+
+/* Subcategory rows: full-width block under each category row, on the same columns as the row above */
 .subcategory-panel {
-  flex-basis: 100%;
+  grid-column: 1 / -1;
   display: flex;
   flex-direction: column;
-  gap: 0.4rem;
-  padding-left: 2rem;
+  gap: 0.5rem;
 }
 
 .subcategory-row {
-  display: flex;
+  display: grid;
+  grid-template-columns: var(--category-columns);
   align-items: center;
-  gap: 0.5rem;
+  column-gap: 0.8rem;
+}
+
+.subcategory-marker {
+  justify-self: center;
+  color: #bbb;
+  font-size: 1.1rem;
+  line-height: 1;
 }
 
 .subcategory-row .subcategory-title-input,
 .subcategory-row .subcategory-new-input {
-  flex: 1;
   min-width: 0;
-  padding: 0.25rem 0.5rem;
+  height: var(--category-control-height);
+  padding: 0.3rem 0.5rem;
   font-size: 0.9rem;
+}
+
+.subcategory-add-group {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  min-width: 0;
+}
+
+.subcategory-add-group .subcategory-new-input {
+  flex: 1;
+}
+
+.subcategory-move-group {
+  display: flex;
+  gap: 0.4rem;
 }
 
 .subcategory-row .subcategory-title-input {
@@ -626,14 +671,30 @@
   outline: none;
 }
 
+/* Optional subcategory prefix: same compact monospace look as the category letter input */
+.subcategory-row .subcategory-letter-input {
+  width: 100%;
+  height: var(--category-control-height);
+  padding: 0.3rem 0.4rem;
+  font-family: "Courier New", Courier, monospace;
+  font-weight: bold;
+  font-size: 0.9rem;
+  text-transform: uppercase;
+}
+
+.subcategory-row .subcategory-letter-input::placeholder {
+  font-weight: normal;
+  color: #bbb;
+}
+
 .btn-move-subcategory {
   background: transparent;
   color: #666;
   border: 1px solid #e0e0e0;
   border-radius: 4px;
-  width: 24px;
-  height: 24px;
-  font-size: 0.7rem;
+  width: 2rem;
+  height: var(--category-control-height);
+  font-size: 0.75rem;
   cursor: pointer;
   flex-shrink: 0;
 }
@@ -648,27 +709,61 @@
   cursor: default;
 }
 
-.btn-delete-subcategory {
-  width: 24px;
-  height: 24px;
-  font-size: 1.1rem;
+/* Add row is collapsed until its "+ Add subcategory" link opens it */
+.subcategory-add-row.hidden {
+  display: none;
 }
 
-.btn-add-subcategory {
+/* Quiet text link in the name column, in the same blue as the ADD button it reveals */
+.btn-toggle-subcategory-add {
+  justify-self: start;
   background: transparent;
-  color: #333;
-  border: 1px solid #999;
-  border-radius: 4px;
-  padding: 0.25rem 0.8rem;
+  border: none;
+  padding: 0.3rem 0.5rem;
+  color: #2563a8;
+  font-family: "Georgia", serif;
   font-size: 0.85rem;
+  letter-spacing: 0.3px;
   cursor: pointer;
   white-space: nowrap;
 }
 
-.btn-add-subcategory:hover {
-  background: #000;
-  border-color: #000;
+.btn-toggle-subcategory-add:hover {
+  color: #164388;
+  text-decoration: underline;
+}
+
+/* Same blue action accent as the Edit Product Categories button, lettered like ADD CATEGORY */
+.btn-add-subcategory {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  min-width: 4.5rem;
+  height: var(--category-control-height);
+  padding: 0 1rem;
+  background: linear-gradient(135deg, #3573b8 0%, #2563a8 100%);
   color: #fff;
+  border: 1px solid #2563a8;
+  border-radius: 4px;
+  font-family: "Georgia", serif;
+  font-size: 0.8rem;
+  font-weight: bold;
+  letter-spacing: 1px;
+  line-height: 1;
+  text-transform: uppercase;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background 0.2s, border-color 0.2s;
+}
+
+.btn-add-subcategory:hover {
+  background: linear-gradient(135deg, #1d5398 0%, #164388 100%);
+  border-color: #164388;
+}
+
+.btn-add-subcategory:active {
+  transform: translateY(1px);
 }
 
 .info-row.hidden {
