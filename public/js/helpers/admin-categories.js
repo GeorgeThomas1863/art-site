@@ -49,6 +49,7 @@ export const populateCategoryList = async (categoryArray) => {
 
   // Read before the redraw so an add row the admin opened stays open (a fresh modal has none open)
   const openAddKeys = findOpenSubcategoryAddKeys(categoryList);
+  const descriptionOpenStates = findDescriptionOpenStates(categoryList);
   categoryList.innerHTML = "";
 
   if (!categoryArray || !categoryArray.length) {
@@ -60,7 +61,8 @@ export const populateCategoryList = async (categoryArray) => {
   }
 
   for (let i = 0; i < categoryArray.length; i++) {
-    const categoryItem = buildCategoryItem(categoryArray[i], openAddKeys.has(categoryArray[i].key));
+    const category = categoryArray[i];
+    const categoryItem = buildCategoryItem(category, openAddKeys.has(category.key), shouldOpenDescription(category, descriptionOpenStates));
     if (!categoryItem) continue;
     categoryList.append(categoryItem);
   }
@@ -78,7 +80,24 @@ const findOpenSubcategoryAddKeys = (categoryList) => {
   return openKeys;
 };
 
-const buildCategoryItem = (category, isAddOpen) => {
+// Map of category key -> whether its description box is open, for rows already on screen
+const findDescriptionOpenStates = (categoryList) => {
+  const openStates = new Map();
+  const rows = categoryList.querySelectorAll(".category-description-row");
+  for (let i = 0; i < rows.length; i++) {
+    openStates.set(rows[i].getAttribute("data-category-key"), !rows[i].classList.contains("hidden"));
+  }
+
+  return openStates;
+};
+
+// A row already on screen keeps the admin's open/hidden choice; a new row starts open only if it has a description
+const shouldOpenDescription = (category, openStates) => {
+  if (openStates.has(category.key)) return openStates.get(category.key);
+  return Boolean(category.description);
+};
+
+const buildCategoryItem = (category, isAddOpen, isDescriptionOpen) => {
   if (!category) return null;
   const count = category.productCount || 0;
 
@@ -126,21 +145,96 @@ const buildCategoryItem = (category, isAddOpen) => {
   deleteButton.setAttribute("data-title", category.title);
   deleteButton.setAttribute("data-count", count);
 
-  const subcategoryPanel = buildSubcategoryPanel(category, isAddOpen);
+  const subcategoryPanel = buildSubcategoryPanel(category, isAddOpen, isDescriptionOpen);
 
   categoryItem.append(dragHandle, titleInput, letterInput, countSpan, deleteButton, subcategoryPanel);
   return categoryItem;
 };
 
-const buildSubcategoryPanel = (category, isAddOpen) => {
+// "+ Add description" link plus the description box it shows/hides (collapsed by default)
+const buildDescriptionPanel = (category, isOpen) => {
+  const panel = document.createElement("div");
+  panel.className = "category-description-panel";
+
+  const toggleRow = document.createElement("div");
+  toggleRow.className = "subcategory-row subcategory-toggle-row";
+
+  const toggleButton = document.createElement("button");
+  toggleButton.className = "btn-toggle-subcategory-add btn-toggle-description";
+  toggleButton.type = "button";
+  toggleButton.id = `toggle-description-${category.key}`;
+  toggleButton.setAttribute("data-label", "toggle-category-description");
+  toggleButton.setAttribute("data-category-key", category.key);
+  toggleButton.setAttribute("data-has-description", Boolean(category.description));
+  setDescriptionToggleState(toggleButton, isOpen);
+
+  toggleRow.append(document.createElement("span"), toggleButton);
+
+  const editRow = document.createElement("div");
+  editRow.className = isOpen ? "category-description-row" : "category-description-row hidden";
+  editRow.id = `category-description-row-${category.key}`;
+  editRow.setAttribute("data-category-key", category.key);
+  editRow.append(document.createElement("span"), buildCategoryDescriptionInput(category), buildDeleteDescriptionButton(category));
+
+  panel.append(toggleRow, editRow);
+  return panel;
+};
+
+const setDescriptionToggleState = (toggleButton, isOpen) => {
+  const hasDescription = toggleButton.getAttribute("data-has-description") === "true";
+  const closedLabel = hasDescription ? "Edit description" : "+ Add description";
+  toggleButton.textContent = isOpen ? "− Hide description" : closedLabel;
+  toggleButton.setAttribute("aria-expanded", isOpen ? "true" : "false");
+};
+
+// Same red × as the subcategory remove button; only shown once a description is saved
+const buildDeleteDescriptionButton = (category) => {
+  const deleteButton = document.createElement("button");
+  deleteButton.className = category.description ? "btn-delete-category btn-delete-description" : "btn-delete-category btn-delete-description hidden";
+  deleteButton.type = "button";
+  deleteButton.id = `delete-description-${category.key}`;
+  deleteButton.textContent = "×";
+  deleteButton.title = "Delete description";
+  deleteButton.setAttribute("data-label", "remove-category-description");
+  deleteButton.setAttribute("data-key", category.key);
+  deleteButton.setAttribute("data-title", category.title);
+
+  return deleteButton;
+};
+
+// Text shown under the category heading on the products page; saves when the box loses focus
+const buildCategoryDescriptionInput = (category) => {
+  const descriptionInput = document.createElement("textarea");
+  descriptionInput.className = "form-input category-description-input";
+  descriptionInput.id = `category-description-${category.key}`;
+  descriptionInput.rows = 3;
+  descriptionInput.maxLength = 3000;
+  descriptionInput.value = category.description || "";
+  descriptionInput.placeholder = "Description shown on the products page (optional)";
+  descriptionInput.title = "Category description - click away to save";
+  descriptionInput.setAttribute("aria-label", `${category.title} description`);
+  descriptionInput.setAttribute("data-label", "category-description-input");
+  descriptionInput.setAttribute("data-key", category.key);
+  descriptionInput.setAttribute("data-description", category.description || "");
+
+  return descriptionInput;
+};
+
+// With a saved description: description, subcategory rows, add-subcategory link.
+// Without one: subcategory rows, "+ Add description" link, add-subcategory link.
+const buildSubcategoryPanel = (category, isAddOpen, isDescriptionOpen) => {
   const panel = document.createElement("div");
   panel.className = "subcategory-panel";
+
+  const descriptionPanel = buildDescriptionPanel(category, isDescriptionOpen);
+  if (category.description) panel.append(descriptionPanel);
 
   const subcategories = category.subcategories || [];
   for (let i = 0; i < subcategories.length; i++) {
     panel.append(buildSubcategoryRow(category, subcategories[i], i, subcategories.length));
   }
 
+  if (!category.description) panel.append(descriptionPanel);
   panel.append(buildSubcategoryToggleRow(category, isAddOpen), buildAddSubcategoryRow(category, isAddOpen));
   return panel;
 };
@@ -510,6 +604,103 @@ export const runRenameCategory = async (inputElement) => {
   await loadCategories();
 
   return data;
+};
+
+export const runSaveCategoryDescription = async (inputElement) => {
+  if (!inputElement) return null;
+
+  const key = inputElement.getAttribute("data-key");
+  const oldDescription = inputElement.getAttribute("data-description") || "";
+  const newDescription = inputElement.value.trim();
+  if (!key) return null;
+  if (newDescription === oldDescription) return null;
+
+  const data = await sendToBack({ route: "/update-category-description-route", key, description: newDescription });
+  if (!data || !data.success) {
+    await displayPopup(data?.message || "Failed to save description", "error");
+    inputElement.value = oldDescription;
+    return null;
+  }
+
+  inputElement.value = newDescription;
+  inputElement.setAttribute("data-description", newDescription);
+  updateDescriptionToggleLabel(key, newDescription);
+  await displayPopup(data.message || "Description saved", "success");
+
+  return data;
+};
+
+export const runDeleteCategoryDescription = async (button) => {
+  if (!button) return null;
+
+  const key = button.getAttribute("data-key");
+  const title = button.getAttribute("data-title");
+  if (!key) return null;
+
+  const confirmDialog = await displayConfirmDialog(`Delete the description for "${title}"?`);
+  if (!confirmDialog) return null;
+
+  const data = await sendToBack({ route: "/update-category-description-route", key, description: "" });
+  if (!data || !data.success) {
+    await displayPopup(data?.message || "Failed to delete description", "error");
+    return null;
+  }
+
+  const inputElement = document.getElementById(`category-description-${key}`);
+  if (inputElement) {
+    inputElement.value = "";
+    inputElement.setAttribute("data-description", "");
+  }
+  updateDescriptionToggleLabel(key, "");
+  await displayPopup(`Description deleted for "${title}"`, "success");
+
+  return data;
+};
+
+// After a save, the closed link reads "Edit description" or "+ Add description" to match,
+// and the delete button shows only while there is a saved description
+const updateDescriptionToggleLabel = (key, description) => {
+  document.getElementById(`delete-description-${key}`)?.classList.toggle("hidden", !description);
+
+  const toggleButton = document.getElementById(`toggle-description-${key}`);
+  if (!toggleButton) return null;
+
+  const isOpen = toggleButton.getAttribute("aria-expanded") === "true";
+  toggleButton.setAttribute("data-has-description", Boolean(description));
+  setDescriptionToggleState(toggleButton, isOpen);
+
+  return true;
+};
+
+// Opens or closes one category's description box; opening puts the cursor in it
+export const toggleDescriptionRow = (toggleButton) => {
+  if (!toggleButton) return null;
+
+  const categoryKey = toggleButton.getAttribute("data-category-key");
+  const editRow = document.getElementById(`category-description-row-${categoryKey}`);
+  if (!editRow) return null;
+
+  const isOpen = editRow.classList.toggle("hidden") === false;
+  setDescriptionToggleState(toggleButton, isOpen);
+  if (isOpen) document.getElementById(`category-description-${categoryKey}`)?.focus();
+
+  return isOpen;
+};
+
+// Escape inside the description box closes it and returns focus to its toggle link (the blur saves it)
+export const closeDescriptionRow = (inputElement) => {
+  if (!inputElement) return null;
+
+  const categoryKey = inputElement.getAttribute("data-key");
+  const editRow = document.getElementById(`category-description-row-${categoryKey}`);
+  const toggleButton = document.getElementById(`toggle-description-${categoryKey}`);
+  if (!editRow || !toggleButton) return null;
+
+  editRow.classList.add("hidden");
+  setDescriptionToggleState(toggleButton, false);
+  toggleButton.focus();
+
+  return true;
 };
 
 // The letter change itself always saves; the popup only decides whether the

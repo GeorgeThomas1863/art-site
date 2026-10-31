@@ -507,6 +507,45 @@
   outline: none;
 }
 
+/* Description link + box: sits between the subcategory rows and the add-subcategory link, on the same columns */
+.category-description-panel {
+  grid-column: 1 / -1;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.category-description-row {
+  display: grid;
+  grid-template-columns: var(--category-columns);
+  column-gap: 0.8rem;
+}
+
+.category-description-row.hidden,
+.category-item .btn-delete-description.hidden {
+  display: none;
+}
+
+/* Delete column, level with the top of the description box */
+.category-description-row .btn-delete-description {
+  grid-column: -2 / -1;
+  align-self: start;
+}
+
+/* Starts under the name input and stops before the delete column */
+.category-item .category-description-input {
+  grid-column: 2 / -2;
+  width: 100%;
+  min-height: 4.5rem;
+  padding: 0.4rem 0.5rem;
+  font-family: inherit;
+  font-size: 0.9rem;
+  line-height: 1.4;
+  color: #333;
+  resize: vertical;
+  box-sizing: border-box;
+}
+
 .category-item .category-count {
   font-size: 0.85rem;
   color: #999;

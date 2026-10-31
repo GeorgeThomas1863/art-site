@@ -46,69 +46,13 @@ export const MAIN_PIC_NEXT_SVG = `<svg viewBox="0 0 24 24" fill="none" stroke="c
 
 //--------------------
 
+// Only "all" is hardcoded; each real category's description is set in admin Edit Categories
 export const categoryDescriptions = {
   all: {
     title: "Our Products",
     details: `Handmade with love from wool and other natural materials, each product has a unique story and a special place in our hearts.    
 
 Click on the categories to learn more.`,
-  },
-
-  acorns: {
-    title: "Acorns",
-    details: `The Acorn, from ancient times the acorn has represented strength, resilience, and endurance.
-
-A symbol of new beginnings, growth and hope.
-
-It is a talisman of good luck and renewal of life.
-
-An acorn is a special gift of endless potential, prosperity, and a token of good fortune.
-`,
-  },
-
-  animals: {
-    title: "Funky Fun Animals!",
-    details: `These whimsical creatures are designed to bring joy to all who see them.
-
-The animals are created with natural fleece, wool roving, wool locks and twists along with other embelishments.
-`,
-  },
-  geodes: {
-    title: "Geodes - Stones with a secret!!!",
-    details: `Revered by many as a connection with the earth's energy. Representing strength, hidden potential, and positive energy flow.
-
-We create our geodes with both wet felting and dry needle felting. Our geodes emerge from multiple layers created by these two methods. Once the exterior is complete the interior beauty emerges by using crystals carefully placed and enhanced with complimentary gemstones, vintage beads and more.
-`,
-  },
-  wallPieces: {
-    title: "Matted original art",
-    details: `For those who like to use their frames we have available 5 by 7 inch needle felted scenes. These are matted to 8 by 10 inches.
-
-These one of a kind scenes are created using wool, sari silk, throwsters waste, and other assorted fibers.
-
-We select antique and vintage frames to complete each piece making them truly on of a kind. Many of our antique frames have history, nicks, paint loss, etc adding integrity and interest to the work.
-
-We are unable to ship some of these pieces due to size, fragility of aged glass, and delicate design. That will be noted in each item's description.
-`,
-  },
-  mountainTreasureBaskets: {
-    title: "Mountain Treasures Baskets",
-    details: `Created in the South Toe Valley of the Black Mountains of North Carolina using wool and natural fibers, these baskets are a beautiful way to display your treasures.
-
-I select colors representing what I have found on the forest floor, along the rivers, and in the meadows.
-
-Rich greens from the Rhododendrons, pine trees and moss. Sprinkle in wildflowers of yellow, blue, and pink. Browns from the earth, tree bark and mushrooms. Shades of gray from the rocks. Sparkles of the rainbow from the Mica and gemstones.
-
-In each basket you will find the treasure of written words, strung together invoking a message of beauty and inspiration.
-`,
-  },
-  gnomeHouses: {
-    title: "Gnome Houses",
-    details: "",
-  },
-  other: {
-    title: "Other",
-    details: `If you don't see what you are looking for, please contact us and we will see if we can create something special for you.`,
   },
 };
 

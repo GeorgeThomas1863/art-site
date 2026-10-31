@@ -33,6 +33,7 @@ import {
   getCategoriesControl,
   addCategoryControl,
   updateCategoryTitleControl,
+  updateCategoryDescriptionControl,
   updateCategoryLetterControl,
   updateCategoryOrderControl,
   deleteCategoryControl,
@@ -99,6 +100,8 @@ router.post("/delete-product-route", requireAuth, deleteProductControl);
 router.post("/add-category-route", requireAuth, addCategoryControl);
 
 router.post("/update-category-title-route", requireAuth, updateCategoryTitleControl);
+
+router.post("/update-category-description-route", requireAuth, updateCategoryDescriptionControl);
 
 router.post("/update-category-letter-route", requireAuth, updateCategoryLetterControl);
 

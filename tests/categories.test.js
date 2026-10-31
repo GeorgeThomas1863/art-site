@@ -11,6 +11,7 @@ import {
   buildCategoryList,
   addCategory,
   updateCategoryTitle,
+  updateCategoryDescription,
   updateCategoryLetter,
   deleteCategory,
   findCategory,
@@ -105,6 +106,55 @@ describe("getCategories", () => {
     expect(result).toHaveLength(1);
     expect(result[0].key).toBe("acorns");
   });
+
+  it("seeds the former hardcoded descriptions with the defaults", async () => {
+    const result = await getCategories();
+
+    let acorns = null;
+    for (const category of result) {
+      if (category.key === "acorns") acorns = category;
+    }
+    expect(acorns.description).toMatch(/^The Acorn, from ancient times/);
+  });
+
+  it("backfills and stores a default description on an existing doc that never had one", async () => {
+    seedCollection(CATEGORIES, [{ key: "geodes", title: "Geodes", letter: "G" }]);
+
+    const result = await getCategories();
+
+    expect(result[0].description).toMatch(/^Revered by many/);
+    expect(readCollection(CATEGORIES)[0].description).toMatch(/^Revered by many/);
+  });
+
+  it("keeps an admin-cleared or admin-written description and skips keys with no default", async () => {
+    seedCollection(CATEGORIES, [
+      { key: "acorns", title: "Acorns", letter: "A", description: "" },
+      { key: "geodes", title: "Geodes", letter: "G", description: "My own text" },
+      { key: "gnomeHouses", title: "Gnome Houses", letter: "H" },
+      { key: "hats", title: "Hats", letter: "T" },
+    ]);
+
+    await getCategories();
+
+    const saved = readCollection(CATEGORIES);
+    expect(saved[0].description).toBe("");
+    expect(saved[1].description).toBe("My own text");
+    expect(saved[2].description).toBeUndefined();
+    expect(saved[3].description).toBeUndefined();
+  });
+
+  it("still returns the categories when a backfill write throws", async () => {
+    seedCollection(CATEGORIES, [{ key: "acorns", title: "Acorns", letter: "A" }]);
+    const updateSpy = vi.spyOn(FakeDbModel.prototype, "updateObjItem").mockRejectedValue(new Error("write failed"));
+    const errorSpy = vi.spyOn(console, "error").mockImplementation(() => {});
+
+    const result = await getCategories();
+    updateSpy.mockRestore();
+    errorSpy.mockRestore();
+
+    expect(result).toHaveLength(1);
+    expect(result[0].description).toBeUndefined();
+  });
 });
 
 //---------- buildCategoryList ----------
@@ -112,8 +162,8 @@ describe("getCategories", () => {
 describe("buildCategoryList", () => {
   it("counts products per category by productType and includes the letter", async () => {
     seedCollection(CATEGORIES, [
-      { key: "acorns", title: "Acorns", letter: "A" },
-      { key: "geodes", title: "Geodes", letter: "G" },
+      { key: "acorns", title: "Acorns", letter: "A", description: "" },
+      { key: "geodes", title: "Geodes", letter: "G", description: "" },
     ]);
     seedCollection(PRODUCTS, [
       buildProductDoc({ productId: "prod-1", productType: "acorns" }),
@@ -124,15 +174,15 @@ describe("buildCategoryList", () => {
     const list = await buildCategoryList();
 
     expect(list).toEqual([
-      { key: "acorns", title: "Acorns", letter: "A", productCount: 2, subcategories: [] },
-      { key: "geodes", title: "Geodes", letter: "G", productCount: 1, subcategories: [] },
+      { key: "acorns", title: "Acorns", letter: "A", description: "", productCount: 2, subcategories: [] },
+      { key: "geodes", title: "Geodes", letter: "G", description: "", productCount: 1, subcategories: [] },
     ]);
   });
 
   it("reports zero products for a category nothing uses", async () => {
-    seedCollection(CATEGORIES, [{ key: "other", title: "Other", letter: "O" }]);
+    seedCollection(CATEGORIES, [{ key: "other", title: "Other", letter: "O", description: "" }]);
     const list = await buildCategoryList();
-    expect(list).toEqual([{ key: "other", title: "Other", letter: "O", productCount: 0, subcategories: [] }]);
+    expect(list).toEqual([{ key: "other", title: "Other", letter: "O", description: "", productCount: 0, subcategories: [] }]);
   });
 });
 
@@ -402,6 +452,68 @@ describe("updateCategoryTitle", () => {
     expect((await updateCategoryTitle({ key: "acorns", title: "   " })).success).toBe(false);
     expect((await updateCategoryTitle({ key: "acorns", title: "x".repeat(61) })).success).toBe(false);
     expect(readCollection(CATEGORIES)[0].title).toBe("Acorns");
+  });
+});
+
+//---------- buildCategoryList description ----------
+
+describe("buildCategoryList description", () => {
+  it("includes the saved description", async () => {
+    seedCollection(CATEGORIES, [{ key: "acorns", title: "Acorns", letter: "A", description: "Strength and growth" }]);
+    const list = await buildCategoryList();
+    expect(list[0].description).toBe("Strength and growth");
+  });
+});
+
+//---------- updateCategoryDescription ----------
+
+describe("updateCategoryDescription", () => {
+  it("saves a trimmed description and keeps its line breaks", async () => {
+    seedCollection(CATEGORIES, [{ key: "acorns", title: "Acorns", letter: "A" }]);
+
+    const result = await updateCategoryDescription({ key: "acorns", description: "  Line one\n\nLine two  " });
+
+    expect(result).toEqual({ success: true, message: 'Description saved for "Acorns"', description: "Line one\n\nLine two" });
+    const saved = readCollection(CATEGORIES)[0];
+    expect(saved.description).toBe("Line one\n\nLine two");
+    expect(saved.title).toBe("Acorns");
+  });
+
+  it("clears the description when given empty text", async () => {
+    seedCollection(CATEGORIES, [{ key: "acorns", title: "Acorns", letter: "A", description: "Old text" }]);
+    const result = await updateCategoryDescription({ key: "acorns", description: "   " });
+    expect(result.success).toBe(true);
+    expect(readCollection(CATEGORIES)[0].description).toBe("");
+  });
+
+  it("reports unchanged when the same description is submitted", async () => {
+    seedCollection(CATEGORIES, [{ key: "acorns", title: "Acorns", letter: "A", description: "Same" }]);
+    const result = await updateCategoryDescription({ key: "acorns", description: "Same" });
+    expect(result).toEqual({ success: true, message: "Description unchanged", description: "Same" });
+  });
+
+  it("rejects an unknown category", async () => {
+    seedCollection(CATEGORIES, [{ key: "acorns", title: "Acorns", letter: "A" }]);
+    const result = await updateCategoryDescription({ key: "nope", description: "Anything" });
+    expect(result).toEqual({ success: false, message: "Category not found" });
+  });
+
+  it("fails instead of reporting saved when the category vanished after the lookup", async () => {
+    seedCollection(CATEGORIES, [{ key: "acorns", title: "Acorns", letter: "A", description: "Old" }]);
+    const updateSpy = vi.spyOn(FakeDbModel.prototype, "updateObjItem").mockResolvedValue({ acknowledged: true, matchedCount: 0, modifiedCount: 0 });
+
+    const result = await updateCategoryDescription({ key: "acorns", description: "New" });
+    updateSpy.mockRestore();
+
+    expect(result).toEqual({ success: false, message: "Failed to update category description" });
+  });
+
+  it("rejects a missing key, non-text input, or a description over 3000 characters", async () => {
+    seedCollection(CATEGORIES, [{ key: "acorns", title: "Acorns", letter: "A", description: "Keep" }]);
+    expect((await updateCategoryDescription({ description: "X" })).success).toBe(false);
+    expect((await updateCategoryDescription({ key: "acorns", description: { $set: "x" } })).success).toBe(false);
+    expect((await updateCategoryDescription({ key: "acorns", description: "x".repeat(3001) })).success).toBe(false);
+    expect(readCollection(CATEGORIES)[0].description).toBe("Keep");
   });
 });
 

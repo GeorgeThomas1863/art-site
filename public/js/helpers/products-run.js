@@ -104,15 +104,15 @@ export const loadPublicCategories = async () => {
   return data;
 };
 
-// Look up a fetched category by key when categoryDescriptions has no hardcoded
-// entry for it, so a brand-new admin-created category still shows its title.
-const buildFallbackDescriptor = (category) => {
-  if (categoryDescriptions[category]) return null;
+// "all" is hardcoded in categoryDescriptions; every real category uses the
+// title and admin-entered description saved on its category doc.
+const buildDescriptionObj = (category) => {
+  if (categoryDescriptions[category]) return categoryDescriptions[category];
 
   const fetchedCategory = findFetchedCategory(category);
   if (!fetchedCategory) return null;
 
-  return { title: fetchedCategory.title, details: "" };
+  return { title: fetchedCategory.title, details: fetchedCategory.description || "" };
 };
 
 const findFetchedCategory = (category) => {
@@ -186,10 +186,7 @@ export const updateCategoryDescription = async (category) => {
   const existingDescription = document.querySelector(".category-description-container");
   if (existingDescription) existingDescription.remove();
 
-  // Build new description for this category, falling back to the fetched
-  // category's title when categoryDescriptions has no entry for it
-  const fallbackDescriptor = buildFallbackDescriptor(category);
-  const newDescription = await buildCategoryDescription(category, fallbackDescriptor);
+  const newDescription = await buildCategoryDescription(buildDescriptionObj(category));
   if (!newDescription) return null;
 
   const filterBar = document.querySelector(".products-filter-bar");

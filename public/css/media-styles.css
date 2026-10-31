@@ -589,9 +589,26 @@
     grid-area: delete;
   }
 
-  .subcategory-panel {
+  .subcategory-panel,
+  .category-description-panel {
     grid-area: auto;
     grid-column: 1 / -1;
+  }
+
+  .category-description-row {
+    grid-template-columns: 1.2rem 3.5rem minmax(0, 1fr) 2.25rem;
+    column-gap: 0.5rem;
+  }
+
+  /* This row has no named areas, so undo the mobile "delete" area and use the last column */
+  .category-description-row .btn-delete-description {
+    grid-area: auto;
+    grid-column: -2 / -1;
+  }
+
+  /* Narrow box wraps a lot, so give it more height to avoid scrolling a short paragraph */
+  .category-item .category-description-input {
+    min-height: 8rem;
   }
 
   .modal-wrapper {

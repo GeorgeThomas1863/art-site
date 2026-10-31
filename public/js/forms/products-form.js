@@ -1,6 +1,6 @@
 import { formatProductType, formatPrice, loadPublicCategories } from "../helpers/products-run.js";
 import { buildCollapseContainer } from "../util/collapse.js";
-import { categoryDescriptions, CAROUSEL_PREV_SVG, CAROUSEL_NEXT_SVG, isPickupOnly } from "../util/define-things.js";
+import { CAROUSEL_PREV_SVG, CAROUSEL_NEXT_SVG, isPickupOnly } from "../util/define-things.js";
 
 // Build the entire products page
 export const buildProductsForm = async () => {
@@ -120,20 +120,17 @@ const buildSubcategoryFilterButton = (categoryKey, subcategoryKey, text) => {
 
 //---------------------
 
-export const buildCategoryDescription = async (category, fallbackDescriptor = null) => {
-  const knownDescription = categoryDescriptions[category];
-  const descriptionObj = knownDescription || fallbackDescriptor;
+// descriptionObj is { title, details }. Admin-entered text, so it goes in as plain
+// text; the CSS keeps its line breaks.
+export const buildCategoryDescription = async (descriptionObj) => {
   if (!descriptionObj || !descriptionObj.title) return null;
-  // A hardcoded entry still needs its details filled in to render (unchanged
-  // behavior); a fallback descriptor is allowed to render with title only.
-  if (knownDescription && !knownDescription.details) return null;
 
   const titleElement = document.createElement("h2");
-  titleElement.innerHTML = `${descriptionObj.title}`;
+  titleElement.textContent = descriptionObj.title;
   titleElement.className = "category-description-title";
 
   const contentElement = document.createElement("div");
-  contentElement.innerHTML = descriptionObj.details || "";
+  contentElement.textContent = descriptionObj.details || "";
   contentElement.className = "category-description-text";
 
   // Build collapse container

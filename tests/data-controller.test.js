@@ -20,6 +20,7 @@ import {
   getCategoriesControl,
   addCategoryControl,
   updateCategoryTitleControl,
+  updateCategoryDescriptionControl,
   updateCategoryLetterControl,
   deleteCategoryControl,
   nextProductCodeControl,
@@ -232,14 +233,14 @@ describe("addNewProductControl", () => {
 
 describe("getCategoriesControl", () => {
   it("returns the category list with product counts", async () => {
-    seedCollection(CATEGORIES, [{ key: "acorns", title: "Acorns", letter: "A", dateCreated: new Date().toISOString() }]);
+    seedCollection(CATEGORIES, [{ key: "acorns", title: "Acorns", letter: "A", description: "", dateCreated: new Date().toISOString() }]);
     seedCollection(PRODUCTS, [
       buildProductDoc({ productId: "p1", productType: "acorns" }),
       buildProductDoc({ productId: "p2", productType: "acorns" }),
     ]);
     const res = buildRes();
     await getCategoriesControl(buildReq(), res);
-    expect(res.json).toHaveBeenCalledWith([{ key: "acorns", title: "Acorns", letter: "A", productCount: 2, subcategories: [] }]);
+    expect(res.json).toHaveBeenCalledWith([{ key: "acorns", title: "Acorns", letter: "A", description: "", productCount: 2, subcategories: [] }]);
   });
 
   it("returns an empty array instead of null when categories fail to load", async () => {
@@ -253,6 +254,22 @@ describe("getCategoriesControl", () => {
     getAllSpy.mockRestore();
 
     expect(res.json).toHaveBeenCalledWith([]);
+  });
+});
+
+describe("updateCategoryDescriptionControl", () => {
+  it("saves the description from the request body", async () => {
+    seedCollection(CATEGORIES, [{ key: "acorns", title: "Acorns", letter: "A" }]);
+    const res = buildRes();
+    await updateCategoryDescriptionControl(buildReq({ body: { key: "acorns", description: "Hello" } }), res);
+    expect(res.json).toHaveBeenCalledWith(expect.objectContaining({ success: true, description: "Hello" }));
+    expect(readCollection(CATEGORIES)[0].description).toBe("Hello");
+  });
+
+  it("responds 500 when no input parameters are provided", async () => {
+    const res = buildRes();
+    await updateCategoryDescriptionControl({}, res);
+    expect(res.status).toHaveBeenCalledWith(500);
   });
 });
 

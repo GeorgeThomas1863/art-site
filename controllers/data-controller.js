@@ -1,6 +1,6 @@
 import { storeProduct, updateProduct, deleteProduct, getProductData, hideOrderedProducts } from "../src/products.js";
 import { storeEvent, updateEvent, deleteEvent, getEventData } from "../src/events.js";
-import { buildCategoryList, addCategory, updateCategoryTitle, updateCategoryLetter, updateCategoryOrder, deleteCategory, addSubcategory, updateSubcategoryTitle, updateSubcategoryLetter, moveSubcategory, deleteSubcategory, buildNextProductCode, findProductCodeOwner } from "../src/categories.js"; //prettier-ignore
+import { buildCategoryList, addCategory, updateCategoryTitle, updateCategoryDescription, updateCategoryLetter, updateCategoryOrder, deleteCategory, addSubcategory, updateSubcategoryTitle, updateSubcategoryLetter, moveSubcategory, deleteSubcategory, buildNextProductCode, findProductCodeOwner } from "../src/categories.js"; //prettier-ignore
 import { submitContact } from "../src/contact.js";
 import {
   storeSubscriber,
@@ -220,6 +220,14 @@ export const updateCategoryTitleControl = async (req, res) => {
   if (!inputParams) return res.status(500).json({ error: "No input parameters" });
 
   const data = await updateCategoryTitle({ key: inputParams.key, title: inputParams.title });
+  return res.json(data);
+};
+
+export const updateCategoryDescriptionControl = async (req, res) => {
+  const inputParams = req.body;
+  if (!inputParams) return res.status(500).json({ error: "No input parameters" });
+
+  const data = await updateCategoryDescription({ key: inputParams.key, description: inputParams.description });
   return res.json(data);
 };
 

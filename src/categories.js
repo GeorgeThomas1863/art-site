@@ -5,14 +5,68 @@ const CATEGORIES_COLLECTION = () => process.env.CATEGORIES_COLLECTION || "catego
 // A category is any title the admin chose plus a 1-3 letter admin-chosen prefix that prefixes
 // auto-assigned product codes. Letters are NOT unique across categories — two categories may share
 // one (and therefore share a running number sequence). `key` is the camelCase productType.
+// The descriptions are the texts the products page used to hardcode; getCategories() copies them
+// onto existing docs that have never had a description saved.
 export const DEFAULT_CATEGORIES = [
-  { key: "acorns", title: "Acorns", letter: "A" },
-  { key: "animals", title: "Animals", letter: "F" }, // "Funky Fun Animals"
-  { key: "geodes", title: "Geodes", letter: "G" },
-  { key: "wallPieces", title: "Wall Pieces", letter: "W" },
-  { key: "mountainTreasureBaskets", title: "Mountain Treasure Baskets", letter: "M" },
+  {
+    key: "acorns",
+    title: "Acorns",
+    letter: "A",
+    description: `The Acorn, from ancient times the acorn has represented strength, resilience, and endurance.
+
+A symbol of new beginnings, growth and hope.
+
+It is a talisman of good luck and renewal of life.
+
+An acorn is a special gift of endless potential, prosperity, and a token of good fortune.`,
+  },
+  {
+    key: "animals",
+    title: "Animals", // "Funky Fun Animals"
+    letter: "F",
+    description: `These whimsical creatures are designed to bring joy to all who see them.
+
+The animals are created with natural fleece, wool roving, wool locks and twists along with other embelishments.`,
+  },
+  {
+    key: "geodes",
+    title: "Geodes",
+    letter: "G",
+    description: `Revered by many as a connection with the earth's energy. Representing strength, hidden potential, and positive energy flow.
+
+We create our geodes with both wet felting and dry needle felting. Our geodes emerge from multiple layers created by these two methods. Once the exterior is complete the interior beauty emerges by using crystals carefully placed and enhanced with complimentary gemstones, vintage beads and more.`,
+  },
+  {
+    key: "wallPieces",
+    title: "Wall Pieces",
+    letter: "W",
+    description: `For those who like to use their frames we have available 5 by 7 inch needle felted scenes. These are matted to 8 by 10 inches.
+
+These one of a kind scenes are created using wool, sari silk, throwsters waste, and other assorted fibers.
+
+We select antique and vintage frames to complete each piece making them truly on of a kind. Many of our antique frames have history, nicks, paint loss, etc adding integrity and interest to the work.
+
+We are unable to ship some of these pieces due to size, fragility of aged glass, and delicate design. That will be noted in each item's description.`,
+  },
+  {
+    key: "mountainTreasureBaskets",
+    title: "Mountain Treasure Baskets",
+    letter: "M",
+    description: `Created in the South Toe Valley of the Black Mountains of North Carolina using wool and natural fibers, these baskets are a beautiful way to display your treasures.
+
+I select colors representing what I have found on the forest floor, along the rivers, and in the meadows.
+
+Rich greens from the Rhododendrons, pine trees and moss. Sprinkle in wildflowers of yellow, blue, and pink. Browns from the earth, tree bark and mushrooms. Shades of gray from the rocks. Sparkles of the rainbow from the Mica and gemstones.
+
+In each basket you will find the treasure of written words, strung together invoking a message of beauty and inspiration.`,
+  },
   { key: "gnomeHouses", title: "Gnome Houses", letter: "H" },
-  { key: "other", title: "Other", letter: "O" },
+  {
+    key: "other",
+    title: "Other",
+    letter: "O",
+    description: `If you don't see what you are looking for, please contact us and we will see if we can create something special for you.`,
+  },
 ];
 
 //---------- key + letter building ----------
@@ -48,6 +102,8 @@ export const normalizeLetter = (letter) => {
   return upperLetter;
 };
 
+const MAX_DESCRIPTION_LENGTH = 3000;
+
 const findTitleError = (trimmedTitle) => {
   if (!trimmedTitle) return "Title is required";
   if (trimmedTitle.length > 60) return "Title must be 60 characters or fewer";
@@ -68,7 +124,10 @@ export const getCategories = async () => {
     const dataModel = new dbModel("", CATEGORIES_COLLECTION());
     const existing = await dataModel.getAll();
     if (!existing) return null;
-    if (existing.length > 0) return sortCategoriesByOrder(existing);
+    if (existing.length > 0) {
+      await backfillDefaultDescriptions(existing);
+      return sortCategoriesByOrder(existing);
+    }
 
     for (let i = 0; i < DEFAULT_CATEGORIES.length; i++) {
       const seedParams = { ...DEFAULT_CATEGORIES[i], sortOrder: i, dateCreated: new Date().toISOString() };
@@ -83,6 +142,44 @@ export const getCategories = async () => {
     console.error("getCategories error:", error);
     return null;
   }
+};
+
+// Only a missing field is backfilled — an admin-cleared description is stored as "" and stays empty.
+// A failed write is logged and skipped so it never blocks reading the categories.
+const backfillDefaultDescriptions = async (categories) => {
+  for (let i = 0; i < categories.length; i++) {
+    if (categories[i].description !== undefined) continue;
+
+    const defaultDescription = findDefaultDescription(categories[i].key);
+    if (!defaultDescription) continue;
+
+    const storeData = await storeDefaultDescription(categories[i].key, defaultDescription);
+    if (!storeData.success) continue;
+
+    categories[i].description = defaultDescription;
+  }
+};
+
+const storeDefaultDescription = async (key, description) => {
+  try {
+    const backfillParams = { keyToLookup: "key", itemValue: key, updateObj: { description } };
+    const backfillModel = new dbModel(backfillParams, CATEGORIES_COLLECTION());
+    const backfillData = await backfillModel.updateObjItem();
+    if (!backfillData?.matchedCount) return { success: false, message: `No category matched key ${key}` };
+
+    return { success: true, message: `Default description stored for ${key}` };
+  } catch (error) {
+    console.error("storeDefaultDescription error for key", key, error);
+    return { success: false, message: "Failed to store default description" };
+  }
+};
+
+const findDefaultDescription = (key) => {
+  for (let i = 0; i < DEFAULT_CATEGORIES.length; i++) {
+    if (DEFAULT_CATEGORIES[i].key === key) return DEFAULT_CATEGORIES[i].description || null;
+  }
+
+  return null;
 };
 
 export const buildCategoryList = async () => {
@@ -114,7 +211,8 @@ export const buildCategoryList = async () => {
         const subcategoryCount = countsBySubType[category.key + "/" + savedSubcategories[j].key] || 0;
         subcategories.push({ ...savedSubcategories[j], productCount: subcategoryCount });
       }
-      list.push({ key: category.key, title: category.title, letter: category.letter, productCount, subcategories });
+      const description = category.description || "";
+      list.push({ key: category.key, title: category.title, letter: category.letter, description, productCount, subcategories });
     }
 
     return list;
@@ -225,6 +323,40 @@ export const updateCategoryTitle = async (inputParams) => {
   } catch (error) {
     console.error("updateCategoryTitle error:", error);
     return { success: false, message: "Failed to update category title" };
+  }
+};
+
+// Sets the text shown under the category heading on the products page. An empty
+// description is allowed and clears it.
+export const updateCategoryDescription = async (inputParams) => {
+  try {
+    const { key, description } = inputParams || {};
+    if (!key) return { success: false, message: "No category key provided" };
+    if (typeof description !== "string") return { success: false, message: "Description must be text" };
+
+    const trimmedDescription = description.trim();
+    if (trimmedDescription.length > MAX_DESCRIPTION_LENGTH) {
+      return { success: false, message: `Description must be ${MAX_DESCRIPTION_LENGTH} characters or fewer` };
+    }
+
+    const lookupParams = { keyToLookup: "key", itemValue: key };
+    const checkModel = new dbModel(lookupParams, CATEGORIES_COLLECTION());
+    const category = await checkModel.getUniqueItem();
+    if (!category) return { success: false, message: "Category not found" };
+
+    if ((category.description || "") === trimmedDescription) {
+      return { success: true, message: "Description unchanged", description: trimmedDescription };
+    }
+
+    const updateParams = { ...lookupParams, updateObj: { description: trimmedDescription } };
+    const updateModel = new dbModel(updateParams, CATEGORIES_COLLECTION());
+    const updateData = await updateModel.updateObjItem();
+    if (!updateData?.matchedCount) return { success: false, message: "Failed to update category description" }; // deleted since the lookup — updateOne resolves truthy even on no match
+
+    return { success: true, message: `Description saved for "${category.title}"`, description: trimmedDescription };
+  } catch (error) {
+    console.error("updateCategoryDescription error:", error);
+    return { success: false, message: "Failed to update category description" };
   }
 };
 
