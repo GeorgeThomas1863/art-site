@@ -220,21 +220,17 @@ const buildCategoryDescriptionInput = (category) => {
   return descriptionInput;
 };
 
-// With a saved description: description, subcategory rows, add-subcategory link.
-// Without one: subcategory rows, "+ Add description" link, add-subcategory link.
+// Description (or "+ Add description" link) first, then subcategory rows, then add-subcategory link
 const buildSubcategoryPanel = (category, isAddOpen, isDescriptionOpen) => {
   const panel = document.createElement("div");
   panel.className = "subcategory-panel";
-
-  const descriptionPanel = buildDescriptionPanel(category, isDescriptionOpen);
-  if (category.description) panel.append(descriptionPanel);
+  panel.append(buildDescriptionPanel(category, isDescriptionOpen));
 
   const subcategories = category.subcategories || [];
   for (let i = 0; i < subcategories.length; i++) {
     panel.append(buildSubcategoryRow(category, subcategories[i], i, subcategories.length));
   }
 
-  if (!category.description) panel.append(descriptionPanel);
   panel.append(buildSubcategoryToggleRow(category, isAddOpen), buildAddSubcategoryRow(category, isAddOpen));
   return panel;
 };
